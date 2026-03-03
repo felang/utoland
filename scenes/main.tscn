@@ -3,14 +3,9 @@
 [ext_resource type="Script" path="res://scripts/main.gd" id="1_main"]
 [ext_resource type="PackedScene" uid="uid://c45jgyl4kxvbv" path="res://scenes/player.tscn" id="1_0wfyh"]
 [ext_resource type="Script" uid="uid://b0j68ldejylty" path="res://scripts/enemy_spawner.gd" id="2_0wfyh"]
-[ext_resource type="PackedScene" uid="uid://b5760tlktfkgu" path="res://scenes/towers/tower_wall.tscn" id="3_jyhfs"]
 [ext_resource type="PackedScene" uid="uid://cw1ribon6hcfu" path="res://scenes/ui/hud.tscn" id="4_tbgi4"]
 [ext_resource type="Script" uid="uid://spn074bn5fw7" path="res://scripts/wave_manager.gd" id="6_tefeu"]
-[ext_resource type="PackedScene" uid="uid://r200n4ikcpv2" path="res://scenes/towers/tower_shooter.tscn" id="7_choun"]
 [ext_resource type="PackedScene" uid="uid://5u5tndodgthf" path="res://scenes/map_boundary.tscn" id="7_o6xl0"]
-[ext_resource type="Script" uid="uid://ckwxfmslcyshb" path="res://scripts/tower_shooter.gd" id="8_ya4ey"]
-[ext_resource type="PackedScene" uid="uid://ucsglghc6mnm" path="res://scenes/towers/tower_slow.tscn" id="9_eb6dy"]
-[ext_resource type="Script" uid="uid://numv2t5y702l" path="res://scripts/tower_slow.gd" id="10_trceg"]
 
 [node name="Main" type="Node2D" unique_id=1198174103]
 script = ExtResource("1_main")
@@ -21,30 +16,9 @@ position = Vector2(400, 300)
 [node name="EnemySpawner" type="Node" parent="." unique_id=1258091345]
 script = ExtResource("2_0wfyh")
 
-[node name="TowerWall1" parent="." unique_id=655985224 instance=ExtResource("3_jyhfs")]
-position = Vector2(200, 0)
-
-[node name="TowerWall2" parent="." unique_id=1428915916 instance=ExtResource("3_jyhfs")]
-position = Vector2(-150, 150)
-
-[node name="TowerWall3" parent="." unique_id=959780861 instance=ExtResource("3_jyhfs")]
-position = Vector2(100, -200)
-
 [node name="HUD" parent="." unique_id=1731831904 instance=ExtResource("4_tbgi4")]
 
 [node name="WaveManager" type="Node" parent="." unique_id=1826046686]
 script = ExtResource("6_tefeu")
 
 [node name="MapBoundary" parent="." unique_id=1220843918 instance=ExtResource("7_o6xl0")]
-
-[node name="TowerShooter1" type="StaticBody2D" parent="." unique_id=1629987127 instance=ExtResource("7_choun")]
-position = Vector2(600, 300)
-collision_layer = 3
-collision_mask = 2
-script = ExtResource("8_ya4ey")
-
-[node name="TowerSlow1" type="StaticBody2D" parent="." unique_id=1886032181 instance=ExtResource("9_eb6dy")]
-position = Vector2(400, 300)
-collision_layer = 3
-collision_mask = 2
-script = ExtResource("10_trceg")
