@@ -39,7 +39,7 @@ func chase_player():
 				target_tower = collision.get_collider()
 				velocity = Vector2.ZERO
 
-func attack_tower(delta):
+func attack_tower(_delta):
 	if not is_instance_valid(target_tower):
 		current_state = State.CHASE_PLAYER
 		return
