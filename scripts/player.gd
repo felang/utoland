@@ -9,6 +9,7 @@ var shoot_timer: float = 0.0
 var bullet_scene = preload("res://scenes/bullet.tscn")
 
 func _ready():
+	add_to_group("player")
 	current_hp = max_hp
 
 func _process(delta):
