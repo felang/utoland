@@ -23,8 +23,8 @@ func _process(delta):
 
 func _physics_process(_delta):
 	var input_vector = Vector2.ZERO
-	input_vector.x = Input.get_axis("ui_left", "ui_right")
-	input_vector.y = Input.get_axis("ui_up", "ui_down")
+	input_vector.x = Input.get_axis("move_left", "move_right")
+	input_vector.y = Input.get_axis("move_up", "move_down")
 
 	if input_vector.length() > 0:
 		input_vector = input_vector.normalized()
