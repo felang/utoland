@@ -1,0 +1,53 @@
+[gd_scene format=3 uid="uid://dwjvqvl0x3dp1"]
+
+[ext_resource type="Script" path="res://scripts/result.gd" id="1_3dhtb"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_pa8dr"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_3dhtb"]
+
+[node name="Result" type="Control" unique_id=1718775285]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1_3dhtb")
+
+[node name="Background" type="ColorRect" parent="." unique_id=302831996]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0, 0, 0, 0.8)
+
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=798752750]
+layout_mode = 0
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -200.0
+offset_right = 200.0
+offset_bottom = 200.0
+
+[node name="TitleLabel" type="Label" parent="VBoxContainer" unique_id=1295650147]
+layout_mode = 2
+text = "胜利！"
+label_settings = SubResource("LabelSettings_pa8dr")
+horizontal_alignment = 1
+
+[node name="WaveLabel" type="Label" parent="VBoxContainer" unique_id=1755270384]
+layout_mode = 2
+text = "存活波次: 0"
+label_settings = SubResource("LabelSettings_3dhtb")
+horizontal_alignment = 1
+
+[node name="RestartButton" type="Button" parent="VBoxContainer" unique_id=1830073469]
+custom_minimum_size = Vector2(200, 50)
+layout_mode = 2
+text = "重新开始"
+
+[node name="QuitButton" type="Button" parent="VBoxContainer" unique_id=347955461]
+custom_minimum_size = Vector2(200, 50)
+layout_mode = 2
+text = "退出游戏"
