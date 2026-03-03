@@ -2,7 +2,10 @@ extends CharacterBody2D
 
 @export var speed: float = 200.0
 @export var max_hp: float = 100.0
-var current_hp: float = 100.0
+var current_hp: float
+
+func _ready():
+	current_hp = max_hp
 
 func _physics_process(_delta):
 	var input_vector = Vector2.ZERO
