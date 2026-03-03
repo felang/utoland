@@ -15,7 +15,11 @@ func _ready():
 		push_warning("HUD: WaveManager node not found in 'wave_manager' group")
 
 func _process(_delta):
-	if player:
+	if player and is_instance_valid(player):
 		hp_label.text = "HP: %.0f" % player.current_hp
+
+	if not wave_manager or not is_instance_valid(wave_manager):
+		wave_manager = get_tree().get_first_node_in_group("wave_manager")
+
 	if wave_manager:
 		timer_label.text = "Time: %.0f" % wave_manager.time_remaining
