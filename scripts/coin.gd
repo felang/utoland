@@ -13,10 +13,15 @@ func _ready():
 	add_to_group("coins")
 
 func _process(delta):
-	if player and global_position.distance_to(player.global_position) < attract_range:
+	if not player or not is_instance_valid(player):
+		player = get_tree().get_first_node_in_group("player")
+		if not player:
+			return
+
+	if global_position.distance_to(player.global_position) < attract_range:
 		is_attracted = true
 
-	if is_attracted and player:
+	if is_attracted:
 		var direction = global_position.direction_to(player.global_position)
 		global_position += direction * attract_speed * delta
 
