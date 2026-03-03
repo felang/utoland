@@ -15,18 +15,18 @@ script = ExtResource("2_0wfyh")
 
 [node name="TowerWall1" type="StaticBody2D" parent="." unique_id=655985224 instance=ExtResource("3_jyhfs")]
 position = Vector2(200, 0)
-collision_layer = 4
+collision_layer = 3
 collision_mask = 2
 script = ExtResource("4_tbgi4")
 
 [node name="TowerWall2" type="StaticBody2D" parent="." unique_id=1428915916 instance=ExtResource("3_jyhfs")]
 position = Vector2(-150, 150)
-collision_layer = 4
+collision_layer = 3
 collision_mask = 2
 script = ExtResource("4_tbgi4")
 
 [node name="TowerWall3" type="StaticBody2D" parent="." unique_id=959780861 instance=ExtResource("3_jyhfs")]
 position = Vector2(100, -200)
-collision_layer = 4
+collision_layer = 3
 collision_mask = 2
 script = ExtResource("4_tbgi4")
