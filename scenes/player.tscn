@@ -6,8 +6,7 @@
 size = Vector2(32, 32)
 
 [node name="Player" type="CharacterBody2D" unique_id=2056081713]
-collision_layer = 1
-collision_mask = 2
+collision_mask = 18
 script = ExtResource("1_3vyb7")
 
 [node name="Visual" type="ColorRect" parent="." unique_id=960031721]
@@ -21,4 +20,3 @@ color = Color(0, 1, 0, 1)
 shape = SubResource("RectangleShape2D_3vyb7")
 
 [node name="Camera" type="Camera2D" parent="." unique_id=1630942064]
-enabled = true
