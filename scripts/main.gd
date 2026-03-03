@@ -20,5 +20,5 @@ func _ready():
 			add_child(tower)
 
 	# 清空已恢复的塔列表，避免重复生成
-	# 注意：不清空，因为玩家死亡后需要重新加载
+	GameData.tower_inventory.clear()
 

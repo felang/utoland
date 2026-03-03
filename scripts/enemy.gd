@@ -67,7 +67,7 @@ func drop_coins():
 		return
 
 	var coin_scene = preload("res://scenes/coin.tscn")
-	var coin_count = randi_range(1, 3)
+	var coin_count = randi_range(2, 5)  # 增加金币掉落数量
 	for i in coin_count:
 		var coin = coin_scene.instantiate()
 		coin.global_position = global_position + Vector2(randf_range(-20, 20), randf_range(-20, 20))

@@ -1,7 +1,7 @@
 extends Control
 
 func _ready():
-	if GameData.current_wave >= 10:
+	if GameData.current_wave > 10:
 		$VBoxContainer/TitleLabel.text = "胜利！"
 	else:
 		$VBoxContainer/TitleLabel.text = "失败"

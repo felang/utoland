@@ -11,6 +11,7 @@ var shoot_timer: float = 0.0
 var invincible_timer: float = 0.0
 var weapon_damage: float = 10.0
 var bullet_scene = preload("res://scenes/bullet.tscn")
+var hp_regen_timer: float = 0.0
 
 func _ready():
 	add_to_group("player")
@@ -45,6 +46,14 @@ func _process(delta):
 	shoot_timer -= delta
 	if shoot_timer <= 0:
 		auto_shoot()
+
+	# 生命回复机制
+	hp_regen_timer += delta
+	if hp_regen_timer >= 5.0:
+		hp_regen_timer = 0.0
+		var regen_amount = GameData.player_stats["hp_regen"]
+		if regen_amount > 0:
+			current_hp = min(current_hp + regen_amount, max_hp)
 
 func _physics_process(_delta):
 	var input_vector = Vector2.ZERO
@@ -105,16 +114,36 @@ func auto_shoot():
 	shoot_timer = fire_rate
 
 func shoot_bullet(target_pos: Vector2):
-	var bullet = bullet_scene.instantiate()
-	bullet.global_position = global_position
-	bullet.direction = global_position.direction_to(target_pos)
-	bullet.damage = weapon_damage  # 应用武器伤害
-	var parent = get_parent()
-	if parent:
-		parent.add_child(bullet)
+	# 霰弹枪发射5发子弹，扇形散开15度
+	if GameData.selected_weapon == "shotgun":
+		var base_direction = global_position.direction_to(target_pos)
+		var base_angle = base_direction.angle()
+		var spread_angles = [-7.5, -3.75, 0, 3.75, 7.5]  # 5发子弹，扇形散开15度
+
+		for angle_offset in spread_angles:
+			var bullet = bullet_scene.instantiate()
+			bullet.global_position = global_position
+			var angle_rad = deg_to_rad(angle_offset)
+			bullet.direction = Vector2(cos(base_angle + angle_rad), sin(base_angle + angle_rad))
+			bullet.damage = weapon_damage
+			var parent = get_parent()
+			if parent:
+				parent.add_child(bullet)
+			else:
+				push_error("Player has no parent to add bullet to")
+				bullet.queue_free()
 	else:
-		push_error("Player has no parent to add bullet to")
-		bullet.queue_free()
+		# 步枪和狙击枪发射单发子弹
+		var bullet = bullet_scene.instantiate()
+		bullet.global_position = global_position
+		bullet.direction = global_position.direction_to(target_pos)
+		bullet.damage = weapon_damage
+		var parent = get_parent()
+		if parent:
+			parent.add_child(bullet)
+		else:
+			push_error("Player has no parent to add bullet to")
+			bullet.queue_free()
 
 func add_coins(amount: int):
 	coins += amount
