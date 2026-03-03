@@ -5,6 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://b5760tlktfkgu" path="res://scenes/towers/tower_wall.tscn" id="3_jyhfs"]
 [ext_resource type="PackedScene" uid="uid://cw1ribon6hcfu" path="res://scenes/ui/hud.tscn" id="4_tbgi4"]
 [ext_resource type="Script" uid="uid://b5nyvbx3m1il2" path="res://scripts/hud.gd" id="5_tefeu"]
+[ext_resource type="Script" uid="uid://spn074bn5fw7" path="res://scripts/wave_manager.gd" id="6_tefeu"]
 
 [node name="Main" type="Node2D" unique_id=1198174103]
 
@@ -25,3 +26,6 @@ position = Vector2(100, -200)
 
 [node name="HUD" type="CanvasLayer" parent="." unique_id=1731831904 instance=ExtResource("4_tbgi4")]
 script = ExtResource("5_tefeu")
+
+[node name="WaveManager" type="Node" parent="." unique_id=1826046686]
+script = ExtResource("6_tefeu")
