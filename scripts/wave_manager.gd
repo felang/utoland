@@ -51,12 +51,20 @@ func start_next_wave():
 
 func complete_wave():
 	is_wave_active = false
+	attract_all_coins()
+	await get_tree().create_timer(2.0).timeout
 	clear_all_enemies()
 	wave_completed.emit(current_wave)
 	print("Wave ", current_wave, " completed!")
 
 	await get_tree().create_timer(3.0).timeout
 	start_next_wave()
+
+func attract_all_coins():
+	var coins = get_tree().get_nodes_in_group("coins")
+	for coin in coins:
+		if coin.has_method("force_attract"):
+			coin.force_attract()
 
 func clear_all_enemies():
 	var enemies = get_tree().get_nodes_in_group("enemies")
