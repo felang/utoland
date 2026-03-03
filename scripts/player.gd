@@ -55,6 +55,10 @@ func take_damage(amount: float):
 
 func die():
 	print("Player died!")
+	var wave_manager = get_tree().get_first_node_in_group("wave_manager")
+	if wave_manager:
+		wave_manager.game_lost.emit()
+	await get_tree().create_timer(1.0).timeout
 	get_tree().reload_current_scene()
 
 func auto_shoot():

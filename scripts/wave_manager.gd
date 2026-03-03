@@ -61,6 +61,9 @@ func complete_wave():
 func clear_all_enemies():
 	var enemies = get_tree().get_nodes_in_group("enemies")
 	for enemy in enemies:
+		if enemy.has_method("set_physics_process"):
+			enemy.set_physics_process(false)
+			enemy.set_process(false)
 		enemy.queue_free()
 
 func get_current_wave_config():
