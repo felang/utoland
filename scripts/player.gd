@@ -15,7 +15,8 @@ func _ready():
 	current_hp = max_hp
 
 func _process(delta):
-	invincible_timer -= delta
+	if invincible_timer > 0:
+		invincible_timer -= delta
 	shoot_timer -= delta
 	if shoot_timer <= 0:
 		auto_shoot()
@@ -36,10 +37,14 @@ func _physics_process(_delta):
 func check_enemy_collision():
 	for i in get_slide_collision_count():
 		var collision = get_slide_collision(i)
-		if collision.get_collider().is_in_group("enemies"):
+		var collider = collision.get_collider()
+		if collider and collider.is_in_group("enemies"):
 			if invincible_timer <= 0:
-				var enemy = collision.get_collider()
-				take_damage(enemy.touch_damage)
+				var enemy = collider
+				if "touch_damage" in enemy:
+					take_damage(enemy.touch_damage)
+				else:
+					take_damage(10.0)  # 默认伤害值
 				invincible_timer = invincible_duration
 
 func take_damage(amount: float):
