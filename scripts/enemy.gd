@@ -71,7 +71,7 @@ func drop_coins():
 	for i in coin_count:
 		var coin = coin_scene.instantiate()
 		coin.global_position = global_position + Vector2(randf_range(-20, 20), randf_range(-20, 20))
-		parent.add_child(coin)
+		parent.call_deferred("add_child", coin)
 
 func apply_slow(slow_percent: float):
 	slow_effects += 1

@@ -18,8 +18,13 @@ var map_max_y = 950.0
 var min_distance_from_player = 200.0
 
 func _ready():
-	wave_manager = get_tree().get_first_node_in_group("wave_manager")
 	player = get_tree().get_first_node_in_group("player")
+
+	# Defer wave_manager lookup to avoid initialization order issues
+	call_deferred("_setup_wave_manager")
+
+func _setup_wave_manager():
+	wave_manager = get_tree().get_first_node_in_group("wave_manager")
 
 	if wave_manager:
 		wave_manager.wave_started.connect(_on_wave_started)
