@@ -13,4 +13,4 @@ func _on_shotgun_selected():
 	start_game()
 
 func start_game():
-	get_tree().change_scene_to_file("res://scenes/main.tscn")
+	get_tree().change_scene_to_file("res://scenes/placement.tscn")
