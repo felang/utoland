@@ -11,6 +11,8 @@ func _ready():
 	if not player:
 		push_warning("HUD: Player node not found in 'player' group")
 	wave_manager = get_tree().get_first_node_in_group("wave_manager")
+	if not wave_manager:
+		push_warning("HUD: WaveManager node not found in 'wave_manager' group")
 
 func _process(_delta):
 	if player:
