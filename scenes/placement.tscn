@@ -1,0 +1,54 @@
+[gd_scene format=3 uid="uid://bp4t00cgojrun"]
+
+[ext_resource type="PackedScene" uid="uid://c45jgyl4kxvbv" path="res://scenes/player.tscn" id="1_8iydn"]
+[ext_resource type="Script" uid="uid://c4msbgxwl6v8l" path="res://scripts/placement.gd" id="1_faaep"]
+[ext_resource type="Script" uid="uid://bmd64dp53aq51" path="res://scripts/player.gd" id="2_faaep"]
+[ext_resource type="PackedScene" uid="uid://5u5tndodgthf" path="res://scenes/map_boundary.tscn" id="3_rftas"]
+
+[node name="Placement" type="Node2D" unique_id=1728279217]
+script = ExtResource("1_faaep")
+
+[node name="Player" type="CharacterBody2D" parent="." unique_id=2056081713 instance=ExtResource("1_8iydn")]
+position = Vector2(400, 300)
+collision_mask = 18
+script = ExtResource("2_faaep")
+
+[node name="MapBoundary" type="Node2D" parent="." unique_id=1220843918 instance=ExtResource("3_rftas")]
+
+[node name="UI" type="CanvasLayer" parent="." unique_id=836118506]
+
+[node name="TowerButtons" type="HBoxContainer" parent="UI" unique_id=562435954]
+offset_left = 20.0
+offset_top = 20.0
+offset_right = 52.0
+offset_bottom = 28.0
+
+[node name="ShooterButton" type="Button" parent="UI/TowerButtons" unique_id=287064566]
+custom_minimum_size = Vector2(120, 40)
+layout_mode = 2
+text = "射手塔 (30)"
+
+[node name="WallButton" type="Button" parent="UI/TowerButtons" unique_id=1473282645]
+custom_minimum_size = Vector2(120, 40)
+layout_mode = 2
+text = "墙塔 (40)"
+
+[node name="SlowButton" type="Button" parent="UI/TowerButtons" unique_id=1521053866]
+custom_minimum_size = Vector2(120, 40)
+layout_mode = 2
+text = "减速塔 (35)"
+
+[node name="CoinsLabel" type="Label" parent="UI" unique_id=243231077]
+offset_left = 20.0
+offset_top = 80.0
+offset_right = 21.0
+offset_bottom = 103.0
+text = "金币: 50"
+
+[node name="StartBattleButton" type="Button" parent="UI" unique_id=1074807471]
+custom_minimum_size = Vector2(200, 50)
+offset_left = 860.0
+offset_top = 1000.0
+offset_right = 868.0
+offset_bottom = 1008.0
+text = "开始战斗"
