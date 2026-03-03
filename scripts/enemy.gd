@@ -8,13 +8,16 @@ enum State { CHASE_PLAYER, ATTACK_TOWER }
 @export var tower_attack_rate: float = 1.0
 @export var touch_damage: float = 10.0
 
+var base_speed: float
 var current_hp: float
 var current_state = State.CHASE_PLAYER
 var target_tower = null
 var attack_timer: float = 0.0
 var player: Node2D = null
+var slow_effects: int = 0  # 记录当前有多少个减速效果
 
 func _ready():
+	base_speed = speed
 	current_hp = max_hp
 	add_to_group("enemies")
 	player = get_tree().get_first_node_in_group("player")
@@ -56,3 +59,14 @@ func take_damage(amount: float):
 
 func die():
 	queue_free()
+
+func apply_slow(slow_percent: float):
+	slow_effects += 1
+	if slow_effects == 1:
+		speed = base_speed * (1.0 - slow_percent)
+
+func remove_slow(slow_percent: float):
+	slow_effects -= 1
+	if slow_effects <= 0:
+		slow_effects = 0
+		speed = base_speed

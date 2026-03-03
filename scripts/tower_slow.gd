@@ -13,9 +13,9 @@ func _ready():
 	slow_area.body_exited.connect(_on_enemy_exited)
 
 func _on_enemy_entered(body):
-	if body.is_in_group("enemies"):
-		body.speed *= (1.0 - slow_percent)
+	if body.is_in_group("enemies") and body.has_method("apply_slow"):
+		body.apply_slow(slow_percent)
 
 func _on_enemy_exited(body):
-	if body.is_in_group("enemies"):
-		body.speed /= (1.0 - slow_percent)
+	if body.is_in_group("enemies") and body.has_method("remove_slow"):
+		body.remove_slow(slow_percent)
