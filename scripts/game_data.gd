@@ -11,7 +11,9 @@ var player_stats = {
 }
 var coins: int = 50
 var current_wave: int = 0
-var tower_inventory = []
+var tower_inventory = []  # 已布置的塔 {type, position}
+var purchased_towers = []  # 商店购买的塔类型（字符串数组）
+var pending_heal: int = 0  # 待应用的治疗量
 
 func reset():
 	selected_weapon = "rifle"
@@ -26,3 +28,5 @@ func reset():
 	coins = 50
 	current_wave = 0
 	tower_inventory = []
+	purchased_towers = []
+	pending_heal = 0

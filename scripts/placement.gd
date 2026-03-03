@@ -15,12 +15,17 @@ var tower_costs = {
 }
 
 func _ready():
+	# 将商店购买的塔添加到金币中（作为可用资源）
+	for tower_type in GameData.purchased_towers:
+		GameData.coins += tower_costs[tower_type]
+	GameData.purchased_towers.clear()
+
 	# 连接按钮信号
 	$UI/TowerButtons/ShooterButton.pressed.connect(func(): select_tower("shooter"))
 	$UI/TowerButtons/WallButton.pressed.connect(func(): select_tower("wall"))
 	$UI/TowerButtons/SlowButton.pressed.connect(func(): select_tower("slow"))
 	$UI/StartBattleButton.pressed.connect(start_battle)
-	
+
 	update_ui()
 
 func _input(event):

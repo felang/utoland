@@ -79,7 +79,7 @@ func buy_item(index: int):
 		else:
 			GameData.player_stats[item["stat"]] += item["value"]
 	elif item.has("type"):  # 植物塔
-		GameData.tower_inventory.append(item["type"])
+		GameData.purchased_towers.append(item["type"])
 	elif item.has("effect"):  # 消耗品
 		apply_consumable(item)
 	
@@ -87,8 +87,7 @@ func buy_item(index: int):
 
 func apply_consumable(item):
 	if item["effect"] == "heal":
-		# 在战斗场景中应用
-		pass
+		GameData.pending_heal += item["value"]
 
 func on_refresh_pressed():
 	if GameData.coins < REFRESH_COST:
@@ -98,10 +97,7 @@ func on_refresh_pressed():
 	update_ui()
 
 func on_confirm_pressed():
-	if GameData.tower_inventory.size() > 0:
-		get_tree().change_scene_to_file("res://scenes/placement.tscn")
-	else:
-		start_next_wave()
+	get_tree().change_scene_to_file("res://scenes/placement.tscn")
 
 func start_next_wave():
 	get_tree().change_scene_to_file("res://scenes/main.tscn")
