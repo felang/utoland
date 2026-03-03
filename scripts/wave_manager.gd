@@ -1,22 +1,67 @@
 extends Node
 
-@export var wave_duration: float = 60.0
-var time_remaining: float
-var victory_triggered: bool = false
+signal wave_started(wave_number: int)
+signal wave_completed(wave_number: int)
+signal game_won()
+signal game_lost()
+
+@export var total_waves: int = 10
+var current_wave: int = 0
+var wave_time_left: float = 0.0
+var is_wave_active: bool = false
+
+# 波次配置
+var wave_configs = {
+	1: {"duration": 45, "enemy_types": ["normal"], "spawn_interval": 4.0, "max_enemies": 15},
+	2: {"duration": 45, "enemy_types": ["normal"], "spawn_interval": 4.0, "max_enemies": 15},
+	3: {"duration": 45, "enemy_types": ["normal"], "spawn_interval": 4.0, "max_enemies": 15},
+	4: {"duration": 50, "enemy_types": ["normal", "fast"], "spawn_interval": 3.0, "max_enemies": 25},
+	5: {"duration": 50, "enemy_types": ["normal", "fast"], "spawn_interval": 3.0, "max_enemies": 25},
+	6: {"duration": 50, "enemy_types": ["normal", "fast"], "spawn_interval": 3.0, "max_enemies": 25},
+	7: {"duration": 60, "enemy_types": ["normal", "fast", "tank"], "spawn_interval": 2.0, "max_enemies": 35},
+	8: {"duration": 60, "enemy_types": ["normal", "fast", "tank"], "spawn_interval": 2.0, "max_enemies": 35},
+	9: {"duration": 60, "enemy_types": ["normal", "fast", "tank"], "spawn_interval": 2.0, "max_enemies": 35},
+	10: {"duration": 60, "enemy_types": ["normal", "fast", "tank"], "spawn_interval": 1.0, "max_enemies": 50}
+}
 
 func _ready():
-	time_remaining = wave_duration
 	add_to_group("wave_manager")
+	start_next_wave()
 
 func _process(delta):
-	if victory_triggered:
+	if is_wave_active:
+		wave_time_left -= delta
+		if wave_time_left <= 0:
+			complete_wave()
+
+func start_next_wave():
+	current_wave += 1
+	if current_wave > total_waves:
+		game_won.emit()
+		print("Victory! You completed all 10 waves!")
+		await get_tree().create_timer(3.0).timeout
+		get_tree().reload_current_scene()
 		return
-	time_remaining -= delta
 
-	if time_remaining <= 0:
-		victory_triggered = true
-		victory()
+	var config = wave_configs[current_wave]
+	wave_time_left = config["duration"]
+	is_wave_active = true
+	wave_started.emit(current_wave)
+	print("Wave ", current_wave, " started!")
 
-func victory():
-	print("Victory! You survived 60 seconds!")
-	get_tree().reload_current_scene()
+func complete_wave():
+	is_wave_active = false
+	clear_all_enemies()
+	wave_completed.emit(current_wave)
+	print("Wave ", current_wave, " completed!")
+
+	await get_tree().create_timer(3.0).timeout
+	start_next_wave()
+
+func clear_all_enemies():
+	var enemies = get_tree().get_nodes_in_group("enemies")
+	for enemy in enemies:
+		enemy.queue_free()
+
+func get_current_wave_config():
+	return wave_configs.get(current_wave, {})

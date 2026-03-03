@@ -22,4 +22,4 @@ func _process(_delta):
 		wave_manager = get_tree().get_first_node_in_group("wave_manager")
 
 	if wave_manager:
-		timer_label.text = "Time: %.0f" % wave_manager.time_remaining
+		timer_label.text = "Wave: %d/10 | Time: %.0f" % [wave_manager.current_wave, wave_manager.wave_time_left]
