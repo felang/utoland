@@ -21,13 +21,15 @@ func _process(delta):
 		spawn_timer = spawn_interval
 
 func spawn_enemy():
-	if not player:
-		return
-	
+	if not player or not is_instance_valid(player):
+		player = get_tree().get_first_node_in_group("player")
+		if not player:
+			return
+
 	var angle = randf() * TAU
 	var offset = Vector2(cos(angle), sin(angle)) * spawn_distance
 	var spawn_pos = player.global_position + offset
-	
+
 	var enemy = enemy_scene.instantiate()
 	enemy.global_position = spawn_pos
 	get_parent().add_child(enemy)
