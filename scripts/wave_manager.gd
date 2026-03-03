@@ -26,6 +26,9 @@ var wave_configs = {
 
 func _ready():
 	add_to_group("wave_manager")
+	# 从 GameData 恢复波次
+	if GameData.current_wave > 0:
+		current_wave = GameData.current_wave
 	start_next_wave()
 
 func _process(delta):
@@ -36,11 +39,13 @@ func _process(delta):
 
 func start_next_wave():
 	current_wave += 1
+	GameData.current_wave = current_wave  # 同步到 GameData
+
 	if current_wave > total_waves:
 		game_won.emit()
 		print("Victory! You completed all 10 waves!")
-		await get_tree().create_timer(3.0).timeout
-		get_tree().reload_current_scene()
+		await get_tree().create_timer(1.0).timeout
+		get_tree().change_scene_to_file("res://scenes/ui/result.tscn")
 		return
 
 	var config = wave_configs[current_wave]
@@ -57,8 +62,8 @@ func complete_wave():
 	wave_completed.emit(current_wave)
 	print("Wave ", current_wave, " completed!")
 
-	await get_tree().create_timer(3.0).timeout
-	start_next_wave()
+	await get_tree().create_timer(1.0).timeout
+	get_tree().change_scene_to_file("res://scenes/ui/shop.tscn")
 
 func attract_all_coins():
 	var coins = get_tree().get_nodes_in_group("coins")

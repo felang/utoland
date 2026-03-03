@@ -9,11 +9,35 @@ var current_hp: float
 var coins: int = 0
 var shoot_timer: float = 0.0
 var invincible_timer: float = 0.0
+var weapon_damage: float = 10.0
 var bullet_scene = preload("res://scenes/bullet.tscn")
 
 func _ready():
 	add_to_group("player")
+
+	# 应用被动属性
+	max_hp = GameData.player_stats["max_hp"]
 	current_hp = max_hp
+	speed = 200.0 * GameData.player_stats["move_speed_mult"]
+
+	# 应用待处理的治疗
+	if GameData.pending_heal > 0:
+		current_hp = min(current_hp + GameData.pending_heal, max_hp)
+		GameData.pending_heal = 0
+
+	# 应用武器配置
+	if GameData.selected_weapon == "rifle":
+		fire_rate = 0.1 / GameData.player_stats["attack_speed_mult"]
+		weapon_damage = 10.0 * GameData.player_stats["damage_mult"]
+	elif GameData.selected_weapon == "shotgun":
+		fire_rate = 0.5 / GameData.player_stats["attack_speed_mult"]
+		weapon_damage = 8.0 * GameData.player_stats["damage_mult"]
+	elif GameData.selected_weapon == "sniper":
+		fire_rate = 1.0 / GameData.player_stats["attack_speed_mult"]
+		weapon_damage = 30.0 * GameData.player_stats["damage_mult"]
+
+	# 同步金币
+	coins = GameData.coins
 
 func _process(delta):
 	if invincible_timer > 0:
@@ -58,9 +82,10 @@ func die():
 	print("Player died!")
 	var wave_manager = get_tree().get_first_node_in_group("wave_manager")
 	if wave_manager:
+		GameData.current_wave = wave_manager.current_wave
 		wave_manager.game_lost.emit()
 	await get_tree().create_timer(1.0).timeout
-	get_tree().reload_current_scene()
+	get_tree().change_scene_to_file("res://scenes/ui/result.tscn")
 
 func auto_shoot():
 	var enemies = get_tree().get_nodes_in_group("enemies")
@@ -83,6 +108,7 @@ func shoot_bullet(target_pos: Vector2):
 	var bullet = bullet_scene.instantiate()
 	bullet.global_position = global_position
 	bullet.direction = global_position.direction_to(target_pos)
+	bullet.damage = weapon_damage  # 应用武器伤害
 	var parent = get_parent()
 	if parent:
 		parent.add_child(bullet)
@@ -92,3 +118,4 @@ func shoot_bullet(target_pos: Vector2):
 
 func add_coins(amount: int):
 	coins += amount
+	GameData.coins = coins  # 同步到 GameData
