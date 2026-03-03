@@ -6,6 +6,7 @@ enum State { CHASE_PLAYER, ATTACK_TOWER }
 @export var max_hp: float = 30.0
 @export var tower_attack_damage: float = 5.0
 @export var tower_attack_rate: float = 1.0
+@export var touch_damage: float = 10.0
 
 var current_hp: float
 var current_state = State.CHASE_PLAYER

@@ -4,8 +4,10 @@ extends CharacterBody2D
 @export var max_hp: float = 100.0
 @export var weapon_range: float = 300.0
 @export var fire_rate: float = 0.1
+@export var invincible_duration: float = 0.5
 var current_hp: float
 var shoot_timer: float = 0.0
+var invincible_timer: float = 0.0
 var bullet_scene = preload("res://scenes/bullet.tscn")
 
 func _ready():
@@ -13,6 +15,7 @@ func _ready():
 	current_hp = max_hp
 
 func _process(delta):
+	invincible_timer -= delta
 	shoot_timer -= delta
 	if shoot_timer <= 0:
 		auto_shoot()
@@ -21,15 +24,27 @@ func _physics_process(_delta):
 	var input_vector = Vector2.ZERO
 	input_vector.x = Input.get_axis("ui_left", "ui_right")
 	input_vector.y = Input.get_axis("ui_up", "ui_down")
-	
+
 	if input_vector.length() > 0:
 		input_vector = input_vector.normalized()
-	
+
 	velocity = input_vector * speed
 	move_and_slide()
 
+	check_enemy_collision()
+
+func check_enemy_collision():
+	for i in get_slide_collision_count():
+		var collision = get_slide_collision(i)
+		if collision.get_collider().is_in_group("enemies"):
+			if invincible_timer <= 0:
+				var enemy = collision.get_collider()
+				take_damage(enemy.touch_damage)
+				invincible_timer = invincible_duration
+
 func take_damage(amount: float):
 	current_hp -= amount
+	print("Player HP: ", current_hp)
 	if current_hp <= 0:
 		die()
 
