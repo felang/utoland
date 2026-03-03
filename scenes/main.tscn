@@ -7,6 +7,9 @@
 [ext_resource type="Script" uid="uid://b5nyvbx3m1il2" path="res://scripts/hud.gd" id="5_tefeu"]
 [ext_resource type="Script" uid="uid://spn074bn5fw7" path="res://scripts/wave_manager.gd" id="6_tefeu"]
 [ext_resource type="PackedScene" uid="uid://5u5tndodgthf" path="res://scenes/map_boundary.tscn" id="7_o6xl0"]
+[ext_resource type="PackedScene" uid="uid://5iglv6nvabcq" path="res://scenes/enemies/enemy_normal.tscn" id="8_normal"]
+[ext_resource type="PackedScene" uid="uid://bxlj77kpxroab" path="res://scenes/enemies/enemy_fast.tscn" id="9_fast"]
+[ext_resource type="PackedScene" uid="uid://c1natg0slsxfx" path="res://scenes/enemies/enemy_tank.tscn" id="10_tank"]
 
 [node name="Main" type="Node2D" unique_id=1198174103]
 
@@ -32,3 +35,21 @@ script = ExtResource("5_tefeu")
 script = ExtResource("6_tefeu")
 
 [node name="MapBoundary" type="Node2D" parent="." unique_id=1220843918 instance=ExtResource("7_o6xl0")]
+
+[node name="EnemyNormal1" parent="." instance=ExtResource("8_normal")]
+position = Vector2(600, 200)
+
+[node name="EnemyNormal2" parent="." instance=ExtResource("8_normal")]
+position = Vector2(650, 400)
+
+[node name="EnemyFast1" parent="." instance=ExtResource("9_fast")]
+position = Vector2(700, 100)
+
+[node name="EnemyFast2" parent="." instance=ExtResource("9_fast")]
+position = Vector2(750, 500)
+
+[node name="EnemyTank1" parent="." instance=ExtResource("10_tank")]
+position = Vector2(800, 300)
+
+[node name="EnemyTank2" parent="." instance=ExtResource("10_tank")]
+position = Vector2(850, 450)
