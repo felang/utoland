@@ -58,7 +58,16 @@ func take_damage(amount: float):
 		die()
 
 func die():
+	drop_coins()
 	queue_free()
+
+func drop_coins():
+	var coin_scene = preload("res://scenes/coin.tscn")
+	var coin_count = randi_range(1, 3)
+	for i in coin_count:
+		var coin = coin_scene.instantiate()
+		coin.global_position = global_position + Vector2(randf_range(-20, 20), randf_range(-20, 20))
+		get_parent().add_child(coin)
 
 func apply_slow(slow_percent: float):
 	slow_effects += 1

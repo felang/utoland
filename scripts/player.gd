@@ -6,6 +6,7 @@ extends CharacterBody2D
 @export var fire_rate: float = 0.1
 @export var invincible_duration: float = 0.5
 var current_hp: float
+var coins: int = 0
 var shoot_timer: float = 0.0
 var invincible_timer: float = 0.0
 var bullet_scene = preload("res://scenes/bullet.tscn")
@@ -88,3 +89,6 @@ func shoot_bullet(target_pos: Vector2):
 	else:
 		push_error("Player has no parent to add bullet to")
 		bullet.queue_free()
+
+func add_coins(amount: int):
+	coins += amount

@@ -16,7 +16,7 @@ func _ready():
 
 func _process(_delta):
 	if player and is_instance_valid(player):
-		hp_label.text = "HP: %.0f" % player.current_hp
+		hp_label.text = "HP: %.0f | Coins: %d" % [player.current_hp, player.coins]
 
 	if not wave_manager or not is_instance_valid(wave_manager):
 		wave_manager = get_tree().get_first_node_in_group("wave_manager")
