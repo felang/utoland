@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://24phowe362yu"]
 
-[ext_resource type="Script" path="res://scripts/start_menu.gd" id="1_irhji"]
+[ext_resource type="Script" uid="uid://crqwnrcfh4ggx" path="res://scripts/start_menu.gd" id="1_irhji"]
 
 [node name="StartMenu" type="Control" unique_id=126935014]
 layout_mode = 3
@@ -17,12 +17,16 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
+offset_left = -275.0
+offset_top = -60.5
+offset_right = 275.0
+offset_bottom = 60.5
 
 [node name="TitleLabel" type="Label" parent="VBoxContainer" unique_id=247976949]
 layout_mode = 2
+theme_override_font_sizes/font_size = 48
 text = "Survivor Tower Defense"
 horizontal_alignment = 1
-theme_override_font_sizes/font_size = 48
 
 [node name="StartButton" type="Button" parent="VBoxContainer" unique_id=504206185]
 custom_minimum_size = Vector2(200, 50)
