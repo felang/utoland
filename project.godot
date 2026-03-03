@@ -25,6 +25,7 @@ window/stretch/aspect="expand"
 
 [autoload]
 
+GameData="*res://scripts/game_data.gd"
 GDAIMCPRuntime="*uid://dcne7ryelpxmn"
 
 [editor_plugins]
