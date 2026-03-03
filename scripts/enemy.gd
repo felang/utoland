@@ -4,17 +4,17 @@ enum State { CHASE_PLAYER, ATTACK_TOWER }
 
 @export var speed: float = 150.0
 @export var max_hp: float = 30.0
-@export var touch_damage: float = 10.0
 @export var tower_attack_damage: float = 5.0
 @export var tower_attack_rate: float = 1.0
 
-var current_hp: float = 30.0
+var current_hp: float
 var current_state = State.CHASE_PLAYER
 var target_tower = null
 var attack_timer: float = 0.0
 var player: Node2D = null
 
 func _ready():
+	current_hp = max_hp
 	add_to_group("enemies")
 	player = get_tree().get_first_node_in_group("player")
 
@@ -28,7 +28,7 @@ func _physics_process(delta):
 			attack_tower(delta)
 
 func chase_player():
-	if player:
+	if player and is_instance_valid(player):
 		velocity = position.direction_to(player.global_position) * speed
 		move_and_slide()
 
