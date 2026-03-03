@@ -3,7 +3,8 @@
 [ext_resource type="PackedScene" uid="uid://c45jgyl4kxvbv" path="res://scenes/player.tscn" id="1_0wfyh"]
 [ext_resource type="Script" uid="uid://b0j68ldejylty" path="res://scripts/enemy_spawner.gd" id="2_0wfyh"]
 [ext_resource type="PackedScene" uid="uid://b5760tlktfkgu" path="res://scenes/towers/tower_wall.tscn" id="3_jyhfs"]
-[ext_resource type="Script" uid="uid://c787bqtynkfr0" path="res://scripts/tower.gd" id="4_tbgi4"]
+[ext_resource type="PackedScene" uid="uid://cw1ribon6hcfu" path="res://scenes/ui/hud.tscn" id="4_tbgi4"]
+[ext_resource type="Script" uid="uid://b5nyvbx3m1il2" path="res://scripts/hud.gd" id="5_tefeu"]
 
 [node name="Main" type="Node2D" unique_id=1198174103]
 
@@ -13,20 +14,14 @@ position = Vector2(400, 300)
 [node name="EnemySpawner" type="Node" parent="." unique_id=1258091345]
 script = ExtResource("2_0wfyh")
 
-[node name="TowerWall1" type="StaticBody2D" parent="." unique_id=655985224 instance=ExtResource("3_jyhfs")]
+[node name="TowerWall1" parent="." unique_id=655985224 instance=ExtResource("3_jyhfs")]
 position = Vector2(200, 0)
-collision_layer = 3
-collision_mask = 2
-script = ExtResource("4_tbgi4")
 
-[node name="TowerWall2" type="StaticBody2D" parent="." unique_id=1428915916 instance=ExtResource("3_jyhfs")]
+[node name="TowerWall2" parent="." unique_id=1428915916 instance=ExtResource("3_jyhfs")]
 position = Vector2(-150, 150)
-collision_layer = 3
-collision_mask = 2
-script = ExtResource("4_tbgi4")
 
-[node name="TowerWall3" type="StaticBody2D" parent="." unique_id=959780861 instance=ExtResource("3_jyhfs")]
+[node name="TowerWall3" parent="." unique_id=959780861 instance=ExtResource("3_jyhfs")]
 position = Vector2(100, -200)
-collision_layer = 3
-collision_mask = 2
-script = ExtResource("4_tbgi4")
+
+[node name="HUD" type="CanvasLayer" parent="." unique_id=1731831904 instance=ExtResource("4_tbgi4")]
+script = ExtResource("5_tefeu")

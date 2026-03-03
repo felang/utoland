@@ -1,0 +1,20 @@
+[gd_scene format=3 uid="uid://cw1ribon6hcfu"]
+
+[ext_resource type="Script" uid="uid://b5nyvbx3m1il2" path="res://scripts/hud.gd" id="1_0mwgc"]
+
+[node name="HUD" type="CanvasLayer" unique_id=1731831904]
+script = ExtResource("1_0mwgc")
+
+[node name="HPLabel" type="Label" parent="." unique_id=79499495]
+offset_left = 10.0
+offset_top = 10.0
+offset_right = 68.0
+offset_bottom = 33.0
+text = "HP: 100"
+
+[node name="TimerLabel" type="Label" parent="." unique_id=1404888428]
+offset_left = 10.0
+offset_top = 40.0
+offset_right = 89.0
+offset_bottom = 63.0
+text = "Time: 0:00"
