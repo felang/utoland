@@ -42,17 +42,24 @@ func auto_shoot():
 	var min_distance = weapon_range
 
 	for enemy in enemies:
-		var distance = global_position.distance_to(enemy.global_position)
-		if distance < min_distance:
-			min_distance = distance
-			closest_enemy = enemy
+		if enemy is Node2D:
+			var distance = global_position.distance_to(enemy.global_position)
+			if distance < min_distance:
+				min_distance = distance
+				closest_enemy = enemy
 
 	if closest_enemy:
 		shoot_bullet(closest_enemy.global_position)
-		shoot_timer = fire_rate
+
+	shoot_timer = fire_rate
 
 func shoot_bullet(target_pos: Vector2):
 	var bullet = bullet_scene.instantiate()
 	bullet.global_position = global_position
 	bullet.direction = global_position.direction_to(target_pos)
-	get_parent().add_child(bullet)
+	var parent = get_parent()
+	if parent:
+		parent.add_child(bullet)
+	else:
+		push_error("Player has no parent to add bullet to")
+		bullet.queue_free()
