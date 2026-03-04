@@ -518,9 +518,10 @@ git commit -m "docs: 添加地图选择功能测试文档"
 ## Task 10: 更新项目文档
 
 **文件**:
-- 修改: `CLAUDE.md:10`
+- 修改: `CLAUDE.md:10,32`
+- 修改: `docs/plans/2026-03-04-map-select-design.md:391`
 
-**步骤 1: 更新场景流程**
+**步骤 1: 更新 CLAUDE.md 场景流程**
 
 将 `CLAUDE.md` 第 10 行的场景流程：
 
@@ -534,7 +535,7 @@ Start Menu → Character Select → Weapon Select → Placement → Combat → S
 Start Menu → Character Select → Weapon Select → Map Select → Placement → Combat → Shop → Placement → Combat → ... → Result
 ```
 
-**步骤 2: 添加地图系统说明**
+**步骤 2: 在 CLAUDE.md 添加地图系统说明**
 
 在 `CLAUDE.md` 第 32 行 "Core Systems" 部分后添加：
 
@@ -542,11 +543,26 @@ Start Menu → Character Select → Weapon Select → Map Select → Placement �
 - **Map System**: 2 maps (Forest, Desert) with visual differences only
 ```
 
-**步骤 3: 提交文档更新**
+**步骤 3: 更新设计文档状态**
+
+将 `docs/plans/2026-03-04-map-select-design.md` 最后一行：
+
+```
+**设计状态**: 已批准，待实施
+```
+
+改为：
+
+```
+**设计状态**: 已批准，已实施
+**实施日期**: 2026-03-04
+```
+
+**步骤 4: 提交文档更新**
 
 ```bash
-git add CLAUDE.md
-git commit -m "docs: 更新 CLAUDE.md 添加地图选择说明"
+git add CLAUDE.md docs/plans/2026-03-04-map-select-design.md
+git commit -m "docs: 更新项目文档，标记地图选择功能已实施"
 ```
 
 ---
@@ -571,7 +587,18 @@ git commit -m "docs: 更新 CLAUDE.md 添加地图选择说明"
 - [ ] 无内存泄漏
 - [ ] 背景加载无卡顿
 
-**步骤 3: 创建功能总结**
+**步骤 3: 更新实施计划状态**
+
+在当前文件 `docs/plans/2026-03-04-map-select-implementation.md` 开头添加状态标记：
+
+在第 1 行 `# 地图选择功能实施计划` 后添加：
+
+```markdown
+**状态**: ✅ 已完成
+**实施日期**: 2026-03-04
+```
+
+**步骤 4: 创建功能总结**
 
 创建 `docs/plans/2026-03-04-map-select-summary.md`：
 
@@ -579,7 +606,7 @@ git commit -m "docs: 更新 CLAUDE.md 添加地图选择说明"
 # 地图选择功能实施总结
 
 **实施日期**: 2026-03-04
-**状态**: 已完成
+**状态**: ✅ 已完成
 
 ## 实现内容
 
@@ -592,23 +619,28 @@ git commit -m "docs: 更新 CLAUDE.md 添加地图选择说明"
 ## 文件清单
 
 ### 新建文件
-- `scenes/ui/map_select.tscn`
-- `scripts/map_select.gd`
-- `assets/maps/` (目录)
-- `assets/maps/README.md`
+- `scenes/ui/map_select.tscn` - 地图选择场景
+- `scripts/map_select.gd` - 地图选择逻辑
+- `assets/maps/` - 地图资源目录
+- `assets/maps/README.md` - 资源说明文档
 
 ### 修改文件
-- `game_config.gd` - 添加地图配置
-- `scripts/game_data.gd` - 添加地图状态
-- `scripts/weapon_select.gd` - 修改跳转目标
-- `scenes/placement.tscn` - 添加背景节点
-- `scripts/placement.gd` - 实现背景加载
-- `CLAUDE.md` - 更新文档
+- `game_config.gd` - 添加 MAPS 配置
+- `scripts/game_data.gd` - 添加 selected_map 状态
+- `scripts/weapon_select.gd` - 修改跳转目标到地图选择
+- `scenes/placement.tscn` - 添加 Background 节点
+- `scripts/placement.gd` - 实现背景加载逻辑
+
+### 文档更新
+- `CLAUDE.md` - 更新场景流程和系统说明
+- `docs/plans/2026-03-04-map-select-design.md` - 标记为已实施
+- `docs/plans/2026-03-04-map-select-implementation.md` - 标记为已完成
 
 ## 当前状态
 
 - ✅ 核心功能完成
 - ✅ 使用纯色背景作为临时方案
+- ✅ 所有文档已更新
 - ⏳ 等待美术资源（预览图和背景图）
 
 ## 后续工作
@@ -627,16 +659,17 @@ git commit -m "docs: 更新 CLAUDE.md 添加地图选择说明"
 1. 配置驱动设计使扩展变得简单
 2. 降级方案确保功能在资源缺失时仍可用
 3. 独立场景设计保持代码清晰
+4. 完整的文档更新（设计、实施、总结）便于后续维护
 ```
 
-**步骤 4: 最终提交**
+**步骤 5: 提交总结文档**
 
 ```bash
-git add docs/plans/2026-03-04-map-select-summary.md
+git add docs/plans/2026-03-04-map-select-summary.md docs/plans/2026-03-04-map-select-implementation.md
 git commit -m "docs: 添加地图选择功能实施总结"
 ```
 
-**步骤 5: 推送代码**
+**步骤 6: 推送代码**
 
 ```bash
 git push origin main
