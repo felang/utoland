@@ -16,26 +16,23 @@ var hp_regen_timer: float = 0.0
 func _ready():
 	add_to_group("player")
 
+	# 重置生命回复计时器（修复已知问题 #2）
+	hp_regen_timer = 0.0
+
 	# 应用被动属性
 	max_hp = GameData.player_stats["max_hp"]
 	current_hp = max_hp
-	speed = 200.0 * GameData.player_stats["move_speed_mult"]
+	speed = GameConfig.PLAYER["initial_speed"] * GameData.player_stats["move_speed_mult"]
 
 	# 应用待处理的治疗
 	if GameData.pending_heal > 0:
 		current_hp = min(current_hp + GameData.pending_heal, max_hp)
 		GameData.pending_heal = 0
 
-	# 应用武器配置
-	if GameData.selected_weapon == "rifle":
-		fire_rate = 0.1 / GameData.player_stats["attack_speed_mult"]
-		weapon_damage = 10.0 * GameData.player_stats["damage_mult"]
-	elif GameData.selected_weapon == "shotgun":
-		fire_rate = 0.5 / GameData.player_stats["attack_speed_mult"]
-		weapon_damage = 8.0 * GameData.player_stats["damage_mult"]
-	elif GameData.selected_weapon == "sniper":
-		fire_rate = 1.0 / GameData.player_stats["attack_speed_mult"]
-		weapon_damage = 30.0 * GameData.player_stats["damage_mult"]
+	# 从 GameConfig 读取武器配置
+	var weapon_data = GameConfig.WEAPONS[GameData.selected_weapon]
+	fire_rate = weapon_data["fire_rate"] / GameData.player_stats["attack_speed_mult"]
+	weapon_damage = weapon_data["damage"] * GameData.player_stats["damage_mult"]
 
 	# 同步金币
 	coins = GameData.coins
@@ -49,7 +46,7 @@ func _process(delta):
 
 	# 生命回复机制
 	hp_regen_timer += delta
-	if hp_regen_timer >= 5.0:
+	if hp_regen_timer >= GameConfig.PLAYER["hp_regen_interval"]:
 		hp_regen_timer = 0.0
 		var regen_amount = GameData.player_stats["hp_regen"]
 		if regen_amount > 0:
@@ -114,11 +111,12 @@ func auto_shoot():
 	shoot_timer = fire_rate
 
 func shoot_bullet(target_pos: Vector2):
-	# 霰弹枪发射5发子弹，扇形散开15度
+	# 霰弹枪发射多发子弹，扇形散开
 	if GameData.selected_weapon == "shotgun":
+		var weapon_data = GameConfig.WEAPONS["shotgun"]
+		var spread_angles = weapon_data["spread_angles"]
 		var base_direction = global_position.direction_to(target_pos)
 		var base_angle = base_direction.angle()
-		var spread_angles = [-7.5, -3.75, 0, 3.75, 7.5]  # 5发子弹，扇形散开15度
 
 		for angle_offset in spread_angles:
 			var bullet = bullet_scene.instantiate()
