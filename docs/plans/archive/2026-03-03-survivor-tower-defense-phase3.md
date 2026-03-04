@@ -1,5 +1,11 @@
 # 阶段 3：商店与成长系统实施计划
 
+> **状态**: ✅ 已完成 (2026-03-03)
+>
+> **实施总结**: 见 `docs/phase3-implementation-summary.md`
+>
+> **归档**: 此计划已归档到 `docs/plans/archive/`
+
 > **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
 
 **Goal:** 补全游戏流程（商店+成长+完整UI）

@@ -21,4 +21,3 @@ func _ready():
 
 	# 清空已恢复的塔列表，避免重复生成
 	GameData.tower_inventory.clear()
-
