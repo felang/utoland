@@ -10,6 +10,7 @@ var character_move_speed_mult: float = 1.0
 var character_hp_regen: float = 0.0
 
 var selected_weapon: String = "rifle"
+var selected_map: String = "forest"  # 当前选择的地图，默认森林
 var player_stats: Dictionary = {
 	"max_hp": 100.0,
 	"hp_mult": 1.0,
@@ -52,6 +53,7 @@ func reset() -> void:
 	init_character(current_character)
 
 	selected_weapon = "rifle"
+	selected_map = "forest"
 	# 将角色属性同步到 player_stats
 	player_stats = {
 		"max_hp": character_max_hp,
