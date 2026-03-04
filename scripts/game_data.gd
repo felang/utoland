@@ -25,6 +25,10 @@ var tower_inventory = []  # 已布置的塔 {type, position}
 var purchased_towers = []  # 商店购买的塔类型（字符串数组）
 var pending_heal: int = 0  # 待应用的治疗量
 
+func _ready() -> void:
+	# 游戏启动时初始化默认角色
+	init_character(current_character)
+
 # 初始化角色属性
 func init_character(character_id: String) -> void:
 	if not GameConfig.CHARACTERS.has(character_id):
