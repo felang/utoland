@@ -22,7 +22,7 @@ func _ready():
 	# 应用被动属性
 	max_hp = GameData.player_stats["max_hp"]
 	current_hp = max_hp
-	speed = GameConfig.PLAYER["initial_speed"] * GameData.player_stats["move_speed_mult"]
+	speed = GameData.character_speed * GameData.player_stats["move_speed_mult"]
 
 	# 应用待处理的治疗
 	if GameData.pending_heal > 0:
