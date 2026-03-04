@@ -47,12 +47,13 @@ func reset() -> void:
 	init_character(current_character)
 
 	selected_weapon = "rifle"
+	# 将角色属性同步到 player_stats
 	player_stats = {
-		"max_hp": 100.0,
-		"hp_regen": 0.0,
-		"damage_mult": 1.0,
-		"attack_speed_mult": 1.0,
-		"move_speed_mult": 1.0,
+		"max_hp": character_max_hp,
+		"hp_regen": character_hp_regen,
+		"damage_mult": character_damage_mult,
+		"attack_speed_mult": character_attack_speed_mult,
+		"move_speed_mult": character_move_speed_mult,
 		"tower_mult": 1.0
 	}
 	coins = GameConfig.PLAYER["initial_coins"]
