@@ -48,7 +48,7 @@ func _process(delta):
 	hp_regen_timer += delta
 	if hp_regen_timer >= GameConfig.PLAYER["hp_regen_interval"]:
 		hp_regen_timer = 0.0
-		var regen_amount = GameData.character_hp_regen
+		var regen_amount = GameData.character_hp_regen + GameData.player_stats["hp_regen"]
 		if regen_amount > 0:
 			current_hp = min(current_hp + regen_amount, max_hp)
 
