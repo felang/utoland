@@ -44,11 +44,6 @@ func spawn_enemy():
 		return
 
 	var config = wave_manager.get_current_wave_config()
-	var current_enemies = get_tree().get_nodes_in_group("enemies").size()
-
-	if current_enemies >= config.get("max_enemies", 20):
-		return
-
 	var enemy_types = config.get("enemy_types", ["normal"])
 	var random_type = enemy_types[randi() % enemy_types.size()]
 	var enemy = enemy_scenes[random_type].instantiate()
