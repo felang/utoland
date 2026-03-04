@@ -8,6 +8,13 @@
 [node name="Placement" type="Node2D" unique_id=1728279217]
 script = ExtResource("1_faaep")
 
+[node name="Background" type="Node2D" parent="."]
+z_index = -100
+
+[node name="BackgroundSprite" type="Sprite2D" parent="Background"]
+position = Vector2(960, 540)
+centered = true
+
 [node name="Player" type="CharacterBody2D" parent="." unique_id=2056081713 instance=ExtResource("1_8iydn")]
 position = Vector2(400, 300)
 collision_mask = 18
