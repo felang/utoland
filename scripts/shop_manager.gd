@@ -1,24 +1,15 @@
 extends Control
 
-const REFRESH_COST = 10
-
 var shop_items = []
 var passive_upgrades = [
-	{"name": "最大生命值+20", "cost": 20, "stat": "max_hp", "value": 20},
-	{"name": "生命回复+5/5秒", "cost": 15, "stat": "hp_regen", "value": 5},
-	{"name": "伤害+10%", "cost": 25, "stat": "damage_mult", "value": 0.1},
-	{"name": "攻击速度+15%", "cost": 20, "stat": "attack_speed_mult", "value": 0.15},
-	{"name": "移动速度+10%", "cost": 15, "stat": "move_speed_mult", "value": 0.1},
-	{"name": "工程学+20%", "cost": 30, "stat": "tower_mult", "value": 0.2}
+	{"name": "最大生命值+20", "stat": "max_hp", "value": 20},
+	{"name": "生命回复+5/5秒", "stat": "hp_regen", "value": 5},
+	{"name": "伤害+10%", "stat": "damage_mult", "value": 0.1},
+	{"name": "攻击速度+15%", "stat": "attack_speed_mult", "value": 0.15},
+	{"name": "移动速度+10%", "stat": "move_speed_mult", "value": 0.1},
+	{"name": "工程学+20%", "stat": "tower_mult", "value": 0.2}
 ]
-var tower_items = [
-	{"name": "豌豆射手", "cost": 25, "type": "shooter"},
-	{"name": "坚果墙", "cost": 30, "type": "wall"},
-	{"name": "冰雪菇", "cost": 28, "type": "slow"}
-]
-var consumables = [
-	{"name": "医疗包", "cost": 12, "effect": "heal", "value": 50}
-]
+var tower_types = ["shooter", "wall", "slow"]
 
 @onready var coin_label = $VBoxContainer/CoinLabel
 @onready var refresh_button = $VBoxContainer/ButtonsContainer/RefreshButton
@@ -47,12 +38,33 @@ func refresh_shop():
 	for i in range(4):
 		var rand = randf()
 		if rand < 0.6:  # 60% 被动属性
-			shop_items.append(passive_upgrades.pick_random())
+			var passive = passive_upgrades.pick_random().duplicate()
+			passive["cost"] = randi_range(
+				GameConfig.SHOP["passive_price_min"],
+				GameConfig.SHOP["passive_price_max"]
+			)
+			shop_items.append(passive)
 		elif rand < 0.9:  # 30% 植物塔
-			shop_items.append(tower_items.pick_random())
+			var tower_type = tower_types.pick_random()
+			var tower_data = GameConfig.TOWERS[tower_type]
+			var tower_item = {
+				"name": tower_data["name"],
+				"type": tower_type,
+				"cost": randi_range(
+					tower_data["shop_price_min"],
+					tower_data["shop_price_max"]
+				)
+			}
+			shop_items.append(tower_item)
 		else:  # 10% 消耗品
-			shop_items.append(consumables.pick_random())
-	
+			var consumable = {
+				"name": "医疗包",
+				"effect": "heal",
+				"value": GameConfig.SHOP["heal_amount"],
+				"cost": GameConfig.SHOP["heal_price"]
+			}
+			shop_items.append(consumable)
+
 	display_items()
 
 func display_items():
@@ -90,9 +102,9 @@ func apply_consumable(item):
 		GameData.pending_heal += item["value"]
 
 func on_refresh_pressed():
-	if GameData.coins < REFRESH_COST:
+	if GameData.coins < GameConfig.SHOP["refresh_cost"]:
 		return
-	GameData.coins -= REFRESH_COST
+	GameData.coins -= GameConfig.SHOP["refresh_cost"]
 	refresh_shop()
 	update_ui()
 
@@ -104,5 +116,5 @@ func start_next_wave():
 
 func update_ui():
 	coin_label.text = "金币: %d" % GameData.coins
-	refresh_button.disabled = GameData.coins < REFRESH_COST
+	refresh_button.disabled = GameData.coins < GameConfig.SHOP["refresh_cost"]
 	display_items()

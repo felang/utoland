@@ -9,7 +9,7 @@ var player_stats = {
 	"move_speed_mult": 1.0,
 	"tower_mult": 1.0
 }
-var coins: int = 100
+var coins: int = GameConfig.PLAYER["initial_coins"]
 var current_wave: int = 0
 var tower_inventory = []  # 已布置的塔 {type, position}
 var purchased_towers = []  # 商店购买的塔类型（字符串数组）
@@ -25,7 +25,7 @@ func reset():
 		"move_speed_mult": 1.0,
 		"tower_mult": 1.0
 	}
-	coins = 100
+	coins = GameConfig.PLAYER["initial_coins"]
 	current_wave = 0
 	tower_inventory = []
 	purchased_towers = []
