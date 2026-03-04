@@ -519,6 +519,9 @@ git commit -m "docs: 添加地图选择功能测试文档"
 
 **文件**:
 - 修改: `CLAUDE.md:10,32`
+- 修改: `docs/ARCHITECTURE.md:42-50`
+- 修改: `docs/GAME_DESIGN.md:29-50`
+- 修改: `docs/CONFIGURATION.md` (添加地图配置说明)
 - 修改: `docs/plans/2026-03-04-map-select-design.md:391`
 
 **步骤 1: 更新 CLAUDE.md 场景流程**
@@ -535,15 +538,104 @@ Start Menu → Character Select → Weapon Select → Placement → Combat → S
 Start Menu → Character Select → Weapon Select → Map Select → Placement → Combat → Shop → Placement → Combat → ... → Result
 ```
 
-**步骤 2: 在 CLAUDE.md 添加地图系统说明**
-
 在 `CLAUDE.md` 第 32 行 "Core Systems" 部分后添加：
 
 ```markdown
 - **Map System**: 2 maps (Forest, Desert) with visual differences only
 ```
 
-**步骤 3: 更新设计文档状态**
+**步骤 2: 更新 ARCHITECTURE.md 场景结构**
+
+在 `docs/ARCHITECTURE.md` 第 24 行场景列表中添加：
+
+```
+│   ├── map_select.tscn           # 地图选择界面
+```
+
+将第 42-50 行的场景切换流程：
+
+```
+开始菜单 (start_menu.tscn)
+    ↓ 点击"开始游戏"
+角色选择 (character_select.tscn)
+    ↓ 选择角色
+武器选择 (weapon_select.tscn)
+    ↓ 选择武器
+```
+
+改为：
+
+```
+开始菜单 (start_menu.tscn)
+    ↓ 点击"开始游戏"
+角色选择 (character_select.tscn)
+    ↓ 选择角色
+武器选择 (weapon_select.tscn)
+    ↓ 选择武器
+地图选择 (map_select.tscn)
+    ↓ 选择地图
+```
+
+**步骤 3: 更新 GAME_DESIGN.md 游戏流程**
+
+将 `docs/GAME_DESIGN.md` 第 31-36 行的流程：
+
+```
+1. 角色选择
+   ↓
+2. 武器选择
+   ↓
+3. 初始布置（100金币）
+```
+
+改为：
+
+```
+1. 角色选择
+   ↓
+2. 武器选择
+   ↓
+3. 地图选择
+   ↓
+4. 初始布置（100金币）
+```
+
+并更新后续步骤编号（4→5, 5→6, ... 11→12）
+
+**步骤 4: 更新 CONFIGURATION.md 添加地图配置**
+
+在 `docs/CONFIGURATION.md` 文件中找到配置项列表部分，添加：
+
+```markdown
+### 地图配置 (MAPS)
+
+定义可选择的地图及其视觉资源。
+
+**配置结构**:
+```gdscript
+const MAPS = {
+	"<map_id>": {
+		"name": String,              # 地图显示名称
+		"description": String,       # 地图描述
+		"preview_image": String,     # 预览图路径
+		"background": String,        # 背景图路径
+		"fallback_color": String     # 降级纯色背景
+	}
+}
+```
+
+**当前地图**:
+- `forest`: 森林地图（默认）
+- `desert`: 沙漠地图
+
+**使用示例**:
+```gdscript
+var map_config = GameConfig.MAPS[GameData.selected_map]
+var bg_path = map_config["background"]
+```
+```
+
+**步骤 5: 更新设计文档状态**
 
 将 `docs/plans/2026-03-04-map-select-design.md` 最后一行：
 
@@ -555,14 +647,14 @@ Start Menu → Character Select → Weapon Select → Map Select → Placement �
 
 ```
 **设计状态**: 已批准，已实施
-**实施日期**: 2026-03-04
+**实施日期**: 2026-03-05
 ```
 
-**步骤 4: 提交文档更新**
+**步骤 6: 提交文档更新**
 
 ```bash
-git add CLAUDE.md docs/plans/2026-03-04-map-select-design.md
-git commit -m "docs: 更新项目文档，标记地图选择功能已实施"
+git add CLAUDE.md docs/ARCHITECTURE.md docs/GAME_DESIGN.md docs/CONFIGURATION.md docs/plans/2026-03-04-map-select-design.md
+git commit -m "docs: 更新所有项目文档，添加地图选择系统说明"
 ```
 
 ---
@@ -633,6 +725,9 @@ git commit -m "docs: 更新项目文档，标记地图选择功能已实施"
 
 ### 文档更新
 - `CLAUDE.md` - 更新场景流程和系统说明
+- `docs/ARCHITECTURE.md` - 更新场景结构和切换流程
+- `docs/GAME_DESIGN.md` - 更新游戏流程
+- `docs/CONFIGURATION.md` - 添加地图配置说明
 - `docs/plans/2026-03-04-map-select-design.md` - 标记为已实施
 - `docs/plans/2026-03-04-map-select-implementation.md` - 标记为已完成
 
