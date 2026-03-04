@@ -1,6 +1,8 @@
 extends StaticBody2D
 class_name Tower
 
+var tower_type: String = "wall"  # 默认类型，子类可以覆盖
+
 @export var max_hp: float = 100.0
 @export var cost: int = 30
 

@@ -15,16 +15,21 @@ var tower_costs = {
 }
 
 func _ready():
+	print("=== placement.gd _ready() 开始 ===")
+	print("tower_inventory 中的塔数量: ", GameData.tower_inventory.size())
+
 	# 恢复之前布置的塔
 	for tower_data in GameData.tower_inventory:
 		var tower_type = tower_data["type"]
 		var tower_pos = tower_data["position"]
+		print("  准备恢复塔: 类型=", tower_type, ", 位置=", tower_pos)
 
 		if tower_scenes.has(tower_type):
 			var tower = tower_scenes[tower_type].instantiate()
 			tower.global_position = tower_pos
 			tower.add_to_group("towers")
 			add_child(tower)
+			print("  已恢复塔: 节点名称=", tower.name)
 
 	# 将商店购买的塔添加到金币中（作为可用资源）
 	for tower_type in GameData.purchased_towers:
@@ -112,18 +117,28 @@ func update_ui():
 	$UI/TowerButtons/SlowButton.disabled = GameData.coins < tower_costs["slow"]
 
 func start_battle():
+	print("=== start_battle() 开始 ===")
 	# 收集场景中所有塔的当前位置
 	var towers = get_tree().get_nodes_in_group("towers")
+	print("场景中的塔数量: ", towers.size())
+	for tower in towers:
+		print("  塔节点名称: ", tower.name)
+
 	var current_towers = []
 
 	for tower in towers:
+		# 使用 tower_type 属性而不是节点名称
 		var tower_type = ""
-		if tower.name.begins_with("TowerShooter"):
-			tower_type = "shooter"
-		elif tower.name.begins_with("TowerWall"):
-			tower_type = "wall"
-		elif tower.name.begins_with("TowerSlow"):
-			tower_type = "slow"
+		if tower.has_method("get") and "tower_type" in tower:
+			tower_type = tower.tower_type
+		else:
+			# 回退到节点名称识别（兼容性）
+			if tower.name.begins_with("TowerShooter"):
+				tower_type = "shooter"
+			elif tower.name.begins_with("TowerWall"):
+				tower_type = "wall"
+			elif tower.name.begins_with("TowerSlow"):
+				tower_type = "slow"
 
 		if tower_type != "":
 			current_towers.append({
@@ -133,5 +148,9 @@ func start_battle():
 
 	# 更新 tower_inventory 为当前所有塔（包括之前的和新布置的）
 	GameData.tower_inventory = current_towers
+
+	print("收集到的塔数据: ", current_towers.size())
+	for data in current_towers:
+		print("  类型: ", data["type"], ", 位置: ", data["position"])
 
 	get_tree().change_scene_to_file("res://scenes/main.tscn")

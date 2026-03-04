@@ -6,6 +6,7 @@ extends Tower
 @onready var slow_area: Area2D = $SlowArea
 
 func _ready():
+	tower_type = "slow"  # 设置塔类型
 	super._ready()
 
 	# 连接信号

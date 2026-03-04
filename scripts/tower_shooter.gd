@@ -10,6 +10,7 @@ extends Tower
 const BULLET_SCENE = preload("res://scenes/bullet.tscn")
 
 func _ready():
+	tower_type = "shooter"  # 设置塔类型
 	super._ready()
 	shoot_timer.wait_time = attack_rate
 	shoot_timer.timeout.connect(_on_shoot_timer_timeout)
