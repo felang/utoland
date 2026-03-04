@@ -20,7 +20,7 @@ func _ready():
 	hp_regen_timer = 0.0
 
 	# 应用被动属性
-	max_hp = GameData.player_stats["max_hp"]
+	max_hp = GameData.player_stats["max_hp"] * GameData.player_stats["hp_mult"]
 	current_hp = max_hp
 	speed = GameData.character_speed * GameData.player_stats["move_speed_mult"]
 

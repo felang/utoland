@@ -10,8 +10,9 @@ var character_move_speed_mult: float = 1.0
 var character_hp_regen: float = 0.0
 
 var selected_weapon: String = "rifle"
-var player_stats = {
+var player_stats: Dictionary = {
 	"max_hp": 100.0,
+	"hp_mult": 1.0,
 	"hp_regen": 0.0,
 	"damage_mult": 1.0,
 	"attack_speed_mult": 1.0,
@@ -50,6 +51,7 @@ func reset() -> void:
 	# 将角色属性同步到 player_stats
 	player_stats = {
 		"max_hp": character_max_hp,
+		"hp_mult": 1.0,
 		"hp_regen": character_hp_regen,
 		"damage_mult": character_damage_mult,
 		"attack_speed_mult": character_attack_speed_mult,

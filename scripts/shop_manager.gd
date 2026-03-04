@@ -1,15 +1,15 @@
 extends Control
 
-var shop_items = []
-var passive_upgrades = [
-	{"name": "最大生命值+20", "stat": "max_hp", "value": 20},
+var shop_items: Array[Dictionary] = []
+var passive_upgrades: Array[Dictionary] = [
+	{"name": "最大生命值+20%", "stat": "hp_mult", "value": 0.2},
 	{"name": "生命回复+5/5秒", "stat": "hp_regen", "value": 5},
 	{"name": "伤害+10%", "stat": "damage_mult", "value": 0.1},
 	{"name": "攻击速度+15%", "stat": "attack_speed_mult", "value": 0.15},
 	{"name": "移动速度+10%", "stat": "move_speed_mult", "value": 0.1},
 	{"name": "工程学+20%", "stat": "tower_mult", "value": 0.2}
 ]
-var tower_types = ["shooter", "wall", "slow"]
+var tower_types: Array[String] = ["shooter", "wall", "slow"]
 
 @onready var coin_label = $VBoxContainer/CoinLabel
 @onready var refresh_button = $VBoxContainer/ButtonsContainer/RefreshButton
@@ -21,7 +21,7 @@ var tower_types = ["shooter", "wall", "slow"]
 	$VBoxContainer/ItemsContainer/Item4
 ]
 
-func _ready():
+func _ready() -> void:
 	refresh_button.pressed.connect(on_refresh_pressed)
 	confirm_button.pressed.connect(on_confirm_pressed)
 	
@@ -33,7 +33,7 @@ func _ready():
 	refresh_shop()
 	update_ui()
 
-func refresh_shop():
+func refresh_shop() -> void:
 	shop_items = []
 	for i in range(4):
 		var rand = randf()
@@ -67,7 +67,7 @@ func refresh_shop():
 
 	display_items()
 
-func display_items():
+func display_items() -> void:
 	for i in range(4):
 		var item = shop_items[i]
 		var name_label = item_containers[i].get_node("NameLabel" if i == 0 else "NameLabel2")
@@ -78,43 +78,40 @@ func display_items():
 		price_label.text = "价格: %d" % item["cost"]
 		buy_button.disabled = GameData.coins < item["cost"]
 
-func buy_item(index: int):
-	var item = shop_items[index]
+func buy_item(index: int) -> void:
+	var item: Dictionary = shop_items[index]
 	if GameData.coins < item["cost"]:
 		return
-	
+
 	GameData.coins -= item["cost"]
-	
-	if item.has("stat"):  # 被动属性
-		if item["stat"].ends_with("_mult"):
-			GameData.player_stats[item["stat"]] += item["value"]
-		else:
-			GameData.player_stats[item["stat"]] += item["value"]
+
+	if item.has("stat"):  # 被动属性升级
+		GameData.player_stats[item["stat"]] += item["value"]
 	elif item.has("type"):  # 植物塔
 		GameData.purchased_towers.append(item["type"])
 	elif item.has("effect"):  # 消耗品
 		apply_consumable(item)
-	
+
 	update_ui()
 
-func apply_consumable(item):
+func apply_consumable(item: Dictionary) -> void:
 	if item["effect"] == "heal":
 		GameData.pending_heal += item["value"]
 
-func on_refresh_pressed():
+func on_refresh_pressed() -> void:
 	if GameData.coins < GameConfig.SHOP["refresh_cost"]:
 		return
 	GameData.coins -= GameConfig.SHOP["refresh_cost"]
 	refresh_shop()
 	update_ui()
 
-func on_confirm_pressed():
+func on_confirm_pressed() -> void:
 	get_tree().change_scene_to_file("res://scenes/placement.tscn")
 
-func start_next_wave():
+func start_next_wave() -> void:
 	get_tree().change_scene_to_file("res://scenes/main.tscn")
 
-func update_ui():
+func update_ui() -> void:
 	coin_label.text = "金币: %d" % GameData.coins
 	refresh_button.disabled = GameData.coins < GameConfig.SHOP["refresh_cost"]
 	display_items()
