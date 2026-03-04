@@ -4,7 +4,36 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a Godot 4.6 game project named "utoland" that uses the GDAI MCP plugin for AI-assisted game development. The project enables AI to control the Godot Editor through MCP (Model Context Protocol) to create scenes, nodes, scripts, and debug code.
+This is a Godot 4.6 game project named "utoland" - a 2D tower defense + survival shooter hybrid. The project uses the GDAI MCP plugin for AI-assisted game development.
+
+**Game Type**: Tower Defense + Survival Shooter
+**Core Loop**: Character selection → Weapon selection → Tower placement → Wave combat → Shop upgrades → Repeat
+
+## Key Architecture
+
+### Game Systems
+
+**Configuration-Driven Design**:
+- All game values centralized in `game_config.gd`
+- No hardcoding allowed - must read from GameConfig
+- See `.claude/rules/no-hardcode.md`
+
+**State Management**:
+- Cross-scene state uses `GameData` AutoLoad singleton
+- Scene transitions destroy nodes, data must persist
+- See `.claude/rules/use-gamedata.md`
+
+**Core Systems**:
+- **Character System**: 3 playable characters (Warrior, Ranger, Tank) with unique stats
+- **Weapon System**: 3 weapons (Rifle, Shotgun, Sniper) with different playstyles
+- **Tower System**: 3 tower types (Shooter, Wall, Slow) for strategic placement
+- **Wave System**: 10 waves with increasing difficulty
+- **Shop System**: Between-wave upgrades for player stats and towers
+
+**Scene Flow**:
+```
+Start Menu → Character Select → Weapon Select → Placement → Combat → Shop → Placement → Combat → ... → Result
+```
 
 ## Key Architecture
 

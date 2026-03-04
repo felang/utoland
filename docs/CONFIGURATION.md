@@ -60,6 +60,9 @@ extends Node
 # 开发模式开关
 const DEBUG_MODE = true
 
+# 角色配置
+const CHARACTERS = { ... }
+
 # 武器配置
 const WEAPONS = { ... }
 
@@ -83,7 +86,77 @@ const SHOP = { ... }
 
 ## 配置项详解
 
-### 1. 武器配置 (WEAPONS)
+### 1. 角色配置 (CHARACTERS)
+
+```gdscript
+const CHARACTERS = {
+    "warrior": {
+        "name": "战士",
+        "description": "高生命值，低速度",
+        "max_hp": 150.0,              # 最大生命值
+        "speed": 180.0,               # 移动速度
+        "damage_mult": 1.2,           # 伤害倍率
+        "attack_speed_mult": 1.0,     # 攻速倍率
+        "move_speed_mult": 0.9,       # 移速倍率
+        "hp_regen": 0.0               # 生命回复（每5秒）
+    },
+    "ranger": {
+        "name": "游侠",
+        "description": "低生命值，高速度",
+        "max_hp": 80.0,
+        "speed": 250.0,
+        "damage_mult": 0.9,
+        "attack_speed_mult": 1.1,
+        "move_speed_mult": 1.25,
+        "hp_regen": 0.0
+    },
+    "tank": {
+        "name": "坦克",
+        "description": "超高生命值，极低速度",
+        "max_hp": 200.0,
+        "speed": 150.0,
+        "damage_mult": 0.8,
+        "attack_speed_mult": 0.9,
+        "move_speed_mult": 0.75,
+        "hp_regen": 1.0
+    }
+}
+```
+
+**字段说明**:
+
+| 字段 | 类型 | 说明 | 影响 |
+|------|------|------|------|
+| `name` | String | 角色显示名称 | UI 显示 |
+| `description` | String | 角色描述 | UI 显示 |
+| `max_hp` | float | 初始最大生命值 | 生存能力 |
+| `speed` | float | 初始移动速度 | 走位能力 |
+| `damage_mult` | float | 伤害倍率 | 武器伤害 = 基础伤害 × 倍率 |
+| `attack_speed_mult` | float | 攻速倍率 | 射击间隔 = 基础间隔 / 倍率 |
+| `move_speed_mult` | float | 移速倍率 | 影响商店速度升级效果 |
+| `hp_regen` | float | 生命回复 | 每5秒回复量 |
+
+**使用方式**:
+
+```gdscript
+# 在 character_select.tscn 中选择角色
+GameData.current_character = "warrior"
+
+# 在 weapon_select.gd 的 _ready() 中初始化
+GameData.init_character()
+
+# 角色属性会初始化到 GameData.player_stats
+```
+
+**角色平衡**:
+
+| 角色 | 生命值 | 速度 | 伤害 | 特点 |
+|------|--------|------|------|------|
+| 战士 | 150 | 180 | 1.2x | 平衡型，适合新手 |
+| 游侠 | 80 | 250 | 0.9x | 高风险高回报 |
+| 坦克 | 200 | 150 | 0.8x | 容错率高，自带回血 |
+
+### 2. 武器配置 (WEAPONS)
 
 ```gdscript
 const WEAPONS = {

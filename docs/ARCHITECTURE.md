@@ -44,6 +44,8 @@ scenes/
 ```
 开始菜单 (start_menu.tscn)
     ↓ 点击"开始游戏"
+角色选择 (character_select.tscn)
+    ↓ 选择角色
 武器选择 (weapon_select.tscn)
     ↓ 选择武器
 布置场景 (placement.tscn)
@@ -83,6 +85,7 @@ scripts/
 ├── main.gd                   # 战斗场景控制器
 ├── shop_manager.gd           # 商店管理器
 ├── start_menu.gd             # 开始菜单
+├── character_select.gd       # 角色选择
 ├── weapon_select.gd          # 武器选择
 └── result.gd                 # 结算界面
 ```
@@ -150,6 +153,7 @@ func apply_passive_upgrade(type, value)  # 应用被动升级
 
 **配置模块**:
 
+- `CHARACTERS` - 角色配置（生命、速度、伤害倍率等）
 - `WEAPONS` - 武器配置（伤害、射速、子弹数等）
 - `ENEMIES` - 敌人配置（生命、速度、伤害、掉落）
 - `TOWERS` - 塔配置（生命、伤害、射程、价格）
@@ -171,7 +175,39 @@ max_hp = enemy_config["hp"]
 
 详见 [配置系统文档](CONFIGURATION.md)
 
-### 3. 玩家系统
+### 3. 角色系统
+
+**文件**: `scripts/game_data.gd`
+
+**核心功能**:
+- 角色选择（战士、游侠、坦克）
+- 角色基础属性初始化
+- 商店升级在角色基础上叠加
+
+**角色配置**:
+
+| 角色 | 生命值 | 速度 | 伤害倍率 | 攻速倍率 | 生命回复 |
+|------|--------|------|----------|----------|----------|
+| 战士 | 150 | 180 | 1.2x | 1.0x | 0 |
+| 游侠 | 80 | 250 | 0.9x | 1.1x | 0 |
+| 坦克 | 200 | 150 | 0.8x | 0.9x | 1.0/5秒 |
+
+**初始化流程**:
+
+```gdscript
+# 在 character_select.tscn 中选择角色
+GameData.current_character = "warrior"
+
+# 在 weapon_select.gd 的 _ready() 中初始化
+GameData.init_character()
+```
+
+**数据流**:
+```
+角色选择 → init_character() → player_stats 初始化 → 商店升级叠加
+```
+
+### 4. 玩家系统
 
 **文件**: `scripts/player.gd`
 
