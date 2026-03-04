@@ -37,17 +37,36 @@ The project has the GDAI MCP plugin installed at `addons/gdai-mcp-plugin-godot/`
 
 When working in this project, you have access to specialized Godot MCP tools:
 
-- `mcp__godot__launch_editor` - Launch Godot editor
-- `mcp__godot__run_project` - Run the project
-- `mcp__godot__get_debug_output` - Get debug output and errors
-- `mcp__godot__stop_project` - Stop running project
-- `mcp__godot__create_scene` - Create new scene files
-- `mcp__godot__add_node` - Add nodes to scenes
-- `mcp__godot__load_sprite` - Load sprites into Sprite2D nodes
-- `mcp__godot__save_scene` - Save scene changes
-- `mcp__godot__get_project_info` - Get project metadata
-- `mcp__godot__get_uid` - Get file UIDs
-- `mcp__godot__update_project_uids` - Update UID references
+- `mcp__gdai-mcp__get_scene_tree` - Get recursive tree view of all nodes in current scene
+- `mcp__gdai-mcp__get_godot_errors` - Get errors from Godot (script errors, etc.)
+- `mcp__gdai-mcp__get_filesystem_tree` - Get recursive tree view of project files
+- `mcp__gdai-mcp__get_project_info` - Get project information from project.godot
+- `mcp__gdai-mcp__get_scene_file_content` - Get raw content of current scene
+- `mcp__gdai-mcp__search_files` - Search filesystem with fuzzy matching
+- `mcp__gdai-mcp__get_open_scripts` - Get list of scripts open in editor
+- `mcp__gdai-mcp__view_script` - View contents of a GDScript file
+- `mcp__gdai-mcp__get_editor_screenshot` - Screenshot of Godot editor window
+- `mcp__gdai-mcp__get_running_scene_screenshot` - Screenshot of running game window
+- `mcp__gdai-mcp__add_node` - Add new node to parent in current scene
+- `mcp__gdai-mcp__add_resource` - Add resource/subresource as property to node
+- `mcp__gdai-mcp__add_scene` - Add scene as node to parent
+- `mcp__gdai-mcp__create_script` - Create GDScript file with content
+- `mcp__gdai-mcp__attach_script` - Attach script to node
+- `mcp__gdai-mcp__create_scene` - Create new scene with root node
+- `mcp__gdai-mcp__edit_file` - Edit file with find and replace
+- `mcp__gdai-mcp__open_scene` - Open scene in editor
+- `mcp__gdai-mcp__update_property` - Update property of node in scene
+- `mcp__gdai-mcp__delete_node` - Delete node in current scene
+- `mcp__gdai-mcp__delete_scene` - Delete scene file
+- `mcp__gdai-mcp__play_scene` - Play current or main scene
+- `mcp__gdai-mcp__execute_editor_script` - Execute arbitrary GDScript in editor
+- `mcp__gdai-mcp__clear_output_logs` - Clear output logs in editor
+- `mcp__gdai-mcp__stop_running_scene` - Stop currently running scene
+- `mcp__gdai-mcp__set_anchor_preset` - Set anchor preset for Control node
+- `mcp__gdai-mcp__duplicate_node` - Duplicate existing node
+- `mcp__gdai-mcp__move_node` - Move node to different parent
+- `mcp__gdai-mcp__simulate_input` - Simulate input actions in running game
+- `mcp__gdai-mcp__get_input_map` - Get input actions defined in project
 
 Use these tools to interact with the Godot project programmatically.
 
