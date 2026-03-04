@@ -112,6 +112,40 @@ const PLAYER = {
 	"hp_regen_interval": 5.0
 }
 
+# 角色配置
+const CHARACTERS = {
+	"warrior": {
+		"name": "战士",
+		"description": "高生命值，低速度",
+		"max_hp": 150.0,
+		"speed": 180.0,
+		"damage_mult": 1.2,
+		"attack_speed_mult": 1.0,
+		"move_speed_mult": 0.9,
+		"hp_regen": 0.0
+	},
+	"ranger": {
+		"name": "游侠",
+		"description": "低生命值，高速度",
+		"max_hp": 80.0,
+		"speed": 250.0,
+		"damage_mult": 0.9,
+		"attack_speed_mult": 1.1,
+		"move_speed_mult": 1.25,
+		"hp_regen": 0.0
+	},
+	"tank": {
+		"name": "坦克",
+		"description": "超高生命值，极低速度",
+		"max_hp": 200.0,
+		"speed": 150.0,
+		"damage_mult": 0.8,
+		"attack_speed_mult": 0.9,
+		"move_speed_mult": 0.75,
+		"hp_regen": 1.0
+	}
+}
+
 # 商店配置
 const SHOP = {
 	"refresh_cost": 10,
