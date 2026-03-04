@@ -1,71 +1,123 @@
 extends Node
 
-# 游戏全局配置文件
-# 用于快速调整游戏平衡性参数
+# 配置驱动优化 - 游戏配置中心
+# 所有游戏数值统一在此管理
 
-class_name GameConfig
+# 开发模式开关
+const DEBUG_MODE = true
 
-# ========== 玩家配置 ==========
-const PLAYER_MAX_HP = 100
-const PLAYER_MOVE_SPEED = 200.0
-const PLAYER_HIT_COOLDOWN = 0.5  # 受击无敌时间
+# 武器配置
+const WEAPONS = {
+	"rifle": {
+		"name": "步枪",
+		"fire_rate": 0.1,
+		"damage": 10.0,
+		"bullet_count": 1,
+		"bullet_speed": 600
+	},
+	"shotgun": {
+		"name": "霰弹枪",
+		"fire_rate": 0.6,
+		"damage": 6.0,
+		"bullet_count": 5,
+		"spread_angles": [-7.5, -3.75, 0, 3.75, 7.5],
+		"bullet_speed": 500
+	},
+	"sniper": {
+		"name": "狙击枪",
+		"fire_rate": 1.0,
+		"damage": 30.0,
+		"bullet_count": 1,
+		"bullet_speed": 800
+	}
+}
 
-# ========== 武器配置 ==========
-const WEAPON_RANGE = 400.0  # 自动索敌范围
-const WEAPON_FIRE_RATE = 0.1  # 速射枪射击间隔（秒）
-const WEAPON_DAMAGE = 10
+# 敌人配置
+const ENEMIES = {
+	"normal": {
+		"name": "普通敌人",
+		"hp": 50.0,
+		"speed": 100.0,
+		"damage": 10.0,
+		"coin_drop_min": 1,
+		"coin_drop_max": 3
+	},
+	"fast": {
+		"name": "快速敌人",
+		"hp": 35.0,
+		"speed": 180.0,
+		"damage": 8.0,
+		"coin_drop_min": 2,
+		"coin_drop_max": 4
+	},
+	"tank": {
+		"name": "坦克敌人",
+		"hp": 200.0,
+		"speed": 50.0,
+		"damage": 25.0,
+		"coin_drop_min": 5,
+		"coin_drop_max": 10
+	}
+}
 
-# ========== 子弹配置 ==========
-const BULLET_SPEED = 600.0
-const BULLET_LIFETIME = 2.0  # 子弹存活时间（秒）
+# 塔配置
+const TOWERS = {
+	"shooter": {
+		"name": "射手塔",
+		"hp": 80.0,
+		"damage": 15.0,
+		"fire_rate": 1.0,
+		"range": 300.0,
+		"shop_price_min": 35,
+		"shop_price_max": 45
+	},
+	"wall": {
+		"name": "墙塔",
+		"hp": 300.0,
+		"shop_price_min": 35,
+		"shop_price_max": 45
+	},
+	"slow": {
+		"name": "减速塔",
+		"hp": 70.0,
+		"range": 200.0,
+		"slow_percent": 0.3,
+		"shop_price_min": 35,
+		"shop_price_max": 45
+	}
+}
 
-# ========== 敌人配置 ==========
-const ENEMY_NORMAL_HP = 30
-const ENEMY_NORMAL_SPEED = 80.0
-const ENEMY_NORMAL_DAMAGE = 10
-const ENEMY_NORMAL_COIN_DROP = 5
+# 波次配置
+const WAVES = {
+	"total_waves": 10,
+	"wave_configs": [
+		{"duration": 45, "spawn_interval": 1.5, "enemy_types": ["normal"]},
+		{"duration": 45, "spawn_interval": 1.5, "enemy_types": ["normal"]},
+		{"duration": 50, "spawn_interval": 1.0, "enemy_types": ["normal", "fast"]},
+		{"duration": 50, "spawn_interval": 1.0, "enemy_types": ["normal", "fast"]},
+		{"duration": 55, "spawn_interval": 1.0, "enemy_types": ["normal", "fast"]},
+		{"duration": 55, "spawn_interval": 0.8, "enemy_types": ["normal", "fast", "tank"]},
+		{"duration": 60, "spawn_interval": 0.8, "enemy_types": ["normal", "fast", "tank"]},
+		{"duration": 60, "spawn_interval": 0.8, "enemy_types": ["normal", "fast", "tank"]},
+		{"duration": 60, "spawn_interval": 0.5, "enemy_types": ["normal", "fast", "tank"]},
+		{"duration": 60, "spawn_interval": 0.5, "enemy_types": ["normal", "fast", "tank"]}
+	]
+}
 
-const ENEMY_FAST_HP = 20
-const ENEMY_FAST_SPEED = 150.0
-const ENEMY_FAST_DAMAGE = 8
-const ENEMY_FAST_COIN_DROP = 8
+# 玩家配置
+const PLAYER = {
+	"initial_hp": 100.0,
+	"initial_speed": 200.0,
+	"initial_coins": 100,
+	"hp_regen_interval": 5.0
+}
 
-const ENEMY_TANK_HP = 100
-const ENEMY_TANK_SPEED = 50.0
-const ENEMY_TANK_DAMAGE = 20
-const ENEMY_TANK_COIN_DROP = 15
-
-# ========== 植物塔配置 ==========
-const TOWER_SHOOTER_HP = 80
-const TOWER_SHOOTER_DAMAGE = 10
-const TOWER_SHOOTER_FIRE_RATE = 1.0
-const TOWER_SHOOTER_RANGE = 300.0
-const TOWER_SHOOTER_COST = 30
-
-const TOWER_WALL_HP = 300
-const TOWER_WALL_COST = 40
-
-const TOWER_SLOW_HP = 70
-const TOWER_SLOW_RANGE = 200.0
-const TOWER_SLOW_EFFECT = 0.5  # 减速 50%
-const TOWER_SLOW_COST = 35
-
-# ========== 波次配置 ==========
-const WAVE_DURATION = [45, 45, 45, 50, 50, 50, 60, 60, 60, 60]  # 每波时长（秒）
-const WAVE_SPAWN_INTERVAL = [2.0, 1.8, 1.5, 1.2, 1.0, 0.8, 0.6, 0.5, 0.4, 0.3]  # 刷怪间隔
-
-# ========== 经济配置 ==========
-const INITIAL_COINS = 50  # 初始金币
-const COIN_PICKUP_RANGE = 100.0  # 自动吸附范围
-const SHOP_REFRESH_COST = 10  # 商店刷新花费
-
-# ========== 网格配置 ==========
-const GRID_SIZE = 32  # 植物塔放置网格大小（像素）
-
-# ========== 地图配置 ==========
-const MAP_WIDTH = 3200
-const MAP_HEIGHT = 2400
-
-# ========== 摄像机配置 ==========
-const CAMERA_ZOOM = Vector2(1.0, 1.0)
-const CAMERA_SMOOTHING = 5.0
+# 商店配置
+const SHOP = {
+	"refresh_cost": 10,
+	"item_count": 4,
+	"passive_price_min": 20,
+	"passive_price_max": 40,
+	"heal_price": 12,
+	"heal_amount": 50
+}
