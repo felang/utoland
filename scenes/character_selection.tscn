@@ -5,15 +5,35 @@
 [node name="root" type="Control" unique_id=282648690]
 script = ExtResource("1_xxxxx")
 layout_mode = 3
-anchors_preset = 0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
 [node name="TitleLabel" type="Label" parent="." unique_id=289252906]
-layout_mode = 0
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 50.0
+offset_bottom = 100.0
+grow_horizontal = 2
 text = "选择角色"
 horizontal_alignment = 1
 
 [node name="CharacterContainer" type="HBoxContainer" parent="." unique_id=1179168628]
-layout_mode = 0
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -300.0
+offset_top = -50.0
+offset_right = 300.0
+offset_bottom = 50.0
+grow_horizontal = 2
+grow_vertical = 2
 
 [node name="WarriorButton" type="Button" parent="CharacterContainer" unique_id=1448305146]
 layout_mode = 2
