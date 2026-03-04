@@ -117,12 +117,12 @@ func start_battle():
 	var current_towers = []
 
 	for tower in towers:
-		# 使用 tower_type 属性而不是节点名称
+		# 优先使用 tower_type 属性
 		var tower_type = ""
-		if tower.has_method("get") and "tower_type" in tower:
+		if "tower_type" in tower:
 			tower_type = tower.tower_type
 		else:
-			# 回退到节点名称识别（兼容性）
+			# 降级方案：通过名称判断
 			if tower.name.begins_with("TowerShooter"):
 				tower_type = "shooter"
 			elif tower.name.begins_with("TowerWall"):

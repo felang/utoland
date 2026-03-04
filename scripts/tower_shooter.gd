@@ -1,5 +1,7 @@
 extends Tower
 
+var tower_type: String = "shooter"
+
 @export var attack_range: float = 300.0
 @export var attack_damage: float = 10.0
 @export var attack_rate: float = 1.0
@@ -10,7 +12,14 @@ extends Tower
 const BULLET_SCENE = preload("res://scenes/bullet.tscn")
 
 func _ready():
-	tower_type = "shooter"  # 设置塔类型
+	# 从 GameConfig 读取配置
+	var tower_data = GameConfig.TOWERS[tower_type]
+	max_hp = tower_data["hp"]
+	current_hp = tower_data["hp"]
+	attack_damage = tower_data["damage"] * GameData.player_stats["tower_mult"]
+	attack_rate = tower_data["fire_rate"]
+	attack_range = tower_data["range"]
+
 	super._ready()
 	shoot_timer.wait_time = attack_rate
 	shoot_timer.timeout.connect(_on_shoot_timer_timeout)
