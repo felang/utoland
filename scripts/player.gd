@@ -13,7 +13,7 @@ var weapon_damage: float = 10.0
 var bullet_scene = preload("res://scenes/bullet.tscn")
 var hp_regen_timer: float = 0.0
 
-func _ready():
+func _ready() -> void:
 	add_to_group("player")
 
 	# 重置生命回复计时器（修复已知问题 #2）
@@ -30,14 +30,14 @@ func _ready():
 		GameData.pending_heal = 0
 
 	# 从 GameConfig 读取武器配置
-	var weapon_data = GameConfig.WEAPONS[GameData.selected_weapon]
+	var weapon_data: Dictionary = GameConfig.WEAPONS[GameData.selected_weapon]
 	fire_rate = weapon_data["fire_rate"] / GameData.player_stats["attack_speed_mult"]
 	weapon_damage = weapon_data["damage"] * GameData.player_stats["damage_mult"]
 
 	# 同步金币
 	coins = GameData.coins
 
-func _process(delta):
+func _process(delta: float) -> void:
 	if invincible_timer > 0:
 		invincible_timer -= delta
 	shoot_timer -= delta
@@ -48,12 +48,12 @@ func _process(delta):
 	hp_regen_timer += delta
 	if hp_regen_timer >= GameConfig.PLAYER["hp_regen_interval"]:
 		hp_regen_timer = 0.0
-		var regen_amount = GameData.character_hp_regen + GameData.player_stats["hp_regen"]
+		var regen_amount: float = GameData.character_hp_regen + GameData.player_stats["hp_regen"]
 		if regen_amount > 0:
 			current_hp = min(current_hp + regen_amount, max_hp)
 
-func _physics_process(_delta):
-	var input_vector = Vector2.ZERO
+func _physics_process(_delta: float) -> void:
+	var input_vector: Vector2 = Vector2.ZERO
 	input_vector.x = Input.get_axis("move_left", "move_right")
 	input_vector.y = Input.get_axis("move_up", "move_down")
 
@@ -65,13 +65,13 @@ func _physics_process(_delta):
 
 	check_enemy_collision()
 
-func check_enemy_collision():
+func check_enemy_collision() -> void:
 	for i in get_slide_collision_count():
-		var collision = get_slide_collision(i)
-		var collider = collision.get_collider()
+		var collision: KinematicCollision2D = get_slide_collision(i)
+		var collider: Object = collision.get_collider()
 		if collider and collider.is_in_group("enemies"):
 			if invincible_timer <= 0:
-				var enemy = collider
+				var enemy: Node = collider
 				if "touch_damage" in enemy:
 					take_damage(enemy.touch_damage)
 				else:
@@ -79,29 +79,29 @@ func check_enemy_collision():
 					take_damage(GameConfig.PLAYER["default_enemy_touch_damage"])
 				invincible_timer = invincible_duration
 
-func take_damage(amount: float):
+func take_damage(amount: float) -> void:
 	current_hp -= amount
 	print("Player HP: ", current_hp)
 	if current_hp <= 0:
 		die()
 
-func die():
+func die() -> void:
 	print("Player died!")
-	var wave_manager = get_tree().get_first_node_in_group("wave_manager")
+	var wave_manager: Node = get_tree().get_first_node_in_group("wave_manager")
 	if wave_manager:
 		GameData.current_wave = wave_manager.current_wave
 		wave_manager.game_lost.emit()
 	await get_tree().create_timer(1.0).timeout
 	get_tree().change_scene_to_file("res://scenes/ui/result.tscn")
 
-func auto_shoot():
-	var enemies = get_tree().get_nodes_in_group("enemies")
-	var closest_enemy = null
-	var min_distance = weapon_range
+func auto_shoot() -> void:
+	var enemies: Array[Node] = get_tree().get_nodes_in_group("enemies")
+	var closest_enemy: Node2D = null
+	var min_distance: float = weapon_range
 
 	for enemy in enemies:
 		if enemy is Node2D:
-			var distance = global_position.distance_to(enemy.global_position)
+			var distance: float = global_position.distance_to(enemy.global_position)
 			if distance < min_distance:
 				min_distance = distance
 				closest_enemy = enemy
@@ -111,21 +111,21 @@ func auto_shoot():
 
 	shoot_timer = fire_rate
 
-func shoot_bullet(target_pos: Vector2):
+func shoot_bullet(target_pos: Vector2) -> void:
 	# 霰弹枪发射多发子弹，扇形散开
 	if GameData.selected_weapon == "shotgun":
-		var weapon_data = GameConfig.WEAPONS["shotgun"]
-		var spread_angles = weapon_data["spread_angles"]
-		var base_direction = global_position.direction_to(target_pos)
-		var base_angle = base_direction.angle()
+		var weapon_data: Dictionary = GameConfig.WEAPONS["shotgun"]
+		var spread_angles: Array = weapon_data["spread_angles"]
+		var base_direction: Vector2 = global_position.direction_to(target_pos)
+		var base_angle: float = base_direction.angle()
 
 		for angle_offset in spread_angles:
-			var bullet = bullet_scene.instantiate()
+			var bullet: Node2D = bullet_scene.instantiate()
 			bullet.global_position = global_position
-			var angle_rad = deg_to_rad(angle_offset)
+			var angle_rad: float = deg_to_rad(angle_offset)
 			bullet.direction = Vector2(cos(base_angle + angle_rad), sin(base_angle + angle_rad))
 			bullet.damage = weapon_damage
-			var parent = get_parent()
+			var parent: Node = get_parent()
 			if parent:
 				parent.add_child(bullet)
 			else:
@@ -133,17 +133,17 @@ func shoot_bullet(target_pos: Vector2):
 				bullet.queue_free()
 	else:
 		# 步枪和狙击枪发射单发子弹
-		var bullet = bullet_scene.instantiate()
+		var bullet: Node2D = bullet_scene.instantiate()
 		bullet.global_position = global_position
 		bullet.direction = global_position.direction_to(target_pos)
 		bullet.damage = weapon_damage
-		var parent = get_parent()
+		var parent: Node = get_parent()
 		if parent:
 			parent.add_child(bullet)
 		else:
 			push_error("Player has no parent to add bullet to")
 			bullet.queue_free()
 
-func add_coins(amount: int):
+func add_coins(amount: int) -> void:
 	coins += amount
 	GameData.coins = coins  # 同步到 GameData
