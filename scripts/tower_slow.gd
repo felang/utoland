@@ -1,13 +1,14 @@
 extends Tower
 
-var tower_type: String = "slow"
-
 @export var slow_radius: float = 200.0
 @export var slow_percent: float = 0.5
 
 @onready var slow_area: Area2D = $SlowArea
 
 func _ready():
+	# 设置塔类型
+	tower_type = "slow"
+
 	# 从 GameConfig 读取配置
 	var tower_data = GameConfig.TOWERS[tower_type]
 	max_hp = tower_data["hp"]
