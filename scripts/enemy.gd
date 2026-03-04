@@ -2,12 +2,15 @@ extends CharacterBody2D
 
 enum State { CHASE_PLAYER, ATTACK_TOWER }
 
-@export var speed: float = 150.0
-@export var max_hp: float = 30.0
-@export var tower_attack_damage: float = 5.0
+# 敌人类型（由生成器设置）
+var enemy_type: String = "normal"
+
 @export var tower_attack_rate: float = 1.0
 @export var touch_damage: float = 10.0
 
+var speed: float
+var max_hp: float
+var tower_attack_damage: float
 var base_speed: float
 var current_hp: float
 var current_state = State.CHASE_PLAYER
@@ -17,8 +20,14 @@ var player: Node2D = null
 var slow_effects: int = 0  # 记录当前有多少个减速效果
 
 func _ready():
-	base_speed = speed
+	# 从配置读取敌人属性
+	var enemy_data = GameConfig.ENEMIES[enemy_type]
+	max_hp = enemy_data["hp"]
 	current_hp = max_hp
+	speed = enemy_data["speed"]
+	base_speed = speed
+	tower_attack_damage = enemy_data["damage"]
+
 	add_to_group("enemies")
 	player = get_tree().get_first_node_in_group("player")
 
@@ -67,7 +76,9 @@ func drop_coins():
 		return
 
 	var coin_scene = preload("res://scenes/coin.tscn")
-	var coin_count = randi_range(2, 5)  # 增加金币掉落数量
+	# 从配置读取金币掉落数量
+	var enemy_data = GameConfig.ENEMIES[enemy_type]
+	var coin_count = randi_range(enemy_data["coin_drop_min"], enemy_data["coin_drop_max"])
 	for i in coin_count:
 		var coin = coin_scene.instantiate()
 		coin.global_position = global_position + Vector2(randf_range(-20, 20), randf_range(-20, 20))

@@ -53,6 +53,9 @@ func spawn_enemy():
 	var random_type = enemy_types[randi() % enemy_types.size()]
 	var enemy = enemy_scenes[random_type].instantiate()
 
+	# 设置敌人类型
+	enemy.enemy_type = random_type
+
 	var spawn_pos = get_random_spawn_position()
 	enemy.global_position = spawn_pos
 	get_parent().add_child(enemy)
