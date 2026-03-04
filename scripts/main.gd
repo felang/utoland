@@ -19,5 +19,4 @@ func _ready():
 			tower.global_position = tower_pos
 			add_child(tower)
 
-	# 清空已恢复的塔列表，避免重复生成
-	GameData.tower_inventory.clear()
+	# 不再清空 tower_inventory，保留已布置的塔数据供下次布置场景使用
