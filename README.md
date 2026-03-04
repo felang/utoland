@@ -135,6 +135,6 @@ utoland/
 
 ## 相关文档
 
-- [角色系统设计文档](docs/2026-03-03-character-system-design.md)
-- [角色系统实施计划](docs/2026-03-03-character-system-implementation-plan.md)
+- [角色系统设计文档](docs/plans/2026-03-04-character-system-design.md)
+- [角色系统实施计划](docs/plans/2026-03-04-character-system-implementation.md)
 - [实施总结](docs/IMPLEMENTATION_SUMMARY.md)
