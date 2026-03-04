@@ -12,6 +12,6 @@ func _ready() -> void:
 func _on_character_selected(character_id: String) -> void:
 	GameData.current_character = character_id
 	print("选择角色: ", character_id)
-	var err := get_tree().change_scene_to_file("res://scenes/placement.tscn")
+	var err := get_tree().change_scene_to_file("res://scenes/ui/weapon_select.tscn")
 	if err != OK:
 		push_error("场景切换失败: " + str(err))
