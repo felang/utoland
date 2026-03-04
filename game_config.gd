@@ -156,3 +156,21 @@ const SHOP = {
 	"heal_price": 12,
 	"heal_amount": 50
 }
+
+# 地图配置
+const MAPS = {
+	"forest": {
+		"name": "森林",
+		"description": "茂密的森林环境",
+		"preview_image": "res://assets/maps/forest_preview.png",
+		"background": "res://assets/maps/forest_bg.png",
+		"fallback_color": "#2d5016"
+	},
+	"desert": {
+		"name": "沙漠",
+		"description": "炎热的沙漠地带",
+		"preview_image": "res://assets/maps/desert_preview.png",
+		"background": "res://assets/maps/desert_bg.png",
+		"fallback_color": "#d4a574"
+	}
+}
