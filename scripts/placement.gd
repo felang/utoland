@@ -15,6 +15,17 @@ var tower_costs = {
 }
 
 func _ready():
+	# 恢复之前布置的塔
+	for tower_data in GameData.tower_inventory:
+		var tower_type = tower_data["type"]
+		var tower_pos = tower_data["position"]
+
+		if tower_scenes.has(tower_type):
+			var tower = tower_scenes[tower_type].instantiate()
+			tower.global_position = tower_pos
+			tower.add_to_group("towers")
+			add_child(tower)
+
 	# 将商店购买的塔添加到金币中（作为可用资源）
 	for tower_type in GameData.purchased_towers:
 		GameData.coins += tower_costs[tower_type]
@@ -101,9 +112,10 @@ func update_ui():
 	$UI/TowerButtons/SlowButton.disabled = GameData.coins < tower_costs["slow"]
 
 func start_battle():
-	# 保存塔的位置到 GameData
+	# 收集场景中所有塔的当前位置
 	var towers = get_tree().get_nodes_in_group("towers")
-	GameData.tower_inventory = []
+	var current_towers = []
+
 	for tower in towers:
 		var tower_type = ""
 		if tower.name.begins_with("TowerShooter"):
@@ -112,10 +124,14 @@ func start_battle():
 			tower_type = "wall"
 		elif tower.name.begins_with("TowerSlow"):
 			tower_type = "slow"
-		
-		GameData.tower_inventory.append({
-			"type": tower_type,
-			"position": tower.global_position
-		})
+
+		if tower_type != "":
+			current_towers.append({
+				"type": tower_type,
+				"position": tower.global_position
+			})
+
+	# 更新 tower_inventory 为当前所有塔（包括之前的和新布置的）
+	GameData.tower_inventory = current_towers
 
 	get_tree().change_scene_to_file("res://scenes/main.tscn")
