@@ -1,11 +1,11 @@
 extends CharacterBody2D
 
-var speed: float
-var max_hp: float
+var speed: float = 0.0  # 从 GameData 初始化
+var max_hp: float = 0.0  # 从 GameData 初始化
 @export var weapon_range: float = 300.0
 @export var fire_rate: float = 0.1
 @export var invincible_duration: float = 0.5
-var current_hp: float
+var current_hp: float = 0.0
 var coins: int = 0
 var shoot_timer: float = 0.0
 var invincible_timer: float = 0.0
@@ -75,7 +75,8 @@ func check_enemy_collision():
 				if "touch_damage" in enemy:
 					take_damage(enemy.touch_damage)
 				else:
-					take_damage(10.0)  # 默认伤害值
+					# 如果敌人没有 touch_damage 属性，使用配置的默认值
+					take_damage(GameConfig.PLAYER["default_enemy_touch_damage"])
 				invincible_timer = invincible_duration
 
 func take_damage(amount: float):
