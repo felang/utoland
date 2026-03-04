@@ -4,6 +4,11 @@ extends Control
 @onready var desert_button: Button = $VBoxContainer/MapCardsContainer/DesertCard/DesertButton
 
 func _ready() -> void:
+	# 验证节点存在
+	if not forest_button or not desert_button:
+		push_error("地图选择按钮未找到")
+		return
+
 	# 连接按钮信号
 	forest_button.pressed.connect(_on_map_selected.bind("forest"))
 	desert_button.pressed.connect(_on_map_selected.bind("desert"))
