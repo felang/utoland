@@ -1,7 +1,7 @@
 extends CharacterBody2D
 
-@export var speed: float = 200.0
-@export var max_hp: float = 100.0
+var speed: float
+var max_hp: float
 @export var weapon_range: float = 300.0
 @export var fire_rate: float = 0.1
 @export var invincible_duration: float = 0.5
@@ -48,7 +48,7 @@ func _process(delta):
 	hp_regen_timer += delta
 	if hp_regen_timer >= GameConfig.PLAYER["hp_regen_interval"]:
 		hp_regen_timer = 0.0
-		var regen_amount = GameData.player_stats["hp_regen"]
+		var regen_amount = GameData.character_hp_regen
 		if regen_amount > 0:
 			current_hp = min(current_hp + regen_amount, max_hp)
 
