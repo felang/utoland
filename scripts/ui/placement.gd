@@ -4,16 +4,6 @@ const GRID_SIZE = 32
 @onready var background_sprite: Sprite2D = $Background/BackgroundSprite
 var selected_tower_type: String = ""
 var preview_tower: Node2D = null
-var tower_scenes = {
-	"shooter": preload("res://scenes/towers/tower_shooter.tscn"),
-	"wall": preload("res://scenes/towers/tower_wall.tscn"),
-	"slow": preload("res://scenes/towers/tower_slow.tscn")
-}
-var tower_costs = {
-	"shooter": 30,
-	"wall": 40,
-	"slow": 35
-}
 
 func _ready():
 	load_map_background()
@@ -23,15 +13,15 @@ func _ready():
 		var tower_type = tower_data["type"]
 		var tower_pos = tower_data["position"]
 
-		if tower_scenes.has(tower_type):
-			var tower = tower_scenes[tower_type].instantiate()
+		var tower = SceneFactory.create_tower(tower_type)
+		if tower:
 			tower.global_position = tower_pos
 			tower.add_to_group("towers")
 			add_child(tower)
 
 	# 将商店购买的塔添加到金币中（作为可用资源）
 	for tower_type in GameData.purchased_towers:
-		GameData.coins += tower_costs[tower_type]
+		GameData.coins += SceneFactory.get_tower_cost(tower_type)
 	GameData.purchased_towers.clear()
 
 	# 连接按钮信号
@@ -54,22 +44,25 @@ func _input(event):
 			cancel_placement()
 
 func select_tower(type: String):
-	if GameData.coins < tower_costs[type]:
+	var cost = SceneFactory.get_tower_cost(type)
+	if GameData.coins < cost:
 		return
 
 	selected_tower_type = type
 	if preview_tower:
 		preview_tower.queue_free()
 
-	preview_tower = tower_scenes[type].instantiate()
-	preview_tower.modulate = Color(1, 1, 1, 0.5)
-	add_child(preview_tower)
+	preview_tower = SceneFactory.create_tower(type)
+	if preview_tower:
+		preview_tower.modulate = Color(1, 1, 1, 0.5)
+		add_child(preview_tower)
 
 func place_tower():
 	if not can_place_at(preview_tower.global_position):
 		return
 
-	GameData.coins -= tower_costs[selected_tower_type]
+	var cost = SceneFactory.get_tower_cost(selected_tower_type)
+	GameData.coins -= cost
 	preview_tower.modulate = Color(1, 1, 1, 1)
 	preview_tower.add_to_group("towers")
 	preview_tower = null
@@ -108,11 +101,11 @@ func cancel_placement():
 
 func update_ui():
 	$UI/CoinsLabel.text = "金币: %d" % GameData.coins
-	
+
 	# 更新按钮状态
-	$UI/TowerButtons/ShooterButton.disabled = GameData.coins < tower_costs["shooter"]
-	$UI/TowerButtons/WallButton.disabled = GameData.coins < tower_costs["wall"]
-	$UI/TowerButtons/SlowButton.disabled = GameData.coins < tower_costs["slow"]
+	$UI/TowerButtons/ShooterButton.disabled = GameData.coins < SceneFactory.get_tower_cost("shooter")
+	$UI/TowerButtons/WallButton.disabled = GameData.coins < SceneFactory.get_tower_cost("wall")
+	$UI/TowerButtons/SlowButton.disabled = GameData.coins < SceneFactory.get_tower_cost("slow")
 
 func start_battle():
 	# 收集场景中所有塔的当前位置
