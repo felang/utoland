@@ -7,8 +7,6 @@ extends Tower
 @onready var detect_area: Area2D = $DetectArea
 @onready var shoot_timer: Timer = $ShootTimer
 
-const BULLET_SCENE = preload("res://scenes/bullet.tscn")
-
 func _ready():
 	# 设置塔类型
 	tower_type = "shooter"
@@ -42,7 +40,7 @@ func shoot_nearest_enemy():
 				closest = enemy
 
 	if closest:
-		var bullet = BULLET_SCENE.instantiate()
+		var bullet = SceneFactory.create_bullet()
 		bullet.global_position = global_position
 		bullet.direction = global_position.direction_to(closest.global_position)
 		bullet.damage = attack_damage
