@@ -74,12 +74,17 @@ const TOWERS = {
 	"wall": {
 		"name": "墙塔",
 		"hp": 300.0,
+		"damage": 0.0,
+		"fire_rate": 0.0,
+		"range": 0.0,
 		"shop_price_min": 35,
 		"shop_price_max": 45
 	},
 	"slow": {
 		"name": "减速塔",
 		"hp": 70.0,
+		"damage": 0.0,
+		"fire_rate": 0.0,
 		"range": 200.0,
 		"slow_percent": 0.3,
 		"shop_price_min": 35,
