@@ -48,6 +48,37 @@ start_menu → character_selection → weapon_select → map_select → main (�
 - **信号通信**: `WaveManager` 通过信号 (`wave_started`, `wave_completed`, `game_won`, `game_lost`) 驱动游戏流程
 - **分组管理**: 实体通过 Godot 分组 (`towers`, `enemies`, `coins`) 进行批量操作
 
+## 开发流程
+
+完整规范见 `docs/design/dev-workflow.md`。以下是 Claude Code 必须遵循的要点：
+
+### Git 工作流
+
+- 分支：`main`（稳定）→ `develop`（开发）→ `feature/<名称>` / `fix/<名称>`
+- 提交格式：`<type>: <中文描述>`，type = feat/fix/refactor/test/docs/chore
+- feature/fix 合并到 develop 前用 Claude Code review
+
+### 代码风格
+
+- 命名：类 `PascalCase`，函数/变量 `snake_case`，常量 `UPPER_SNAKE_CASE`，信号 `snake_case` 过去式，私有 `_` 前缀
+- 文件：脚本 `snake_case.gd`，场景 `snake_case.tscn`
+- 脚本内顺序：信号 → 常量 → @export → @onready → 变量 → 生命周期 → 公共方法 → 私有方法
+- 中文注释，英文标识符
+- 函数参数和返回值使用类型标注
+
+### 架构规范
+
+- **禁止硬编码数值** — 所有游戏数值在 `GameConfig` 中定义
+- **禁止直接实例化场景** — 通过 `SceneFactory` 创建实体
+- **禁止系统间直接调用** — 系统之间通过信号通信
+- 新增实体流程：GameConfig 配置 → 脚本 → 场景 → SceneFactory 注册 → 测试
+
+### 测试规范
+
+- 核心模块必须有单元测试，新功能/bugfix 必须附带测试
+- 文件：`test_<模块>.gd`，方法：`test_<行为描述>()`，继承 `GutTest`
+- Bug 修复先写失败测试再修复（TDD）
+
 ## MCP 插件
 
 项目集成了 `gdai-mcp-plugin-godot` 插件，可通过 MCP 工具直接操控 Godot 编辑器（创建场景、添加节点、运行项目等）。
