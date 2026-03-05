@@ -1,0 +1,24 @@
+[gd_scene format=3 uid="uid://bxlj77kpxroab"]
+
+[ext_resource type="Script" uid="uid://b1ohisgqjft26" path="res://scripts/entities/enemy.gd" id="1_onop2"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_t5l71"]
+size = Vector2(32, 32)
+
+[node name="EnemyFast" type="CharacterBody2D" unique_id=1365841566]
+collision_layer = 2
+collision_mask = 5
+script = ExtResource("1_onop2")
+speed = 250.0
+max_hp = 20.0
+touch_damage = 8.0
+
+[node name="Visual" type="ColorRect" parent="." unique_id=274199104]
+offset_left = -16.0
+offset_top = -16.0
+offset_right = 16.0
+offset_bottom = 16.0
+color = Color(0, 0, 1, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=404462319]
+shape = SubResource("RectangleShape2D_t5l71")
