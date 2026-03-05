@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://b1t3kht6tjtgi"]
 
-[ext_resource type="Script" uid="uid://d3om02tgj5wxf" path="res://scripts/weapon_select.gd" id="1_6yodv"]
+[ext_resource type="Script" uid="uid://d3om02tgj5wxf" path="res://scripts/ui/weapon_select.gd" id="1_6yodv"]
 
 [node name="WeaponSelect" type="Control" unique_id=1303348726]
 layout_mode = 3

@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://r200n4ikcpv2"]
 
-[ext_resource type="Script" uid="uid://ckwxfmslcyshb" path="res://scripts/tower_shooter.gd" id="1_15q5k"]
+[ext_resource type="Script" uid="uid://ckwxfmslcyshb" path="res://scripts/entities/towers/tower_shooter.gd" id="1_15q5k"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_dgv38"]
 size = Vector2(32, 32)

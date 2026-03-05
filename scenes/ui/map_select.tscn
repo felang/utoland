@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://c8y7m5n3p4q2r"]
 
-[ext_resource type="Script" path="res://scripts/map_select.gd" id="1_a1b2c"]
+[ext_resource type="Script" path="res://scripts/ui/map_select.gd" id="1_a1b2c"]
 
 [node name="MapSelect" type="Control"]
 script = ExtResource("1_a1b2c")
