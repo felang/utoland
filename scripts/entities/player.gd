@@ -10,7 +10,6 @@ var coins: int = 0
 var shoot_timer: float = 0.0
 var invincible_timer: float = 0.0
 var weapon_damage: float = 10.0
-var bullet_scene = preload("res://scenes/bullet.tscn")
 var hp_regen_timer: float = 0.0
 
 func _ready() -> void:
@@ -120,7 +119,7 @@ func shoot_bullet(target_pos: Vector2) -> void:
 		var base_angle: float = base_direction.angle()
 
 		for angle_offset in spread_angles:
-			var bullet: Node2D = bullet_scene.instantiate()
+			var bullet: Node2D = SceneFactory.create_bullet()
 			bullet.global_position = global_position
 			var angle_rad: float = deg_to_rad(angle_offset)
 			bullet.direction = Vector2(cos(base_angle + angle_rad), sin(base_angle + angle_rad))
@@ -133,7 +132,7 @@ func shoot_bullet(target_pos: Vector2) -> void:
 				bullet.queue_free()
 	else:
 		# 步枪和狙击枪发射单发子弹
-		var bullet: Node2D = bullet_scene.instantiate()
+		var bullet: Node2D = SceneFactory.create_bullet()
 		bullet.global_position = global_position
 		bullet.direction = global_position.direction_to(target_pos)
 		bullet.damage = weapon_damage
