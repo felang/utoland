@@ -15,6 +15,13 @@ run/main_scene="uid://24phowe362yu"
 config/features=PackedStringArray("4.6", "GL Compatibility")
 config/icon="res://icon.svg"
 
+[autoload]
+
+GameData="*res://scripts/core/game_data.gd"
+GDAIMCPRuntime="*uid://dcne7ryelpxmn"
+GameConfig="*res://game_config.gd"
+SceneFactory="*res://scripts/core/scene_factory.gd"
+
 [display]
 
 window/size/viewport_width=1920
@@ -22,13 +29,6 @@ window/size/viewport_height=1080
 window/size/mode=2
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
-
-[autoload]
-
-GameData="*res://scripts/core/game_data.gd"
-GDAIMCPRuntime="*uid://dcne7ryelpxmn"
-GameConfig="*res://game_config.gd"
-SceneFactory="*res://scripts/core/scene_factory.gd"
 
 [editor_plugins]
 
