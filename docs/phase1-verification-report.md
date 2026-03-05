@@ -10,7 +10,7 @@
 ## Verification Results
 
 ### 1. File Structure ✅
-- ✅ `addons/gut/` - GUT 测试框架已安装（131 个文件）
+- ✅ `addons/gut/` - GUT 测试框架已安装（248 个文件）
 - ✅ `tests/unit/` - 单元测试目录已创建
 - ✅ `tests/integration/` - 集成测试目录已创建
 - ✅ `scripts/core/` - 核心脚本目录（包含 game_data.gd, scene_factory.gd）
@@ -34,18 +34,20 @@
 
 - ⚠️ Preload 检查 - 部分遗留代码
   - SceneFactory 正确使用 preload（预期行为）
-  - **遗留问题**：以下文件仍有 preload()：
+  - **遗留问题**：以下 6 个文件仍有 preload()：
     - `scripts/ui/placement.gd` - tower scenes
     - `scripts/entities/player.gd` - bullet scene
     - `scripts/entities/towers/tower_shooter.gd` - bullet scene
     - `scripts/systems/enemy_spawner.gd` - enemy scenes
+    - `scripts/entities/enemy.gd` - coin scene
+    - `scripts/scenes/main.gd` - UI scenes
   - **注意**：这些是 Phase 2 的重构目标，不影响 Phase 1 完成
 
 - ✅ 场景文件检查 - 无 preload()
   - 所有 .tscn 文件中无 preload() 调用
 
 ### 3. Git Verification ✅
-- ✅ Phase 1 提交数：**8 个提交**
+- ✅ Phase 1 提交数：**10 个提交**
   1. `6541d21` - feat: install GUT testing framework
   2. `4a86adb` - fix: add .gitkeep to test directories for git tracking
   3. `e3a8042` - refactor: reorganize scripts directory structure
@@ -55,6 +57,7 @@
   7. `2a00e74` - fix: simplify SceneFactory to avoid config conflicts
   8. `f56ae4c` - docs: add development rules documentation
   9. `63de7d5` - test: add unit tests for SceneFactory
+  10. `45fe99e` - docs: 添加技术债务解决方案设计文档
 
 - ✅ 提交信息遵循约定（feat/fix/docs/test/refactor）
 
