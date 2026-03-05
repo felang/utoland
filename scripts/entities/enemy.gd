@@ -88,7 +88,7 @@ func apply_slow(slow_percent: float):
 	if slow_effects == 1:
 		speed = base_speed * (1.0 - slow_percent)
 
-func remove_slow(slow_percent: float):
+func remove_slow(_slow_percent: float):
 	slow_effects -= 1
 	if slow_effects <= 0:
 		slow_effects = 0
