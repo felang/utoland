@@ -1,7 +1,7 @@
 # Godot 4+ specific ignores
 .godot/
 /android/
-addons/
+addons/gdai-mcp-plugin-godot/
 .vscode
 
 # 临时测试文件
