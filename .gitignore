@@ -11,6 +11,3 @@ addons/gdai-mcp-plugin-godot/
 # 临时测试文件
 *test*.tscn
 auto_*.tscn
-
-# UID 文件（Godot 自动生成）
-*.uid
