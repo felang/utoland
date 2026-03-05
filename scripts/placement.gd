@@ -15,6 +15,8 @@ var tower_costs = {
 }
 
 func _ready():
+	load_map_background()
+
 	# 恢复之前布置的塔
 	for tower_data in GameData.tower_inventory:
 		var tower_type = tower_data["type"]
@@ -140,3 +142,42 @@ func start_battle():
 	GameData.tower_inventory = current_towers
 
 	get_tree().change_scene_to_file("res://scenes/main.tscn")
+
+func load_map_background():
+	# 获取选择的地图
+	var map_id = GameData.selected_map
+
+	# 验证地图配置存在
+	if not GameConfig.MAPS.has(map_id):
+		push_warning("未知地图: " + map_id + ", 使用默认地图")
+		map_id = "forest"
+		GameData.selected_map = map_id
+
+	var map_config = GameConfig.MAPS[map_id]
+	var bg_path = map_config["background"]
+
+	# 尝试加载背景图
+	if ResourceLoader.exists(bg_path):
+		var bg_texture = load(bg_path)
+		$Background/BackgroundSprite.texture = bg_texture
+		print("加载地图背景: ", map_config["name"])
+	else:
+		# 降级方案：使用纯色背景
+		push_warning("背景图不存在: " + bg_path + ", 使用纯色背景")
+		use_fallback_background(map_id)
+
+func use_fallback_background(map_id: String):
+	# 移除 Sprite2D，使用 ColorRect
+	var sprite = $Background/BackgroundSprite
+	if sprite:
+		sprite.queue_free()
+
+	var color_rect = ColorRect.new()
+	color_rect.size = Vector2(1920, 1080)
+	color_rect.position = Vector2(-960, -540)  # 相对于 Background 节点
+
+	var map_config = GameConfig.MAPS[map_id]
+	color_rect.color = Color(map_config["fallback_color"])
+
+	$Background.add_child(color_rect)
+	print("使用纯色背景: ", map_config["name"], " (", map_config["fallback_color"], ")")
