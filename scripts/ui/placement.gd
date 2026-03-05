@@ -58,6 +58,9 @@ func select_tower(type: String):
 		add_child(preview_tower)
 
 func place_tower():
+	if not preview_tower:
+		return
+
 	if not can_place_at(preview_tower.global_position):
 		return
 
