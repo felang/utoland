@@ -6,16 +6,8 @@ func _ready():
 		var tower_type = tower_data["type"]
 		var tower_pos = tower_data["position"]
 
-		var tower_scene = null
-		if tower_type == "shooter":
-			tower_scene = preload("res://scenes/towers/tower_shooter.tscn")
-		elif tower_type == "wall":
-			tower_scene = preload("res://scenes/towers/tower_wall.tscn")
-		elif tower_type == "slow":
-			tower_scene = preload("res://scenes/towers/tower_slow.tscn")
-
-		if tower_scene:
-			var tower = tower_scene.instantiate()
+		var tower = SceneFactory.create_tower(tower_type)
+		if tower:
 			tower.global_position = tower_pos
 			add_child(tower)
 
