@@ -1,11 +1,5 @@
 extends Node
 
-var enemy_scenes = {
-	"normal": preload("res://scenes/enemies/enemy_normal.tscn"),
-	"fast": preload("res://scenes/enemies/enemy_fast.tscn"),
-	"tank": preload("res://scenes/enemies/enemy_tank.tscn")
-}
-
 var spawn_timer: float = 0.0
 var wave_manager: Node
 var player: Node2D
@@ -46,10 +40,7 @@ func spawn_enemy():
 	var config = wave_manager.get_current_wave_config()
 	var enemy_types = config.get("enemy_types", ["normal"])
 	var random_type = enemy_types[randi() % enemy_types.size()]
-	var enemy = enemy_scenes[random_type].instantiate()
-
-	# 设置敌人类型
-	enemy.enemy_type = random_type
+	var enemy = SceneFactory.create_enemy(random_type)
 
 	var spawn_pos = get_random_spawn_position()
 	enemy.global_position = spawn_pos
