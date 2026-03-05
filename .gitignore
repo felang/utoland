@@ -1,8 +1,12 @@
 # Godot 4+ specific ignores
 .godot/
 /android/
-addons/gdai-mcp-plugin-godot/
 .vscode
+.DS_Store
+
+# 插件（通过包管理器安装，不提交）
+addons/gut/
+addons/gdai-mcp-plugin-godot/
 
 # 临时测试文件
 *test*.tscn
