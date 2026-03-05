@@ -75,12 +75,11 @@ func drop_coins():
 	if not parent:
 		return
 
-	var coin_scene = preload("res://scenes/coin.tscn")
 	# 从配置读取金币掉落数量
 	var enemy_data = GameConfig.ENEMIES[enemy_type]
 	var coin_count = randi_range(enemy_data["coin_drop_min"], enemy_data["coin_drop_max"])
 	for i in coin_count:
-		var coin = coin_scene.instantiate()
+		var coin = SceneFactory.create_coin()
 		coin.global_position = global_position + Vector2(randf_range(-20, 20), randf_range(-20, 20))
 		parent.call_deferred("add_child", coin)
 
