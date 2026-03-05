@@ -1,6 +1,7 @@
 extends Node2D
 
 const GRID_SIZE = 32
+@onready var background_sprite: Sprite2D = $Background/BackgroundSprite
 var selected_tower_type: String = ""
 var preview_tower: Node2D = null
 var tower_scenes = {
@@ -159,8 +160,12 @@ func load_map_background():
 	# 尝试加载背景图
 	if ResourceLoader.exists(bg_path):
 		var bg_texture = load(bg_path)
-		$Background/BackgroundSprite.texture = bg_texture
-		print("加载地图背景: ", map_config["name"])
+		if bg_texture and background_sprite:
+			background_sprite.texture = bg_texture
+			print("加载地图背景: ", map_config["name"])
+		else:
+			push_warning("背景图加载失败或节点不存在，使用纯色背景")
+			use_fallback_background(map_id)
 	else:
 		# 降级方案：使用纯色背景
 		push_warning("背景图不存在: " + bg_path + ", 使用纯色背景")
@@ -168,13 +173,15 @@ func load_map_background():
 
 func use_fallback_background(map_id: String):
 	# 移除 Sprite2D，使用 ColorRect
-	var sprite = $Background/BackgroundSprite
-	if sprite:
-		sprite.queue_free()
+	if background_sprite:
+		background_sprite.queue_free()
+
+	# 获取视口尺寸（而非硬编码）
+	var viewport_size = get_viewport_rect().size
 
 	var color_rect = ColorRect.new()
-	color_rect.size = Vector2(1920, 1080)
-	color_rect.position = Vector2(-960, -540)  # 相对于 Background 节点
+	color_rect.size = viewport_size
+	color_rect.position = -viewport_size / 2  # 居中对齐
 
 	var map_config = GameConfig.MAPS[map_id]
 	color_rect.color = Color(map_config["fallback_color"])
