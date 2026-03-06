@@ -37,7 +37,7 @@ func _physics_process(delta: float) -> void:
 
 func _process_outbound(delta: float) -> void:
 	var move_distance: float = speed * delta
-	position += direction * move_distance
+	global_position += direction * move_distance
 	_traveled += move_distance
 	if _traveled >= outbound_distance:
 		_state = "RETURNING"
@@ -53,7 +53,7 @@ func _process_returning(delta: float) -> void:
 		queue_free()
 		return
 	var move_dir: Vector2 = to_player.normalized()
-	position += move_dir * return_speed * delta
+	global_position += move_dir * return_speed * delta
 
 func _on_body_entered(body: Node2D) -> void:
 	if not body.is_in_group("enemies"):

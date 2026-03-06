@@ -149,8 +149,8 @@ func _shoot_boomerang(target_pos: Vector2) -> void:
 		boomerang.queue_free()
 
 func _shoot_laser(target_pos: Vector2) -> void:
-	var weapon_data: Dictionary = GameConfig.WEAPONS["laser"]
-	var beam_range: float = weapon_data["beam_range"]
+	var laser_config: Dictionary = GameConfig.WEAPONS[GameData.selected_weapon]
+	var beam_range: float = laser_config["beam_range"]
 	var direction: Vector2 = global_position.direction_to(target_pos)
 	var end_pos: Vector2 = global_position + direction * beam_range
 
@@ -176,7 +176,7 @@ func _shoot_laser(target_pos: Vector2) -> void:
 			if collider.has_method("take_damage"):
 				collider.take_damage(weapon_damage)
 		from = result["position"] + direction * 1.0
-		query.exclude = query.exclude + [collider.get_rid()]
+		query.exclude.append(collider.get_rid())
 
 	# 生成视觉效果
 	var beam: Node2D = SceneFactory.create_laser_beam()
