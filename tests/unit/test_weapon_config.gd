@@ -29,6 +29,11 @@ func test_boomerang_has_projectile_type():
 func test_laser_has_projectile_type():
 	assert_eq(GameConfig.WEAPONS["laser"]["projectile_type"], "laser", "激光枪弹道类型应为 laser")
 
+func test_all_weapons_have_range():
+	for weapon_id in GameConfig.WEAPONS:
+		assert_true(GameConfig.WEAPONS[weapon_id].has("range"),
+			"武器 %s 应有 range 字段" % weapon_id)
+
 func test_boomerang_has_required_fields():
 	var b: Dictionary = GameConfig.WEAPONS["boomerang"]
 	assert_true(b.has("speed"), "回旋镖应有 speed")
