@@ -277,3 +277,29 @@ const EFFECTS = {
 		"flash_duration": 0.05
 	}
 }
+
+# 精灵图配置 — 待素材到位后替换场景中的 ColorRect
+const SPRITES = {
+	"player": {
+		"warrior": "res://assets/sprites/player/warrior.png",
+		"ranger": "res://assets/sprites/player/ranger.png",
+		"tank": "res://assets/sprites/player/tank.png"
+	},
+	"enemies": {
+		"normal": "res://assets/sprites/enemies/normal.png",
+		"fast": "res://assets/sprites/enemies/fast.png",
+		"tank": "res://assets/sprites/enemies/tank.png"
+	},
+	"towers": {
+		"shooter": "res://assets/sprites/towers/shooter.png",
+		"wall": "res://assets/sprites/towers/wall.png",
+		"slow": "res://assets/sprites/towers/slow.png"
+	},
+	"projectiles": {
+		"bullet": "res://assets/sprites/projectiles/bullet.png",
+		"boomerang": "res://assets/sprites/projectiles/boomerang.png"
+	},
+	"items": {
+		"coin": "res://assets/sprites/items/coin.png"
+	}
+}
