@@ -38,6 +38,13 @@ func start_next_wave():
 	wave_time_left = config["duration"]
 	is_wave_active = true
 	wave_started.emit(current_wave)
+	# 波次开始屏幕震动
+	var player_node: Node2D = get_tree().get_first_node_in_group("player")
+	if player_node:
+		var camera: Camera2D = player_node.get_node_or_null("Camera")
+		if camera and camera.has_method("shake"):
+			var shake_config: Dictionary = GameConfig.EFFECTS["camera_shake"]["wave_start"]
+			camera.shake(shake_config["intensity"], shake_config["duration"])
 	print("Wave ", current_wave, " started!")
 
 func complete_wave():
