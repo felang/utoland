@@ -150,3 +150,10 @@ func test_enemy_coin_drop_config():
 		assert_true(config.has("coin_drop_min"), "Enemy config should have coin_drop_min")
 		assert_true(config.has("coin_drop_max"), "Enemy config should have coin_drop_max")
 		assert_gte(config["coin_drop_max"], config["coin_drop_min"], "Max coin drop should be >= min")
+
+func test_spawn_position_is_inside_new_map_bounds():
+	var spawner = preload("res://scripts/systems/enemy_spawner.gd").new()
+	for i in range(20):
+		var pos = spawner.get_random_spawn_position()
+		assert_lte(abs(pos.x), GameConfig.MAP_HALF_WIDTH)
+		assert_lte(abs(pos.y), GameConfig.MAP_HALF_HEIGHT)

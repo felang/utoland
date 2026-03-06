@@ -12,11 +12,11 @@ script = ExtResource("1_faaep")
 z_index = -100
 
 [node name="BackgroundSprite" type="Sprite2D" parent="Background"]
-position = Vector2(960, 540)
+position = Vector2(0, 0)
 centered = true
 
 [node name="Player" type="CharacterBody2D" parent="." unique_id=2056081713 instance=ExtResource("1_8iydn")]
-position = Vector2(400, 300)
+position = Vector2(0, 0)
 collision_mask = 18
 script = ExtResource("2_faaep")
 

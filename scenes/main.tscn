@@ -11,7 +11,7 @@
 script = ExtResource("1_main")
 
 [node name="Player" parent="." unique_id=2056081713 instance=ExtResource("1_0wfyh")]
-position = Vector2(400, 300)
+position = Vector2(0, 0)
 
 [node name="EnemySpawner" type="Node" parent="." unique_id=1258091345]
 script = ExtResource("2_0wfyh")
