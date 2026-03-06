@@ -17,3 +17,8 @@ func test_map_half_extents_are_correct():
 func test_viewport_matches_new_standard():
 	assert_eq(ProjectSettings.get_setting("display/window/size/viewport_width"), 640)
 	assert_eq(ProjectSettings.get_setting("display/window/size/viewport_height"), 360)
+
+func test_new_dimension_standard_values_are_stable():
+	assert_eq(GameConfig.GRID_SIZE, GameConfig.PPU)
+	assert_eq(GameConfig.MAP_PIXEL_WIDTH, 40 * 30)
+	assert_eq(GameConfig.MAP_PIXEL_HEIGHT, 30 * 30)
