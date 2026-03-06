@@ -41,4 +41,5 @@ func _on_body_entered(body):
 		body.take_damage(damage)
 		if body.has_method("apply_knockback"):
 			body.apply_knockback(direction)
+		EffectsManager.spawn_hit_sparks(global_position)
 		queue_free()
