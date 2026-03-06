@@ -92,8 +92,8 @@ func can_place_at(pos: Vector2) -> bool:
 
 func get_grid_position(pos: Vector2) -> Vector2:
 	return Vector2(
-		floor(pos.x / GRID_SIZE) * GRID_SIZE + GRID_SIZE / 2,
-		floor(pos.y / GRID_SIZE) * GRID_SIZE + GRID_SIZE / 2
+		floor(pos.x / GRID_SIZE) * GRID_SIZE + GRID_SIZE / 2.0,
+		floor(pos.y / GRID_SIZE) * GRID_SIZE + GRID_SIZE / 2.0
 	)
 
 func cancel_placement():
