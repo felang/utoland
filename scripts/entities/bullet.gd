@@ -10,7 +10,7 @@ func _ready():
 	body_entered.connect(_on_body_entered)
 
 func _physics_process(delta):
-	position += direction * speed * delta
+	global_position += direction * speed * delta
 	elapsed += delta
 	if elapsed >= lifetime:
 		queue_free()

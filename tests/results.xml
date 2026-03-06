@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="GutTests" failures="0" tests="60" >
+  <testsuite name="tests/unit/test_enemy_spawner_bounds.gd" tests="1" failures="0" skipped="0" time="0.000154" >
+      <testcase name="test_spawner_bounds_follow_game_config" assertions="4" status="pass" classname="tests/unit/test_enemy_spawner_bounds.gd" time="0.000154" >
+      </testcase>
+  </testsuite>
+  <testsuite name="tests/unit/test_entity_scene_dimensions.gd" tests="4" failures="0" skipped="0" time="0.00567" >
+      <testcase name="test_player_size_matches_30_grid" assertions="1" status="pass" classname="tests/unit/test_entity_scene_dimensions.gd" time="0.005107" >
+      </testcase>
+      <testcase name="test_enemy_sizes_match_new_standard" assertions="3" status="pass" classname="tests/unit/test_entity_scene_dimensions.gd" time="0.000206" >
+      </testcase>
+      <testcase name="test_tower_sizes_match_new_standard" assertions="3" status="pass" classname="tests/unit/test_entity_scene_dimensions.gd" time="0.000226" >
+      </testcase>
+      <testcase name="test_bullet_and_coin_sizes_match_new_standard" assertions="2" status="pass" classname="tests/unit/test_entity_scene_dimensions.gd" time="0.000131" >
+      </testcase>
+  </testsuite>
+  <testsuite name="tests/unit/test_game_config_dimensions.gd" tests="5" failures="0" skipped="0" time="0.00049" >
+      <testcase name="test_world_size_constants_are_defined" assertions="8" status="pass" classname="tests/unit/test_game_config_dimensions.gd" time="0.000142" >
+      </testcase>
+      <testcase name="test_map_half_extents_are_correct" assertions="2" status="pass" classname="tests/unit/test_game_config_dimensions.gd" time="0.000124" >
+      </testcase>
+      <testcase name="test_viewport_matches_new_standard" assertions="2" status="pass" classname="tests/unit/test_game_config_dimensions.gd" time="0.000065" >
+      </testcase>
+      <testcase name="test_new_dimension_standard_values_are_stable" assertions="3" status="pass" classname="tests/unit/test_game_config_dimensions.gd" time="0.000073" >
+      </testcase>
+      <testcase name="test_entity_dimension_constants_are_stable" assertions="4" status="pass" classname="tests/unit/test_game_config_dimensions.gd" time="0.000086" >
+      </testcase>
+  </testsuite>
+  <testsuite name="tests/unit/test_placement_grid_rules.gd" tests="3" failures="0" skipped="0" time="0.038703" >
+      <testcase name="test_get_grid_position_uses_game_config_grid_size" assertions="2" status="pass" classname="tests/unit/test_placement_grid_rules.gd" time="0.034183" >
+      </testcase>
+      <testcase name="test_can_place_at_rejects_position_outside_map_extents" assertions="2" status="pass" classname="tests/unit/test_placement_grid_rules.gd" time="0.002407" >
+      </testcase>
+      <testcase name="test_can_place_at_allows_position_on_map_boundary" assertions="1" status="pass" classname="tests/unit/test_placement_grid_rules.gd" time="0.002113" >
+      </testcase>
+  </testsuite>
+  <testsuite name="tests/unit/test_scene_factory.gd" tests="11" failures="0" skipped="0" time="0.001746" >
+      <testcase name="test_create_tower_shooter" assertions="2" status="pass" classname="tests/unit/test_scene_factory.gd" time="0.000166" >
+      </testcase>
+      <testcase name="test_create_tower_wall" assertions="2" status="pass" classname="tests/unit/test_scene_factory.gd" time="0.000136" >
+      </testcase>
+      <testcase name="test_create_tower_slow" assertions="2" status="pass" classname="tests/unit/test_scene_factory.gd" time="0.000144" >
+      </testcase>
+      <testcase name="test_create_tower_invalid" assertions="2" status="pass" classname="tests/unit/test_scene_factory.gd" time="0.000174" >
+      </testcase>
+      <testcase name="test_create_enemy_normal" assertions="2" status="pass" classname="tests/unit/test_scene_factory.gd" time="0.000156" >
+      </testcase>
+      <testcase name="test_create_enemy_fast" assertions="2" status="pass" classname="tests/unit/test_scene_factory.gd" time="0.000141" >
+      </testcase>
+      <testcase name="test_create_enemy_tank" assertions="2" status="pass" classname="tests/unit/test_scene_factory.gd" time="0.000137" >
+      </testcase>
+      <testcase name="test_create_enemy_invalid" assertions="2" status="pass" classname="tests/unit/test_scene_factory.gd" time="0.000186" >
+      </testcase>
+      <testcase name="test_create_bullet" assertions="1" status="pass" classname="tests/unit/test_scene_factory.gd" time="0.00013" >
+      </testcase>
+      <testcase name="test_create_coin" assertions="1" status="pass" classname="tests/unit/test_scene_factory.gd" time="0.000134" >
+      </testcase>
+      <testcase name="test_get_tower_cost" assertions="5" status="pass" classname="tests/unit/test_scene_factory.gd" time="0.000242" >
+      </testcase>
+  </testsuite>
+  <testsuite name="tests/integration/test_combat_flow.gd" tests="14" failures="0" skipped="0" time="1.777369" >
+      <testcase name="test_tower_shoots_at_enemy" assertions="1" status="pass" classname="tests/integration/test_combat_flow.gd" time="1.426139" >
+      </testcase>
+      <testcase name="test_enemy_takes_damage" assertions="1" status="pass" classname="tests/integration/test_combat_flow.gd" time="0.000639" >
+      </testcase>
+      <testcase name="test_enemy_dies_at_zero_hp" assertions="1" status="pass" classname="tests/integration/test_combat_flow.gd" time="0.047201" >
+      </testcase>
+      <testcase name="test_enemy_drops_coins_on_death" assertions="1" status="pass" classname="tests/integration/test_combat_flow.gd" time="0.055742" >
+      </testcase>
+      <testcase name="test_coin_drop_amount_from_config" assertions="2" status="pass" classname="tests/integration/test_combat_flow.gd" time="0.000804" >
+      </testcase>
+      <testcase name="test_bullet_damages_enemy" assertions="1" status="pass" classname="tests/integration/test_combat_flow.gd" time="0.00048" >
+      </testcase>
+      <testcase name="test_coin_collection" assertions="3" status="pass" classname="tests/integration/test_combat_flow.gd" time="0.000316" >
+      </testcase>
+      <testcase name="test_multiple_enemies_take_damage" assertions="2" status="pass" classname="tests/integration/test_combat_flow.gd" time="0.000443" >
+      </testcase>
+      <testcase name="test_tower_damage_from_config" assertions="1" status="pass" classname="tests/integration/test_combat_flow.gd" time="0.04566" >
+      </testcase>
+      <testcase name="test_bullet_has_damage_property" assertions="2" status="pass" classname="tests/integration/test_combat_flow.gd" time="0.000659" >
+      </testcase>
+      <testcase name="test_enemy_drops_correct_coin_count" assertions="2" status="pass" classname="tests/integration/test_combat_flow.gd" time="0.048366" >
+      </testcase>
+      <testcase name="test_tower_takes_damage_from_enemy" assertions="1" status="pass" classname="tests/integration/test_combat_flow.gd" time="0.000942" >
+      </testcase>
+      <testcase name="test_tower_destroyed_at_zero_hp" assertions="1" status="pass" classname="tests/integration/test_combat_flow.gd" time="0.046345" >
+      </testcase>
+      <testcase name="test_combat_full_cycle" assertions="1" status="pass" classname="tests/integration/test_combat_flow.gd" time="0.103633" >
+      </testcase>
+  </testsuite>
+  <testsuite name="tests/integration/test_enemy_spawning.gd" tests="13" failures="0" skipped="0" time="0.005754" >
+      <testcase name="test_spawn_normal_enemy" assertions="3" status="pass" classname="tests/integration/test_enemy_spawning.gd" time="0.000527" >
+      </testcase>
+      <testcase name="test_spawn_fast_enemy" assertions="3" status="pass" classname="tests/integration/test_enemy_spawning.gd" time="0.000419" >
+      </testcase>
+      <testcase name="test_spawn_tank_enemy" assertions="3" status="pass" classname="tests/integration/test_enemy_spawning.gd" time="0.000392" >
+      </testcase>
+      <testcase name="test_enemy_config_from_gameconfig" assertions="4" status="pass" classname="tests/integration/test_enemy_spawning.gd" time="0.000396" >
+      </testcase>
+      <testcase name="test_fast_enemy_config" assertions="3" status="pass" classname="tests/integration/test_enemy_spawning.gd" time="0.000299" >
+      </testcase>
+      <testcase name="test_tank_enemy_config" assertions="3" status="pass" classname="tests/integration/test_enemy_spawning.gd" time="0.000295" >
+      </testcase>
+      <testcase name="test_enemy_type_is_set_correctly" assertions="6" status="pass" classname="tests/integration/test_enemy_spawning.gd" time="0.000658" >
+      </testcase>
+      <testcase name="test_invalid_enemy_type" assertions="2" status="pass" classname="tests/integration/test_enemy_spawning.gd" time="0.000439" >
+      </testcase>
+      <testcase name="test_multiple_enemy_spawning" assertions="2" status="pass" classname="tests/integration/test_enemy_spawning.gd" time="0.000577" >
+      </testcase>
+      <testcase name="test_mixed_enemy_types_spawning" assertions="5" status="pass" classname="tests/integration/test_enemy_spawning.gd" time="0.000475" >
+      </testcase>
+      <testcase name="test_enemy_base_speed_initialization" assertions="2" status="pass" classname="tests/integration/test_enemy_spawning.gd" time="0.000347" >
+      </testcase>
+      <testcase name="test_enemy_coin_drop_config" assertions="9" status="pass" classname="tests/integration/test_enemy_spawning.gd" time="0.000194" >
+      </testcase>
+      <testcase name="test_spawn_position_is_inside_new_map_bounds" assertions="40" status="pass" classname="tests/integration/test_enemy_spawning.gd" time="0.000736" >
+      </testcase>
+  </testsuite>
+  <testsuite name="tests/integration/test_tower_placement.gd" tests="9" failures="0" skipped="0" time="0.003366" >
+      <testcase name="test_place_shooter_tower" assertions="4" status="pass" classname="tests/integration/test_tower_placement.gd" time="0.00053" >
+      </testcase>
+      <testcase name="test_place_wall_tower" assertions="3" status="pass" classname="tests/integration/test_tower_placement.gd" time="0.000317" >
+      </testcase>
+      <testcase name="test_place_slow_tower" assertions="3" status="pass" classname="tests/integration/test_tower_placement.gd" time="0.000333" >
+      </testcase>
+      <testcase name="test_tower_cost_deduction" assertions="4" status="pass" classname="tests/integration/test_tower_placement.gd" time="0.000309" >
+      </testcase>
+      <testcase name="test_invalid_tower_placement" assertions="2" status="pass" classname="tests/integration/test_tower_placement.gd" time="0.000362" >
+      </testcase>
+      <testcase name="test_insufficient_coins" assertions="2" status="pass" classname="tests/integration/test_tower_placement.gd" time="0.00016" >
+      </testcase>
+      <testcase name="test_tower_restoration" assertions="4" status="pass" classname="tests/integration/test_tower_placement.gd" time="0.000455" >
+      </testcase>
+      <testcase name="test_multiple_tower_placement" assertions="2" status="pass" classname="tests/integration/test_tower_placement.gd" time="0.000507" >
+      </testcase>
+      <testcase name="test_tower_hp_from_config" assertions="2" status="pass" classname="tests/integration/test_tower_placement.gd" time="0.000393" >
+      </testcase>
+  </testsuite>
+</testsuites>
