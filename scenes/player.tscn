@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://c45jgyl4kxvbv"]
 
 [ext_resource type="Script" uid="uid://bmd64dp53aq51" path="res://scripts/entities/player.gd" id="1_3vyb7"]
+[ext_resource type="Script" path="res://scripts/systems/camera_shake.gd" id="2_shake"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_3vyb7"]
 size = Vector2(30, 30)
@@ -20,3 +21,4 @@ color = Color(0, 1, 0, 1)
 shape = SubResource("RectangleShape2D_3vyb7")
 
 [node name="Camera" type="Camera2D" parent="." unique_id=1630942064]
+script = ExtResource("2_shake")

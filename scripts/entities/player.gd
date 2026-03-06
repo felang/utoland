@@ -81,6 +81,11 @@ func check_enemy_collision() -> void:
 
 func take_damage(amount: float) -> void:
 	current_hp -= amount
+	# 屏幕震动
+	var camera: Camera2D = $Camera
+	if camera and camera.has_method("shake"):
+		var shake_config: Dictionary = GameConfig.EFFECTS["camera_shake"]["player_hit"]
+		camera.shake(shake_config["intensity"], shake_config["duration"])
 	print("Player HP: ", current_hp)
 	if current_hp <= 0:
 		die()
