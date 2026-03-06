@@ -275,6 +275,12 @@ const EFFECTS = {
 		"edge_color": Color(1, 0.2, 0.2, 0.7),
 		"flash_alpha": 0.03,
 		"flash_duration": 0.05
+	},
+	"camera": {
+		"zoom": Vector2(0.75, 0.75),
+		"smoothing_speed": 8.0,
+		"look_ahead_distance": 40.0,
+		"look_ahead_smoothing": 3.0
 	}
 }
 

@@ -64,6 +64,11 @@ func _physics_process(_delta: float) -> void:
 	velocity = input_vector * speed
 	move_and_slide()
 
+	# 摄像机前瞻
+	var camera: Camera2D = $Camera
+	if camera and camera.has_method("update_look_ahead"):
+		camera.update_look_ahead(velocity)
+
 	check_enemy_collision()
 
 func check_enemy_collision() -> void:

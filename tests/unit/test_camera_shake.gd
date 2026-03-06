@@ -1,6 +1,6 @@
 extends GutTest
 
-# 屏幕震动系统单元测试
+# 摄像机系统单元测试
 
 var shake_script = preload("res://scripts/systems/camera_shake.gd")
 
@@ -28,3 +28,34 @@ func test_trauma_decays_over_time():
 	var initial = camera._trauma
 	camera._process(0.1)
 	assert_lt(camera._trauma, initial, "trauma 应随时间衰减")
+
+func test_camera_zoom_from_config():
+	var camera = Camera2D.new()
+	camera.set_script(shake_script)
+	add_child_autoqfree(camera)
+	await get_tree().process_frame
+	var expected_zoom: Vector2 = GameConfig.EFFECTS["camera"]["zoom"]
+	assert_eq(camera.zoom, expected_zoom, "摄像机缩放应从配置读取")
+
+func test_camera_has_map_limits():
+	var camera = Camera2D.new()
+	camera.set_script(shake_script)
+	add_child_autoqfree(camera)
+	await get_tree().process_frame
+	assert_eq(camera.limit_left, -int(GameConfig.MAP_HALF_WIDTH), "左边界应为地图左端")
+	assert_eq(camera.limit_right, int(GameConfig.MAP_HALF_WIDTH), "右边界应为地图右端")
+
+func test_camera_smoothing_enabled():
+	var camera = Camera2D.new()
+	camera.set_script(shake_script)
+	add_child_autoqfree(camera)
+	await get_tree().process_frame
+	assert_true(camera.position_smoothing_enabled, "平滑跟随应开启")
+
+func test_look_ahead_updates():
+	var camera = Camera2D.new()
+	camera.set_script(shake_script)
+	add_child_autoqfree(camera)
+	await get_tree().process_frame
+	camera.update_look_ahead(Vector2(200, 0))
+	assert_ne(camera._look_ahead_offset, Vector2.ZERO, "有速度时前瞻偏移应非零")
