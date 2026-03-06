@@ -27,21 +27,21 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -420.0
-offset_top = -220.0
-offset_right = 420.0
-offset_bottom = 220.0
+offset_left = -280.0
+offset_top = -150.0
+offset_right = 280.0
+offset_bottom = 150.0
 grow_horizontal = 2
 grow_vertical = 2
 
 [node name="TitleLabel" type="Label" parent="VBoxContainer"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 32
+theme_override_font_sizes/font_size = 28
 text = "选择地图"
 horizontal_alignment = 1
 
 [node name="Spacer" type="Control" parent="VBoxContainer"]
-custom_minimum_size = Vector2(0, 40)
+custom_minimum_size = Vector2(0, 20)
 layout_mode = 2
 
 [node name="MapCardsContainer" type="HBoxContainer" parent="VBoxContainer"]
@@ -52,13 +52,13 @@ alignment = 1
 layout_mode = 2
 
 [node name="ForestButton" type="Button" parent="VBoxContainer/MapCardsContainer/ForestCard"]
-custom_minimum_size = Vector2(400, 300)
+custom_minimum_size = Vector2(240, 140)
 layout_mode = 2
 text = "森林地图"
 
 [node name="ForestLabel" type="Label" parent="VBoxContainer/MapCardsContainer/ForestCard"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 24
+theme_override_font_sizes/font_size = 18
 text = "森林"
 horizontal_alignment = 1
 
@@ -68,20 +68,20 @@ text = "茂密的森林环境"
 horizontal_alignment = 1
 
 [node name="CardSpacer" type="Control" parent="VBoxContainer/MapCardsContainer"]
-custom_minimum_size = Vector2(40, 0)
+custom_minimum_size = Vector2(20, 0)
 layout_mode = 2
 
 [node name="DesertCard" type="VBoxContainer" parent="VBoxContainer/MapCardsContainer"]
 layout_mode = 2
 
 [node name="DesertButton" type="Button" parent="VBoxContainer/MapCardsContainer/DesertCard"]
-custom_minimum_size = Vector2(400, 300)
+custom_minimum_size = Vector2(240, 140)
 layout_mode = 2
 text = "沙漠地图"
 
 [node name="DesertLabel" type="Label" parent="VBoxContainer/MapCardsContainer/DesertCard"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 24
+theme_override_font_sizes/font_size = 18
 text = "沙漠"
 horizontal_alignment = 1
 

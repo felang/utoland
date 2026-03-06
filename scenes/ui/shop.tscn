@@ -21,10 +21,10 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -400.0
-offset_top = -350.0
-offset_right = 400.0
-offset_bottom = 350.0
+offset_left = -280.0
+offset_top = -150.0
+offset_right = 280.0
+offset_bottom = 150.0
 
 [node name="Title" type="Label" parent="VBoxContainer" unique_id=1921872584]
 layout_mode = 2
@@ -43,17 +43,17 @@ layout_mode = 2
 layout_mode = 2
 
 [node name="NameLabel" type="Label" parent="VBoxContainer/ItemsContainer/Item1" unique_id=745582618]
-custom_minimum_size = Vector2(200, 0)
+custom_minimum_size = Vector2(180, 0)
 layout_mode = 2
 text = "商品名称"
 
 [node name="PriceLabel" type="Label" parent="VBoxContainer/ItemsContainer/Item1" unique_id=1596893343]
-custom_minimum_size = Vector2(100, 0)
+custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
 text = "价格: 0"
 
 [node name="BuyButton" type="Button" parent="VBoxContainer/ItemsContainer/Item1" unique_id=959698697]
-custom_minimum_size = Vector2(100, 0)
+custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
 text = "购买"
 
@@ -61,17 +61,17 @@ text = "购买"
 layout_mode = 2
 
 [node name="PriceLabel2" type="Label" parent="VBoxContainer/ItemsContainer/Item2" unique_id=686209700]
-custom_minimum_size = Vector2(100, 0)
+custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
 text = "价格: 0"
 
 [node name="BuyButton2" type="Button" parent="VBoxContainer/ItemsContainer/Item2" unique_id=682105134]
-custom_minimum_size = Vector2(100, 0)
+custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
 text = "购买"
 
 [node name="NameLabel2" type="Label" parent="VBoxContainer/ItemsContainer/Item2" unique_id=1694751994]
-custom_minimum_size = Vector2(200, 0)
+custom_minimum_size = Vector2(180, 0)
 layout_mode = 2
 text = "商品名称"
 
@@ -79,17 +79,17 @@ text = "商品名称"
 layout_mode = 2
 
 [node name="NameLabel2" type="Label" parent="VBoxContainer/ItemsContainer/Item3" unique_id=504576354]
-custom_minimum_size = Vector2(200, 0)
+custom_minimum_size = Vector2(180, 0)
 layout_mode = 2
 text = "商品名称"
 
 [node name="PriceLabel2" type="Label" parent="VBoxContainer/ItemsContainer/Item3" unique_id=1366710136]
-custom_minimum_size = Vector2(100, 0)
+custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
 text = "价格: 0"
 
 [node name="BuyButton2" type="Button" parent="VBoxContainer/ItemsContainer/Item3" unique_id=2100005327]
-custom_minimum_size = Vector2(100, 0)
+custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
 text = "购买"
 
@@ -97,17 +97,17 @@ text = "购买"
 layout_mode = 2
 
 [node name="PriceLabel2" type="Label" parent="VBoxContainer/ItemsContainer/Item4" unique_id=421674279]
-custom_minimum_size = Vector2(100, 0)
+custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
 text = "价格: 0"
 
 [node name="NameLabel2" type="Label" parent="VBoxContainer/ItemsContainer/Item4" unique_id=325585939]
-custom_minimum_size = Vector2(200, 0)
+custom_minimum_size = Vector2(180, 0)
 layout_mode = 2
 text = "商品名称"
 
 [node name="BuyButton2" type="Button" parent="VBoxContainer/ItemsContainer/Item4" unique_id=152792192]
-custom_minimum_size = Vector2(100, 0)
+custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
 text = "购买"
 
@@ -115,11 +115,11 @@ text = "购买"
 layout_mode = 2
 
 [node name="RefreshButton" type="Button" parent="VBoxContainer/ButtonsContainer" unique_id=987082711]
-custom_minimum_size = Vector2(150, 40)
+custom_minimum_size = Vector2(120, 32)
 layout_mode = 2
 text = "刷新 (10金币)"
 
 [node name="ConfirmButton" type="Button" parent="VBoxContainer/ButtonsContainer" unique_id=1471049955]
-custom_minimum_size = Vector2(150, 40)
+custom_minimum_size = Vector2(120, 32)
 layout_mode = 2
 text = "确认"

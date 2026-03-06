@@ -17,18 +17,18 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -275.0
-offset_top = -60.5
-offset_right = 275.0
-offset_bottom = 60.5
+offset_left = -160.0
+offset_top = -70.0
+offset_right = 160.0
+offset_bottom = 70.0
 
 [node name="TitleLabel" type="Label" parent="VBoxContainer" unique_id=247976949]
 layout_mode = 2
-theme_override_font_sizes/font_size = 48
+theme_override_font_sizes/font_size = 32
 text = "Survivor Tower Defense"
 horizontal_alignment = 1
 
 [node name="StartButton" type="Button" parent="VBoxContainer" unique_id=504206185]
-custom_minimum_size = Vector2(200, 50)
+custom_minimum_size = Vector2(160, 36)
 layout_mode = 2
 text = "Start Game"

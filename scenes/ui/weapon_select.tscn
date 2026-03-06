@@ -18,9 +18,9 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -100.0
-offset_top = -65.5
+offset_top = -55.0
 offset_right = 100.0
-offset_bottom = 65.5
+offset_bottom = 55.0
 
 [node name="TitleLabel" type="Label" parent="VBoxContainer" unique_id=2063109494]
 layout_mode = 2
@@ -28,11 +28,11 @@ text = "Select Your Weapon"
 horizontal_alignment = 1
 
 [node name="RifleButton" type="Button" parent="VBoxContainer" unique_id=920330542]
-custom_minimum_size = Vector2(200, 50)
+custom_minimum_size = Vector2(160, 36)
 layout_mode = 2
 text = "Rifle (速射枪)"
 
 [node name="ShotgunButton" type="Button" parent="VBoxContainer" unique_id=586197566]
-custom_minimum_size = Vector2(200, 50)
+custom_minimum_size = Vector2(160, 36)
 layout_mode = 2
 text = "Shotgun (爆裂霰弹)"

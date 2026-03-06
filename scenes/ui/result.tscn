@@ -25,10 +25,10 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -200.0
-offset_top = -200.0
-offset_right = 200.0
-offset_bottom = 200.0
+offset_left = -160.0
+offset_top = -110.0
+offset_right = 160.0
+offset_bottom = 110.0
 
 [node name="TitleLabel" type="Label" parent="VBoxContainer" unique_id=1295650147]
 layout_mode = 2
@@ -43,11 +43,11 @@ label_settings = SubResource("LabelSettings_3dhtb")
 horizontal_alignment = 1
 
 [node name="RestartButton" type="Button" parent="VBoxContainer" unique_id=1830073469]
-custom_minimum_size = Vector2(200, 50)
+custom_minimum_size = Vector2(160, 36)
 layout_mode = 2
 text = "重新开始"
 
 [node name="QuitButton" type="Button" parent="VBoxContainer" unique_id=347955461]
-custom_minimum_size = Vector2(200, 50)
+custom_minimum_size = Vector2(160, 36)
 layout_mode = 2
 text = "退出游戏"

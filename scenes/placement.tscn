@@ -31,17 +31,17 @@ offset_right = 52.0
 offset_bottom = 28.0
 
 [node name="ShooterButton" type="Button" parent="UI/TowerButtons" unique_id=287064566]
-custom_minimum_size = Vector2(120, 40)
+custom_minimum_size = Vector2(120, 32)
 layout_mode = 2
 text = "射手塔 (30)"
 
 [node name="WallButton" type="Button" parent="UI/TowerButtons" unique_id=1473282645]
-custom_minimum_size = Vector2(120, 40)
+custom_minimum_size = Vector2(120, 32)
 layout_mode = 2
 text = "墙塔 (40)"
 
 [node name="SlowButton" type="Button" parent="UI/TowerButtons" unique_id=1521053866]
-custom_minimum_size = Vector2(120, 40)
+custom_minimum_size = Vector2(120, 32)
 layout_mode = 2
 text = "减速塔 (35)"
 
@@ -53,9 +53,9 @@ offset_bottom = 103.0
 text = "金币: 50"
 
 [node name="StartBattleButton" type="Button" parent="UI" unique_id=1074807471]
-custom_minimum_size = Vector2(200, 50)
-offset_left = 860.0
-offset_top = 1000.0
-offset_right = 868.0
-offset_bottom = 1008.0
+custom_minimum_size = Vector2(160, 36)
+offset_left = 460.0
+offset_top = 300.0
+offset_right = 468.0
+offset_bottom = 308.0
 text = "开始战斗"
