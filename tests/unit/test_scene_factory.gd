@@ -80,3 +80,14 @@ func test_get_tower_cost():
 	var invalid_cost = SceneFactory.get_tower_cost("invalid_type")
 	assert_eq(invalid_cost, 0, "Invalid tower type should return 0")
 	assert_push_error("Unknown tower type")
+
+# Boomerang and laser beam tests
+func test_create_boomerang():
+	var boomerang = SceneFactory.create_boomerang()
+	assert_not_null(boomerang, "Boomerang should be created")
+	boomerang.queue_free()
+
+func test_create_laser_beam():
+	var beam = SceneFactory.create_laser_beam()
+	assert_not_null(beam, "Laser beam should be created")
+	beam.queue_free()
