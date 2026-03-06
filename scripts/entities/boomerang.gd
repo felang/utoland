@@ -16,6 +16,8 @@ var _traveled: float = 0.0
 var _elapsed: float = 0.0
 var _hit_outbound: Array = []
 var _hit_returning: Array = []
+var _trail: Line2D = null
+var _trail_positions: Array[Vector2] = []
 
 func _ready() -> void:
 	var config: Dictionary = GameConfig.WEAPONS["boomerang"]
@@ -23,12 +25,33 @@ func _ready() -> void:
 	outbound_distance = config["outbound_distance"]
 	return_speed_mult = config["return_speed_mult"]
 	body_entered.connect(_on_body_entered)
+	# 创建拖尾
+	var fx_config: Dictionary = GameConfig.EFFECTS["boomerang"]
+	_trail = Line2D.new()
+	_trail.width = fx_config["trail_width"]
+	_trail.default_color = fx_config["trail_color"]
+	_trail.top_level = true
+	_trail.z_index = -1
+	add_child(_trail)
 
 func _physics_process(delta: float) -> void:
 	_elapsed += delta
 	if _elapsed >= max_lifetime:
 		queue_free()
 		return
+	# 旋转
+	var fx_config: Dictionary = GameConfig.EFFECTS["boomerang"]
+	var rot_speed: float = deg_to_rad(fx_config["rotation_speed"])
+	if _state == "RETURNING":
+		rot_speed *= fx_config["return_rotation_mult"]
+	rotation += rot_speed * delta
+	# 拖尾更新
+	_trail_positions.insert(0, global_position)
+	if _trail_positions.size() > fx_config["trail_points"]:
+		_trail_positions.resize(fx_config["trail_points"])
+	_trail.clear_points()
+	for pos in _trail_positions:
+		_trail.add_point(pos)
 	match _state:
 		"OUTBOUND":
 			_process_outbound(delta)
