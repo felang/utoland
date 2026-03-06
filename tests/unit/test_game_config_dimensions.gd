@@ -13,3 +13,7 @@ func test_world_size_constants_are_defined():
 func test_map_half_extents_are_correct():
 	assert_eq(GameConfig.MAP_HALF_WIDTH, 600)
 	assert_eq(GameConfig.MAP_HALF_HEIGHT, 450)
+
+func test_viewport_matches_new_standard():
+	assert_eq(ProjectSettings.get_setting("display/window/size/viewport_width"), 640)
+	assert_eq(ProjectSettings.get_setting("display/window/size/viewport_height"), 360)
