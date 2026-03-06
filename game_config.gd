@@ -37,25 +37,32 @@ const UI_CARD_GAP = 20
 const WEAPONS = {
 	"rifle": {
 		"name": "步枪",
+		"projectile_type": "bullet",
 		"fire_rate": 0.1,
 		"damage": 10.0,
 		"bullet_count": 1,
-		"bullet_speed": 600
+		"bullet_speed": 600,
+		"range": 300.0
 	},
-	"shotgun": {
-		"name": "霰弹枪",
-		"fire_rate": 0.6,
-		"damage": 6.0,
-		"bullet_count": 5,
-		"spread_angles": [-7.5, -3.75, 0, 3.75, 7.5],
-		"bullet_speed": 500
+	"boomerang": {
+		"name": "回旋镖",
+		"projectile_type": "boomerang",
+		"fire_rate": 0.8,
+		"damage": 15.0,
+		"speed": 350.0,
+		"outbound_distance": 200.0,
+		"return_speed_mult": 1.3,
+		"range": 200.0
 	},
-	"sniper": {
-		"name": "狙击枪",
-		"fire_rate": 1.0,
-		"damage": 30.0,
-		"bullet_count": 1,
-		"bullet_speed": 800
+	"laser": {
+		"name": "激光枪",
+		"projectile_type": "laser",
+		"fire_rate": 0.15,
+		"damage": 8.0,
+		"beam_range": 400.0,
+		"beam_width": 2.0,
+		"beam_duration": 0.08,
+		"range": 400.0
 	}
 }
 
