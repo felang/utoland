@@ -6,6 +6,19 @@ extends Node
 # 开发模式开关
 const DEBUG_MODE = true
 
+# 全局尺寸标准
+const BASE_VIEWPORT_WIDTH = 640
+const BASE_VIEWPORT_HEIGHT = 360
+const PPU = 30
+const GRID_SIZE = 30
+
+const MAP_COLS = 40
+const MAP_ROWS = 30
+const MAP_PIXEL_WIDTH = MAP_COLS * GRID_SIZE   # 1200
+const MAP_PIXEL_HEIGHT = MAP_ROWS * GRID_SIZE  # 900
+const MAP_HALF_WIDTH = MAP_PIXEL_WIDTH / 2     # 600
+const MAP_HALF_HEIGHT = MAP_PIXEL_HEIGHT / 2   # 450
+
 # 武器配置
 const WEAPONS = {
 	"rifle": {

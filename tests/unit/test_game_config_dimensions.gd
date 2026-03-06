@@ -1,0 +1,15 @@
+extends GutTest
+
+func test_world_size_constants_are_defined():
+	assert_eq(GameConfig.BASE_VIEWPORT_WIDTH, 640)
+	assert_eq(GameConfig.BASE_VIEWPORT_HEIGHT, 360)
+	assert_eq(GameConfig.PPU, 30)
+	assert_eq(GameConfig.GRID_SIZE, 30)
+	assert_eq(GameConfig.MAP_COLS, 40)
+	assert_eq(GameConfig.MAP_ROWS, 30)
+	assert_eq(GameConfig.MAP_PIXEL_WIDTH, 1200)
+	assert_eq(GameConfig.MAP_PIXEL_HEIGHT, 900)
+
+func test_map_half_extents_are_correct():
+	assert_eq(GameConfig.MAP_HALF_WIDTH, 600)
+	assert_eq(GameConfig.MAP_HALF_HEIGHT, 450)
