@@ -22,3 +22,9 @@ func test_new_dimension_standard_values_are_stable():
 	assert_eq(GameConfig.GRID_SIZE, GameConfig.PPU)
 	assert_eq(GameConfig.MAP_PIXEL_WIDTH, 40 * 30)
 	assert_eq(GameConfig.MAP_PIXEL_HEIGHT, 30 * 30)
+
+func test_entity_dimension_constants_are_stable():
+	assert_eq(GameConfig.ENTITY_SIZE_STANDARD, 30)
+	assert_eq(GameConfig.ENTITY_SIZE_TANK, 45)
+	assert_eq(GameConfig.BULLET_SIZE, 6)
+	assert_eq(GameConfig.COIN_RADIUS, 6)

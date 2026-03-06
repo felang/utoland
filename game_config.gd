@@ -19,6 +19,12 @@ const MAP_PIXEL_HEIGHT = MAP_ROWS * GRID_SIZE  # 900
 const MAP_HALF_WIDTH = MAP_PIXEL_WIDTH / 2.0     # 600
 const MAP_HALF_HEIGHT = MAP_PIXEL_HEIGHT / 2.0   # 450
 
+# 实体尺寸标准（像素）
+const ENTITY_SIZE_STANDARD = GRID_SIZE      # 30
+const ENTITY_SIZE_TANK = int(GRID_SIZE * 1.5)  # 45
+const BULLET_SIZE = int(GRID_SIZE * 0.2)    # 6
+const COIN_RADIUS = int(GRID_SIZE * 0.2)    # 6
+
 # 武器配置
 const WEAPONS = {
 	"rifle": {
