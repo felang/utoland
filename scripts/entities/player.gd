@@ -81,11 +81,15 @@ func check_enemy_collision() -> void:
 
 func take_damage(amount: float) -> void:
 	current_hp -= amount
+	# 受击闪白
+	_flash_white()
 	# 屏幕震动
 	var camera: Camera2D = $Camera
 	if camera and camera.has_method("shake"):
 		var shake_config: Dictionary = GameConfig.EFFECTS["camera_shake"]["player_hit"]
 		camera.shake(shake_config["intensity"], shake_config["duration"])
+	# 无敌帧闪烁
+	_start_invincible_blink()
 	print("Player HP: ", current_hp)
 	if current_hp <= 0:
 		die()
@@ -198,3 +202,22 @@ func _shoot_laser(target_pos: Vector2) -> void:
 func add_coins(amount: int) -> void:
 	coins += amount
 	GameData.coins = coins  # 同步到 GameData
+
+func _flash_white() -> void:
+	var original_modulate: Color = modulate
+	modulate = Color(2, 2, 2, 1)
+	var tween: Tween = create_tween()
+	tween.tween_property(self, "modulate", original_modulate, GameConfig.EFFECTS["hit_flash"]["duration"])
+
+var _blink_tween: Tween = null
+
+func _start_invincible_blink() -> void:
+	if _blink_tween and _blink_tween.is_valid():
+		_blink_tween.kill()
+	var config: Dictionary = GameConfig.EFFECTS["invincible_blink"]
+	var blink_count: int = int(invincible_duration / (config["interval"] * 2))
+	_blink_tween = create_tween()
+	for i in blink_count:
+		_blink_tween.tween_property(self, "modulate:a", config["alpha_low"], config["interval"])
+		_blink_tween.tween_property(self, "modulate:a", config["alpha_high"], config["interval"])
+	_blink_tween.tween_property(self, "modulate:a", 1.0, 0.01)

@@ -63,6 +63,7 @@ func attack_tower(_delta):
 
 func take_damage(amount: float):
 	current_hp -= amount
+	_flash_white()
 	if current_hp <= 0:
 		die()
 
@@ -88,6 +89,13 @@ func apply_knockback(dir: Vector2) -> void:
 	var tween: Tween = create_tween()
 	var target_pos: Vector2 = global_position + dir * config["distance"]
 	tween.tween_property(self, "global_position", target_pos, config["duration"]).set_ease(Tween.EASE_OUT)
+
+func _flash_white() -> void:
+	var config: Dictionary = GameConfig.EFFECTS["hit_flash"]
+	var original_modulate: Color = modulate
+	modulate = Color(2, 2, 2, 1)  # 超亮让 ColorRect 变白
+	var tween: Tween = create_tween()
+	tween.tween_property(self, "modulate", original_modulate, config["duration"])
 
 func apply_slow(slow_percent: float):
 	slow_effects += 1
