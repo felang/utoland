@@ -21,5 +21,14 @@ func _ready():
 
 func take_damage(amount: float):
 	current_hp -= amount
+	# 受击闪白
+	var original_modulate: Color = modulate
+	modulate = Color(2, 2, 2, 1)
+	var tween: Tween = create_tween()
+	tween.tween_property(self, "modulate", original_modulate, GameConfig.EFFECTS["hit_flash"]["duration"])
+	# 伤害数字
+	EffectsManager.spawn_damage_number(global_position + Vector2(0, -20), amount)
 	if current_hp <= 0:
+		# 死亡特效
+		EffectsManager.spawn_death_effect(global_position, Color.GREEN)
 		queue_free()
