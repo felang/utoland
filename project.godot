@@ -21,6 +21,7 @@ GameData="*res://scripts/core/game_data.gd"
 GDAIMCPRuntime="*uid://dcne7ryelpxmn"
 GameConfig="*res://game_config.gd"
 SceneFactory="*res://scripts/core/scene_factory.gd"
+EffectsManager="*res://scripts/systems/effects_manager.gd"
 
 [display]
 

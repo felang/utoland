@@ -64,10 +64,25 @@ func attack_tower(_delta):
 func take_damage(amount: float):
 	current_hp -= amount
 	_flash_white()
+	# 伤害数字
+	EffectsManager.spawn_damage_number(global_position + Vector2(0, -20), amount)
+	# 击中火花
+	EffectsManager.spawn_hit_sparks(global_position)
 	if current_hp <= 0:
 		die()
 
 func die():
+	# 死亡爆炸特效
+	var visual: ColorRect = $Visual
+	var death_color: Color = visual.color if visual else Color.RED
+	EffectsManager.spawn_death_effect(global_position, death_color)
+	# 屏幕震动
+	var player_node: Node2D = get_tree().get_first_node_in_group("player")
+	if player_node:
+		var camera: Camera2D = player_node.get_node_or_null("Camera")
+		if camera and camera.has_method("shake"):
+			var shake_config: Dictionary = GameConfig.EFFECTS["camera_shake"]["enemy_kill"]
+			camera.shake(shake_config["intensity"], shake_config["duration"])
 	drop_coins()
 	queue_free()
 
