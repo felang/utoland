@@ -5,10 +5,10 @@ var wave_manager: Node
 var player: Node2D
 
 # Map boundaries
-var map_min_x = -1250.0
-var map_max_x = 1250.0
-var map_min_y = -950.0
-var map_max_y = 950.0
+var map_min_x: float = -GameConfig.MAP_HALF_WIDTH
+var map_max_x: float = GameConfig.MAP_HALF_WIDTH
+var map_min_y: float = -GameConfig.MAP_HALF_HEIGHT
+var map_max_y: float = GameConfig.MAP_HALF_HEIGHT
 var min_distance_from_player = 200.0
 
 func _ready():
