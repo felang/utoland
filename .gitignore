@@ -8,6 +8,9 @@
 addons/gut/
 addons/gdai-mcp-plugin-godot/
 
+# 测试输出
+tests/results.xml
+
 # 临时测试文件
 *test*.tscn
 auto_*.tscn
