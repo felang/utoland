@@ -60,12 +60,17 @@ func _on_body_entered(body: Node2D) -> void:
 		return
 	if not body.has_method("take_damage"):
 		return
+	var knockback_dir: Vector2 = global_position.direction_to(body.global_position)
 	match _state:
 		"OUTBOUND":
 			if body not in _hit_outbound:
 				_hit_outbound.append(body)
 				body.take_damage(damage)
+				if body.has_method("apply_knockback"):
+					body.apply_knockback(knockback_dir)
 		"RETURNING":
 			if body not in _hit_returning:
 				_hit_returning.append(body)
 				body.take_damage(damage)
+				if body.has_method("apply_knockback"):
+					body.apply_knockback(knockback_dir)

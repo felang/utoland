@@ -180,6 +180,8 @@ func _shoot_laser(target_pos: Vector2) -> void:
 			hit_enemies.append(collider)
 			if collider.has_method("take_damage"):
 				collider.take_damage(weapon_damage)
+			if collider.has_method("apply_knockback"):
+				collider.apply_knockback(direction)
 		from = result["position"] + direction * 1.0
 		query.exclude.append(collider.get_rid())
 

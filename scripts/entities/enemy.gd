@@ -83,6 +83,12 @@ func drop_coins():
 		coin.global_position = global_position + Vector2(randf_range(-20, 20), randf_range(-20, 20))
 		parent.call_deferred("add_child", coin)
 
+func apply_knockback(dir: Vector2) -> void:
+	var config: Dictionary = GameConfig.EFFECTS["knockback"]
+	var tween: Tween = create_tween()
+	var target_pos: Vector2 = global_position + dir * config["distance"]
+	tween.tween_property(self, "global_position", target_pos, config["duration"]).set_ease(Tween.EASE_OUT)
+
 func apply_slow(slow_percent: float):
 	slow_effects += 1
 	if slow_effects == 1:
