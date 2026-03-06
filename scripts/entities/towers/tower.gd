@@ -22,10 +22,7 @@ func _ready():
 func take_damage(amount: float):
 	current_hp -= amount
 	# 受击闪白
-	var original_modulate: Color = modulate
-	modulate = Color(2, 2, 2, 1)
-	var tween: Tween = create_tween()
-	tween.tween_property(self, "modulate", original_modulate, GameConfig.EFFECTS["hit_flash"]["duration"])
+	EffectsManager.flash_white(self)
 	# 伤害数字
 	EffectsManager.spawn_damage_number(global_position + Vector2(0, -20), amount)
 	if current_hp <= 0:

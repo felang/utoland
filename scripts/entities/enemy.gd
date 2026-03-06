@@ -18,6 +18,7 @@ var target_tower = null
 var attack_timer: float = 0.0
 var player: Node2D = null
 var slow_effects: int = 0  # 记录当前有多少个减速效果
+var _knockback_tween: Tween = null
 
 func _ready():
 	# 从配置读取敌人属性
@@ -72,8 +73,11 @@ func take_damage(amount: float):
 		die()
 
 func die():
+	# 清理活跃的 tween
+	if _knockback_tween and _knockback_tween.is_valid():
+		_knockback_tween.kill()
 	# 死亡爆炸特效
-	var visual: ColorRect = $Visual
+	var visual = get_node_or_null("Visual")
 	var death_color: Color = visual.color if visual else Color.RED
 	EffectsManager.spawn_death_effect(global_position, death_color)
 	# 屏幕震动
@@ -101,16 +105,14 @@ func drop_coins():
 
 func apply_knockback(dir: Vector2) -> void:
 	var config: Dictionary = GameConfig.EFFECTS["knockback"]
-	var tween: Tween = create_tween()
+	if _knockback_tween and _knockback_tween.is_valid():
+		_knockback_tween.kill()
+	_knockback_tween = create_tween()
 	var target_pos: Vector2 = global_position + dir * config["distance"]
-	tween.tween_property(self, "global_position", target_pos, config["duration"]).set_ease(Tween.EASE_OUT)
+	_knockback_tween.tween_property(self, "global_position", target_pos, config["duration"]).set_ease(Tween.EASE_OUT)
 
 func _flash_white() -> void:
-	var config: Dictionary = GameConfig.EFFECTS["hit_flash"]
-	var original_modulate: Color = modulate
-	modulate = Color(2, 2, 2, 1)  # 超亮让 ColorRect 变白
-	var tween: Tween = create_tween()
-	tween.tween_property(self, "modulate", original_modulate, config["duration"])
+	EffectsManager.flash_white(self)
 
 func apply_slow(slow_percent: float):
 	slow_effects += 1

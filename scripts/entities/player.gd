@@ -11,6 +11,7 @@ var shoot_timer: float = 0.0
 var invincible_timer: float = 0.0
 var weapon_damage: float = 10.0
 var hp_regen_timer: float = 0.0
+var _blink_tween: Tween = null
 
 func _ready() -> void:
 	add_to_group("player")
@@ -88,8 +89,6 @@ func take_damage(amount: float) -> void:
 	if camera and camera.has_method("shake"):
 		var shake_config: Dictionary = GameConfig.EFFECTS["camera_shake"]["player_hit"]
 		camera.shake(shake_config["intensity"], shake_config["duration"])
-	# 无敌帧闪烁
-	_start_invincible_blink()
 	print("Player HP: ", current_hp)
 	if current_hp <= 0:
 		die()
@@ -201,7 +200,7 @@ func _shoot_laser(target_pos: Vector2) -> void:
 		var flash: ColorRect = ColorRect.new()
 		flash.color = Color(1, 0, 0, flash_config["flash_alpha"])
 		flash.size = Vector2(2000, 2000)
-		flash.position = Vector2(-1000, -1000)
+		flash.position = global_position - Vector2(1000, 1000)
 		flash.z_index = 90
 		flash.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		parent.add_child(flash)
@@ -230,12 +229,8 @@ func _spawn_muzzle_flash(pos: Vector2) -> void:
 		tween.tween_callback(flash.queue_free)
 
 func _flash_white() -> void:
-	var original_modulate: Color = modulate
-	modulate = Color(2, 2, 2, 1)
-	var tween: Tween = create_tween()
-	tween.tween_property(self, "modulate", original_modulate, GameConfig.EFFECTS["hit_flash"]["duration"])
-
-var _blink_tween: Tween = null
+	var tween: Tween = EffectsManager.flash_white(self)
+	tween.tween_callback(_start_invincible_blink)
 
 func _start_invincible_blink() -> void:
 	if _blink_tween and _blink_tween.is_valid():

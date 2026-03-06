@@ -3,6 +3,13 @@ extends Node
 # 特效管理器 — 统一管理伤害数字、击中火花、死亡爆炸等视觉特效
 # 作为 Autoload 单例全局可用
 
+func flash_white(node: Node2D) -> Tween:
+	var original_modulate: Color = node.modulate
+	node.modulate = Color(2, 2, 2, 1)
+	var tween: Tween = create_tween()
+	tween.tween_property(node, "modulate", original_modulate, GameConfig.EFFECTS["hit_flash"]["duration"])
+	return tween
+
 func spawn_damage_number(pos: Vector2, damage: float) -> void:
 	var config: Dictionary = GameConfig.EFFECTS["damage_number"]
 	var label: Label = Label.new()
