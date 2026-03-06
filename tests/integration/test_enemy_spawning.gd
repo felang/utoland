@@ -96,6 +96,7 @@ func test_invalid_enemy_type():
 	# Test that invalid enemy type returns null
 	var invalid_enemy = SceneFactory.create_enemy("invalid_type")
 	assert_null(invalid_enemy, "Invalid enemy type should return null")
+	assert_push_error("Unknown enemy type")
 
 func test_multiple_enemy_spawning():
 	# Test spawning multiple enemies

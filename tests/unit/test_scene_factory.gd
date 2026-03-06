@@ -25,6 +25,7 @@ func test_create_tower_slow():
 func test_create_tower_invalid():
 	var tower = SceneFactory.create_tower("invalid_type")
 	assert_null(tower, "Invalid tower type should return null")
+	assert_push_error("Unknown tower type")
 
 # Enemy creation tests
 func test_create_enemy_normal():
@@ -48,6 +49,7 @@ func test_create_enemy_tank():
 func test_create_enemy_invalid():
 	var enemy = SceneFactory.create_enemy("invalid_type")
 	assert_null(enemy, "Invalid enemy type should return null")
+	assert_push_error("Unknown enemy type")
 
 # Bullet and coin tests
 func test_create_bullet():
@@ -77,3 +79,4 @@ func test_get_tower_cost():
 	# Test invalid tower type
 	var invalid_cost = SceneFactory.get_tower_cost("invalid_type")
 	assert_eq(invalid_cost, 0, "Invalid tower type should return 0")
+	assert_push_error("Unknown tower type")

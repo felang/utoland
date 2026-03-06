@@ -67,6 +67,7 @@ func test_invalid_tower_placement():
 	# Test that invalid tower type returns null
 	var invalid_tower = SceneFactory.create_tower("invalid_type")
 	assert_null(invalid_tower, "Invalid tower type should return null")
+	assert_push_error("Unknown tower type")
 
 func test_insufficient_coins():
 	# Test placement prevention when not enough coins
