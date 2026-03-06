@@ -1,6 +1,6 @@
 extends Node2D
 
-const GRID_SIZE = 32
+const GRID_SIZE = GameConfig.GRID_SIZE
 @onready var background_sprite: Sprite2D = $Background/BackgroundSprite
 var selected_tower_type: String = ""
 var preview_tower: Node2D = null
@@ -74,7 +74,7 @@ func place_tower():
 
 func can_place_at(pos: Vector2) -> bool:
 	# 检查是否在地图边界内
-	if abs(pos.x) > 1300 or abs(pos.y) > 1000:
+	if abs(pos.x) > GameConfig.MAP_HALF_WIDTH or abs(pos.y) > GameConfig.MAP_HALF_HEIGHT:
 		return false
 	
 	# 检查是否与其他塔重叠
