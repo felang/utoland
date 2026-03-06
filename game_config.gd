@@ -25,6 +25,14 @@ const ENTITY_SIZE_TANK = int(GRID_SIZE * 1.5)  # 45
 const BULLET_SIZE = int(GRID_SIZE * 0.2)    # 6
 const COIN_RADIUS = int(GRID_SIZE * 0.2)    # 6
 
+# UI 尺寸标准（640x360 逻辑分辨率）
+const UI_BUTTON_SIZE = Vector2(160, 36)
+const UI_BUTTON_SMALL_SIZE = Vector2(120, 32)
+const UI_MAP_CARD_SIZE = Vector2(240, 140)
+const UI_RESULT_PANEL_SIZE = Vector2(320, 220)
+const UI_SHOP_PANEL_SIZE = Vector2(560, 300)
+const UI_CARD_GAP = 20
+
 # 武器配置
 const WEAPONS = {
 	"rifle": {
