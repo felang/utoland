@@ -140,6 +140,7 @@ func _shoot_bullet(target_pos: Vector2) -> void:
 	var parent: Node = get_parent()
 	if parent:
 		parent.add_child(bullet)
+		_spawn_muzzle_flash(global_position)
 	else:
 		push_error("Player has no parent to add bullet to")
 		bullet.queue_free()
@@ -214,6 +215,19 @@ func _shoot_laser(target_pos: Vector2) -> void:
 func add_coins(amount: int) -> void:
 	coins += amount
 	GameData.coins = coins  # 同步到 GameData
+
+func _spawn_muzzle_flash(pos: Vector2) -> void:
+	var flash: ColorRect = ColorRect.new()
+	flash.size = Vector2(6, 6)
+	flash.position = pos - Vector2(3, 3)
+	flash.color = Color(1, 1, 0.8, 0.9)
+	flash.z_index = 10
+	var parent_node: Node = get_parent()
+	if parent_node:
+		parent_node.add_child(flash)
+		var tween: Tween = create_tween()
+		tween.tween_property(flash, "scale", Vector2(0.1, 0.1), 0.05).set_ease(Tween.EASE_OUT)
+		tween.tween_callback(flash.queue_free)
 
 func _flash_white() -> void:
 	var original_modulate: Color = modulate
