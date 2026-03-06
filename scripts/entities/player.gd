@@ -195,6 +195,18 @@ func _shoot_laser(target_pos: Vector2) -> void:
 	if parent:
 		parent.add_child(beam)
 		beam.fire(global_position, end_pos)
+		# 全屏红色频闪
+		var flash_config: Dictionary = GameConfig.EFFECTS["laser"]
+		var flash: ColorRect = ColorRect.new()
+		flash.color = Color(1, 0, 0, flash_config["flash_alpha"])
+		flash.size = Vector2(2000, 2000)
+		flash.position = Vector2(-1000, -1000)
+		flash.z_index = 90
+		flash.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		parent.add_child(flash)
+		var flash_tween: Tween = create_tween()
+		flash_tween.tween_property(flash, "modulate:a", 0.0, flash_config["flash_duration"])
+		flash_tween.tween_callback(flash.queue_free)
 	else:
 		push_error("Player has no parent to add laser beam to")
 		beam.queue_free()
