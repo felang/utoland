@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://bjbwijr1iu4l4" path="res://scripts/entities/bullet.gd" id="1_mkf8s"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_h1aey"]
-size = Vector2(8, 8)
+size = Vector2(6, 6)
 
 [node name="Bullet" type="Area2D" unique_id=371684145]
 collision_layer = 4
@@ -11,10 +11,10 @@ collision_mask = 2
 script = ExtResource("1_mkf8s")
 
 [node name="ColorRect" type="ColorRect" parent="." unique_id=644542042]
-offset_left = -4.0
-offset_top = -4.0
-offset_right = 4.0
-offset_bottom = 4.0
+offset_left = -3.0
+offset_top = -3.0
+offset_right = 3.0
+offset_bottom = 3.0
 color = Color(1, 1, 0, 1)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1156088235]
