@@ -28,3 +28,8 @@ func test_entity_dimension_constants_are_stable():
 	assert_eq(GameConfig.ENTITY_SIZE_TANK, 45)
 	assert_eq(GameConfig.BULLET_SIZE, 6)
 	assert_eq(GameConfig.COIN_RADIUS, 6)
+
+func test_entity_and_ui_size_tokens_are_grid_aligned():
+	assert_eq(GameConfig.ENTITY_SIZE_STANDARD, GameConfig.GRID_SIZE)
+	assert_eq(GameConfig.BULLET_SIZE, int(GameConfig.GRID_SIZE * 0.2))
+	assert_eq(GameConfig.UI_BUTTON_SIZE, Vector2(160, 36))
