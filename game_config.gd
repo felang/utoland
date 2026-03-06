@@ -213,3 +213,67 @@ const MAPS = {
 		"fallback_color": "#d4a574"
 	}
 }
+
+# 特效配置
+const EFFECTS = {
+	"camera_shake": {
+		"player_hit": {"intensity": 3.0, "duration": 0.1},
+		"enemy_kill": {"intensity": 2.0, "duration": 0.08},
+		"wave_start": {"intensity": 5.0, "duration": 0.2}
+	},
+	"knockback": {
+		"distance": 15.0,
+		"duration": 0.1
+	},
+	"hit_flash": {
+		"duration": 0.05,
+		"color": Color.WHITE
+	},
+	"invincible_blink": {
+		"interval": 0.08,
+		"alpha_low": 0.3,
+		"alpha_high": 1.0
+	},
+	"damage_number": {
+		"float_distance": 30.0,
+		"random_offset_x": 10.0,
+		"duration": 0.6,
+		"big_damage_threshold": 30.0,
+		"big_damage_scale": 1.3,
+		"normal_color": Color.WHITE,
+		"big_color": Color.YELLOW
+	},
+	"death_particles": {
+		"count": 10,
+		"spread": 20.0,
+		"lifetime": 0.3,
+		"gravity": 200.0
+	},
+	"hit_sparks": {
+		"count": 5,
+		"lifetime": 0.15,
+		"spread_speed": 100.0
+	},
+	"coin_pickup": {
+		"shrink_duration": 0.15
+	},
+	"bullet_trail": {
+		"length": 15.0,
+		"width": 2.0,
+		"color": Color(1, 1, 0, 0.6)
+	},
+	"boomerang": {
+		"rotation_speed": 720.0,
+		"trail_points": 6,
+		"trail_width": 3.0,
+		"trail_color": Color(0.2, 0.8, 1.0, 0.6),
+		"return_rotation_mult": 1.5
+	},
+	"laser": {
+		"beam_width": 4.0,
+		"core_color": Color(1, 1, 1, 0.9),
+		"edge_color": Color(1, 0.2, 0.2, 0.7),
+		"flash_alpha": 0.03,
+		"flash_duration": 0.05
+	}
+}
