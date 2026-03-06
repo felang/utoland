@@ -32,6 +32,7 @@ func _ready() -> void:
 	var weapon_data: Dictionary = GameConfig.WEAPONS[GameData.selected_weapon]
 	fire_rate = weapon_data["fire_rate"] / GameData.player_stats["attack_speed_mult"]
 	weapon_damage = weapon_data["damage"] * GameData.player_stats["damage_mult"]
+	weapon_range = weapon_data["range"]
 
 	# 同步金币
 	coins = GameData.coins
@@ -106,42 +107,86 @@ func auto_shoot() -> void:
 				closest_enemy = enemy
 
 	if closest_enemy:
-		shoot_bullet(closest_enemy.global_position)
+		shoot_weapon(closest_enemy.global_position)
 
 	shoot_timer = fire_rate
 
-func shoot_bullet(target_pos: Vector2) -> void:
-	# 霰弹枪发射多发子弹，扇形散开
-	if GameData.selected_weapon == "shotgun":
-		var weapon_data: Dictionary = GameConfig.WEAPONS["shotgun"]
-		var spread_angles: Array = weapon_data["spread_angles"]
-		var base_direction: Vector2 = global_position.direction_to(target_pos)
-		var base_angle: float = base_direction.angle()
+func shoot_weapon(target_pos: Vector2) -> void:
+	var weapon_data: Dictionary = GameConfig.WEAPONS[GameData.selected_weapon]
+	var projectile_type: String = weapon_data["projectile_type"]
 
-		for angle_offset in spread_angles:
-			var bullet: Node2D = SceneFactory.create_bullet()
-			bullet.global_position = global_position
-			var angle_rad: float = deg_to_rad(angle_offset)
-			bullet.direction = Vector2(cos(base_angle + angle_rad), sin(base_angle + angle_rad))
-			bullet.damage = weapon_damage
-			var parent: Node = get_parent()
-			if parent:
-				parent.add_child(bullet)
-			else:
-				push_error("Player has no parent to add bullet to")
-				bullet.queue_free()
+	match projectile_type:
+		"bullet":
+			_shoot_bullet(target_pos)
+		"boomerang":
+			_shoot_boomerang(target_pos)
+		"laser":
+			_shoot_laser(target_pos)
+
+func _shoot_bullet(target_pos: Vector2) -> void:
+	var bullet: Area2D = SceneFactory.create_bullet()
+	bullet.global_position = global_position
+	bullet.direction = global_position.direction_to(target_pos)
+	bullet.damage = weapon_damage
+	var parent: Node = get_parent()
+	if parent:
+		parent.add_child(bullet)
 	else:
-		# 步枪和狙击枪发射单发子弹
-		var bullet: Node2D = SceneFactory.create_bullet()
-		bullet.global_position = global_position
-		bullet.direction = global_position.direction_to(target_pos)
-		bullet.damage = weapon_damage
-		var parent: Node = get_parent()
-		if parent:
-			parent.add_child(bullet)
-		else:
-			push_error("Player has no parent to add bullet to")
-			bullet.queue_free()
+		push_error("Player has no parent to add bullet to")
+		bullet.queue_free()
+
+func _shoot_boomerang(target_pos: Vector2) -> void:
+	var boomerang: Area2D = SceneFactory.create_boomerang()
+	boomerang.global_position = global_position
+	boomerang.direction = global_position.direction_to(target_pos)
+	boomerang.damage = weapon_damage
+	boomerang.player = self
+	var parent: Node = get_parent()
+	if parent:
+		parent.add_child(boomerang)
+	else:
+		push_error("Player has no parent to add boomerang to")
+		boomerang.queue_free()
+
+func _shoot_laser(target_pos: Vector2) -> void:
+	var weapon_data: Dictionary = GameConfig.WEAPONS["laser"]
+	var beam_range: float = weapon_data["beam_range"]
+	var direction: Vector2 = global_position.direction_to(target_pos)
+	var end_pos: Vector2 = global_position + direction * beam_range
+
+	# 射线查询：检测线上所有敌人（贯穿）
+	var space_state: PhysicsDirectSpaceState2D = get_world_2d().direct_space_state
+	var query: PhysicsRayQueryParameters2D = PhysicsRayQueryParameters2D.create(
+		global_position, end_pos, 2  # collision_mask = 2 (enemies layer)
+	)
+	query.collide_with_areas = false
+	query.collide_with_bodies = true
+
+	# 循环射线查询实现贯穿
+	var hit_enemies: Array = []
+	var from: Vector2 = global_position
+	for i in range(20):  # 安全上限
+		query.from = from
+		var result: Dictionary = space_state.intersect_ray(query)
+		if result.is_empty():
+			break
+		var collider: Node2D = result["collider"]
+		if collider.is_in_group("enemies") and collider not in hit_enemies:
+			hit_enemies.append(collider)
+			if collider.has_method("take_damage"):
+				collider.take_damage(weapon_damage)
+		from = result["position"] + direction * 1.0
+		query.exclude = query.exclude + [collider.get_rid()]
+
+	# 生成视觉效果
+	var beam: Node2D = SceneFactory.create_laser_beam()
+	var parent: Node = get_parent()
+	if parent:
+		parent.add_child(beam)
+		beam.fire(global_position, end_pos)
+	else:
+		push_error("Player has no parent to add laser beam to")
+		beam.queue_free()
 
 func add_coins(amount: int) -> void:
 	coins += amount
