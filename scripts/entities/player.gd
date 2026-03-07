@@ -12,6 +12,8 @@ var invincible_timer: float = 0.0
 var weapon_damage: float = 10.0
 var hp_regen_timer: float = 0.0
 var _blink_tween: Tween = null
+var _sprite: AnimatedSprite2D = null
+var _current_anim: String = ""
 
 func _ready() -> void:
 	add_to_group("player")
@@ -38,6 +40,9 @@ func _ready() -> void:
 	# 同步金币
 	coins = GameData.coins
 
+	# 替换 ColorRect 为 AnimatedSprite2D
+	_setup_sprite()
+
 func _process(delta: float) -> void:
 	if invincible_timer > 0:
 		invincible_timer -= delta
@@ -63,6 +68,9 @@ func _physics_process(_delta: float) -> void:
 
 	velocity = input_vector * speed
 	move_and_slide()
+
+	# 更新精灵动画
+	_update_animation()
 
 	# 摄像机前瞻
 	var camera: Camera2D = $Camera
@@ -215,6 +223,40 @@ func _shoot_laser(target_pos: Vector2) -> void:
 	else:
 		push_error("Player has no parent to add laser beam to")
 		beam.queue_free()
+
+func _setup_sprite() -> void:
+	# 移除旧的 ColorRect Visual
+	var old_visual: Node = get_node_or_null("Visual")
+	if old_visual:
+		old_visual.queue_free()
+
+	# 创建 AnimatedSprite2D
+	var character: String = GameData.current_character
+	var sprite_config: Dictionary = GameConfig.SPRITES["player"].get(character, {})
+	if sprite_config.is_empty():
+		return
+
+	_sprite = AnimatedSprite2D.new()
+	_sprite.name = "Visual"
+	_sprite.sprite_frames = SpriteLoader.create_player_sprite_frames(sprite_config)
+	# 16px 精灵缩放到 30px 显示大小
+	var target_size: float = GameConfig.ENTITY_SIZE_STANDARD
+	var sprite_size: float = sprite_config["frame_size"].x
+	_sprite.scale = Vector2.ONE * (target_size / sprite_size)
+	add_child(_sprite)
+	# 确保在 CollisionShape2D 之上渲染
+	move_child(_sprite, 0)
+	_sprite.play("idle")
+	_current_anim = "idle"
+
+func _update_animation() -> void:
+	if not _sprite:
+		return
+	var anim: String = SpriteLoader.get_walk_animation(velocity, _current_anim)
+	if anim != _current_anim:
+		if _sprite.sprite_frames.has_animation(anim):
+			_sprite.play(anim)
+			_current_anim = anim
 
 func add_coins(amount: int) -> void:
 	coins += amount

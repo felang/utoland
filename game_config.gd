@@ -284,28 +284,71 @@ const EFFECTS = {
 	}
 }
 
-# 精灵图配置 — 待素材到位后替换场景中的 ColorRect
+# 精灵图配置 — 像素精灵图集成 (Ninja Adventure 素材包)
 const SPRITES = {
 	"player": {
-		"warrior": "res://assets/sprites/player/warrior.png",
-		"ranger": "res://assets/sprites/player/ranger.png",
-		"tank": "res://assets/sprites/player/tank.png"
+		"warrior": {
+			"idle": "res://assets/sprites/player/knight_idle.png",
+			"walk": "res://assets/sprites/player/knight_walk.png",
+			"frame_size": Vector2(16, 16),
+			"idle_frames": 4,
+			"walk_frames": 4,
+			"walk_directions": 4,
+			"fps": 8.0
+		},
+		"ranger": {
+			"idle": "res://assets/sprites/player/hunter_idle.png",
+			"walk": "res://assets/sprites/player/hunter_walk.png",
+			"frame_size": Vector2(16, 16),
+			"idle_frames": 4,
+			"walk_frames": 4,
+			"walk_directions": 4,
+			"fps": 8.0
+		},
+		"tank": {
+			"idle": "res://assets/sprites/player/monk_idle.png",
+			"walk": "res://assets/sprites/player/monk_walk.png",
+			"frame_size": Vector2(16, 16),
+			"idle_frames": 4,
+			"walk_frames": 4,
+			"walk_directions": 4,
+			"fps": 8.0
+		}
 	},
 	"enemies": {
-		"normal": "res://assets/sprites/enemies/normal.png",
-		"fast": "res://assets/sprites/enemies/fast.png",
-		"tank": "res://assets/sprites/enemies/tank.png"
+		"normal": {
+			"spritesheet": "res://assets/sprites/enemies/slime.png",
+			"frame_size": Vector2(16, 16),
+			"walk_frames": 4,
+			"walk_directions": 4,
+			"fps": 8.0
+		},
+		"fast": {
+			"spritesheet": "res://assets/sprites/enemies/bluebat.png",
+			"frame_size": Vector2(16, 16),
+			"walk_frames": 4,
+			"walk_directions": 4,
+			"fps": 10.0
+		},
+		"tank": {
+			"spritesheet": "res://assets/sprites/enemies/trex.png",
+			"frame_size": Vector2(16, 16),
+			"walk_frames": 4,
+			"walk_directions": 4,
+			"fps": 6.0
+		}
 	},
 	"towers": {
-		"shooter": "res://assets/sprites/towers/shooter.png",
-		"wall": "res://assets/sprites/towers/wall.png",
-		"slow": "res://assets/sprites/towers/slow.png"
+		"tileset": "res://assets/sprites/towers/tileset_towers.png",
+		"shooter": {"region": Rect2(32, 0, 16, 16)},
+		"wall": {"region": Rect2(64, 32, 16, 16)},
+		"slow": {"region": Rect2(320, 0, 16, 16)}
 	},
 	"projectiles": {
-		"bullet": "res://assets/sprites/projectiles/bullet.png",
-		"boomerang": "res://assets/sprites/projectiles/boomerang.png"
+		"bullet": "res://assets/sprites/projectiles/kunai.png",
+		"boomerang": "res://assets/sprites/projectiles/shuriken.png"
 	},
 	"items": {
-		"coin": "res://assets/sprites/items/coin.png"
+		"coin": "res://assets/sprites/items/gold_coin.png"
 	}
 }

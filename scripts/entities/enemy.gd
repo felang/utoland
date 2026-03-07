@@ -19,6 +19,9 @@ var attack_timer: float = 0.0
 var player: Node2D = null
 var slow_effects: int = 0  # 记录当前有多少个减速效果
 var _knockback_tween: Tween = null
+var _sprite: AnimatedSprite2D = null
+var _current_anim: String = ""
+var _death_color: Color = Color.RED  # 死亡特效颜色
 
 func _ready():
 	# 从配置读取敌人属性
@@ -31,6 +34,9 @@ func _ready():
 
 	add_to_group("enemies")
 	player = get_tree().get_first_node_in_group("player")
+
+	# 替换 ColorRect 为 AnimatedSprite2D
+	_setup_sprite()
 
 func _physics_process(delta):
 	attack_timer -= delta
@@ -45,6 +51,7 @@ func chase_player():
 	if player and is_instance_valid(player):
 		velocity = position.direction_to(player.global_position) * speed
 		move_and_slide()
+		_update_animation()
 
 		for i in get_slide_collision_count():
 			var collision = get_slide_collision(i)
@@ -77,9 +84,7 @@ func die():
 	if _knockback_tween and _knockback_tween.is_valid():
 		_knockback_tween.kill()
 	# 死亡爆炸特效
-	var visual = get_node_or_null("Visual")
-	var death_color: Color = visual.color if visual else Color.RED
-	EffectsManager.spawn_death_effect(global_position, death_color)
+	EffectsManager.spawn_death_effect(global_position, _death_color)
 	# 屏幕震动
 	var player_node: Node2D = get_tree().get_first_node_in_group("player")
 	if player_node:
@@ -124,3 +129,39 @@ func remove_slow(_slow_percent: float):
 	if slow_effects <= 0:
 		slow_effects = 0
 		speed = base_speed
+
+func _setup_sprite() -> void:
+	# 移除旧的 ColorRect Visual
+	var old_visual: Node = get_node_or_null("Visual")
+	if old_visual:
+		# 保存颜色作为死亡特效颜色
+		if old_visual is ColorRect:
+			_death_color = old_visual.color
+		old_visual.queue_free()
+
+	# 创建 AnimatedSprite2D
+	var sprite_config: Dictionary = GameConfig.SPRITES["enemies"].get(enemy_type, {})
+	if sprite_config.is_empty():
+		return
+
+	_sprite = AnimatedSprite2D.new()
+	_sprite.name = "Visual"
+	_sprite.sprite_frames = SpriteLoader.create_enemy_sprite_frames(sprite_config)
+	# 根据敌人类型缩放：tank=45px，其他=30px
+	var target_size: float = float(GameConfig.ENTITY_SIZE_TANK if enemy_type == "tank" else GameConfig.ENTITY_SIZE_STANDARD)
+	var sprite_size: float = sprite_config["frame_size"].x
+	_sprite.scale = Vector2.ONE * (target_size / sprite_size)
+	add_child(_sprite)
+	move_child(_sprite, 0)
+	_sprite.play("walk_down")
+	_current_anim = "walk_down"
+
+func _update_animation() -> void:
+	if not _sprite:
+		return
+	var anim: String = SpriteLoader.get_walk_animation(velocity, _current_anim)
+	if anim == "idle":
+		return
+	if anim != _current_anim and _sprite.sprite_frames.has_animation(anim):
+		_sprite.play(anim)
+		_current_anim = anim

@@ -1,6 +1,7 @@
-[gd_scene format=3 uid="uid://5uhjfg5l2l8i"]
+[gd_scene load_steps=5 format=3 uid="uid://5uhjfg5l2l8i"]
 
 [ext_resource type="Script" uid="uid://ckwxfmslcyshb" path="res://scripts/entities/towers/tower_shooter.gd" id="1_15q5k"]
+[ext_resource type="Texture2D" path="res://assets/sprites/towers/tileset_towers.png" id="2_tileset"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_dgv38"]
 size = Vector2(30, 30)
@@ -13,12 +14,11 @@ collision_layer = 3
 collision_mask = 2
 script = ExtResource("1_15q5k")
 
-[node name="Visual" type="ColorRect" parent="." unique_id=1512730339]
-offset_left = -15.0
-offset_top = -15.0
-offset_right = 15.0
-offset_bottom = 15.0
-color = Color(0.2, 0.8, 0.2, 1)
+[node name="Visual" type="Sprite2D" parent="." unique_id=1512730339]
+texture = ExtResource("2_tileset")
+scale = Vector2(1.875, 1.875)
+region_enabled = true
+region_rect = Rect2(32, 0, 16, 16)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=203969423]
 shape = SubResource("RectangleShape2D_dgv38")
