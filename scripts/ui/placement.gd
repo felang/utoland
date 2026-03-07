@@ -8,6 +8,11 @@ var preview_tower: Node2D = null
 func _ready() -> void:
 	_load_map_background()
 
+	# 添加网格覆层
+	var grid_overlay: Node2D = preload("res://scripts/ui/grid_overlay.gd").new()
+	grid_overlay.z_index = -50
+	add_child(grid_overlay)
+
 	# 恢复之前布置的塔
 	for tower_data in GameData.tower_inventory:
 		var tower_type: String = tower_data["type"]
