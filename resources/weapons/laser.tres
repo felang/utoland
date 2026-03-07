@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1")
 id = "laser"
-display_name = "激光"
+display_name = "激光枪"
 projectile_type = "laser"
 fire_rate = 0.15
 damage = 8.0

@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1")
 id = "shooter"
-display_name = "射击塔"
+display_name = "射手塔"
 hp = 80.0
 damage = 15.0
 fire_rate = 1.0
