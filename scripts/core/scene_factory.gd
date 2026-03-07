@@ -32,13 +32,13 @@ func create_tower(type: String) -> Node2D:
 	return tower
 
 func get_tower_cost(type: String) -> int:
-	if not GameConfig.TOWERS.has(type):
+	if not GameConfig.towers.has(type):
 		push_error("Unknown tower type: " + type)
 		return 0
 
-	var config = GameConfig.TOWERS[type]
+	var td: TowerData = GameConfig.towers[type]
 	# Use average of min/max for consistent pricing
-	return (config["shop_price_min"] + config["shop_price_max"]) / 2
+	return (td.shop_price_min + td.shop_price_max) / 2
 
 # Enemy creation — 注入 EnemyData Resource
 func create_enemy(type: String) -> CharacterBody2D:

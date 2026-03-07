@@ -4,7 +4,7 @@ extends Node
 ## 所有系统间的事件均通过 EventBus 发布/订阅，避免系统间直接耦合。
 
 # 波次系统
-signal wave_started(wave_number: int, wave_config: Dictionary)
+signal wave_started(wave_number: int, wave_data: WaveData)
 signal wave_completed(wave_number: int)
 signal game_won()
 signal game_lost()

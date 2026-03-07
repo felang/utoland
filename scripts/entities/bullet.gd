@@ -11,15 +11,13 @@ var _trail_positions: Array[Vector2] = []
 var _trail_max_points: int = 4
 
 func _ready():
-	# 从配置读取拖尾最大点数
-	if GameConfig.effects:
-		_trail_max_points = GameConfig.effects.bullet_trail_max_points
+	var fx: EffectConfigData = GameConfig.effects
+	_trail_max_points = fx.bullet_trail_max_points
 	body_entered.connect(_on_body_entered)
 	# 创建拖尾 Line2D
-	var config: Dictionary = GameConfig.EFFECTS["bullet_trail"]
 	_trail = Line2D.new()
-	_trail.width = config["width"]
-	_trail.default_color = config["color"]
+	_trail.width = fx.bullet_trail_width
+	_trail.default_color = fx.bullet_trail_color
 	_trail.z_index = -1
 	_trail.top_level = true
 	add_child(_trail)

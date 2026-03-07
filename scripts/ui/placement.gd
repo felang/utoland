@@ -145,20 +145,20 @@ func load_map_background():
 	var map_id = GameData.selected_map
 
 	# 验证地图配置存在
-	if not GameConfig.MAPS.has(map_id):
+	if not GameConfig.maps.has(map_id):
 		push_warning("未知地图: " + map_id + ", 使用默认地图")
 		map_id = "forest"
 		GameData.selected_map = map_id
 
-	var map_config = GameConfig.MAPS[map_id]
-	var bg_path = map_config["background"]
+	var md: MapData = GameConfig.maps[map_id]
+	var bg_path: String = md.background
 
 	# 尝试加载背景图
 	if ResourceLoader.exists(bg_path):
 		var bg_texture = load(bg_path)
 		if bg_texture and background_sprite:
 			background_sprite.texture = bg_texture
-			print("加载地图背景: ", map_config["name"])
+			print("加载地图背景: ", md.display_name)
 		else:
 			push_warning("背景图加载失败或节点不存在，使用纯色背景")
 			use_fallback_background(map_id)
@@ -179,8 +179,8 @@ func use_fallback_background(map_id: String):
 	color_rect.size = viewport_size
 	color_rect.position = -viewport_size / 2  # 居中对齐
 
-	var map_config = GameConfig.MAPS[map_id]
-	color_rect.color = Color(map_config["fallback_color"])
+	var md: MapData = GameConfig.maps[map_id]
+	color_rect.color = Color(md.fallback_color)
 
 	$Background.add_child(color_rect)
-	print("使用纯色背景: ", map_config["name"], " (", map_config["fallback_color"], ")")
+	print("使用纯色背景: ", md.display_name, " (", md.fallback_color, ")")

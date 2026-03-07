@@ -98,8 +98,8 @@ func take_damage(amount: float) -> void:
 	# 受击闪白 + 无敌帧
 	_flash_white()
 	# 屏幕震动
-	var shake_config: Dictionary = GameConfig.EFFECTS["camera_shake"]["player_hit"]
-	EventBus.camera_shake_requested.emit(shake_config["intensity"], shake_config["duration"])
+	var fx: EffectConfigData = GameConfig.effects
+	EventBus.camera_shake_requested.emit(fx.camera_shake_player_hit_intensity, fx.camera_shake_player_hit_duration)
 	print("Player HP: ", health.current_hp)
 
 func _on_died() -> void:
@@ -119,10 +119,10 @@ func _flash_white() -> void:
 func _start_invincible_blink() -> void:
 	if _blink_tween and _blink_tween.is_valid():
 		_blink_tween.kill()
-	var config: Dictionary = GameConfig.EFFECTS["invincible_blink"]
-	var blink_count: int = int(invincible_duration / (config["interval"] * 2))
+	var fx: EffectConfigData = GameConfig.effects
+	var blink_count: int = int(invincible_duration / (fx.invincible_blink_interval * 2))
 	_blink_tween = create_tween()
 	for i in blink_count:
-		_blink_tween.tween_property(self, "modulate:a", config["alpha_low"], config["interval"])
-		_blink_tween.tween_property(self, "modulate:a", config["alpha_high"], config["interval"])
+		_blink_tween.tween_property(self, "modulate:a", fx.invincible_blink_alpha_low, fx.invincible_blink_interval)
+		_blink_tween.tween_property(self, "modulate:a", fx.invincible_blink_alpha_high, fx.invincible_blink_interval)
 	_blink_tween.tween_property(self, "modulate:a", 1.0, 0.01)

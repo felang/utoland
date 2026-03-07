@@ -32,11 +32,11 @@ func _on_body_entered(body):
 
 func _play_pickup_effect() -> void:
 	set_deferred("monitoring", false)
-	var config: Dictionary = GameConfig.EFFECTS["coin_pickup"]
+	var shrink_dur: float = GameConfig.effects.coin_pickup_shrink_duration
 	var tween: Tween = create_tween()
 	tween.set_parallel(true)
-	tween.tween_property(self, "scale", Vector2(0.1, 0.1), config["shrink_duration"])
-	tween.tween_property(self, "modulate:a", 0.0, config["shrink_duration"])
+	tween.tween_property(self, "scale", Vector2(0.1, 0.1), shrink_dur)
+	tween.tween_property(self, "modulate:a", 0.0, shrink_dur)
 	tween.set_parallel(false)
 	tween.tween_callback(queue_free)
 

@@ -7,25 +7,25 @@ func flash_white(node: Node2D) -> Tween:
 	var original_modulate: Color = node.modulate
 	node.modulate = Color(2, 2, 2, 1)
 	var tween: Tween = create_tween()
-	tween.tween_property(node, "modulate", original_modulate, GameConfig.EFFECTS["hit_flash"]["duration"])
+	tween.tween_property(node, "modulate", original_modulate, GameConfig.effects.hit_flash_duration)
 	return tween
 
 func spawn_damage_number(pos: Vector2, damage: float) -> void:
-	var config: Dictionary = GameConfig.EFFECTS["damage_number"]
+	var fx: EffectConfigData = GameConfig.effects
 	var label: Label = Label.new()
 	label.text = str(int(damage))
 	label.add_to_group("damage_numbers")
 	label.global_position = pos
-	label.z_index = GameConfig.effects.damage_number_z_index if GameConfig.effects else 100
+	label.z_index = fx.damage_number_z_index
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 
 	# 大伤害特殊样式
-	var is_big: bool = damage >= config["big_damage_threshold"]
+	var is_big: bool = damage >= fx.damage_number_big_threshold
 	if is_big:
-		label.modulate = config["big_color"]
-		label.scale = Vector2(config["big_damage_scale"], config["big_damage_scale"])
+		label.modulate = fx.damage_number_big_color
+		label.scale = Vector2(fx.damage_number_big_scale, fx.damage_number_big_scale)
 	else:
-		label.modulate = config["normal_color"]
+		label.modulate = fx.damage_number_normal_color
 
 	# 添加到场景树
 	var tree: SceneTree = get_tree()
@@ -35,9 +35,9 @@ func spawn_damage_number(pos: Vector2, damage: float) -> void:
 		add_child(label)
 
 	# 动画：上浮 + 随机横向偏移 + 淡出
-	var offset_x: float = randf_range(-config["random_offset_x"], config["random_offset_x"])
-	var target_pos: Vector2 = pos + Vector2(offset_x, -config["float_distance"])
-	var duration: float = config["duration"]
+	var offset_x: float = randf_range(-fx.damage_number_random_offset_x, fx.damage_number_random_offset_x)
+	var target_pos: Vector2 = pos + Vector2(offset_x, -fx.damage_number_float_distance)
+	var duration: float = fx.damage_number_duration
 
 	var tween: Tween = create_tween()
 	tween.set_parallel(true)
@@ -47,13 +47,13 @@ func spawn_damage_number(pos: Vector2, damage: float) -> void:
 	tween.tween_callback(label.queue_free)
 
 func spawn_hit_sparks(pos: Vector2, color: Color = Color.YELLOW) -> void:
-	var config: Dictionary = GameConfig.EFFECTS["hit_sparks"]
-	for i in config["count"]:
+	var fx: EffectConfigData = GameConfig.effects
+	for i in fx.hit_spark_count:
 		var spark: ColorRect = ColorRect.new()
 		spark.size = Vector2(2, 2)
 		spark.position = pos - Vector2(1, 1)
 		spark.color = color
-		spark.z_index = GameConfig.effects.hit_spark_z_index if GameConfig.effects else 50
+		spark.z_index = fx.hit_spark_z_index
 		var tree: SceneTree = get_tree()
 		if tree and tree.current_scene:
 			tree.current_scene.add_child(spark)
@@ -62,23 +62,23 @@ func spawn_hit_sparks(pos: Vector2, color: Color = Color.YELLOW) -> void:
 
 		var angle: float = randf() * TAU
 		var spread_dir: Vector2 = Vector2.from_angle(angle)
-		var target: Vector2 = pos + spread_dir * config["spread_speed"] * config["lifetime"]
+		var target: Vector2 = pos + spread_dir * fx.hit_spark_spread_speed * fx.hit_spark_lifetime
 
 		var tween: Tween = create_tween()
 		tween.set_parallel(true)
-		tween.tween_property(spark, "position", target - Vector2(1, 1), config["lifetime"])
-		tween.tween_property(spark, "modulate:a", 0.0, config["lifetime"])
+		tween.tween_property(spark, "position", target - Vector2(1, 1), fx.hit_spark_lifetime)
+		tween.tween_property(spark, "modulate:a", 0.0, fx.hit_spark_lifetime)
 		tween.set_parallel(false)
 		tween.tween_callback(spark.queue_free)
 
 func spawn_death_effect(pos: Vector2, entity_color: Color) -> void:
-	var config: Dictionary = GameConfig.EFFECTS["death_particles"]
-	for i in config["count"]:
+	var fx: EffectConfigData = GameConfig.effects
+	for i in fx.death_particle_count:
 		var particle: ColorRect = ColorRect.new()
 		particle.size = Vector2(3, 3)
 		particle.position = pos - Vector2(1.5, 1.5)
 		particle.color = entity_color
-		particle.z_index = GameConfig.effects.death_particle_z_index if GameConfig.effects else 50
+		particle.z_index = fx.death_particle_z_index
 
 		var tree: SceneTree = get_tree()
 		if tree and tree.current_scene:
@@ -87,18 +87,14 @@ func spawn_death_effect(pos: Vector2, entity_color: Color) -> void:
 			add_child(particle)
 
 		var angle: float = randf() * TAU
-		var speed: float
-		if GameConfig.effects:
-			speed = randf_range(GameConfig.effects.death_particle_speed_min, GameConfig.effects.death_particle_speed_max)
-		else:
-			speed = randf_range(50.0, 120.0)
+		var speed: float = randf_range(fx.death_particle_speed_min, fx.death_particle_speed_max)
 		var spread_dir: Vector2 = Vector2.from_angle(angle)
-		var target: Vector2 = pos + spread_dir * speed * config["lifetime"]
-		target.y += config["gravity"] * config["lifetime"] * config["lifetime"] * 0.5
+		var target: Vector2 = pos + spread_dir * speed * fx.death_particle_lifetime
+		target.y += fx.death_particle_gravity * fx.death_particle_lifetime * fx.death_particle_lifetime * 0.5
 
 		var tween: Tween = create_tween()
 		tween.set_parallel(true)
-		tween.tween_property(particle, "position", target - Vector2(1.5, 1.5), config["lifetime"]).set_ease(Tween.EASE_OUT)
-		tween.tween_property(particle, "modulate:a", 0.0, config["lifetime"] * 0.5).set_delay(config["lifetime"] * 0.5)
+		tween.tween_property(particle, "position", target - Vector2(1.5, 1.5), fx.death_particle_lifetime).set_ease(Tween.EASE_OUT)
+		tween.tween_property(particle, "modulate:a", 0.0, fx.death_particle_lifetime * 0.5).set_delay(fx.death_particle_lifetime * 0.5)
 		tween.set_parallel(false)
 		tween.tween_callback(particle.queue_free)

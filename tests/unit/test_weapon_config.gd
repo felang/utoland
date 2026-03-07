@@ -1,47 +1,47 @@
 extends GutTest
 
-# 验证 GameConfig.WEAPONS 包含正确的武器配置
+# 验证 GameConfig.weapons 包含正确的武器配置
 
 func test_weapons_has_rifle():
-	assert_true(GameConfig.WEAPONS.has("rifle"), "应包含 rifle")
+	assert_true(GameConfig.weapons.has("rifle"), "应包含 rifle")
 
 func test_weapons_has_boomerang():
-	assert_true(GameConfig.WEAPONS.has("boomerang"), "应包含 boomerang")
+	assert_true(GameConfig.weapons.has("boomerang"), "应包含 boomerang")
 
 func test_weapons_has_laser():
-	assert_true(GameConfig.WEAPONS.has("laser"), "应包含 laser")
+	assert_true(GameConfig.weapons.has("laser"), "应包含 laser")
 
 func test_weapons_no_shotgun():
-	assert_false(GameConfig.WEAPONS.has("shotgun"), "不应包含 shotgun")
+	assert_false(GameConfig.weapons.has("shotgun"), "不应包含 shotgun")
 
 func test_weapons_no_sniper():
-	assert_false(GameConfig.WEAPONS.has("sniper"), "不应包含 sniper")
+	assert_false(GameConfig.weapons.has("sniper"), "不应包含 sniper")
 
 func test_weapons_count():
-	assert_eq(GameConfig.WEAPONS.size(), 3, "应有 3 把武器")
+	assert_eq(GameConfig.weapons.size(), 3, "应有 3 把武器")
 
 func test_rifle_has_projectile_type():
-	assert_eq(GameConfig.WEAPONS["rifle"]["projectile_type"], "bullet", "步枪弹道类型应为 bullet")
+	assert_eq(GameConfig.weapons["rifle"].projectile_type, "bullet", "步枪弹道类型应为 bullet")
 
 func test_boomerang_has_projectile_type():
-	assert_eq(GameConfig.WEAPONS["boomerang"]["projectile_type"], "boomerang", "回旋镖弹道类型应为 boomerang")
+	assert_eq(GameConfig.weapons["boomerang"].projectile_type, "boomerang", "回旋镖弹道类型应为 boomerang")
 
 func test_laser_has_projectile_type():
-	assert_eq(GameConfig.WEAPONS["laser"]["projectile_type"], "laser", "激光枪弹道类型应为 laser")
+	assert_eq(GameConfig.weapons["laser"].projectile_type, "laser", "激光枪弹道类型应为 laser")
 
 func test_all_weapons_have_range():
-	for weapon_id in GameConfig.WEAPONS:
-		assert_true(GameConfig.WEAPONS[weapon_id].has("range"),
-			"武器 %s 应有 range 字段" % weapon_id)
+	for weapon_id in GameConfig.weapons:
+		var w: WeaponData = GameConfig.weapons[weapon_id]
+		assert_gt(w.weapon_range, 0.0, "武器 %s 应有正的射程" % weapon_id)
 
 func test_boomerang_has_required_fields():
-	var b: Dictionary = GameConfig.WEAPONS["boomerang"]
-	assert_true(b.has("speed"), "回旋镖应有 speed")
-	assert_true(b.has("outbound_distance"), "回旋镖应有 outbound_distance")
-	assert_true(b.has("return_speed_mult"), "回旋镖应有 return_speed_mult")
+	var w: WeaponData = GameConfig.weapons["boomerang"]
+	assert_gt(w.boomerang_speed, 0.0, "回旋镖应有 speed")
+	assert_gt(w.outbound_distance, 0.0, "回旋镖应有 outbound_distance")
+	assert_gt(w.return_speed_mult, 0.0, "回旋镖应有 return_speed_mult")
 
 func test_laser_has_required_fields():
-	var l: Dictionary = GameConfig.WEAPONS["laser"]
-	assert_true(l.has("beam_range"), "激光应有 beam_range")
-	assert_true(l.has("beam_width"), "激光应有 beam_width")
-	assert_true(l.has("beam_duration"), "激光应有 beam_duration")
+	var w: WeaponData = GameConfig.weapons["laser"]
+	assert_gt(w.beam_range, 0.0, "激光应有 beam_range")
+	assert_gt(w.beam_width, 0.0, "激光应有 beam_width")
+	assert_gt(w.beam_duration, 0.0, "激光应有 beam_duration")

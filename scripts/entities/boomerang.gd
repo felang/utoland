@@ -1,7 +1,7 @@
 extends Area2D
 
 # 回旋镖弹道 — 去程穿透 + 回程追踪玩家
-# 配置从 GameConfig.WEAPONS["boomerang"] 读取
+# 配置从 GameConfig.weapons["boomerang"] 读取
 
 var speed: float = 350.0
 var direction: Vector2 = Vector2.RIGHT
@@ -20,16 +20,16 @@ var _trail: Line2D = null
 var _trail_positions: Array[Vector2] = []
 
 func _ready() -> void:
-	var config: Dictionary = GameConfig.WEAPONS["boomerang"]
-	speed = config["speed"]
-	outbound_distance = config["outbound_distance"]
-	return_speed_mult = config["return_speed_mult"]
+	var w: WeaponData = GameConfig.weapons["boomerang"]
+	speed = w.boomerang_speed
+	outbound_distance = w.outbound_distance
+	return_speed_mult = w.return_speed_mult
 	body_entered.connect(_on_body_entered)
 	# 创建拖尾
-	var fx_config: Dictionary = GameConfig.EFFECTS["boomerang"]
+	var fx: EffectConfigData = GameConfig.effects
 	_trail = Line2D.new()
-	_trail.width = fx_config["trail_width"]
-	_trail.default_color = fx_config["trail_color"]
+	_trail.width = fx.boomerang_trail_width
+	_trail.default_color = fx.boomerang_trail_color
 	_trail.top_level = true
 	_trail.z_index = -1
 	add_child(_trail)
@@ -40,15 +40,15 @@ func _physics_process(delta: float) -> void:
 		queue_free()
 		return
 	# 旋转
-	var fx_config: Dictionary = GameConfig.EFFECTS["boomerang"]
-	var rot_speed: float = deg_to_rad(fx_config["rotation_speed"])
+	var fx: EffectConfigData = GameConfig.effects
+	var rot_speed: float = deg_to_rad(fx.boomerang_rotation_speed)
 	if _state == "RETURNING":
-		rot_speed *= fx_config["return_rotation_mult"]
+		rot_speed *= fx.boomerang_return_rotation_mult
 	rotation += rot_speed * delta
 	# 拖尾更新
 	_trail_positions.insert(0, global_position)
-	if _trail_positions.size() > fx_config["trail_points"]:
-		_trail_positions.resize(fx_config["trail_points"])
+	if _trail_positions.size() > fx.boomerang_trail_points:
+		_trail_positions.resize(fx.boomerang_trail_points)
 	_trail.clear_points()
 	for pos in _trail_positions:
 		_trail.add_point(pos)
@@ -72,7 +72,7 @@ func _process_returning(delta: float) -> void:
 	var return_speed: float = speed * return_speed_mult
 	var to_player: Vector2 = player.global_position - global_position
 	var distance: float = to_player.length()
-	var return_dist: float = GameConfig.effects.boomerang_return_distance if GameConfig.effects else 15.0
+	var return_dist: float = GameConfig.effects.boomerang_return_distance
 	if distance < return_dist:
 		queue_free()
 		return

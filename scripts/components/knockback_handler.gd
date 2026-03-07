@@ -10,12 +10,12 @@ func apply_knockback(direction: Vector2) -> void:
 	if not owner_node:
 		return
 
-	var config: Dictionary = GameConfig.EFFECTS["knockback"]
+	var fx: EffectConfigData = GameConfig.effects
 	if _knockback_tween and _knockback_tween.is_valid():
 		_knockback_tween.kill()
 	_knockback_tween = owner_node.create_tween()
-	var target_pos: Vector2 = owner_node.global_position + direction * config["distance"]
-	_knockback_tween.tween_property(owner_node, "global_position", target_pos, config["duration"]).set_ease(Tween.EASE_OUT)
+	var target_pos: Vector2 = owner_node.global_position + direction * fx.knockback_distance
+	_knockback_tween.tween_property(owner_node, "global_position", target_pos, fx.knockback_duration).set_ease(Tween.EASE_OUT)
 
 func kill_tween() -> void:
 	if _knockback_tween and _knockback_tween.is_valid():

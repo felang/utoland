@@ -6,7 +6,9 @@ func test_event_bus_exists():
 
 func test_wave_started_signal():
 	watch_signals(EventBus)
-	EventBus.wave_started.emit(1, {"duration": 45})
+	var wd := WaveData.new()
+	wd.duration = 45.0
+	EventBus.wave_started.emit(1, wd)
 	assert_signal_emitted(EventBus, "wave_started")
 
 func test_wave_completed_signal():

@@ -1,6 +1,6 @@
 extends Node
 
-var total_waves: int = GameConfig.WAVES["total_waves"]
+var total_waves: int = GameConfig.waves.size()
 var current_wave: int = 0
 var wave_time_left: float = 0.0
 var is_wave_active: bool = false
@@ -29,12 +29,12 @@ func start_next_wave():
 		get_tree().change_scene_to_file("res://scenes/ui/result.tscn")
 		return
 
-	var config = GameConfig.WAVES["wave_configs"][current_wave - 1]
-	wave_time_left = config["duration"]
+	var wave_data: WaveData = GameConfig.waves[current_wave - 1]
+	wave_time_left = wave_data.duration
 	is_wave_active = true
-	EventBus.wave_started.emit(current_wave, config)
-	var shake_config: Dictionary = GameConfig.EFFECTS["camera_shake"]["wave_start"]
-	EventBus.camera_shake_requested.emit(shake_config["intensity"], shake_config["duration"])
+	EventBus.wave_started.emit(current_wave, wave_data)
+	var fx: EffectConfigData = GameConfig.effects
+	EventBus.camera_shake_requested.emit(fx.camera_shake_wave_start_intensity, fx.camera_shake_wave_start_duration)
 	print("Wave ", current_wave, " started!")
 
 func complete_wave():
@@ -62,10 +62,10 @@ func clear_all_enemies():
 			enemy.set_process(false)
 		enemy.queue_free()
 
-func get_current_wave_config():
+func get_current_wave_data() -> WaveData:
 	if current_wave > 0 and current_wave <= total_waves:
-		return GameConfig.WAVES["wave_configs"][current_wave - 1]
-	return {}
+		return GameConfig.waves[current_wave - 1]
+	return null
 
 func _on_player_died() -> void:
 	EventBus.game_lost.emit()

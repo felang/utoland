@@ -7,15 +7,15 @@ var beam_duration: float = 0.08
 @onready var line: Line2D = $Line2D
 
 func _ready() -> void:
-	beam_duration = GameConfig.WEAPONS["laser"]["beam_duration"]
+	beam_duration = GameConfig.weapons["laser"].beam_duration
 	# 应用特效配置
-	var fx_config: Dictionary = GameConfig.EFFECTS["laser"]
-	line.width = fx_config["beam_width"]
+	var fx: EffectConfigData = GameConfig.effects
+	line.width = fx.laser_beam_width
 	# 渐变：边缘红 → 中心白 → 边缘红
 	var gradient: Gradient = Gradient.new()
-	gradient.set_color(0, fx_config["edge_color"])
-	gradient.add_point(0.5, fx_config["core_color"])
-	gradient.set_color(gradient.get_point_count() - 1, fx_config["edge_color"])
+	gradient.set_color(0, fx.laser_edge_color)
+	gradient.add_point(0.5, fx.laser_core_color)
+	gradient.set_color(gradient.get_point_count() - 1, fx.laser_edge_color)
 	line.gradient = gradient
 
 func fire(from: Vector2, to: Vector2) -> void:

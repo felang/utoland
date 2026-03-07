@@ -1,6 +1,6 @@
 extends Control
 
-# 武器选择界面 — 数据驱动，从 GameConfig.WEAPONS 生成按钮
+# 武器选择界面 — 数据驱动，从 GameConfig.weapons 生成按钮
 
 @onready var container: VBoxContainer = $VBoxContainer
 
@@ -11,10 +11,10 @@ func _ready() -> void:
 			child.queue_free()
 
 	# 从 GameConfig 动态生成武器按钮
-	for weapon_id in GameConfig.WEAPONS:
-		var weapon_data: Dictionary = GameConfig.WEAPONS[weapon_id]
+	for weapon_id in GameConfig.weapons:
+		var w: WeaponData = GameConfig.weapons[weapon_id]
 		var button: Button = Button.new()
-		button.text = weapon_data["name"]
+		button.text = w.display_name
 		button.custom_minimum_size = GameConfig.UI_BUTTON_SIZE
 		button.pressed.connect(_on_weapon_selected.bind(weapon_id))
 		container.add_child(button)

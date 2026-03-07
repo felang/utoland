@@ -24,9 +24,9 @@ func _process(delta):
 			_wave_time_left = 0.0
 	timer_label.text = "Wave: %d/10 | Time: %.0f" % [GameData.current_wave, _wave_time_left]
 
-func _on_wave_started(wave_number: int, wave_config: Dictionary) -> void:
+func _on_wave_started(_wave_number: int, wave_data: WaveData) -> void:
 	_is_wave_active = true
-	_wave_time_left = wave_config.get("duration", 0.0)
+	_wave_time_left = wave_data.duration
 
 func _on_wave_completed(_wave_number: int) -> void:
 	_is_wave_active = false

@@ -2,7 +2,7 @@ extends Node
 
 var spawn_timer: float = 0.0
 var player: Node2D
-var _current_wave_config: Dictionary = {}
+var _current_wave_data: WaveData = null
 var _is_wave_active: bool = false
 
 # Map boundaries
@@ -30,10 +30,10 @@ func _process(delta):
 	spawn_timer -= delta
 	if spawn_timer <= 0:
 		spawn_enemy()
-		spawn_timer = _current_wave_config.get("spawn_interval", 3.0)
+		spawn_timer = _current_wave_data.spawn_interval
 
 func spawn_enemy():
-	var enemy_types = _current_wave_config.get("enemy_types", ["normal"])
+	var enemy_types = _current_wave_data.enemy_types
 	var random_type = enemy_types[randi() % enemy_types.size()]
 	var enemy = SceneFactory.create_enemy(random_type)
 
@@ -56,8 +56,8 @@ func get_random_spawn_position() -> Vector2:
 
 	return spawn_pos
 
-func _on_wave_started(wave_number: int, wave_config: Dictionary) -> void:
-	_current_wave_config = wave_config
+func _on_wave_started(_wave_number: int, wave_data: WaveData) -> void:
+	_current_wave_data = wave_data
 	_is_wave_active = true
 	spawn_timer = 0.0
 

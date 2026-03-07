@@ -32,21 +32,21 @@ func _ready() -> void:
 
 # 初始化角色属性
 func init_character(character_id: String) -> void:
-	if not GameConfig.CHARACTERS.has(character_id):
+	if not GameConfig.characters.has(character_id):
 		push_error("未知角色: " + character_id)
 		character_id = "warrior"  # 回退到默认角色
 
 	current_character = character_id
-	var char_data: Dictionary = GameConfig.CHARACTERS[character_id]
+	var char_data: CharacterData = GameConfig.characters[character_id]
 
-	character_max_hp = char_data["max_hp"]
-	character_speed = char_data["speed"]
-	character_damage_mult = char_data["damage_mult"]
-	character_attack_speed_mult = char_data["attack_speed_mult"]
-	character_move_speed_mult = char_data["move_speed_mult"]
-	character_hp_regen = char_data["hp_regen"]
+	character_max_hp = char_data.max_hp
+	character_speed = char_data.speed
+	character_damage_mult = char_data.damage_mult
+	character_attack_speed_mult = char_data.attack_speed_mult
+	character_move_speed_mult = char_data.move_speed_mult
+	character_hp_regen = char_data.hp_regen
 
-	print("角色初始化: ", char_data["name"], " (", character_id, ")")
+	print("角色初始化: ", char_data.display_name, " (", character_id, ")")
 
 func reset() -> void:
 	# 初始化角色（使用当前选择的角色）

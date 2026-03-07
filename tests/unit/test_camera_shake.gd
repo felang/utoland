@@ -34,7 +34,7 @@ func test_camera_zoom_from_config():
 	camera.set_script(shake_script)
 	add_child_autoqfree(camera)
 	await get_tree().process_frame
-	var expected_zoom: Vector2 = GameConfig.EFFECTS["camera"]["zoom"]
+	var expected_zoom: Vector2 = GameConfig.effects.camera_zoom
 	assert_eq(camera.zoom, expected_zoom, "摄像机缩放应从配置读取")
 
 func test_camera_has_map_limits():

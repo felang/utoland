@@ -85,8 +85,8 @@ func die() -> void:
 func _on_died() -> void:
 	_knockback.kill_tween()
 	# 屏幕震动
-	var shake_config: Dictionary = GameConfig.EFFECTS["camera_shake"]["enemy_kill"]
-	EventBus.camera_shake_requested.emit(shake_config["intensity"], shake_config["duration"])
+	var fx: EffectConfigData = GameConfig.effects
+	EventBus.camera_shake_requested.emit(fx.camera_shake_enemy_kill_intensity, fx.camera_shake_enemy_kill_duration)
 	EventBus.enemy_killed.emit(enemy_type, global_position)
 	drop_coins()
 	queue_free()

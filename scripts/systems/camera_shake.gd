@@ -13,12 +13,12 @@ var _shake_elapsed: float = 0.0
 var _look_ahead_offset: Vector2 = Vector2.ZERO
 
 func _ready() -> void:
-	var config: Dictionary = GameConfig.EFFECTS["camera"]
+	var fx: EffectConfigData = GameConfig.effects
 	# 缩放
-	zoom = config["zoom"]
+	zoom = fx.camera_zoom
 	# 平滑跟随
 	position_smoothing_enabled = true
-	position_smoothing_speed = config["smoothing_speed"]
+	position_smoothing_speed = fx.camera_smoothing_speed
 	# 地图边界限制
 	limit_left = -int(GameConfig.MAP_HALF_WIDTH)
 	limit_right = int(GameConfig.MAP_HALF_WIDTH)
@@ -35,11 +35,11 @@ func shake(intensity: float, duration: float) -> void:
 	_trauma = maxf(_trauma, intensity)
 
 func update_look_ahead(player_velocity: Vector2) -> void:
-	var config: Dictionary = GameConfig.EFFECTS["camera"]
+	var fx: EffectConfigData = GameConfig.effects
 	var target_offset: Vector2 = Vector2.ZERO
 	if player_velocity.length() > 10.0:
-		target_offset = player_velocity.normalized() * config["look_ahead_distance"]
-	_look_ahead_offset = _look_ahead_offset.lerp(target_offset, get_process_delta_time() * config["look_ahead_smoothing"])
+		target_offset = player_velocity.normalized() * fx.camera_look_ahead_distance
+	_look_ahead_offset = _look_ahead_offset.lerp(target_offset, get_process_delta_time() * fx.camera_look_ahead_smoothing)
 
 func _process(delta: float) -> void:
 	var shake_offset: Vector2 = Vector2.ZERO
