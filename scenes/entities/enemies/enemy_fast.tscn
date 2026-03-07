@@ -5,9 +5,17 @@
 [ext_resource type="Script" path="res://scripts/components/knockback_handler.gd" id="3_knockback"]
 [ext_resource type="Script" path="res://scripts/components/slow_handler.gd" id="4_slow"]
 [ext_resource type="Script" path="res://scripts/components/sprite_animator.gd" id="5_sprite"]
+[ext_resource type="Script" uid="uid://bx7m3k2vpqn4r" path="res://scripts/components/hitbox.gd" id="6_hitbox"]
+[ext_resource type="Script" path="res://scripts/components/hurtbox.gd" id="7_hurtbox"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_t5l71"]
 size = Vector2(30, 30)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_hitbox"]
+radius = 12.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_hurtbox"]
+radius = 12.0
 
 [node name="EnemyFast" type="CharacterBody2D" unique_id=1365841566]
 collision_layer = 2
@@ -36,3 +44,19 @@ script = ExtResource("4_slow")
 
 [node name="SpriteAnimator" type="Node" parent="."]
 script = ExtResource("5_sprite")
+
+[node name="Hitbox" type="Area2D" parent="."]
+collision_layer = 32
+collision_mask = 64
+script = ExtResource("6_hitbox")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
+shape = SubResource("CircleShape2D_hitbox")
+
+[node name="Hurtbox" type="Area2D" parent="."]
+collision_layer = 128
+collision_mask = 4
+script = ExtResource("7_hurtbox")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox"]
+shape = SubResource("CircleShape2D_hurtbox")
