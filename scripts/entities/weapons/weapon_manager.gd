@@ -14,6 +14,8 @@ func initialize(weapon_ids: Array[String]) -> void:
 
 func _add_weapon(data: WeaponData) -> void:
 	var weapon: Weapon = _create_weapon(data.projectile_type)
+	if not weapon:
+		return
 	weapon.initialize(data)
 	add_child(weapon)
 	_weapons.append(weapon)
@@ -24,6 +26,8 @@ func tick(delta: float) -> void:
 		weapon.tick(delta, target)
 
 func _find_closest_enemy() -> Node2D:
+	if not is_inside_tree():
+		return null
 	var owner_node: Node2D = get_parent() as Node2D
 	if not owner_node:
 		return null
@@ -44,4 +48,4 @@ func _create_weapon(projectile_type: String) -> Weapon:
 		"boomerang": return BoomerangWeapon.new()
 		"laser":     return LaserWeapon.new()
 	push_error("WeaponManager: 未知 projectile_type: " + projectile_type)
-	return Weapon.new()
+	return null
