@@ -98,20 +98,15 @@ func take_damage(amount: float) -> void:
 	# 受击闪白
 	_flash_white()
 	# 屏幕震动
-	var camera: Camera2D = $Camera
-	if camera and camera.has_method("shake"):
-		var shake_config: Dictionary = GameConfig.EFFECTS["camera_shake"]["player_hit"]
-		camera.shake(shake_config["intensity"], shake_config["duration"])
+	var shake_config: Dictionary = GameConfig.EFFECTS["camera_shake"]["player_hit"]
+	EventBus.camera_shake_requested.emit(shake_config["intensity"], shake_config["duration"])
 	print("Player HP: ", current_hp)
 	if current_hp <= 0:
 		die()
 
 func die() -> void:
 	print("Player died!")
-	var wave_manager: Node = get_tree().get_first_node_in_group("wave_manager")
-	if wave_manager:
-		GameData.current_wave = wave_manager.current_wave
-		wave_manager.game_lost.emit()
+	EventBus.player_died.emit()
 	await get_tree().create_timer(1.0).timeout
 	get_tree().change_scene_to_file("res://scenes/ui/result.tscn")
 
