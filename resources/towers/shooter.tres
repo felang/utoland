@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="TowerData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/tower_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "shooter"
+display_name = "射手塔"
+hp = 80.0
+damage = 15.0
+fire_rate = 1.0
+attack_range = 300.0

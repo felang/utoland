@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="CharacterData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/character_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "ranger"
+display_name = "游侠"
+description = "低生命值，高速度"
+max_hp = 80.0
+speed = 250.0
+damage_mult = 0.9
+attack_speed_mult = 1.1
+move_speed_mult = 1.25

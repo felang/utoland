@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/enemy_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "fast"
+display_name = "快速敌人"
+hp = 35.0
+speed = 180.0
+damage = 8.0
+coin_drop_min = 2
+coin_drop_max = 4

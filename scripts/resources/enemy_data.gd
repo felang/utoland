@@ -1,0 +1,10 @@
+class_name EnemyData
+extends Resource
+
+@export var id: String = ""
+@export var display_name: String = ""
+@export var hp: float = 50.0
+@export var speed: float = 100.0
+@export var damage: float = 10.0
+@export var coin_drop_min: int = 1
+@export var coin_drop_max: int = 3

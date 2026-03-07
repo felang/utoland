@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="MapData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/map_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "forest"
+display_name = "森林"
+description = "茂密的森林环境"
+preview_image = "res://assets/maps/forest_preview.png"
+background = "res://assets/maps/forest_bg.png"

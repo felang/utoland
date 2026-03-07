@@ -42,4 +42,4 @@ func _play_pickup_effect() -> void:
 
 func force_attract():
 	is_attracted = true
-	attract_speed = 800.0
+	attract_speed = attract_speed * 1.6

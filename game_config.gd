@@ -1,7 +1,9 @@
 extends Node
 
 # 配置驱动优化 - 游戏配置中心
-# 所有游戏数值统一在此管理
+# Resource 资源注册表 + 向后兼容字典
+
+# ===== 常量（保留不变） =====
 
 # 开发模式开关
 const DEBUG_MODE = true
@@ -33,117 +35,7 @@ const UI_RESULT_PANEL_SIZE = Vector2(320, 220)
 const UI_SHOP_PANEL_SIZE = Vector2(560, 300)
 const UI_CARD_GAP = 20
 
-# 武器配置
-const WEAPONS = {
-	"rifle": {
-		"name": "步枪",
-		"projectile_type": "bullet",
-		"fire_rate": 0.1,
-		"damage": 10.0,
-		"bullet_count": 1,
-		"bullet_speed": 600,
-		"range": 300.0
-	},
-	"boomerang": {
-		"name": "回旋镖",
-		"projectile_type": "boomerang",
-		"fire_rate": 0.8,
-		"damage": 15.0,
-		"speed": 350.0,
-		"outbound_distance": 200.0,
-		"return_speed_mult": 1.3,
-		"range": 200.0
-	},
-	"laser": {
-		"name": "激光枪",
-		"projectile_type": "laser",
-		"fire_rate": 0.15,
-		"damage": 8.0,
-		"beam_range": 400.0,
-		"beam_width": 2.0,
-		"beam_duration": 0.08,
-		"range": 400.0
-	}
-}
-
-# 敌人配置
-const ENEMIES = {
-	"normal": {
-		"name": "普通敌人",
-		"hp": 50.0,
-		"speed": 100.0,
-		"damage": 10.0,
-		"coin_drop_min": 1,
-		"coin_drop_max": 3
-	},
-	"fast": {
-		"name": "快速敌人",
-		"hp": 35.0,
-		"speed": 180.0,
-		"damage": 8.0,
-		"coin_drop_min": 2,
-		"coin_drop_max": 4
-	},
-	"tank": {
-		"name": "坦克敌人",
-		"hp": 200.0,
-		"speed": 50.0,
-		"damage": 25.0,
-		"coin_drop_min": 5,
-		"coin_drop_max": 10
-	}
-}
-
-# 塔配置
-const TOWERS = {
-	"shooter": {
-		"name": "射手塔",
-		"hp": 80.0,
-		"damage": 15.0,
-		"fire_rate": 1.0,
-		"range": 300.0,
-		"shop_price_min": 35,
-		"shop_price_max": 45
-	},
-	"wall": {
-		"name": "墙塔",
-		"hp": 300.0,
-		"damage": 0.0,
-		"fire_rate": 0.0,
-		"range": 0.0,
-		"shop_price_min": 35,
-		"shop_price_max": 45
-	},
-	"slow": {
-		"name": "减速塔",
-		"hp": 70.0,
-		"damage": 0.0,
-		"fire_rate": 0.0,
-		"range": 200.0,
-		"slow_percent": 0.3,
-		"shop_price_min": 35,
-		"shop_price_max": 45
-	}
-}
-
-# 波次配置
-const WAVES = {
-	"total_waves": 10,
-	"wave_configs": [
-		{"duration": 45, "spawn_interval": 1.5, "enemy_types": ["normal"]},
-		{"duration": 45, "spawn_interval": 1.5, "enemy_types": ["normal"]},
-		{"duration": 50, "spawn_interval": 1.0, "enemy_types": ["normal", "fast"]},
-		{"duration": 50, "spawn_interval": 1.0, "enemy_types": ["normal", "fast"]},
-		{"duration": 55, "spawn_interval": 1.0, "enemy_types": ["normal", "fast"]},
-		{"duration": 55, "spawn_interval": 0.8, "enemy_types": ["normal", "fast", "tank"]},
-		{"duration": 60, "spawn_interval": 0.8, "enemy_types": ["normal", "fast", "tank"]},
-		{"duration": 60, "spawn_interval": 0.8, "enemy_types": ["normal", "fast", "tank"]},
-		{"duration": 60, "spawn_interval": 0.5, "enemy_types": ["normal", "fast", "tank"]},
-		{"duration": 60, "spawn_interval": 0.5, "enemy_types": ["normal", "fast", "tank"]}
-	]
-}
-
-# 玩家配置
+# ===== 玩家配置（保持 const 避免 Autoload 顺序问题） =====
 const PLAYER = {
 	"initial_hp": 100.0,
 	"initial_speed": 200.0,
@@ -152,139 +44,7 @@ const PLAYER = {
 	"default_enemy_touch_damage": 10.0  # 敌人没有 touch_damage 属性时的默认伤害
 }
 
-# 角色配置
-const CHARACTERS = {
-	"warrior": {
-		"name": "战士",
-		"description": "高生命值，低速度",
-		"max_hp": 150.0,
-		"speed": 180.0,
-		"damage_mult": 1.2,
-		"attack_speed_mult": 1.0,
-		"move_speed_mult": 0.9,
-		"hp_regen": 0.0
-	},
-	"ranger": {
-		"name": "游侠",
-		"description": "低生命值，高速度",
-		"max_hp": 80.0,
-		"speed": 250.0,
-		"damage_mult": 0.9,
-		"attack_speed_mult": 1.1,
-		"move_speed_mult": 1.25,
-		"hp_regen": 0.0
-	},
-	"tank": {
-		"name": "坦克",
-		"description": "超高生命值，极低速度",
-		"max_hp": 200.0,
-		"speed": 150.0,
-		"damage_mult": 0.8,
-		"attack_speed_mult": 0.9,
-		"move_speed_mult": 0.75,
-		"hp_regen": 1.0
-	}
-}
-
-# 商店配置
-const SHOP = {
-	"refresh_cost": 10,
-	"item_count": 4,
-	"passive_price_min": 20,
-	"passive_price_max": 40,
-	"heal_price": 12,
-	"heal_amount": 50
-}
-
-# 地图配置
-const MAPS = {
-	"forest": {
-		"name": "森林",
-		"description": "茂密的森林环境",
-		"preview_image": "res://assets/maps/forest_preview.png",
-		"background": "res://assets/maps/forest_bg.png",
-		"fallback_color": "#2d5016"
-	},
-	"desert": {
-		"name": "沙漠",
-		"description": "炎热的沙漠地带",
-		"preview_image": "res://assets/maps/desert_preview.png",
-		"background": "res://assets/maps/desert_bg.png",
-		"fallback_color": "#d4a574"
-	}
-}
-
-# 特效配置
-const EFFECTS = {
-	"camera_shake": {
-		"player_hit": {"intensity": 3.0, "duration": 0.1},
-		"enemy_kill": {"intensity": 2.0, "duration": 0.08},
-		"wave_start": {"intensity": 5.0, "duration": 0.2}
-	},
-	"knockback": {
-		"distance": 15.0,
-		"duration": 0.1
-	},
-	"hit_flash": {
-		"duration": 0.05,
-		"color": Color.WHITE
-	},
-	"invincible_blink": {
-		"interval": 0.08,
-		"alpha_low": 0.3,
-		"alpha_high": 1.0
-	},
-	"damage_number": {
-		"float_distance": 30.0,
-		"random_offset_x": 10.0,
-		"duration": 0.6,
-		"big_damage_threshold": 30.0,
-		"big_damage_scale": 1.3,
-		"normal_color": Color.WHITE,
-		"big_color": Color.YELLOW
-	},
-	"death_particles": {
-		"count": 10,
-		"spread": 20.0,
-		"lifetime": 0.3,
-		"gravity": 200.0
-	},
-	"hit_sparks": {
-		"count": 5,
-		"lifetime": 0.15,
-		"spread_speed": 100.0
-	},
-	"coin_pickup": {
-		"shrink_duration": 0.15
-	},
-	"bullet_trail": {
-		"length": 15.0,
-		"width": 2.0,
-		"color": Color(1, 1, 0, 0.6)
-	},
-	"boomerang": {
-		"rotation_speed": 720.0,
-		"trail_points": 6,
-		"trail_width": 3.0,
-		"trail_color": Color(0.2, 0.8, 1.0, 0.6),
-		"return_rotation_mult": 1.5
-	},
-	"laser": {
-		"beam_width": 4.0,
-		"core_color": Color(1, 1, 1, 0.9),
-		"edge_color": Color(1, 0.2, 0.2, 0.7),
-		"flash_alpha": 0.03,
-		"flash_duration": 0.05
-	},
-	"camera": {
-		"zoom": Vector2(0.75, 0.75),
-		"smoothing_speed": 8.0,
-		"look_ahead_distance": 40.0,
-		"look_ahead_smoothing": 3.0
-	}
-}
-
-# 精灵图配置 — 像素精灵图集成 (Ninja Adventure 素材包)
+# ===== 精灵图配置（暂保留 const，后续资源化） =====
 const SPRITES = {
 	"player": {
 		"warrior": {
@@ -352,3 +112,181 @@ const SPRITES = {
 		"coin": "res://assets/sprites/items/gold_coin.png"
 	}
 }
+
+# ===== 资源注册表 =====
+var weapons: Dictionary = {}
+var enemies: Dictionary = {}
+var towers: Dictionary = {}
+var waves: Array = []  # Array of WaveData，按 wave_number 排序
+var characters: Dictionary = {}
+var maps: Dictionary = {}
+var effects: EffectConfigData = null
+var shop: ShopConfigData = null
+var spawn: SpawnConfigData = null
+
+# ===== 向后兼容字典（运行时从 Resource 构建） =====
+var WEAPONS: Dictionary = {}
+var ENEMIES: Dictionary = {}
+var TOWERS: Dictionary = {}
+var WAVES: Dictionary = {}
+var CHARACTERS: Dictionary = {}
+var SHOP: Dictionary = {}
+var MAPS: Dictionary = {}
+var EFFECTS: Dictionary = {}
+
+
+func _ready() -> void:
+	_load_resources_from_dir("res://resources/weapons/", weapons)
+	_load_resources_from_dir("res://resources/enemies/", enemies)
+	_load_resources_from_dir("res://resources/towers/", towers)
+	_load_waves("res://resources/waves/")
+	_load_resources_from_dir("res://resources/characters/", characters)
+	_load_resources_from_dir("res://resources/maps/", maps)
+	effects = load("res://resources/effects/default_effects.tres")
+	shop = load("res://resources/shop/default_shop.tres")
+	spawn = load("res://resources/spawn/default_spawn.tres")
+	_build_compat_dicts()
+
+
+func _load_resources_from_dir(path: String, target: Dictionary) -> void:
+	var dir := DirAccess.open(path)
+	if not dir:
+		push_error("无法打开资源目录: " + path)
+		return
+	dir.list_dir_begin()
+	var file_name := dir.get_next()
+	while file_name != "":
+		if file_name.ends_with(".tres"):
+			var res: Resource = load(path + file_name)
+			if res and "id" in res:
+				target[res.id] = res
+		file_name = dir.get_next()
+
+
+func _load_waves(path: String) -> void:
+	var dir := DirAccess.open(path)
+	if not dir:
+		push_error("无法打开波次目录: " + path)
+		return
+	dir.list_dir_begin()
+	var file_name := dir.get_next()
+	while file_name != "":
+		if file_name.ends_with(".tres"):
+			var res: Resource = load(path + file_name)
+			if res is WaveData:
+				waves.append(res)
+		file_name = dir.get_next()
+	waves.sort_custom(func(a: WaveData, b: WaveData) -> bool: return a.wave_number < b.wave_number)
+
+
+func _build_compat_dicts() -> void:
+	# 从 Resource 构建向后兼容字典
+
+	# WEAPONS
+	for id in weapons:
+		var w: WeaponData = weapons[id]
+		var d: Dictionary = {
+			"name": w.display_name,
+			"projectile_type": w.projectile_type,
+			"fire_rate": w.fire_rate,
+			"damage": w.damage,
+			"range": w.weapon_range,
+		}
+		if w.projectile_type == "bullet":
+			d["bullet_count"] = w.bullet_count
+			d["bullet_speed"] = w.bullet_speed
+		elif w.projectile_type == "boomerang":
+			d["speed"] = w.boomerang_speed
+			d["outbound_distance"] = w.outbound_distance
+			d["return_speed_mult"] = w.return_speed_mult
+		elif w.projectile_type == "laser":
+			d["beam_range"] = w.beam_range
+			d["beam_width"] = w.beam_width
+			d["beam_duration"] = w.beam_duration
+		WEAPONS[id] = d
+
+	# ENEMIES
+	for id in enemies:
+		var e: EnemyData = enemies[id]
+		ENEMIES[id] = {
+			"name": e.display_name, "hp": e.hp, "speed": e.speed,
+			"damage": e.damage, "coin_drop_min": e.coin_drop_min, "coin_drop_max": e.coin_drop_max
+		}
+
+	# TOWERS
+	for id in towers:
+		var t: TowerData = towers[id]
+		var d: Dictionary = {
+			"name": t.display_name, "hp": t.hp, "damage": t.damage,
+			"fire_rate": t.fire_rate, "range": t.attack_range,
+			"shop_price_min": t.shop_price_min, "shop_price_max": t.shop_price_max
+		}
+		if t.slow_percent > 0:
+			d["slow_percent"] = t.slow_percent
+		TOWERS[id] = d
+
+	# WAVES
+	var wave_configs: Array = []
+	for w in waves:
+		wave_configs.append({
+			"duration": w.duration,
+			"spawn_interval": w.spawn_interval,
+			"enemy_types": Array(w.enemy_types)
+		})
+	WAVES = {"total_waves": waves.size(), "wave_configs": wave_configs}
+
+	# CHARACTERS
+	for id in characters:
+		var c: CharacterData = characters[id]
+		CHARACTERS[id] = {
+			"name": c.display_name, "description": c.description,
+			"max_hp": c.max_hp, "speed": c.speed,
+			"damage_mult": c.damage_mult, "attack_speed_mult": c.attack_speed_mult,
+			"move_speed_mult": c.move_speed_mult, "hp_regen": c.hp_regen
+		}
+
+	# MAPS
+	for id in maps:
+		var m: MapData = maps[id]
+		MAPS[id] = {
+			"name": m.display_name, "description": m.description,
+			"preview_image": m.preview_image, "background": m.background,
+			"fallback_color": m.fallback_color
+		}
+
+	# SHOP
+	if shop:
+		SHOP = {
+			"refresh_cost": shop.refresh_cost, "item_count": shop.item_count,
+			"passive_price_min": shop.passive_price_min, "passive_price_max": shop.passive_price_max,
+			"heal_price": shop.heal_price, "heal_amount": shop.heal_amount
+		}
+
+	# EFFECTS
+	if effects:
+		EFFECTS = {
+			"camera_shake": {
+				"player_hit": {"intensity": effects.camera_shake_player_hit_intensity, "duration": effects.camera_shake_player_hit_duration},
+				"enemy_kill": {"intensity": effects.camera_shake_enemy_kill_intensity, "duration": effects.camera_shake_enemy_kill_duration},
+				"wave_start": {"intensity": effects.camera_shake_wave_start_intensity, "duration": effects.camera_shake_wave_start_duration}
+			},
+			"knockback": {"distance": effects.knockback_distance, "duration": effects.knockback_duration},
+			"hit_flash": {"duration": effects.hit_flash_duration, "color": effects.hit_flash_color},
+			"invincible_blink": {"interval": effects.invincible_blink_interval, "alpha_low": effects.invincible_blink_alpha_low, "alpha_high": effects.invincible_blink_alpha_high},
+			"damage_number": {
+				"float_distance": effects.damage_number_float_distance,
+				"random_offset_x": effects.damage_number_random_offset_x,
+				"duration": effects.damage_number_duration,
+				"big_damage_threshold": effects.damage_number_big_threshold,
+				"big_damage_scale": effects.damage_number_big_scale,
+				"normal_color": effects.damage_number_normal_color,
+				"big_color": effects.damage_number_big_color
+			},
+			"death_particles": {"count": effects.death_particle_count, "spread": effects.death_particle_spread, "lifetime": effects.death_particle_lifetime, "gravity": effects.death_particle_gravity},
+			"hit_sparks": {"count": effects.hit_spark_count, "lifetime": effects.hit_spark_lifetime, "spread_speed": effects.hit_spark_spread_speed},
+			"coin_pickup": {"shrink_duration": effects.coin_pickup_shrink_duration},
+			"bullet_trail": {"length": effects.bullet_trail_length, "width": effects.bullet_trail_width, "color": effects.bullet_trail_color},
+			"boomerang": {"rotation_speed": effects.boomerang_rotation_speed, "trail_points": effects.boomerang_trail_points, "trail_width": effects.boomerang_trail_width, "trail_color": effects.boomerang_trail_color, "return_rotation_mult": effects.boomerang_return_rotation_mult},
+			"laser": {"beam_width": effects.laser_beam_width, "core_color": effects.laser_core_color, "edge_color": effects.laser_edge_color, "flash_alpha": effects.laser_flash_alpha, "flash_duration": effects.laser_flash_duration},
+			"camera": {"zoom": effects.camera_zoom, "smoothing_speed": effects.camera_smoothing_speed, "look_ahead_distance": effects.camera_look_ahead_distance, "look_ahead_smoothing": effects.camera_look_ahead_smoothing}
+		}
