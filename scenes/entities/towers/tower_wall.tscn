@@ -5,7 +5,7 @@
 [ext_resource type="Script" path="res://scripts/components/health_component.gd" id="3_health"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_7nxki"]
-size = Vector2(30, 30)
+size = Vector2(32, 32)
 
 [node name="TowerWall" type="StaticBody2D" unique_id=655985224]
 collision_layer = 8

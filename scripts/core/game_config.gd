@@ -11,8 +11,8 @@ const DEBUG_MODE = true
 # 全局尺寸标准
 const BASE_VIEWPORT_WIDTH = 640
 const BASE_VIEWPORT_HEIGHT = 360
-const PPU = 30
-const GRID_SIZE = 30
+const PPU = 32
+const GRID_SIZE = 32
 
 const MAP_COLS = 40
 const MAP_ROWS = 30

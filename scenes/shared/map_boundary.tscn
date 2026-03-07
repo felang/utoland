@@ -1,21 +1,21 @@
 [gd_scene format=3 uid="uid://5u5tndodgthf"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_iyhav"]
-size = Vector2(1260, 30)
+size = Vector2(1344, 32)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_wiefh"]
-size = Vector2(1260, 30)
+size = Vector2(1344, 32)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_6v7eo"]
-size = Vector2(30, 960)
+size = Vector2(32, 1024)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ixxjf"]
-size = Vector2(30, 960)
+size = Vector2(32, 1024)
 
 [node name="MapBoundary" type="Node2D" unique_id=1220843918]
 
 [node name="TopWall" type="StaticBody2D" parent="." unique_id=1675849148]
-position = Vector2(0, -465)
+position = Vector2(0, -496)
 collision_layer = 16
 collision_mask = 15
 
@@ -23,14 +23,14 @@ collision_mask = 15
 shape = SubResource("RectangleShape2D_iyhav")
 
 [node name="Visual" type="ColorRect" parent="TopWall" unique_id=19432555]
-offset_left = -630.0
-offset_top = -15.0
-offset_right = 630.0
-offset_bottom = 15.0
+offset_left = -672.0
+offset_top = -16.0
+offset_right = 672.0
+offset_bottom = 16.0
 color = Color(0.4, 0.3, 0.2, 1)
 
 [node name="BottomWall" type="StaticBody2D" parent="." unique_id=1375923321]
-position = Vector2(0, 465)
+position = Vector2(0, 496)
 collision_layer = 16
 collision_mask = 15
 
@@ -38,14 +38,14 @@ collision_mask = 15
 shape = SubResource("RectangleShape2D_wiefh")
 
 [node name="Visual" type="ColorRect" parent="BottomWall" unique_id=1097299308]
-offset_left = -630.0
-offset_top = -15.0
-offset_right = 630.0
-offset_bottom = 15.0
+offset_left = -672.0
+offset_top = -16.0
+offset_right = 672.0
+offset_bottom = 16.0
 color = Color(0.4, 0.3, 0.2, 1)
 
 [node name="LeftWall" type="StaticBody2D" parent="." unique_id=1196996007]
-position = Vector2(-615, 0)
+position = Vector2(-656, 0)
 collision_layer = 16
 collision_mask = 15
 
@@ -53,14 +53,14 @@ collision_mask = 15
 shape = SubResource("RectangleShape2D_6v7eo")
 
 [node name="Visual" type="ColorRect" parent="LeftWall" unique_id=312801315]
-offset_left = -15.0
-offset_top = -480.0
-offset_right = 15.0
-offset_bottom = 480.0
+offset_left = -16.0
+offset_top = -512.0
+offset_right = 16.0
+offset_bottom = 512.0
 color = Color(0.4, 0.3, 0.2, 1)
 
 [node name="RightWall" type="StaticBody2D" parent="." unique_id=272618173]
-position = Vector2(615, 0)
+position = Vector2(656, 0)
 collision_layer = 16
 collision_mask = 15
 
@@ -68,8 +68,8 @@ collision_mask = 15
 shape = SubResource("RectangleShape2D_ixxjf")
 
 [node name="Visual" type="ColorRect" parent="RightWall" unique_id=850013460]
-offset_left = -15.0
-offset_top = -480.0
-offset_right = 15.0
-offset_bottom = 480.0
+offset_left = -16.0
+offset_top = -512.0
+offset_right = 16.0
+offset_bottom = 512.0
 color = Color(0.4, 0.3, 0.2, 1)

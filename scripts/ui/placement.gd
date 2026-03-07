@@ -1,11 +1,18 @@
 extends Node2D
 
 const GRID_SIZE = GameConfig.GRID_SIZE
+const CAMERA_PAN_SPEED    = 600.0
+const ZOOM_STEP           = 1.15
+const ZOOM_MIN            = Vector2(0.25, 0.25)
+const ZOOM_MAX            = Vector2(2.0, 2.0)
+const PLACEMENT_ZOOM_INIT = Vector2(0.375, 0.375)
+
 @onready var background_sprite: Sprite2D = $Background/BackgroundSprite
 var selected_tower_type: String = ""
 var preview_tower: Node2D = null
 var _range_indicator: RangeIndicator = null
 var _selected_placed_tower: Node2D = null
+var _placement_camera: Camera2D = null
 
 func _ready() -> void:
 	_load_map_background()
@@ -43,7 +50,40 @@ func _ready() -> void:
 
 	_update_ui()
 
+	# 冻结玩家移动
+	$Player.set_physics_process(false)
+
+	# 创建独立布置镜头
+	_placement_camera = Camera2D.new()
+	_placement_camera.zoom = PLACEMENT_ZOOM_INIT
+	_placement_camera.position_smoothing_enabled = false
+	_placement_camera.limit_left   = -int(GameConfig.MAP_HALF_WIDTH)
+	_placement_camera.limit_right  =  int(GameConfig.MAP_HALF_WIDTH)
+	_placement_camera.limit_top    = -int(GameConfig.MAP_HALF_HEIGHT)
+	_placement_camera.limit_bottom =  int(GameConfig.MAP_HALF_HEIGHT)
+	add_child(_placement_camera)
+	_placement_camera.make_current()
+
+func _process(delta: float) -> void:
+	if _placement_camera:
+		var pan := Vector2(
+			Input.get_axis("move_left", "move_right"),
+			Input.get_axis("move_up", "move_down")
+		)
+		_placement_camera.position += pan * CAMERA_PAN_SPEED * delta
+
 func _input(event: InputEvent) -> void:
+	# 滚轮缩放
+	if event is InputEventMouseButton and event.pressed and _placement_camera:
+		if event.button_index == MOUSE_BUTTON_WHEEL_UP:
+			_placement_camera.zoom = (_placement_camera.zoom * ZOOM_STEP).clamp(ZOOM_MIN, ZOOM_MAX)
+			get_viewport().set_input_as_handled()
+			return
+		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+			_placement_camera.zoom = (_placement_camera.zoom / ZOOM_STEP).clamp(ZOOM_MIN, ZOOM_MAX)
+			get_viewport().set_input_as_handled()
+			return
+
 	if event is InputEventMouseMotion and preview_tower:
 		var grid_pos: Vector2 = _get_grid_position(get_global_mouse_position())
 		preview_tower.global_position = grid_pos
@@ -241,12 +281,12 @@ func _use_fallback_background(map_id: String) -> void:
 	if background_sprite:
 		background_sprite.queue_free()
 
-	# 获取视口尺寸（而非硬编码）
-	var viewport_size: Vector2 = get_viewport_rect().size
+	# 使用地图尺寸而非视口尺寸，确保背景与网格对齐
+	var map_size: Vector2 = Vector2(GameConfig.MAP_PIXEL_WIDTH, GameConfig.MAP_PIXEL_HEIGHT)
 
 	var color_rect: ColorRect = ColorRect.new()
-	color_rect.size = viewport_size
-	color_rect.position = -viewport_size / 2  # 居中对齐
+	color_rect.size = map_size
+	color_rect.position = -map_size / 2  # 居中对齐
 
 	var md: MapData = GameConfig.maps[map_id]
 	color_rect.color = Color(md.fallback_color)
