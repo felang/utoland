@@ -13,13 +13,10 @@ var _enemy_scenes: Dictionary = {
 	"tank": preload("res://scenes/entities/enemies/enemy_tank.tscn")
 }
 
-var _bullet_scene: PackedScene = preload("res://scenes/entities/bullet.tscn")
 var _bullet_projectile_scene: PackedScene = preload("res://scenes/entities/projectiles/bullet_projectile.tscn")
 var _boomerang_projectile_scene: PackedScene = preload("res://scenes/entities/projectiles/boomerang_projectile.tscn")
 var _laser_projectile_scene: PackedScene = preload("res://scenes/entities/projectiles/laser_projectile.tscn")
 var _coin_scene: PackedScene = preload("res://scenes/entities/coin.tscn")
-var _boomerang_scene: PackedScene = preload("res://scenes/entities/boomerang.tscn")
-var _laser_beam_scene: PackedScene = preload("res://scenes/entities/laser_beam.tscn")
 
 # Tower creation — 注入 TowerData Resource
 func create_tower(type: String) -> Node2D:
@@ -56,21 +53,9 @@ func create_enemy(type: String) -> CharacterBody2D:
 		enemy.data = GameConfig.enemies[type]
 	return enemy
 
-# Bullet creation
-func create_bullet() -> Area2D:
-	return _bullet_scene.instantiate()
-
 # Coin creation
 func create_coin() -> Area2D:
 	return _coin_scene.instantiate()
-
-# Boomerang creation
-func create_boomerang() -> Area2D:
-	return _boomerang_scene.instantiate()
-
-# Laser beam creation
-func create_laser_beam() -> Node2D:
-	return _laser_beam_scene.instantiate()
 
 # BulletProjectile creation — 新投射物系统
 func create_bullet_projectile() -> BulletProjectile:

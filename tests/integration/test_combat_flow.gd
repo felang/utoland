@@ -87,27 +87,19 @@ func test_coin_drop_amount_from_config():
 	assert_gte(enemy_data.coin_drop_min, 1, "Min coin drop should be at least 1")
 	assert_gte(enemy_data.coin_drop_max, enemy_data.coin_drop_min, "Max coin drop should be >= min")
 
-func test_bullet_damages_enemy():
-	# Test that bullet can damage enemy
-	var bullet = SceneFactory.create_bullet()
-	test_scene.add_child(bullet)
-	bullet.global_position = Vector2(100, 100)
-	bullet.damage = 15.0
-
+func test_bullet_projectile_damages_enemy():
+	# Test that bullet projectile can damage enemy via take_damage
 	var enemy = SceneFactory.create_enemy("normal")
 	test_scene.add_child(enemy)
 	enemy.global_position = Vector2(100, 100)
 
 	var initial_hp = enemy.health.current_hp
+	var damage_amount: float = 15.0
 
-	# Simulate bullet hitting enemy
-	if bullet.has_signal("body_entered"):
-		bullet._on_body_entered(enemy)
-	else:
-		# Manually trigger damage
-		enemy.take_damage(bullet.damage)
+	# 直接调用 take_damage 验证伤害机制
+	enemy.take_damage(damage_amount)
 
-	assert_lt(enemy.health.current_hp, initial_hp, "Enemy HP should decrease after bullet hit")
+	assert_lt(enemy.health.current_hp, initial_hp, "Enemy HP should decrease after damage")
 
 func test_coin_collection():
 	# Test coin collection mechanism

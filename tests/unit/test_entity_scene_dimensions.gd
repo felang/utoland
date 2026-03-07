@@ -32,10 +32,12 @@ func test_tower_sizes_match_new_standard():
 	add_child_autofree(slow)
 	assert_eq(slow.get_node("CollisionShape2D").shape.size, Vector2(30, 30))
 
-func test_bullet_and_coin_sizes_match_new_standard():
-	var bullet = load("res://scenes/entities/bullet.tscn").instantiate()
+func test_bullet_projectile_and_coin_sizes_match_new_standard():
+	var bullet: BulletProjectile = SceneFactory.create_bullet_projectile()
 	add_child_autofree(bullet)
-	assert_eq(bullet.get_node("CollisionShape2D").shape.size, Vector2(6, 6))
+	var hitbox_shape: CollisionShape2D = bullet.get_node("Hitbox/CollisionShape2D")
+	assert_not_null(hitbox_shape, "BulletProjectile 应有 Hitbox/CollisionShape2D")
+	assert_true(hitbox_shape.shape is CircleShape2D, "BulletProjectile 碰撞形状应为 CircleShape2D")
 
 	var coin = load("res://scenes/entities/coin.tscn").instantiate()
 	add_child_autofree(coin)

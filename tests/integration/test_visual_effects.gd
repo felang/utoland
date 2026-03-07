@@ -11,23 +11,23 @@ func test_enemy_death_triggers_effects():
 	var labels = get_tree().get_nodes_in_group("damage_numbers")
 	assert_gt(labels.size(), 0, "敌人受击后应生成伤害数字")
 
-func test_bullet_creates_trail():
-	var bullet = SceneFactory.create_bullet()
-	bullet.direction = Vector2.RIGHT
+func test_bullet_projectile_creates_trail():
+	var bullet: BulletProjectile = SceneFactory.create_bullet_projectile()
 	add_child_autoqfree(bullet)
+	bullet.setup(10.0, 0.0, Vector2.ZERO, Vector2.RIGHT)
 	await get_tree().process_frame
 	var has_trail: bool = false
 	for child in bullet.get_children():
 		if child is Line2D:
 			has_trail = true
 			break
-	assert_true(has_trail, "子弹应有 Line2D 拖尾子节点")
+	assert_true(has_trail, "子弹投射物应有 Line2D 拖尾子节点")
 
-func test_boomerang_rotates():
-	var boomerang = SceneFactory.create_boomerang()
-	boomerang.direction = Vector2.RIGHT
+func test_boomerang_projectile_rotates():
+	var boomerang: BoomerangProjectile = SceneFactory.create_boomerang_projectile()
 	add_child_autoqfree(boomerang)
+	boomerang.setup(10.0, 0.0, Vector2.ZERO, Vector2.RIGHT)
 	var initial_rotation: float = boomerang.rotation
 	await get_tree().create_timer(0.1).timeout
-	assert_ne(boomerang.rotation, initial_rotation, "回旋镖应持续旋转")
+	assert_ne(boomerang.rotation, initial_rotation, "回旋镖投射物应持续旋转")
 

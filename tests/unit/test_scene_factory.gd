@@ -51,12 +51,7 @@ func test_create_enemy_invalid():
 	assert_null(enemy, "Invalid enemy type should return null")
 	assert_push_error("Unknown enemy type")
 
-# Bullet and coin tests
-func test_create_bullet():
-	var bullet = SceneFactory.create_bullet()
-	assert_not_null(bullet, "Bullet should be created")
-	bullet.queue_free()
-
+# Coin tests
 func test_create_coin():
 	var coin = SceneFactory.create_coin()
 	assert_not_null(coin, "Coin should be created")
@@ -81,13 +76,18 @@ func test_get_tower_cost():
 	assert_eq(invalid_cost, 0, "Invalid tower type should return 0")
 	assert_push_error("Unknown tower type")
 
-# Boomerang and laser beam tests
-func test_create_boomerang():
-	var boomerang = SceneFactory.create_boomerang()
-	assert_not_null(boomerang, "Boomerang should be created")
+# 新投射物工厂方法测试
+func test_create_bullet_projectile():
+	var bullet = SceneFactory.create_bullet_projectile()
+	assert_not_null(bullet, "BulletProjectile should be created")
+	bullet.queue_free()
+
+func test_create_boomerang_projectile():
+	var boomerang = SceneFactory.create_boomerang_projectile()
+	assert_not_null(boomerang, "BoomerangProjectile should be created")
 	boomerang.queue_free()
 
-func test_create_laser_beam():
-	var beam = SceneFactory.create_laser_beam()
-	assert_not_null(beam, "Laser beam should be created")
+func test_create_laser_projectile():
+	var beam = SceneFactory.create_laser_projectile()
+	assert_not_null(beam, "LaserProjectile should be created")
 	beam.queue_free()

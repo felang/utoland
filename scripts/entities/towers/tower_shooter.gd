@@ -37,8 +37,7 @@ func shoot_nearest_enemy():
 				closest = enemy
 
 	if closest:
-		var bullet = SceneFactory.create_bullet()
-		bullet.global_position = global_position
-		bullet.direction = global_position.direction_to(closest.global_position)
-		bullet.damage = attack_damage
+		var bullet: BulletProjectile = SceneFactory.create_bullet_projectile()
+		var direction: Vector2 = global_position.direction_to(closest.global_position)
 		get_parent().add_child(bullet)
+		bullet.setup(attack_damage, 0.0, global_position, direction)
