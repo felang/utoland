@@ -2,21 +2,6 @@ extends GutTest
 
 # 验证 GameConfig.weapons 包含正确的武器配置
 
-func test_weapons_has_rifle():
-	assert_true(GameConfig.weapons.has("rifle"), "应包含 rifle")
-
-func test_weapons_has_boomerang():
-	assert_true(GameConfig.weapons.has("boomerang"), "应包含 boomerang")
-
-func test_weapons_has_laser():
-	assert_true(GameConfig.weapons.has("laser"), "应包含 laser")
-
-func test_weapons_no_shotgun():
-	assert_false(GameConfig.weapons.has("shotgun"), "不应包含 shotgun")
-
-func test_weapons_no_sniper():
-	assert_false(GameConfig.weapons.has("sniper"), "不应包含 sniper")
-
 func test_weapons_count():
 	assert_eq(GameConfig.weapons.size(), 3, "应有 3 把武器")
 

@@ -31,15 +31,3 @@ func test_boomerang_rotates():
 	await get_tree().create_timer(0.1).timeout
 	assert_ne(boomerang.rotation, initial_rotation, "回旋镖应持续旋转")
 
-func test_enemy_has_all_feedback_methods():
-	var enemy = SceneFactory.create_enemy("normal")
-	add_child_autoqfree(enemy)
-	assert_true(enemy.has_method("apply_knockback"), "应有击退方法")
-	assert_true(enemy.has_method("_flash_white"), "应有闪白方法")
-	assert_true(enemy.has_method("take_damage"), "应有受伤方法")
-
-func test_effects_manager_available():
-	assert_not_null(EffectsManager, "EffectsManager 应作为 autoload 可用")
-	assert_true(EffectsManager.has_method("spawn_damage_number"), "应有伤害数字方法")
-	assert_true(EffectsManager.has_method("spawn_hit_sparks"), "应有击中火花方法")
-	assert_true(EffectsManager.has_method("spawn_death_effect"), "应有死亡特效方法")

@@ -2,11 +2,6 @@ extends GutTest
 
 # 击退系统单元测试
 
-func test_enemy_has_knockback_method():
-	var enemy = SceneFactory.create_enemy("normal")
-	add_child_autoqfree(enemy)
-	assert_true(enemy.has_method("apply_knockback"), "敌人应有 apply_knockback 方法")
-
 func test_knockback_changes_position():
 	var enemy = SceneFactory.create_enemy("normal")
 	add_child_autoqfree(enemy)

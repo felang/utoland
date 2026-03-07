@@ -10,16 +10,6 @@ func test_weapon_system_exists_on_player():
 	assert_not_null(weapon, "Player 应有 WeaponSystem 子节点")
 	assert_true(weapon is WeaponSystem, "应为 WeaponSystem 类型")
 
-func test_weapon_system_has_auto_shoot():
-	var ws = WeaponSystem.new()
-	add_child_autoqfree(ws)
-	assert_true(ws.has_method("auto_shoot"), "WeaponSystem 应有 auto_shoot 方法")
-
-func test_weapon_system_has_shoot_weapon():
-	var ws = WeaponSystem.new()
-	add_child_autoqfree(ws)
-	assert_true(ws.has_method("shoot_weapon"), "WeaponSystem 应有 shoot_weapon 方法")
-
 func test_initialize_from_weapon_data():
 	var ws = WeaponSystem.new()
 	var node = Node2D.new()

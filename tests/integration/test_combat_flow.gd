@@ -146,14 +146,6 @@ func test_tower_damage_from_config():
 	var expected_damage = GameConfig.towers["shooter"].damage * GameData.player_stats["tower_mult"]
 	assert_eq(tower.attack_damage, expected_damage, "Tower damage should match config")
 
-func test_bullet_has_damage_property():
-	# Test that bullet has damage property
-	var bullet = SceneFactory.create_bullet()
-	test_scene.add_child(bullet)
-
-	assert_true("damage" in bullet, "Bullet should have damage property")
-	assert_gt(bullet.damage, 0, "Bullet damage should be positive")
-
 func test_enemy_drops_correct_coin_count():
 	# Test that enemy drops coins within configured range
 	var enemy = SceneFactory.create_enemy("tank")

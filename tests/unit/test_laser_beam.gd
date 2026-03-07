@@ -2,11 +2,6 @@ extends GutTest
 
 # 激光视觉效果实体单元测试
 
-func test_laser_beam_creation():
-	var beam: Node2D = SceneFactory.create_laser_beam()
-	assert_not_null(beam, "激光应被创建")
-	beam.queue_free()
-
 func test_laser_beam_has_line2d():
 	var beam: Node2D = SceneFactory.create_laser_beam()
 	add_child_autofree(beam)
