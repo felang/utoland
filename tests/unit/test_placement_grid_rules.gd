@@ -38,3 +38,21 @@ func test_can_place_at_rejects_position_outside_map_extents():
 func test_can_place_at_allows_position_on_map_boundary():
 	var boundary_position = Vector2(GameConfig.MAP_HALF_WIDTH, 0)
 	assert_true(placement._can_place_at(boundary_position))
+
+func test_find_tower_at_returns_closest_tower():
+	var tower = SceneFactory.create_tower(Enums.TowerId.SHOOTER)
+	tower.global_position = Vector2(105, 105)
+	tower.add_to_group(Enums.Group.TOWERS)
+	placement.add_child(tower)
+
+	var found = placement._find_tower_at(Vector2(110, 110))
+	assert_eq(found, tower, "应找到最近的塔")
+
+func test_find_tower_at_returns_null_when_too_far():
+	var tower = SceneFactory.create_tower(Enums.TowerId.SHOOTER)
+	tower.global_position = Vector2(105, 105)
+	tower.add_to_group(Enums.Group.TOWERS)
+	placement.add_child(tower)
+
+	var found = placement._find_tower_at(Vector2(300, 300))
+	assert_null(found, "距离太远应返回 null")

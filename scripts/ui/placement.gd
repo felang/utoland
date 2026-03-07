@@ -5,6 +5,7 @@ const GRID_SIZE = GameConfig.GRID_SIZE
 var selected_tower_type: String = ""
 var preview_tower: Node2D = null
 var _range_indicator: RangeIndicator = null
+var _selected_placed_tower: Node2D = null
 
 func _ready() -> void:
 	_load_map_background()
@@ -49,13 +50,20 @@ func _input(event: InputEvent) -> void:
 		_range_indicator.global_position = grid_pos
 
 	if event is InputEventMouseButton and event.pressed:
-		if event.button_index == MOUSE_BUTTON_LEFT and preview_tower:
-			_place_tower()
+		if event.button_index == MOUSE_BUTTON_LEFT:
+			if preview_tower:
+				_place_tower()
+			else:
+				var clicked_tower: Node2D = _find_tower_at(get_global_mouse_position())
+				if clicked_tower:
+					_select_placed_tower(clicked_tower)
+				else:
+					_deselect_tower()
 		elif event.button_index == MOUSE_BUTTON_RIGHT:
 			_cancel_placement()
 
 func _select_tower(type: String) -> void:
-	_range_indicator.hide_range()
+	_deselect_tower()
 	var cost: int = SceneFactory.get_tower_cost(type)
 	if GameData.coins < cost:
 		return
@@ -117,6 +125,32 @@ func _cancel_placement() -> void:
 		preview_tower = null
 		selected_tower_type = ""
 		_range_indicator.hide_range()
+
+func _find_tower_at(pos: Vector2) -> Node2D:
+	var towers: Array[Node] = get_tree().get_nodes_in_group(Enums.Group.TOWERS)
+	var closest: Node2D = null
+	var min_dist: float = GRID_SIZE / 2.0
+
+	for tower in towers:
+		if tower == preview_tower:
+			continue
+		var dist: float = tower.global_position.distance_to(pos)
+		if dist < min_dist:
+			min_dist = dist
+			closest = tower
+	return closest
+
+func _select_placed_tower(tower: Node2D) -> void:
+	_selected_placed_tower = tower
+	if tower.data and tower.data.attack_range > 0:
+		_range_indicator.global_position = tower.global_position
+		_range_indicator.set_range(tower.data.attack_range)
+	else:
+		_range_indicator.hide_range()
+
+func _deselect_tower() -> void:
+	_selected_placed_tower = null
+	_range_indicator.hide_range()
 
 func _update_ui() -> void:
 	$UI/CoinsLabel.text = "金币: %d" % GameData.coins
