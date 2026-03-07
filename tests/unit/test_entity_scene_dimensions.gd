@@ -7,28 +7,28 @@ func test_player_size_matches_30_grid():
 	assert_eq(shape.size, Vector2(30, 30))
 
 func test_enemy_sizes_match_new_standard():
-	var normal = SceneFactory.create_enemy("normal")
+	var normal = SceneFactory.create_enemy(Enums.Enemy.NORMAL)
 	add_child_autofree(normal)
 	assert_eq(normal.get_node("CollisionShape2D").shape.size, Vector2(30, 30))
 
-	var fast = SceneFactory.create_enemy("fast")
+	var fast = SceneFactory.create_enemy(Enums.Enemy.FAST)
 	add_child_autofree(fast)
 	assert_eq(fast.get_node("CollisionShape2D").shape.size, Vector2(30, 30))
 
-	var tank = SceneFactory.create_enemy("tank")
+	var tank = SceneFactory.create_enemy(Enums.Enemy.TANK)
 	add_child_autofree(tank)
 	assert_eq(tank.get_node("CollisionShape2D").shape.size, Vector2(45, 45))
 
 func test_tower_sizes_match_new_standard():
-	var shooter = SceneFactory.create_tower("shooter")
+	var shooter = SceneFactory.create_tower(Enums.Tower.SHOOTER)
 	add_child_autofree(shooter)
 	assert_eq(shooter.get_node("CollisionShape2D").shape.size, Vector2(30, 30))
 
-	var wall = SceneFactory.create_tower("wall")
+	var wall = SceneFactory.create_tower(Enums.Tower.WALL)
 	add_child_autofree(wall)
 	assert_eq(wall.get_node("CollisionShape2D").shape.size, Vector2(30, 30))
 
-	var slow = SceneFactory.create_tower("slow")
+	var slow = SceneFactory.create_tower(Enums.Tower.SLOW)
 	add_child_autofree(slow)
 	assert_eq(slow.get_node("CollisionShape2D").shape.size, Vector2(30, 30))
 

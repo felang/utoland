@@ -37,7 +37,7 @@ func _find_closest_enemy(range_limit: float = INF) -> Node2D:
 	var owner_node: Node2D = get_parent() as Node2D
 	if not owner_node:
 		return null
-	var enemies: Array[Node] = get_tree().get_nodes_in_group("enemies")
+	var enemies: Array[Node] = get_tree().get_nodes_in_group(Enums.Group.ENEMIES)
 	var closest: Node2D = null
 	var min_dist: float = range_limit  # 只考虑射程内的敌人
 	for enemy in enemies:
@@ -50,8 +50,8 @@ func _find_closest_enemy(range_limit: float = INF) -> Node2D:
 
 func _create_weapon(projectile_type: String) -> Weapon:
 	match projectile_type:
-		"bullet":    return BulletWeapon.new()
-		"boomerang": return BoomerangWeapon.new()
-		"laser":     return LaserWeapon.new()
+		Enums.Projectile.BULLET:    return BulletWeapon.new()
+		Enums.Projectile.BOOMERANG: return BoomerangWeapon.new()
+		Enums.Projectile.LASER:     return LaserWeapon.new()
 	push_error("WeaponManager: 未知 projectile_type: " + projectile_type)
 	return null

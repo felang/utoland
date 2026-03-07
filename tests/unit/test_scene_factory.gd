@@ -5,21 +5,21 @@ extends GutTest
 
 # Tower creation tests
 func test_create_tower_shooter():
-	var tower = SceneFactory.create_tower("shooter")
+	var tower = SceneFactory.create_tower(Enums.Tower.SHOOTER)
 	assert_not_null(tower, "Shooter tower should be created")
-	assert_eq(tower.tower_type, "shooter", "Tower type should be 'shooter'")
+	assert_eq(tower.tower_type, Enums.Tower.SHOOTER, "Tower type should be 'shooter'")
 	tower.queue_free()
 
 func test_create_tower_wall():
-	var tower = SceneFactory.create_tower("wall")
+	var tower = SceneFactory.create_tower(Enums.Tower.WALL)
 	assert_not_null(tower, "Wall tower should be created")
-	assert_eq(tower.tower_type, "wall", "Tower type should be 'wall'")
+	assert_eq(tower.tower_type, Enums.Tower.WALL, "Tower type should be 'wall'")
 	tower.queue_free()
 
 func test_create_tower_slow():
-	var tower = SceneFactory.create_tower("slow")
+	var tower = SceneFactory.create_tower(Enums.Tower.SLOW)
 	assert_not_null(tower, "Slow tower should be created")
-	assert_eq(tower.tower_type, "slow", "Tower type should be 'slow'")
+	assert_eq(tower.tower_type, Enums.Tower.SLOW, "Tower type should be 'slow'")
 	tower.queue_free()
 
 func test_create_tower_invalid():
@@ -29,21 +29,21 @@ func test_create_tower_invalid():
 
 # Enemy creation tests
 func test_create_enemy_normal():
-	var enemy = SceneFactory.create_enemy("normal")
+	var enemy = SceneFactory.create_enemy(Enums.Enemy.NORMAL)
 	assert_not_null(enemy, "Normal enemy should be created")
-	assert_eq(enemy.enemy_type, "normal", "Enemy type should be 'normal'")
+	assert_eq(enemy.enemy_type, Enums.Enemy.NORMAL, "Enemy type should be 'normal'")
 	enemy.queue_free()
 
 func test_create_enemy_fast():
-	var enemy = SceneFactory.create_enemy("fast")
+	var enemy = SceneFactory.create_enemy(Enums.Enemy.FAST)
 	assert_not_null(enemy, "Fast enemy should be created")
-	assert_eq(enemy.enemy_type, "fast", "Enemy type should be 'fast'")
+	assert_eq(enemy.enemy_type, Enums.Enemy.FAST, "Enemy type should be 'fast'")
 	enemy.queue_free()
 
 func test_create_enemy_tank():
-	var enemy = SceneFactory.create_enemy("tank")
+	var enemy = SceneFactory.create_enemy(Enums.Enemy.TANK)
 	assert_not_null(enemy, "Tank enemy should be created")
-	assert_eq(enemy.enemy_type, "tank", "Enemy type should be 'tank'")
+	assert_eq(enemy.enemy_type, Enums.Enemy.TANK, "Enemy type should be 'tank'")
 	enemy.queue_free()
 
 func test_create_enemy_invalid():
@@ -60,15 +60,15 @@ func test_create_coin():
 # Tower cost test
 func test_get_tower_cost():
 	# Test shooter tower cost (average of 35 and 45 = 40)
-	var shooter_cost = SceneFactory.get_tower_cost("shooter")
+	var shooter_cost = SceneFactory.get_tower_cost(Enums.Tower.SHOOTER)
 	assert_eq(shooter_cost, 40, "Shooter tower cost should be 40 (average of 35 and 45)")
 
 	# Test wall tower cost (average of 35 and 45 = 40)
-	var wall_cost = SceneFactory.get_tower_cost("wall")
+	var wall_cost = SceneFactory.get_tower_cost(Enums.Tower.WALL)
 	assert_eq(wall_cost, 40, "Wall tower cost should be 40 (average of 35 and 45)")
 
 	# Test slow tower cost (average of 35 and 45 = 40)
-	var slow_cost = SceneFactory.get_tower_cost("slow")
+	var slow_cost = SceneFactory.get_tower_cost(Enums.Tower.SLOW)
 	assert_eq(slow_cost, 40, "Slow tower cost should be 40 (average of 35 and 45)")
 
 	# Test invalid tower type

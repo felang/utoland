@@ -5,9 +5,9 @@ extends Tower
 
 @onready var slow_area: Area2D = $SlowArea
 
-func _ready():
+func _ready() -> void:
 	# 设置塔类型
-	tower_type = "slow"
+	tower_type = Enums.Tower.SLOW
 
 	# 从注入的 Resource 初始化（HP 由 super._ready() 处理）
 	slow_radius = data.attack_range
@@ -19,10 +19,10 @@ func _ready():
 	slow_area.body_entered.connect(_on_enemy_entered)
 	slow_area.body_exited.connect(_on_enemy_exited)
 
-func _on_enemy_entered(body):
-	if body.is_in_group("enemies") and body.has_method("apply_slow"):
+func _on_enemy_entered(body: Node2D) -> void:
+	if body.is_in_group(Enums.Group.ENEMIES) and body.has_method("apply_slow"):
 		body.apply_slow(slow_percent)
 
-func _on_enemy_exited(body):
-	if body.is_in_group("enemies") and body.has_method("remove_slow"):
+func _on_enemy_exited(body: Node2D) -> void:
+	if body.is_in_group(Enums.Group.ENEMIES) and body.has_method("remove_slow"):
 		body.remove_slow(slow_percent)

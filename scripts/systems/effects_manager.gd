@@ -14,7 +14,7 @@ func spawn_damage_number(pos: Vector2, damage: float) -> void:
 	var fx: EffectConfigData = GameConfig.effects
 	var label: Label = Label.new()
 	label.text = str(int(damage))
-	label.add_to_group("damage_numbers")
+	label.add_to_group(Enums.Group.DAMAGE_NUMBERS)
 	label.global_position = pos
 	label.z_index = fx.damage_number_z_index
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER

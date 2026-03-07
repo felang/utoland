@@ -10,7 +10,7 @@ func test_add_weapon_creates_bullet_weapon():
 	var mgr = WeaponManager.new()
 	add_child_autofree(mgr)
 	var data = WeaponData.new()
-	data.projectile_type = "bullet"
+	data.projectile_type = Enums.Projectile.BULLET
 	data.fire_rate = 0.5
 	data.damage = 10.0
 	mgr._add_weapon(data)
@@ -21,7 +21,7 @@ func test_add_weapon_creates_boomerang_weapon():
 	var mgr = WeaponManager.new()
 	add_child_autofree(mgr)
 	var data = WeaponData.new()
-	data.projectile_type = "boomerang"
+	data.projectile_type = Enums.Projectile.BOOMERANG
 	data.fire_rate = 1.0
 	data.damage = 15.0
 	mgr._add_weapon(data)
@@ -32,7 +32,7 @@ func test_add_weapon_creates_laser_weapon():
 	var mgr = WeaponManager.new()
 	add_child_autofree(mgr)
 	var data = WeaponData.new()
-	data.projectile_type = "laser"
+	data.projectile_type = Enums.Projectile.LASER
 	data.fire_rate = 2.0
 	data.damage = 30.0
 	mgr._add_weapon(data)

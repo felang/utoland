@@ -12,15 +12,15 @@ var _blink_tween: Tween = null
 @onready var _sprite_animator: SpriteAnimator = $SpriteAnimator
 
 func _ready() -> void:
-	add_to_group("player")
+	add_to_group(Enums.Group.PLAYER)
 
 	# 重置生命回复计时器（修复已知问题 #2）
 	hp_regen_timer = 0.0
 
 	# 应用被动属性
-	var max_hp: float = GameData.player_stats["max_hp"] * GameData.player_stats["hp_mult"]
+	var max_hp: float = GameData.player_stats[Enums.Stat.MAX_HP] * GameData.player_stats[Enums.Stat.HP_MULT]
 	health.initialize(max_hp)
-	speed = GameData.character_speed * GameData.player_stats["move_speed_mult"]
+	speed = GameData.character_speed * GameData.player_stats[Enums.Stat.MOVE_SPEED_MULT]
 
 	# 应用待处理的治疗
 	if GameData.pending_heal > 0:
@@ -54,7 +54,7 @@ func _process(delta: float) -> void:
 	hp_regen_timer += delta
 	if hp_regen_timer >= GameConfig.PLAYER["hp_regen_interval"]:
 		hp_regen_timer = 0.0
-		var regen_amount: float = GameData.character_hp_regen + GameData.player_stats["hp_regen"]
+		var regen_amount: float = GameData.character_hp_regen + GameData.player_stats[Enums.Stat.HP_REGEN]
 		if regen_amount > 0:
 			health.heal(regen_amount)
 
@@ -100,7 +100,7 @@ func _on_died() -> void:
 	print("Player died!")
 	EventBus.player_died.emit()
 	await get_tree().create_timer(1.0).timeout
-	SceneManager.go_to("result")
+	SceneManager.go_to(Enums.Scene.RESULT)
 
 func add_coins(amount: int) -> void:
 	coins += amount

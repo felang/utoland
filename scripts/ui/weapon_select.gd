@@ -21,4 +21,4 @@ func _ready() -> void:
 
 func _on_weapon_selected(weapon_id: String) -> void:
 	GameData.selected_weapon = weapon_id
-	SceneManager.go_to("map_select")
+	SceneManager.go_to(Enums.Scene.MAP_SELECT)

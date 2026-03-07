@@ -43,7 +43,7 @@ func test_camera_shake_requested_signal():
 
 func test_enemy_killed_signal():
 	watch_signals(EventBus)
-	EventBus.enemy_killed.emit("normal", Vector2(100, 200))
+	EventBus.enemy_killed.emit(Enums.Enemy.NORMAL, Vector2(100, 200))
 	assert_signal_emitted(EventBus, "enemy_killed")
 
 func test_coins_changed_signal():
@@ -58,10 +58,10 @@ func test_coin_collected_signal():
 
 func test_tower_placed_signal():
 	watch_signals(EventBus)
-	EventBus.tower_placed.emit("shooter", Vector2(200, 300))
+	EventBus.tower_placed.emit(Enums.Tower.SHOOTER, Vector2(200, 300))
 	assert_signal_emitted(EventBus, "tower_placed")
 
 func test_tower_destroyed_signal():
 	watch_signals(EventBus)
-	EventBus.tower_destroyed.emit("wall", Vector2(150, 250))
+	EventBus.tower_destroyed.emit(Enums.Tower.WALL, Vector2(150, 250))
 	assert_signal_emitted(EventBus, "tower_destroyed")

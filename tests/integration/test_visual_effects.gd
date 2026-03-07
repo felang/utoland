@@ -3,12 +3,12 @@ extends GutTest
 # 视觉效果集成测试
 
 func test_enemy_death_triggers_effects():
-	var enemy = SceneFactory.create_enemy("normal")
+	var enemy = SceneFactory.create_enemy(Enums.Enemy.NORMAL)
 	add_child_autoqfree(enemy)
 	await get_tree().process_frame
 	enemy.take_damage(999.0)
 	await get_tree().process_frame
-	var labels = get_tree().get_nodes_in_group("damage_numbers")
+	var labels = get_tree().get_nodes_in_group(Enums.Group.DAMAGE_NUMBERS)
 	assert_gt(labels.size(), 0, "敌人受击后应生成伤害数字")
 
 func test_bullet_projectile_creates_trail():

@@ -15,7 +15,7 @@ func tick(delta: float, target: Node2D) -> void:
 	_cooldown -= delta
 	if _cooldown <= 0.0 and target:
 		fire(target)
-		var speed_mult: float = GameData.player_stats.get("attack_speed_mult", 1.0)
+		var speed_mult: float = GameData.player_stats.get(Enums.Stat.ATTACK_SPEED_MULT, 1.0)
 		_cooldown = weapon_data.fire_rate / speed_mult
 
 func fire(_target: Node2D) -> void:

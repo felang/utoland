@@ -12,7 +12,7 @@ func before_each():
 
 func test_tower_shoots_at_enemy():
 	# Test that tower can shoot bullets
-	var tower = SceneFactory.create_tower("shooter")
+	var tower = SceneFactory.create_tower(Enums.Tower.SHOOTER)
 	test_scene.add_child(tower)
 	tower.global_position = Vector2(200, 200)
 
@@ -20,7 +20,7 @@ func test_tower_shoots_at_enemy():
 	await wait_frames(2)
 
 	# Create enemy in range
-	var enemy = SceneFactory.create_enemy("normal")
+	var enemy = SceneFactory.create_enemy(Enums.Enemy.NORMAL)
 	test_scene.add_child(enemy)
 	enemy.global_position = Vector2(250, 200)  # Within 300 range
 
@@ -29,11 +29,11 @@ func test_tower_shoots_at_enemy():
 
 	# Check if bullet was created (may have already hit and been destroyed)
 	# We verify the tower has the ability to shoot
-	assert_true(tower.has_method("shoot_nearest_enemy"), "Tower should have shoot_nearest_enemy method")
+	assert_true(tower.has_method("_shoot_nearest_enemy"), "Tower should have _shoot_nearest_enemy method")
 
 func test_enemy_takes_damage():
 	# Test that enemy can take damage
-	var enemy = SceneFactory.create_enemy("normal")
+	var enemy = SceneFactory.create_enemy(Enums.Enemy.NORMAL)
 	test_scene.add_child(enemy)
 
 	var initial_hp = enemy.health.current_hp
@@ -45,7 +45,7 @@ func test_enemy_takes_damage():
 
 func test_enemy_dies_at_zero_hp():
 	# Test that enemy dies when HP reaches zero
-	var enemy = SceneFactory.create_enemy("normal")
+	var enemy = SceneFactory.create_enemy(Enums.Enemy.NORMAL)
 	test_scene.add_child(enemy)
 
 	var initial_hp = enemy.health.current_hp
@@ -61,10 +61,10 @@ func test_enemy_dies_at_zero_hp():
 
 func test_enemy_drops_coins_on_death():
 	# Test that enemy drops coins when it dies
-	var enemy = SceneFactory.create_enemy("normal")
+	var enemy = SceneFactory.create_enemy(Enums.Enemy.NORMAL)
 	test_scene.add_child(enemy)
 
-	var initial_coin_count = test_scene.get_tree().get_nodes_in_group("coins").size()
+	var initial_coin_count = test_scene.get_tree().get_nodes_in_group(Enums.Group.COINS).size()
 
 	# Kill enemy
 	enemy.die()
@@ -72,24 +72,24 @@ func test_enemy_drops_coins_on_death():
 	# Wait for coins to be added
 	await wait_frames(2)
 
-	var final_coin_count = test_scene.get_tree().get_nodes_in_group("coins").size()
+	var final_coin_count = test_scene.get_tree().get_nodes_in_group(Enums.Group.COINS).size()
 
 	# Should have more coins than before
 	assert_gt(final_coin_count, initial_coin_count, "Coins should be dropped after enemy death")
 
 func test_coin_drop_amount_from_config():
 	# Test that coin drop amount respects GameConfig
-	var enemy = SceneFactory.create_enemy("normal")
+	var enemy = SceneFactory.create_enemy(Enums.Enemy.NORMAL)
 	test_scene.add_child(enemy)
 
-	var enemy_data: EnemyData = GameConfig.enemies["normal"]
+	var enemy_data: EnemyData = GameConfig.enemies[Enums.Enemy.NORMAL]
 
 	assert_gte(enemy_data.coin_drop_min, 1, "Min coin drop should be at least 1")
 	assert_gte(enemy_data.coin_drop_max, enemy_data.coin_drop_min, "Max coin drop should be >= min")
 
 func test_bullet_projectile_damages_enemy():
 	# Test that bullet projectile can damage enemy via take_damage
-	var enemy = SceneFactory.create_enemy("normal")
+	var enemy = SceneFactory.create_enemy(Enums.Enemy.NORMAL)
 	test_scene.add_child(enemy)
 	enemy.global_position = Vector2(100, 100)
 
@@ -108,13 +108,13 @@ func test_coin_collection():
 	coin.global_position = Vector2(150, 150)
 
 	assert_not_null(coin, "Coin should be created")
-	assert_true(coin.is_in_group("coins"), "Coin should be in 'coins' group")
+	assert_true(coin.is_in_group(Enums.Group.COINS), "Coin should be in 'coins' group")
 	assert_gt(coin.value, 0, "Coin should have positive value")
 
 func test_multiple_enemies_take_damage():
 	# Test that multiple enemies can take damage independently
-	var enemy1 = SceneFactory.create_enemy("normal")
-	var enemy2 = SceneFactory.create_enemy("fast")
+	var enemy1 = SceneFactory.create_enemy(Enums.Enemy.NORMAL)
+	var enemy2 = SceneFactory.create_enemy(Enums.Enemy.FAST)
 
 	test_scene.add_child(enemy1)
 	test_scene.add_child(enemy2)
@@ -130,30 +130,30 @@ func test_multiple_enemies_take_damage():
 
 func test_tower_damage_from_config():
 	# Test that tower damage is loaded from GameConfig
-	var tower = SceneFactory.create_tower("shooter")
+	var tower = SceneFactory.create_tower(Enums.Tower.SHOOTER)
 	test_scene.add_child(tower)
 
 	await wait_frames(2)
 
-	var expected_damage = GameConfig.towers["shooter"].damage * GameData.player_stats["tower_mult"]
+	var expected_damage = GameConfig.towers[Enums.Tower.SHOOTER].damage * GameData.player_stats[Enums.Stat.TOWER_MULT]
 	assert_eq(tower.attack_damage, expected_damage, "Tower damage should match config")
 
 func test_enemy_drops_correct_coin_count():
 	# Test that enemy drops coins within configured range
-	var enemy = SceneFactory.create_enemy("tank")
+	var enemy = SceneFactory.create_enemy(Enums.Enemy.TANK)
 	test_scene.add_child(enemy)
 
-	var enemy_data: EnemyData = GameConfig.enemies["tank"]
+	var enemy_data: EnemyData = GameConfig.enemies[Enums.Enemy.TANK]
 	var min_coins = enemy_data.coin_drop_min
 	var max_coins = enemy_data.coin_drop_max
 
 	# Kill enemy and count coins
-	var initial_coins = test_scene.get_tree().get_nodes_in_group("coins").size()
+	var initial_coins = test_scene.get_tree().get_nodes_in_group(Enums.Group.COINS).size()
 	enemy.die()
 
 	await wait_frames(2)
 
-	var final_coins = test_scene.get_tree().get_nodes_in_group("coins").size()
+	var final_coins = test_scene.get_tree().get_nodes_in_group(Enums.Group.COINS).size()
 	var dropped_coins = final_coins - initial_coins
 
 	assert_gte(dropped_coins, min_coins, "Should drop at least min coins")
@@ -161,7 +161,7 @@ func test_enemy_drops_correct_coin_count():
 
 func test_tower_takes_damage_from_enemy():
 	# Test that tower can take damage
-	var tower = SceneFactory.create_tower("wall")
+	var tower = SceneFactory.create_tower(Enums.Tower.WALL)
 	test_scene.add_child(tower)
 
 	var initial_hp = tower.health.current_hp
@@ -173,7 +173,7 @@ func test_tower_takes_damage_from_enemy():
 
 func test_tower_destroyed_at_zero_hp():
 	# Test that tower is destroyed when HP reaches zero
-	var tower = SceneFactory.create_tower("wall")
+	var tower = SceneFactory.create_tower(Enums.Tower.WALL)
 	test_scene.add_child(tower)
 
 	var initial_hp = tower.health.current_hp
@@ -189,13 +189,13 @@ func test_tower_destroyed_at_zero_hp():
 
 func test_combat_full_cycle():
 	# Test a complete combat cycle: tower shoots, enemy takes damage, dies, drops coins
-	var tower = SceneFactory.create_tower("shooter")
+	var tower = SceneFactory.create_tower(Enums.Tower.SHOOTER)
 	test_scene.add_child(tower)
 	tower.global_position = Vector2(200, 200)
 
 	await wait_frames(2)
 
-	var enemy = SceneFactory.create_enemy("normal")
+	var enemy = SceneFactory.create_enemy(Enums.Enemy.NORMAL)
 	test_scene.add_child(enemy)
 	enemy.global_position = Vector2(250, 200)
 
@@ -208,5 +208,5 @@ func test_combat_full_cycle():
 	await wait_frames(2)
 
 	# Verify coins were dropped
-	var coins = test_scene.get_tree().get_nodes_in_group("coins")
+	var coins = test_scene.get_tree().get_nodes_in_group(Enums.Group.COINS)
 	assert_gt(coins.size(), 0, "Coins should be dropped after enemy death")

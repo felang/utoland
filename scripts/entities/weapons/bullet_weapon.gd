@@ -5,7 +5,7 @@ extends Weapon
 func fire(target: Node2D) -> void:
 	if not owner_node:
 		return
-	var final_damage: float = weapon_data.damage * GameData.player_stats.get("damage_mult", 1.0)
+	var final_damage: float = weapon_data.damage * GameData.player_stats.get(Enums.Stat.DAMAGE_MULT, 1.0)
 	var direction: Vector2 = owner_node.global_position.direction_to(target.global_position)
 	var bullet: BulletProjectile = SceneFactory.create_bullet_projectile()
 	bullet.speed = weapon_data.bullet_speed

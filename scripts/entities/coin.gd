@@ -7,14 +7,14 @@ extends Area2D
 var player: Node2D = null
 var is_attracted: bool = false
 
-func _ready():
+func _ready() -> void:
 	body_entered.connect(_on_body_entered)
-	player = get_tree().get_first_node_in_group("player")
-	add_to_group("coins")
+	player = get_tree().get_first_node_in_group(Enums.Group.PLAYER)
+	add_to_group(Enums.Group.COINS)
 
-func _process(delta):
+func _process(delta: float) -> void:
 	if not player or not is_instance_valid(player):
-		player = get_tree().get_first_node_in_group("player")
+		player = get_tree().get_first_node_in_group(Enums.Group.PLAYER)
 		if not player:
 			return
 
@@ -22,11 +22,11 @@ func _process(delta):
 		is_attracted = true
 
 	if is_attracted:
-		var direction = global_position.direction_to(player.global_position)
+		var direction: Vector2 = global_position.direction_to(player.global_position)
 		global_position += direction * attract_speed * delta
 
-func _on_body_entered(body):
-	if body.is_in_group("player"):
+func _on_body_entered(body: Node2D) -> void:
+	if body.is_in_group(Enums.Group.PLAYER):
 		body.add_coins(value)
 		_play_pickup_effect()
 
@@ -40,6 +40,6 @@ func _play_pickup_effect() -> void:
 	tween.set_parallel(false)
 	tween.tween_callback(queue_free)
 
-func force_attract():
+func force_attract() -> void:
 	is_attracted = true
 	attract_speed = attract_speed * 1.6

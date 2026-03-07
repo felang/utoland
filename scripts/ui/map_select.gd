@@ -10,11 +10,11 @@ func _ready() -> void:
 		return
 
 	# 连接按钮信号
-	forest_button.pressed.connect(_on_map_selected.bind("forest"))
-	desert_button.pressed.connect(_on_map_selected.bind("desert"))
+	forest_button.pressed.connect(_on_map_selected.bind(Enums.Map.FOREST))
+	desert_button.pressed.connect(_on_map_selected.bind(Enums.Map.DESERT))
 
 	# 验证地图配置
-	if not GameConfig.maps.has("forest") or not GameConfig.maps.has("desert"):
+	if not GameConfig.maps.has(Enums.Map.FOREST) or not GameConfig.maps.has(Enums.Map.DESERT):
 		push_error("地图配置缺失")
 
 func _on_map_selected(map_id: String) -> void:
@@ -29,4 +29,4 @@ func _on_map_selected(map_id: String) -> void:
 	print("选择地图: ", md.display_name)
 
 	# 跳转到塔布置场景
-	SceneManager.go_to("placement")
+	SceneManager.go_to(Enums.Scene.PLACEMENT)

@@ -3,7 +3,7 @@ extends GutTest
 # 受击闪白和无敌帧闪烁测试
 
 func test_enemy_flash_changes_modulate():
-	var enemy = SceneFactory.create_enemy("normal")
+	var enemy = SceneFactory.create_enemy(Enums.Enemy.NORMAL)
 	add_child_autoqfree(enemy)
 	await get_tree().process_frame
 	var original: Color = enemy.modulate

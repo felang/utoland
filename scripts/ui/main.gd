@@ -1,12 +1,12 @@
 extends Node2D
 
-func _ready():
+func _ready() -> void:
 	# 恢复布置的塔
-	for tower_data in GameData.tower_inventory:
-		var tower_type = tower_data["type"]
-		var tower_pos = tower_data["position"]
+	for tower_data: Dictionary in GameData.tower_inventory:
+		var tower_type: String = tower_data["type"]
+		var tower_pos: Vector2 = tower_data["position"]
 
-		var tower = SceneFactory.create_tower(tower_type)
+		var tower: Node2D = SceneFactory.create_tower(tower_type)
 		if tower:
 			tower.global_position = tower_pos
 			add_child(tower)

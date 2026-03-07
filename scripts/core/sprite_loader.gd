@@ -18,17 +18,17 @@ static func create_player_sprite_frames(config: Dictionary) -> SpriteFrames:
 	var walk_tex: Texture2D = load(config["walk"])
 
 	# idle 动画（单行，4帧）
-	frames.add_animation("idle")
-	frames.set_animation_speed("idle", fps)
-	frames.set_animation_loop("idle", true)
+	frames.add_animation(Enums.Anim.IDLE)
+	frames.set_animation_speed(Enums.Anim.IDLE, fps)
+	frames.set_animation_loop(Enums.Anim.IDLE, true)
 	for i in config["idle_frames"]:
 		var atlas := AtlasTexture.new()
 		atlas.atlas = idle_tex
 		atlas.region = Rect2(i * frame_size.x, 0, frame_size.x, frame_size.y)
-		frames.add_frame("idle", atlas)
+		frames.add_frame(Enums.Anim.IDLE, atlas)
 
 	# walk 动画（4方向，每方向4帧）
-	var dir_names: Array[String] = ["walk_down", "walk_up", "walk_left", "walk_right"]
+	var dir_names: Array[String] = [Enums.Anim.WALK_DOWN, Enums.Anim.WALK_UP, Enums.Anim.WALK_LEFT, Enums.Anim.WALK_RIGHT]
 	for dir_idx in config["walk_directions"]:
 		var anim_name: String = dir_names[dir_idx]
 		frames.add_animation(anim_name)
@@ -41,8 +41,8 @@ static func create_player_sprite_frames(config: Dictionary) -> SpriteFrames:
 			frames.add_frame(anim_name, atlas)
 
 	# 删除默认的 "default" 动画
-	if frames.has_animation("default"):
-		frames.remove_animation("default")
+	if frames.has_animation(Enums.Anim.DEFAULT):
+		frames.remove_animation(Enums.Anim.DEFAULT)
 
 	return frames
 
@@ -57,7 +57,7 @@ static func create_enemy_sprite_frames(config: Dictionary) -> SpriteFrames:
 	var spritesheet: Texture2D = load(config["spritesheet"])
 
 	# 4方向 walk 动画
-	var dir_names: Array[String] = ["walk_down", "walk_up", "walk_left", "walk_right"]
+	var dir_names: Array[String] = [Enums.Anim.WALK_DOWN, Enums.Anim.WALK_UP, Enums.Anim.WALK_LEFT, Enums.Anim.WALK_RIGHT]
 	for dir_idx in config["walk_directions"]:
 		var anim_name: String = dir_names[dir_idx]
 		frames.add_animation(anim_name)
@@ -70,8 +70,8 @@ static func create_enemy_sprite_frames(config: Dictionary) -> SpriteFrames:
 			frames.add_frame(anim_name, atlas)
 
 	# 删除默认的 "default" 动画
-	if frames.has_animation("default"):
-		frames.remove_animation("default")
+	if frames.has_animation(Enums.Anim.DEFAULT):
+		frames.remove_animation(Enums.Anim.DEFAULT)
 
 	return frames
 
@@ -93,14 +93,14 @@ static func create_atlas_texture(tileset_path: String, region: Rect2) -> AtlasTe
 # current_anim 用于方向滞后：对角移动时保持当前方向，避免快速切换
 static func get_walk_animation(velocity: Vector2, current_anim: String = "", hysteresis_keep: float = 0.7, hysteresis_switch: float = 1.4) -> String:
 	if velocity.length_squared() < 1.0:
-		return "idle"
+		return Enums.Anim.IDLE
 
 	var abs_x: float = abs(velocity.x)
 	var abs_y: float = abs(velocity.y)
 
 	# 滞后阈值：当前方向轴需要比另一轴小 30% 以上才切换
-	var is_current_horizontal: bool = current_anim in ["walk_left", "walk_right"]
-	var is_current_vertical: bool = current_anim in ["walk_up", "walk_down"]
+	var is_current_horizontal: bool = current_anim in [Enums.Anim.WALK_LEFT, Enums.Anim.WALK_RIGHT]
+	var is_current_vertical: bool = current_anim in [Enums.Anim.WALK_UP, Enums.Anim.WALK_DOWN]
 
 	var use_horizontal: bool
 	if is_current_horizontal:
@@ -114,6 +114,6 @@ static func get_walk_animation(velocity: Vector2, current_anim: String = "", hys
 		use_horizontal = abs_x > abs_y
 
 	if use_horizontal:
-		return "walk_right" if velocity.x > 0 else "walk_left"
+		return Enums.Anim.WALK_RIGHT if velocity.x > 0 else Enums.Anim.WALK_LEFT
 	else:
-		return "walk_down" if velocity.y > 0 else "walk_up"
+		return Enums.Anim.WALK_DOWN if velocity.y > 0 else Enums.Anim.WALK_UP

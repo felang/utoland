@@ -15,43 +15,43 @@ func before_each():
 
 func test_place_shooter_tower():
 	# Test placing a shooter tower
-	var tower = SceneFactory.create_tower("shooter")
+	var tower = SceneFactory.create_tower(Enums.Tower.SHOOTER)
 	assert_not_null(tower, "Shooter tower should be created")
 
 	test_scene.add_child(tower)
 	tower.global_position = Vector2(100, 100)
 
-	assert_eq(tower.tower_type, "shooter", "Tower type should be 'shooter'")
-	assert_true(tower.is_in_group("towers"), "Tower should be in 'towers' group")
+	assert_eq(tower.tower_type, Enums.Tower.SHOOTER, "Tower type should be 'shooter'")
+	assert_true(tower.is_in_group(Enums.Group.TOWERS), "Tower should be in 'towers' group")
 	assert_gt(tower.health.current_hp, 0, "Tower should have positive HP")
 
 func test_place_wall_tower():
 	# Test placing a wall tower
-	var tower = SceneFactory.create_tower("wall")
+	var tower = SceneFactory.create_tower(Enums.Tower.WALL)
 	assert_not_null(tower, "Wall tower should be created")
 
 	test_scene.add_child(tower)
 	tower.global_position = Vector2(200, 200)
 
-	assert_eq(tower.tower_type, "wall", "Tower type should be 'wall'")
-	assert_true(tower.is_in_group("towers"), "Tower should be in 'towers' group")
+	assert_eq(tower.tower_type, Enums.Tower.WALL, "Tower type should be 'wall'")
+	assert_true(tower.is_in_group(Enums.Group.TOWERS), "Tower should be in 'towers' group")
 
 func test_place_slow_tower():
 	# Test placing a slow tower
-	var tower = SceneFactory.create_tower("slow")
+	var tower = SceneFactory.create_tower(Enums.Tower.SLOW)
 	assert_not_null(tower, "Slow tower should be created")
 
 	test_scene.add_child(tower)
 	tower.global_position = Vector2(300, 300)
 
-	assert_eq(tower.tower_type, "slow", "Tower type should be 'slow'")
-	assert_true(tower.is_in_group("towers"), "Tower should be in 'towers' group")
+	assert_eq(tower.tower_type, Enums.Tower.SLOW, "Tower type should be 'slow'")
+	assert_true(tower.is_in_group(Enums.Group.TOWERS), "Tower should be in 'towers' group")
 
 func test_tower_cost_deduction():
 	# Test that tower cost is correctly calculated
-	var shooter_cost = SceneFactory.get_tower_cost("shooter")
-	var wall_cost = SceneFactory.get_tower_cost("wall")
-	var slow_cost = SceneFactory.get_tower_cost("slow")
+	var shooter_cost = SceneFactory.get_tower_cost(Enums.Tower.SHOOTER)
+	var wall_cost = SceneFactory.get_tower_cost(Enums.Tower.WALL)
+	var slow_cost = SceneFactory.get_tower_cost(Enums.Tower.SLOW)
 
 	assert_eq(shooter_cost, 40, "Shooter tower cost should be 40")
 	assert_eq(wall_cost, 40, "Wall tower cost should be 40")
@@ -72,7 +72,7 @@ func test_invalid_tower_placement():
 func test_insufficient_coins():
 	# Test placement prevention when not enough coins
 	GameData.coins = 10  # Less than tower cost
-	var tower_cost = SceneFactory.get_tower_cost("shooter")
+	var tower_cost = SceneFactory.get_tower_cost(Enums.Tower.SHOOTER)
 
 	assert_gt(tower_cost, GameData.coins, "Tower cost should be greater than available coins")
 
@@ -83,7 +83,7 @@ func test_insufficient_coins():
 
 func test_tower_restoration():
 	# Test that towers can be restored from inventory
-	var tower_type = "shooter"
+	var tower_type = Enums.Tower.SHOOTER
 	var tower_position = Vector2(150, 150)
 
 	# Simulate saving tower to inventory
@@ -114,7 +114,7 @@ func test_multiple_tower_placement():
 	var towers = []
 
 	for i in range(3):
-		var tower = SceneFactory.create_tower("shooter")
+		var tower = SceneFactory.create_tower(Enums.Tower.SHOOTER)
 		test_scene.add_child(tower)
 		tower.global_position = Vector2(i * 100, i * 100)
 		towers.append(tower)
@@ -122,19 +122,19 @@ func test_multiple_tower_placement():
 	assert_eq(towers.size(), 3, "Should have 3 towers")
 
 	# Verify all towers are in the scene
-	var towers_in_group = test_scene.get_tree().get_nodes_in_group("towers")
+	var towers_in_group = test_scene.get_tree().get_nodes_in_group(Enums.Group.TOWERS)
 	assert_gte(towers_in_group.size(), 3, "Should have at least 3 towers in group")
 
 func test_tower_hp_from_config():
 	# Test that tower HP is loaded from GameConfig
-	var shooter = SceneFactory.create_tower("shooter")
+	var shooter = SceneFactory.create_tower(Enums.Tower.SHOOTER)
 	test_scene.add_child(shooter)
 
-	var expected_hp = GameConfig.towers["shooter"].hp
+	var expected_hp = GameConfig.towers[Enums.Tower.SHOOTER].hp
 	assert_eq(shooter.health.current_hp, expected_hp, "Shooter tower HP should match config")
 
-	var wall = SceneFactory.create_tower("wall")
+	var wall = SceneFactory.create_tower(Enums.Tower.WALL)
 	test_scene.add_child(wall)
 
-	expected_hp = GameConfig.towers["wall"].hp
+	expected_hp = GameConfig.towers[Enums.Tower.WALL].hp
 	assert_eq(wall.health.current_hp, expected_hp, "Wall tower HP should match config")

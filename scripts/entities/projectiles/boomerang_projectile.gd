@@ -8,7 +8,7 @@ var outbound_distance: float = 200.0
 var return_speed_mult: float = 1.3
 var max_lifetime: float = 5.0  # TODO: 待 WeaponData 扩展 boomerang_max_lifetime 字段后改为配置驱动
 
-var _state: String = "OUTBOUND"
+var _state: Enums.BoomerangState = Enums.BoomerangState.OUTBOUND
 var _traveled: float = 0.0
 var _elapsed: float = 0.0
 var _direction: Vector2 = Vector2.RIGHT
@@ -22,12 +22,12 @@ var _return_dist_threshold: float = 30.0
 
 func _on_setup(direction: Vector2) -> void:
 	_direction = direction
-	_state = "OUTBOUND"
+	_state = Enums.BoomerangState.OUTBOUND
 	_traveled = 0.0
 	_elapsed = 0.0
-	assert(GameConfig.weapons.has("boomerang"), "缺少 boomerang 武器配置，请检查 resources/weapons/")
+	assert(GameConfig.weapons.has(Enums.Weapon.BOOMERANG), "缺少 boomerang 武器配置，请检查 resources/weapons/")
 	# 从 WeaponData 读取回旋镖配置
-	var w: WeaponData = GameConfig.weapons["boomerang"]
+	var w: WeaponData = GameConfig.weapons[Enums.Weapon.BOOMERANG]
 	speed = w.boomerang_speed
 	outbound_distance = w.outbound_distance
 	return_speed_mult = w.return_speed_mult
@@ -53,19 +53,19 @@ func _physics_process(delta: float) -> void:
 	if _elapsed >= max_lifetime:
 		_cleanup_and_free()
 		return
-	var rot_speed: float = _return_rotation_speed if _state == "RETURNING" else _rotation_speed
+	var rot_speed: float = _return_rotation_speed if _state == Enums.BoomerangState.RETURNING else _rotation_speed
 	rotation += rot_speed * delta
 	_update_trail()
 	match _state:
-		"OUTBOUND":  _process_outbound(delta)
-		"RETURNING": _process_returning(delta)
+		Enums.BoomerangState.OUTBOUND:  _process_outbound(delta)
+		Enums.BoomerangState.RETURNING: _process_returning(delta)
 
 func _process_outbound(delta: float) -> void:
 	var dist: float = speed * delta
 	global_position += _direction * dist
 	_traveled += dist
 	if _traveled >= outbound_distance:
-		_state = "RETURNING"
+		_state = Enums.BoomerangState.RETURNING
 
 func _process_returning(delta: float) -> void:
 	if not is_instance_valid(_player):

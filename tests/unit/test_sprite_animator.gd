@@ -3,7 +3,7 @@ extends GutTest
 # SpriteAnimator 单元测试
 
 func test_sprite_animator_exists_on_enemy():
-	var enemy = SceneFactory.create_enemy("normal")
+	var enemy = SceneFactory.create_enemy(Enums.Enemy.NORMAL)
 	add_child_autoqfree(enemy)
 	var animator = enemy.get_node_or_null("SpriteAnimator")
 	assert_not_null(animator, "Enemy 应有 SpriteAnimator 子节点")

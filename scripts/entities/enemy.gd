@@ -9,12 +9,11 @@ var data: EnemyData = null
 var enemy_type: String = "normal"
 
 @export var tower_attack_rate: float = 1.0
-@export var touch_damage: float = 10.0
 
 var speed: float
 var tower_attack_damage: float
-var current_state = State.CHASE_PLAYER
-var target_tower = null
+var current_state: int = State.CHASE_PLAYER
+var target_tower: Node2D = null
 var attack_timer: float = 0.0
 var player: Node2D = null
 
@@ -24,7 +23,7 @@ var player: Node2D = null
 @onready var _sprite_animator: SpriteAnimator = $SpriteAnimator
 @onready var _hitbox: Hitbox = $Hitbox
 
-func _ready():
+func _ready() -> void:
 	# 从注入的 Resource 初始化（SceneFactory 设置 data）
 	health.initialize(data.hp)
 	_hitbox.damage = data.damage
@@ -32,8 +31,8 @@ func _ready():
 	tower_attack_damage = data.damage
 	slow_handler.initialize(data.speed)
 
-	add_to_group("enemies")
-	player = get_tree().get_first_node_in_group("player")
+	add_to_group(Enums.Group.ENEMIES)
+	player = get_tree().get_first_node_in_group(Enums.Group.PLAYER)
 
 	# 连接组件信号
 	health.died.connect(_on_died)
@@ -42,36 +41,36 @@ func _ready():
 
 	# 设置精灵
 	var sprite_config: Dictionary = GameConfig.SPRITES["enemies"].get(enemy_type, {})
-	var target_size: float = float(GameConfig.ENTITY_SIZE_TANK if enemy_type == "tank" else GameConfig.ENTITY_SIZE_STANDARD)
+	var target_size: float = float(GameConfig.ENTITY_SIZE_TANK if enemy_type == Enums.Enemy.TANK else GameConfig.ENTITY_SIZE_STANDARD)
 	_sprite_animator._sprite = null  # 确保重新创建
 	# 获取死亡特效颜色（从旧 Visual）
 	health.death_color = _sprite_animator.get_death_color_from_visual()
 	_sprite_animator.setup_enemy_sprite(sprite_config, target_size)
 
-func _physics_process(delta):
+func _physics_process(delta: float) -> void:
 	attack_timer -= delta
 
 	match current_state:
 		State.CHASE_PLAYER:
-			chase_player()
+			_chase_player()
 		State.ATTACK_TOWER:
-			attack_tower(delta)
+			_attack_tower(delta)
 
-func chase_player():
+func _chase_player() -> void:
 	if player and is_instance_valid(player):
 		velocity = position.direction_to(player.global_position) * speed
 		move_and_slide()
 		_sprite_animator.update_animation_no_idle(velocity)
 
 		for i in get_slide_collision_count():
-			var collision = get_slide_collision(i)
-			var collider = collision.get_collider()
-			if collider and collider.is_in_group("towers"):
+			var collision: KinematicCollision2D = get_slide_collision(i)
+			var collider: Object = collision.get_collider()
+			if collider and collider.is_in_group(Enums.Group.TOWERS):
 				current_state = State.ATTACK_TOWER
 				target_tower = collider
 				velocity = Vector2.ZERO
 
-func attack_tower(_delta):
+func _attack_tower(_delta: float) -> void:
 	if not is_instance_valid(target_tower):
 		current_state = State.CHASE_PLAYER
 		return
@@ -80,7 +79,7 @@ func attack_tower(_delta):
 		target_tower.take_damage(tower_attack_damage)
 		attack_timer = tower_attack_rate
 
-func take_damage(amount: float):
+func take_damage(amount: float) -> void:
 	health.take_damage(amount)
 
 func die() -> void:
@@ -92,11 +91,11 @@ func _on_died() -> void:
 	var fx: EffectConfigData = GameConfig.effects
 	EventBus.camera_shake_requested.emit(fx.camera_shake_enemy_kill_intensity, fx.camera_shake_enemy_kill_duration)
 	EventBus.enemy_killed.emit(enemy_type, global_position)
-	drop_coins()
+	_drop_coins()
 	queue_free()
 
-func drop_coins():
-	var parent = get_parent()
+func _drop_coins() -> void:
+	var parent: Node = get_parent()
 	if not parent:
 		return
 
@@ -112,7 +111,7 @@ func apply_knockback(dir: Vector2) -> void:
 func _flash_white() -> void:
 	EffectsManager.flash_white(self)
 
-func apply_slow(slow_percent: float):
+func apply_slow(slow_percent: float) -> void:
 	slow_handler.apply_slow(slow_percent)
 
 func _on_hurtbox_hit(damage: float, knockback_dir: Vector2) -> void:
@@ -120,7 +119,7 @@ func _on_hurtbox_hit(damage: float, knockback_dir: Vector2) -> void:
 	if knockback_dir.length() > 0:
 		_knockback.apply_knockback(knockback_dir.normalized())
 
-func remove_slow(slow_percent: float):
+func remove_slow(slow_percent: float) -> void:
 	slow_handler.remove_slow(slow_percent)
 
 func _on_speed_changed(new_speed: float) -> void:

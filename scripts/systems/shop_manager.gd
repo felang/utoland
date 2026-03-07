@@ -2,14 +2,14 @@ extends Control
 
 var shop_items: Array[Dictionary] = []
 var passive_upgrades: Array[Dictionary] = [
-	{"name": "最大生命值+20%", "stat": "hp_mult", "value": 0.2},
-	{"name": "生命回复+5/5秒", "stat": "hp_regen", "value": 5},
-	{"name": "伤害+10%", "stat": "damage_mult", "value": 0.1},
-	{"name": "攻击速度+15%", "stat": "attack_speed_mult", "value": 0.15},
-	{"name": "移动速度+10%", "stat": "move_speed_mult", "value": 0.1},
-	{"name": "工程学+20%", "stat": "tower_mult", "value": 0.2}
+	{"name": "最大生命值+20%", "stat": Enums.Stat.HP_MULT, "value": 0.2},
+	{"name": "生命回复+5/5秒", "stat": Enums.Stat.HP_REGEN, "value": 5},
+	{"name": "伤害+10%", "stat": Enums.Stat.DAMAGE_MULT, "value": 0.1},
+	{"name": "攻击速度+15%", "stat": Enums.Stat.ATTACK_SPEED_MULT, "value": 0.15},
+	{"name": "移动速度+10%", "stat": Enums.Stat.MOVE_SPEED_MULT, "value": 0.1},
+	{"name": "工程学+20%", "stat": Enums.Stat.TOWER_MULT, "value": 0.2}
 ]
-var tower_types: Array[String] = ["shooter", "wall", "slow"]
+var tower_types: Array[String] = [Enums.Tower.SHOOTER, Enums.Tower.WALL, Enums.Tower.SLOW]
 
 @onready var coin_label = $VBoxContainer/CoinLabel
 @onready var refresh_button = $VBoxContainer/ButtonsContainer/RefreshButton
@@ -36,7 +36,7 @@ func _ready() -> void:
 func refresh_shop() -> void:
 	shop_items = []
 	for i in range(4):
-		var rand = randf()
+		var rand: float = randf()
 		if rand < 0.6:  # 60% 被动属性
 			var passive = passive_upgrades.pick_random().duplicate()
 			passive["cost"] = randi_range(
@@ -103,10 +103,10 @@ func on_refresh_pressed() -> void:
 	update_ui()
 
 func on_confirm_pressed() -> void:
-	SceneManager.go_to("placement")
+	SceneManager.go_to(Enums.Scene.PLACEMENT)
 
 func start_next_wave() -> void:
-	SceneManager.go_to("main")
+	SceneManager.go_to(Enums.Scene.MAIN)
 
 func update_ui() -> void:
 	coin_label.text = "金币: %d" % GameData.coins

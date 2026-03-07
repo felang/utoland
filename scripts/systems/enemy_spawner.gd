@@ -12,8 +12,8 @@ var map_min_y: float = -GameConfig.MAP_HALF_HEIGHT
 var map_max_y: float = GameConfig.MAP_HALF_HEIGHT
 var min_distance_from_player: float = 200.0
 
-func _ready():
-	player = get_tree().get_first_node_in_group("player")
+func _ready() -> void:
+	player = get_tree().get_first_node_in_group(Enums.Group.PLAYER)
 	# 从配置读取生成距离
 	if GameConfig.spawn:
 		min_distance_from_player = GameConfig.spawn.min_distance_from_player
@@ -23,7 +23,7 @@ func _ready():
 	EventBus.game_won.connect(_on_game_ended)
 	EventBus.game_lost.connect(_on_game_ended)
 
-func _process(delta):
+func _process(delta: float) -> void:
 	if not _is_wave_active:
 		return
 
@@ -32,12 +32,12 @@ func _process(delta):
 		spawn_enemy()
 		spawn_timer = _current_wave_data.spawn_interval
 
-func spawn_enemy():
-	var enemy_types = _current_wave_data.enemy_types
-	var random_type = enemy_types[randi() % enemy_types.size()]
-	var enemy = SceneFactory.create_enemy(random_type)
+func spawn_enemy() -> void:
+	var enemy_types: Array = _current_wave_data.enemy_types
+	var random_type: String = enemy_types[randi() % enemy_types.size()]
+	var enemy: Node = SceneFactory.create_enemy(random_type)
 
-	var spawn_pos = get_random_spawn_position()
+	var spawn_pos: Vector2 = get_random_spawn_position()
 	enemy.global_position = spawn_pos
 	get_parent().add_child(enemy)
 

@@ -3,7 +3,7 @@ extends GutTest
 # 击退系统单元测试
 
 func test_knockback_changes_position():
-	var enemy = SceneFactory.create_enemy("normal")
+	var enemy = SceneFactory.create_enemy(Enums.Enemy.NORMAL)
 	add_child_autoqfree(enemy)
 	await get_tree().process_frame
 	var original_pos: Vector2 = enemy.global_position
@@ -13,7 +13,7 @@ func test_knockback_changes_position():
 	assert_ne(enemy.global_position, original_pos, "击退后位置应改变")
 
 func test_enemy_still_takes_damage_during_knockback():
-	var enemy = SceneFactory.create_enemy("normal")
+	var enemy = SceneFactory.create_enemy(Enums.Enemy.NORMAL)
 	add_child_autoqfree(enemy)
 	await get_tree().process_frame
 	enemy.apply_knockback(Vector2.RIGHT)

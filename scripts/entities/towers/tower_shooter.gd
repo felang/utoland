@@ -7,12 +7,12 @@ extends Tower
 @onready var detect_area: Area2D = $DetectArea
 @onready var shoot_timer: Timer = $ShootTimer
 
-func _ready():
+func _ready() -> void:
 	# 设置塔类型
-	tower_type = "shooter"
+	tower_type = Enums.Tower.SHOOTER
 
 	# 从注入的 Resource 初始化（HP 由 super._ready() 处理）
-	attack_damage = data.damage * GameData.player_stats["tower_mult"]
+	attack_damage = data.damage * GameData.player_stats[Enums.Stat.TOWER_MULT]
 	attack_rate = data.fire_rate
 	attack_range = data.attack_range
 
@@ -21,17 +21,17 @@ func _ready():
 	shoot_timer.timeout.connect(_on_shoot_timer_timeout)
 	shoot_timer.start()
 
-func _on_shoot_timer_timeout():
-	shoot_nearest_enemy()
+func _on_shoot_timer_timeout() -> void:
+	_shoot_nearest_enemy()
 
-func shoot_nearest_enemy():
-	var enemies = detect_area.get_overlapping_bodies()
-	var closest = null
-	var min_dist = attack_range
+func _shoot_nearest_enemy() -> void:
+	var enemies: Array[Node2D] = detect_area.get_overlapping_bodies()
+	var closest: Node2D = null
+	var min_dist: float = attack_range
 
-	for enemy in enemies:
-		if enemy.is_in_group("enemies"):
-			var dist = global_position.distance_to(enemy.global_position)
+	for enemy: Node2D in enemies:
+		if enemy.is_in_group(Enums.Group.ENEMIES):
+			var dist: float = global_position.distance_to(enemy.global_position)
 			if dist < min_dist:
 				min_dist = dist
 				closest = enemy
