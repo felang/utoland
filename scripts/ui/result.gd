@@ -12,7 +12,7 @@ func _ready():
 
 func _on_restart():
 	GameData.reset()
-	get_tree().change_scene_to_file("res://scenes/ui/start_menu.tscn")
+	SceneManager.go_to("start_menu")
 
 func _on_quit():
 	get_tree().quit()

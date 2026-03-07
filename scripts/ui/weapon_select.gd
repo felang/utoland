@@ -21,4 +21,4 @@ func _ready() -> void:
 
 func _on_weapon_selected(weapon_id: String) -> void:
 	GameData.selected_weapon = weapon_id
-	get_tree().change_scene_to_file("res://scenes/ui/map_select.tscn")
+	SceneManager.go_to("map_select")

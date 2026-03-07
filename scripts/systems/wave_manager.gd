@@ -26,7 +26,7 @@ func start_next_wave():
 		EventBus.game_won.emit()
 		print("Victory! You completed all waves!")
 		await get_tree().create_timer(1.0).timeout
-		get_tree().change_scene_to_file("res://scenes/ui/result.tscn")
+		SceneManager.go_to("result")
 		return
 
 	var wave_data: WaveData = GameConfig.waves[current_wave - 1]
@@ -46,7 +46,7 @@ func complete_wave():
 	print("Wave ", current_wave, " completed!")
 
 	await get_tree().create_timer(1.0).timeout
-	get_tree().change_scene_to_file("res://scenes/ui/shop.tscn")
+	SceneManager.go_to("shop")
 
 func attract_all_coins():
 	var coins = get_tree().get_nodes_in_group("coins")

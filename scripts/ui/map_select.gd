@@ -29,6 +29,4 @@ func _on_map_selected(map_id: String) -> void:
 	print("选择地图: ", md.display_name)
 
 	# 跳转到塔布置场景
-	var err := get_tree().change_scene_to_file("res://scenes/levels/placement.tscn")
-	if err != OK:
-		push_error("场景切换失败: " + str(err))
+	SceneManager.go_to("placement")
