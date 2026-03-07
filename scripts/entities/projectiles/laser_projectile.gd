@@ -18,6 +18,8 @@ func _on_setup(direction: Vector2) -> void:
 	var rect: RectangleShape2D = RectangleShape2D.new()
 	rect.size = Vector2(beam_range, 8.0)
 	shape_node.shape = rect
+	# position 在 Hitbox(Area2D) 局部空间中设置：将碰撞框中心移至激光路径中点
+	# rotation 使 RectangleShape2D 沿发射方向旋转，覆盖完整光束路径
 	shape_node.position = direction * beam_range * 0.5
 	shape_node.rotation = direction.angle()
 	# 视觉 Line2D
