@@ -19,7 +19,7 @@ radius = 16.0
 
 [node name="EnemyTank" type="CharacterBody2D" unique_id=1365841566]
 collision_layer = 2
-collision_mask = 5
+collision_mask = 8
 script = ExtResource("1_onop2")
 touch_damage = 15.0
 

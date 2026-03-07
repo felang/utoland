@@ -14,7 +14,7 @@ size = Vector2(30, 30)
 radius = 12.0
 
 [node name="Player" type="CharacterBody2D" unique_id=2056081713]
-collision_mask = 18
+collision_mask = 24
 script = ExtResource("1_3vyb7")
 
 [node name="Visual" type="ColorRect" parent="." unique_id=960031721]
