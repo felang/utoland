@@ -25,9 +25,9 @@ func _ready() -> void:
 	GameData.purchased_towers.clear()
 
 	# 连接按钮信号
-	$UI/TowerButtons/ShooterButton.pressed.connect(func() -> void: _select_tower(Enums.Tower.SHOOTER))
-	$UI/TowerButtons/WallButton.pressed.connect(func() -> void: _select_tower(Enums.Tower.WALL))
-	$UI/TowerButtons/SlowButton.pressed.connect(func() -> void: _select_tower(Enums.Tower.SLOW))
+	$UI/TowerButtons/ShooterButton.pressed.connect(func() -> void: _select_tower(Enums.TowerId.SHOOTER))
+	$UI/TowerButtons/WallButton.pressed.connect(func() -> void: _select_tower(Enums.TowerId.WALL))
+	$UI/TowerButtons/SlowButton.pressed.connect(func() -> void: _select_tower(Enums.TowerId.SLOW))
 	$UI/StartBattleButton.pressed.connect(_start_battle)
 
 	_update_ui()
@@ -106,9 +106,9 @@ func _update_ui() -> void:
 	$UI/CoinsLabel.text = "金币: %d" % GameData.coins
 
 	# 更新按钮状态
-	$UI/TowerButtons/ShooterButton.disabled = GameData.coins < SceneFactory.get_tower_cost(Enums.Tower.SHOOTER)
-	$UI/TowerButtons/WallButton.disabled = GameData.coins < SceneFactory.get_tower_cost(Enums.Tower.WALL)
-	$UI/TowerButtons/SlowButton.disabled = GameData.coins < SceneFactory.get_tower_cost(Enums.Tower.SLOW)
+	$UI/TowerButtons/ShooterButton.disabled = GameData.coins < SceneFactory.get_tower_cost(Enums.TowerId.SHOOTER)
+	$UI/TowerButtons/WallButton.disabled = GameData.coins < SceneFactory.get_tower_cost(Enums.TowerId.WALL)
+	$UI/TowerButtons/SlowButton.disabled = GameData.coins < SceneFactory.get_tower_cost(Enums.TowerId.SLOW)
 
 func _start_battle() -> void:
 	# 收集场景中所有塔的当前位置
@@ -123,11 +123,11 @@ func _start_battle() -> void:
 		else:
 			# 降级方案：通过名称判断
 			if tower.name.begins_with("TowerShooter"):
-				tower_type = Enums.Tower.SHOOTER
+				tower_type = Enums.TowerId.SHOOTER
 			elif tower.name.begins_with("TowerWall"):
-				tower_type = Enums.Tower.WALL
+				tower_type = Enums.TowerId.WALL
 			elif tower.name.begins_with("TowerSlow"):
-				tower_type = Enums.Tower.SLOW
+				tower_type = Enums.TowerId.SLOW
 
 		if tower_type != "":
 			current_towers.append({

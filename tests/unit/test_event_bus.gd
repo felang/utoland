@@ -58,10 +58,10 @@ func test_coin_collected_signal():
 
 func test_tower_placed_signal():
 	watch_signals(EventBus)
-	EventBus.tower_placed.emit(Enums.Tower.SHOOTER, Vector2(200, 300))
+	EventBus.tower_placed.emit(Enums.TowerId.SHOOTER, Vector2(200, 300))
 	assert_signal_emitted(EventBus, "tower_placed")
 
 func test_tower_destroyed_signal():
 	watch_signals(EventBus)
-	EventBus.tower_destroyed.emit(Enums.Tower.WALL, Vector2(150, 250))
+	EventBus.tower_destroyed.emit(Enums.TowerId.WALL, Vector2(150, 250))
 	assert_signal_emitted(EventBus, "tower_destroyed")

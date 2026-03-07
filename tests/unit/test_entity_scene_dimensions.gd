@@ -20,15 +20,15 @@ func test_enemy_sizes_match_new_standard():
 	assert_eq(tank.get_node("CollisionShape2D").shape.size, Vector2(45, 45))
 
 func test_tower_sizes_match_new_standard():
-	var shooter = SceneFactory.create_tower(Enums.Tower.SHOOTER)
+	var shooter = SceneFactory.create_tower(Enums.TowerId.SHOOTER)
 	add_child_autofree(shooter)
 	assert_eq(shooter.get_node("CollisionShape2D").shape.size, Vector2(30, 30))
 
-	var wall = SceneFactory.create_tower(Enums.Tower.WALL)
+	var wall = SceneFactory.create_tower(Enums.TowerId.WALL)
 	add_child_autofree(wall)
 	assert_eq(wall.get_node("CollisionShape2D").shape.size, Vector2(30, 30))
 
-	var slow = SceneFactory.create_tower(Enums.Tower.SLOW)
+	var slow = SceneFactory.create_tower(Enums.TowerId.SLOW)
 	add_child_autofree(slow)
 	assert_eq(slow.get_node("CollisionShape2D").shape.size, Vector2(30, 30))
 

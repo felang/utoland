@@ -2,9 +2,9 @@ extends Node
 
 # Scene preloads - centralized
 var _tower_scenes: Dictionary = {
-	Enums.Tower.SHOOTER: preload("res://scenes/entities/towers/tower_shooter.tscn"),
-	Enums.Tower.WALL: preload("res://scenes/entities/towers/tower_wall.tscn"),
-	Enums.Tower.SLOW: preload("res://scenes/entities/towers/tower_slow.tscn")
+	Enums.TowerId.SHOOTER: preload("res://scenes/entities/towers/tower_shooter.tscn"),
+	Enums.TowerId.WALL: preload("res://scenes/entities/towers/tower_wall.tscn"),
+	Enums.TowerId.SLOW: preload("res://scenes/entities/towers/tower_slow.tscn")
 }
 
 var _enemy_scenes: Dictionary = {

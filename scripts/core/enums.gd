@@ -13,7 +13,6 @@ class Group:
 class Scene:
 	const START_MENU = "start_menu"
 	const CHARACTER_SELECTION = "character_selection"
-	const WEAPON_SELECT = "weapon_select"
 	const MAP_SELECT = "map_select"
 	const SHOP = "shop"
 	const PLACEMENT = "placement"
@@ -27,7 +26,7 @@ class Character:
 	const TANK = "tank"
 
 # 武器 ID
-class Weapon:
+class WeaponId:
 	const RIFLE = "rifle"
 	const BOOMERANG = "boomerang"
 	const LASER = "laser"
@@ -39,13 +38,13 @@ class Enemy:
 	const TANK = "tank"
 
 # 塔类型
-class Tower:
+class TowerId:
 	const SHOOTER = "shooter"
 	const WALL = "wall"
 	const SLOW = "slow"
 
 # 投射物类型
-class Projectile:
+class ProjectileId:
 	const BULLET = "bullet"
 	const BOOMERANG = "boomerang"
 	const LASER = "laser"

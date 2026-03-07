@@ -9,7 +9,7 @@ var passive_upgrades: Array[Dictionary] = [
 	{"name": "移动速度+10%", "stat": Enums.Stat.MOVE_SPEED_MULT, "value": 0.1},
 	{"name": "工程学+20%", "stat": Enums.Stat.TOWER_MULT, "value": 0.2}
 ]
-var tower_types: Array[String] = [Enums.Tower.SHOOTER, Enums.Tower.WALL, Enums.Tower.SLOW]
+var tower_types: Array[String] = [Enums.TowerId.SHOOTER, Enums.TowerId.WALL, Enums.TowerId.SLOW]
 
 @onready var coin_label = $VBoxContainer/CoinLabel
 @onready var refresh_button = $VBoxContainer/ButtonsContainer/RefreshButton

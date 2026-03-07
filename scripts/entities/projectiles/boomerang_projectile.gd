@@ -25,9 +25,9 @@ func _on_setup(direction: Vector2) -> void:
 	_state = Enums.BoomerangState.OUTBOUND
 	_traveled = 0.0
 	_elapsed = 0.0
-	assert(GameConfig.weapons.has(Enums.Weapon.BOOMERANG), "缺少 boomerang 武器配置，请检查 resources/weapons/")
+	assert(GameConfig.weapons.has(Enums.WeaponId.BOOMERANG), "缺少 boomerang 武器配置，请检查 resources/weapons/")
 	# 从 WeaponData 读取回旋镖配置
-	var w: WeaponData = GameConfig.weapons[Enums.Weapon.BOOMERANG]
+	var w: WeaponData = GameConfig.weapons[Enums.WeaponId.BOOMERANG]
 	speed = w.boomerang_speed
 	outbound_distance = w.outbound_distance
 	return_speed_mult = w.return_speed_mult

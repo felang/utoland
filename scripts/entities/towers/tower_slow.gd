@@ -7,7 +7,7 @@ extends Tower
 
 func _ready() -> void:
 	# 设置塔类型
-	tower_type = Enums.Tower.SLOW
+	tower_type = Enums.TowerId.SLOW
 
 	# 从注入的 Resource 初始化（HP 由 super._ready() 处理）
 	slow_radius = data.attack_range

@@ -19,11 +19,11 @@ config/icon="res://icon.svg"
 
 GameConfig="*res://scripts/core/game_config.gd"
 GameData="*res://scripts/core/game_data.gd"
-GDAIMCPRuntime="*uid://dcne7ryelpxmn"
 SceneFactory="*res://scripts/core/scene_factory.gd"
 EffectsManager="*res://scripts/systems/effects_manager.gd"
 EventBus="*res://scripts/core/event_bus.gd"
 SceneManager="*res://scripts/core/scene_manager.gd"
+GDAIMCPRuntime="*uid://dcne7ryelpxmn"
 
 [display]
 

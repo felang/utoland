@@ -9,7 +9,7 @@ var character_attack_speed_mult: float = 1.0
 var character_move_speed_mult: float = 1.0
 var character_hp_regen: float = 0.0
 
-var selected_weapon: String = Enums.Weapon.RIFLE
+var selected_weapon: String = Enums.WeaponId.RIFLE
 var selected_map: String = Enums.Map.FOREST  # 当前选择的地图，默认森林
 var player_stats: Dictionary = {
 	Enums.Stat.MAX_HP: 100.0,
@@ -52,7 +52,7 @@ func reset() -> void:
 	# 初始化角色（使用当前选择的角色）
 	init_character(current_character)
 
-	selected_weapon = Enums.Weapon.RIFLE
+	selected_weapon = Enums.WeaponId.RIFLE
 	selected_map = Enums.Map.FOREST
 	# 将角色属性同步到 player_stats
 	player_stats = {

@@ -5,21 +5,21 @@ extends GutTest
 
 # Tower creation tests
 func test_create_tower_shooter():
-	var tower = SceneFactory.create_tower(Enums.Tower.SHOOTER)
+	var tower = SceneFactory.create_tower(Enums.TowerId.SHOOTER)
 	assert_not_null(tower, "Shooter tower should be created")
-	assert_eq(tower.tower_type, Enums.Tower.SHOOTER, "Tower type should be 'shooter'")
+	assert_eq(tower.tower_type, Enums.TowerId.SHOOTER, "Tower type should be 'shooter'")
 	tower.queue_free()
 
 func test_create_tower_wall():
-	var tower = SceneFactory.create_tower(Enums.Tower.WALL)
+	var tower = SceneFactory.create_tower(Enums.TowerId.WALL)
 	assert_not_null(tower, "Wall tower should be created")
-	assert_eq(tower.tower_type, Enums.Tower.WALL, "Tower type should be 'wall'")
+	assert_eq(tower.tower_type, Enums.TowerId.WALL, "Tower type should be 'wall'")
 	tower.queue_free()
 
 func test_create_tower_slow():
-	var tower = SceneFactory.create_tower(Enums.Tower.SLOW)
+	var tower = SceneFactory.create_tower(Enums.TowerId.SLOW)
 	assert_not_null(tower, "Slow tower should be created")
-	assert_eq(tower.tower_type, Enums.Tower.SLOW, "Tower type should be 'slow'")
+	assert_eq(tower.tower_type, Enums.TowerId.SLOW, "Tower type should be 'slow'")
 	tower.queue_free()
 
 func test_create_tower_invalid():
@@ -60,15 +60,15 @@ func test_create_coin():
 # Tower cost test
 func test_get_tower_cost():
 	# Test shooter tower cost (average of 35 and 45 = 40)
-	var shooter_cost = SceneFactory.get_tower_cost(Enums.Tower.SHOOTER)
+	var shooter_cost = SceneFactory.get_tower_cost(Enums.TowerId.SHOOTER)
 	assert_eq(shooter_cost, 40, "Shooter tower cost should be 40 (average of 35 and 45)")
 
 	# Test wall tower cost (average of 35 and 45 = 40)
-	var wall_cost = SceneFactory.get_tower_cost(Enums.Tower.WALL)
+	var wall_cost = SceneFactory.get_tower_cost(Enums.TowerId.WALL)
 	assert_eq(wall_cost, 40, "Wall tower cost should be 40 (average of 35 and 45)")
 
 	# Test slow tower cost (average of 35 and 45 = 40)
-	var slow_cost = SceneFactory.get_tower_cost(Enums.Tower.SLOW)
+	var slow_cost = SceneFactory.get_tower_cost(Enums.TowerId.SLOW)
 	assert_eq(slow_cost, 40, "Slow tower cost should be 40 (average of 35 and 45)")
 
 	# Test invalid tower type

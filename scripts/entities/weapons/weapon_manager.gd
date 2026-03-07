@@ -50,8 +50,8 @@ func _find_closest_enemy(range_limit: float = INF) -> Node2D:
 
 func _create_weapon(projectile_type: String) -> Weapon:
 	match projectile_type:
-		Enums.Projectile.BULLET:    return BulletWeapon.new()
-		Enums.Projectile.BOOMERANG: return BoomerangWeapon.new()
-		Enums.Projectile.LASER:     return LaserWeapon.new()
+		Enums.ProjectileId.BULLET:    return BulletWeapon.new()
+		Enums.ProjectileId.BOOMERANG: return BoomerangWeapon.new()
+		Enums.ProjectileId.LASER:     return LaserWeapon.new()
 	push_error("WeaponManager: 未知 projectile_type: " + projectile_type)
 	return null

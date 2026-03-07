@@ -9,7 +9,7 @@ extends Tower
 
 func _ready() -> void:
 	# 设置塔类型
-	tower_type = Enums.Tower.SHOOTER
+	tower_type = Enums.TowerId.SHOOTER
 
 	# 从注入的 Resource 初始化（HP 由 super._ready() 处理）
 	attack_damage = data.damage * GameData.player_stats[Enums.Stat.TOWER_MULT]

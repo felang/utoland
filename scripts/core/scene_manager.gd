@@ -3,7 +3,6 @@ extends Node
 const SCENES: Dictionary = {
 	"start_menu":          "res://scenes/ui/start_menu.tscn",
 	"character_selection": "res://scenes/ui/character_selection.tscn",
-	"weapon_select":       "res://scenes/ui/weapon_select.tscn",
 	"map_select":          "res://scenes/ui/map_select.tscn",
 	"shop":                "res://scenes/ui/shop.tscn",
 	"result":              "res://scenes/ui/result.tscn",
