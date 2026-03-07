@@ -22,6 +22,7 @@ GDAIMCPRuntime="*uid://dcne7ryelpxmn"
 GameConfig="*res://game_config.gd"
 SceneFactory="*res://scripts/core/scene_factory.gd"
 EffectsManager="*res://scripts/systems/effects_manager.gd"
+EventBus="*res://scripts/core/event_bus.gd"
 
 [display]
 

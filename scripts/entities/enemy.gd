@@ -86,12 +86,9 @@ func die():
 	# 死亡爆炸特效
 	EffectsManager.spawn_death_effect(global_position, _death_color)
 	# 屏幕震动
-	var player_node: Node2D = get_tree().get_first_node_in_group("player")
-	if player_node:
-		var camera: Camera2D = player_node.get_node_or_null("Camera")
-		if camera and camera.has_method("shake"):
-			var shake_config: Dictionary = GameConfig.EFFECTS["camera_shake"]["enemy_kill"]
-			camera.shake(shake_config["intensity"], shake_config["duration"])
+	var shake_config: Dictionary = GameConfig.EFFECTS["camera_shake"]["enemy_kill"]
+	EventBus.camera_shake_requested.emit(shake_config["intensity"], shake_config["duration"])
+	EventBus.enemy_killed.emit(enemy_type, global_position)
 	drop_coins()
 	queue_free()
 

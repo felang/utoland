@@ -1,8 +1,9 @@
 extends Node
 
 var spawn_timer: float = 0.0
-var wave_manager: Node
 var player: Node2D
+var _current_wave_config: Dictionary = {}
+var _is_wave_active: bool = false
 
 # Map boundaries
 var map_min_x: float = -GameConfig.MAP_HALF_WIDTH
@@ -13,32 +14,23 @@ var min_distance_from_player = 200.0
 
 func _ready():
 	player = get_tree().get_first_node_in_group("player")
-
-	# Defer wave_manager lookup to avoid initialization order issues
-	call_deferred("_setup_wave_manager")
-
-func _setup_wave_manager():
-	wave_manager = get_tree().get_first_node_in_group("wave_manager")
-
-	if wave_manager:
-		wave_manager.wave_started.connect(_on_wave_started)
+	# 连接 EventBus 信号
+	EventBus.wave_started.connect(_on_wave_started)
+	EventBus.wave_completed.connect(_on_wave_completed)
+	EventBus.game_won.connect(_on_game_ended)
+	EventBus.game_lost.connect(_on_game_ended)
 
 func _process(delta):
-	if not wave_manager or not wave_manager.is_wave_active:
+	if not _is_wave_active:
 		return
 
 	spawn_timer -= delta
 	if spawn_timer <= 0:
 		spawn_enemy()
-		var config = wave_manager.get_current_wave_config()
-		spawn_timer = config.get("spawn_interval", 3.0)
+		spawn_timer = _current_wave_config.get("spawn_interval", 3.0)
 
 func spawn_enemy():
-	if not wave_manager:
-		return
-
-	var config = wave_manager.get_current_wave_config()
-	var enemy_types = config.get("enemy_types", ["normal"])
+	var enemy_types = _current_wave_config.get("enemy_types", ["normal"])
 	var random_type = enemy_types[randi() % enemy_types.size()]
 	var enemy = SceneFactory.create_enemy(random_type)
 
@@ -61,5 +53,13 @@ func get_random_spawn_position() -> Vector2:
 
 	return spawn_pos
 
-func _on_wave_started(_wave_number: int):
+func _on_wave_started(wave_number: int, wave_config: Dictionary) -> void:
+	_current_wave_config = wave_config
+	_is_wave_active = true
 	spawn_timer = 0.0
+
+func _on_wave_completed(_wave_number: int) -> void:
+	_is_wave_active = false
+
+func _on_game_ended() -> void:
+	_is_wave_active = false

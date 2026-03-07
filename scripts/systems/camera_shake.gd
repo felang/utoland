@@ -24,6 +24,8 @@ func _ready() -> void:
 	limit_right = int(GameConfig.MAP_HALF_WIDTH)
 	limit_top = -int(GameConfig.MAP_HALF_HEIGHT)
 	limit_bottom = int(GameConfig.MAP_HALF_HEIGHT)
+	# 连接全局 camera shake 请求
+	EventBus.camera_shake_requested.connect(shake)
 
 func shake(intensity: float, duration: float) -> void:
 	if intensity > _shake_intensity:
