@@ -23,7 +23,7 @@ func test_place_shooter_tower():
 
 	assert_eq(tower.tower_type, "shooter", "Tower type should be 'shooter'")
 	assert_true(tower.is_in_group("towers"), "Tower should be in 'towers' group")
-	assert_gt(tower.current_hp, 0, "Tower should have positive HP")
+	assert_gt(tower.health.current_hp, 0, "Tower should have positive HP")
 
 func test_place_wall_tower():
 	# Test placing a wall tower
@@ -130,11 +130,11 @@ func test_tower_hp_from_config():
 	var shooter = SceneFactory.create_tower("shooter")
 	test_scene.add_child(shooter)
 
-	var expected_hp = GameConfig.TOWERS["shooter"]["hp"]
-	assert_eq(shooter.current_hp, expected_hp, "Shooter tower HP should match config")
+	var expected_hp = GameConfig.towers["shooter"].hp
+	assert_eq(shooter.health.current_hp, expected_hp, "Shooter tower HP should match config")
 
 	var wall = SceneFactory.create_tower("wall")
 	test_scene.add_child(wall)
 
-	expected_hp = GameConfig.TOWERS["wall"]["hp"]
-	assert_eq(wall.current_hp, expected_hp, "Wall tower HP should match config")
+	expected_hp = GameConfig.towers["wall"].hp
+	assert_eq(wall.health.current_hp, expected_hp, "Wall tower HP should match config")

@@ -12,18 +12,9 @@ func _ready():
 	tower_type = "shooter"
 
 	# 从注入的 Resource 初始化（HP 由 super._ready() 处理）
-	if data:
-		_initial_max_hp = data.hp
-		attack_damage = data.damage * GameData.player_stats["tower_mult"]
-		attack_rate = data.fire_rate
-		attack_range = data.attack_range
-	else:
-		# 向后兼容
-		var tower_config: Dictionary = GameConfig.TOWERS[tower_type]
-		_initial_max_hp = tower_config["hp"]
-		attack_damage = tower_config["damage"] * GameData.player_stats["tower_mult"]
-		attack_rate = tower_config["fire_rate"]
-		attack_range = tower_config["range"]
+	attack_damage = data.damage * GameData.player_stats["tower_mult"]
+	attack_rate = data.fire_rate
+	attack_range = data.attack_range
 
 	super._ready()
 	shoot_timer.wait_time = attack_rate

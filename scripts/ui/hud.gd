@@ -16,7 +16,7 @@ func _ready():
 
 func _process(delta):
 	if player and is_instance_valid(player):
-		hp_label.text = "HP: %.0f | Coins: %d" % [player.current_hp, player.coins]
+		hp_label.text = "HP: %.0f | Coins: %d" % [player.health.current_hp, player.coins]
 
 	if _is_wave_active:
 		_wave_time_left -= delta

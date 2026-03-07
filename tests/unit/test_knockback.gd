@@ -22,6 +22,6 @@ func test_enemy_still_takes_damage_during_knockback():
 	add_child_autoqfree(enemy)
 	await get_tree().process_frame
 	enemy.apply_knockback(Vector2.RIGHT)
-	var hp_before: float = enemy.current_hp
+	var hp_before: float = enemy.health.current_hp
 	enemy.take_damage(10.0)
-	assert_lt(enemy.current_hp, hp_before, "击退期间仍应可以受伤")
+	assert_lt(enemy.health.current_hp, hp_before, "击退期间仍应可以受伤")

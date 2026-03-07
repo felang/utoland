@@ -48,25 +48,22 @@ func test_enemy_config_from_gameconfig():
 	var normal_enemy = SceneFactory.create_enemy("normal")
 	test_scene.add_child(normal_enemy)
 
-	var expected_hp = GameConfig.ENEMIES["normal"]["hp"]
-	var expected_speed = GameConfig.ENEMIES["normal"]["speed"]
-	var expected_damage = GameConfig.ENEMIES["normal"]["damage"]
+	var enemy_data: EnemyData = GameConfig.enemies["normal"]
 
-	assert_eq(normal_enemy.max_hp, expected_hp, "Normal enemy max HP should match config")
-	assert_eq(normal_enemy.current_hp, expected_hp, "Normal enemy current HP should equal max HP")
-	assert_eq(normal_enemy.speed, expected_speed, "Normal enemy speed should match config")
-	assert_eq(normal_enemy.tower_attack_damage, expected_damage, "Normal enemy damage should match config")
+	assert_eq(normal_enemy.health.max_hp, enemy_data.hp, "Normal enemy max HP should match config")
+	assert_eq(normal_enemy.health.current_hp, enemy_data.hp, "Normal enemy current HP should equal max HP")
+	assert_eq(normal_enemy.speed, enemy_data.speed, "Normal enemy speed should match config")
+	assert_eq(normal_enemy.tower_attack_damage, enemy_data.damage, "Normal enemy damage should match config")
 
 func test_fast_enemy_config():
 	# Test fast enemy configuration
 	var fast_enemy = SceneFactory.create_enemy("fast")
 	test_scene.add_child(fast_enemy)
 
-	var expected_hp = GameConfig.ENEMIES["fast"]["hp"]
-	var expected_speed = GameConfig.ENEMIES["fast"]["speed"]
+	var enemy_data: EnemyData = GameConfig.enemies["fast"]
 
-	assert_eq(fast_enemy.max_hp, expected_hp, "Fast enemy max HP should match config")
-	assert_eq(fast_enemy.speed, expected_speed, "Fast enemy speed should match config")
+	assert_eq(fast_enemy.health.max_hp, enemy_data.hp, "Fast enemy max HP should match config")
+	assert_eq(fast_enemy.speed, enemy_data.speed, "Fast enemy speed should match config")
 	assert_gt(fast_enemy.speed, 100.0, "Fast enemy should have high speed")
 
 func test_tank_enemy_config():
@@ -74,12 +71,11 @@ func test_tank_enemy_config():
 	var tank_enemy = SceneFactory.create_enemy("tank")
 	test_scene.add_child(tank_enemy)
 
-	var expected_hp = GameConfig.ENEMIES["tank"]["hp"]
-	var expected_speed = GameConfig.ENEMIES["tank"]["speed"]
+	var enemy_data: EnemyData = GameConfig.enemies["tank"]
 
-	assert_eq(tank_enemy.max_hp, expected_hp, "Tank enemy max HP should match config")
-	assert_eq(tank_enemy.speed, expected_speed, "Tank enemy speed should match config")
-	assert_gt(tank_enemy.max_hp, 100.0, "Tank enemy should have high HP")
+	assert_eq(tank_enemy.health.max_hp, enemy_data.hp, "Tank enemy max HP should match config")
+	assert_eq(tank_enemy.speed, enemy_data.speed, "Tank enemy speed should match config")
+	assert_gt(tank_enemy.health.max_hp, 100.0, "Tank enemy should have high HP")
 
 func test_enemy_type_is_set_correctly():
 	# Test that enemy_type is correctly set for all enemy types
@@ -134,23 +130,22 @@ func test_mixed_enemy_types_spawning():
 
 	# Verify different stats
 	assert_lt(normal.speed, fast.speed, "Fast enemy should be faster than normal")
-	assert_gt(tank.max_hp, normal.max_hp, "Tank enemy should have more HP than normal")
+	assert_gt(tank.health.max_hp, normal.health.max_hp, "Tank enemy should have more HP than normal")
 
 func test_enemy_base_speed_initialization():
 	# Test that base_speed is correctly initialized
 	var enemy = SceneFactory.create_enemy("normal")
 	test_scene.add_child(enemy)
 
-	assert_eq(enemy.base_speed, enemy.speed, "Base speed should equal current speed initially")
-	assert_gt(enemy.base_speed, 0, "Base speed should be positive")
+	assert_eq(enemy.slow_handler.base_speed, enemy.speed, "Base speed should equal current speed initially")
+	assert_gt(enemy.slow_handler.base_speed, 0, "Base speed should be positive")
 
 func test_enemy_coin_drop_config():
 	# Test that coin drop values are in GameConfig
-	for enemy_type in ["normal", "fast", "tank"]:
-		var config = GameConfig.ENEMIES[enemy_type]
-		assert_true(config.has("coin_drop_min"), "Enemy config should have coin_drop_min")
-		assert_true(config.has("coin_drop_max"), "Enemy config should have coin_drop_max")
-		assert_gte(config["coin_drop_max"], config["coin_drop_min"], "Max coin drop should be >= min")
+	for type in ["normal", "fast", "tank"]:
+		var enemy_data: EnemyData = GameConfig.enemies[type]
+		assert_gt(enemy_data.coin_drop_min, 0, "Enemy config should have positive coin_drop_min")
+		assert_gte(enemy_data.coin_drop_max, enemy_data.coin_drop_min, "Max coin drop should be >= min")
 
 func test_spawn_position_is_inside_new_map_bounds():
 	var spawner = preload("res://scripts/systems/enemy_spawner.gd").new()

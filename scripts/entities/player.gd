@@ -8,7 +8,7 @@ var invincible_timer: float = 0.0
 var hp_regen_timer: float = 0.0
 var _blink_tween: Tween = null
 
-@onready var _health: HealthComponent = $HealthComponent
+@onready var health: HealthComponent = $HealthComponent
 @onready var _weapon: WeaponSystem = $WeaponSystem
 @onready var _sprite_animator: SpriteAnimator = $SpriteAnimator
 
@@ -20,30 +20,23 @@ func _ready() -> void:
 
 	# 应用被动属性
 	var max_hp: float = GameData.player_stats["max_hp"] * GameData.player_stats["hp_mult"]
-	_health.initialize(max_hp)
+	health.initialize(max_hp)
 	speed = GameData.character_speed * GameData.player_stats["move_speed_mult"]
 
 	# 应用待处理的治疗
 	if GameData.pending_heal > 0:
-		_health.heal(GameData.pending_heal)
+		health.heal(GameData.pending_heal)
 		GameData.pending_heal = 0
 
 	# 初始化武器系统
 	var weapon_res: WeaponData = GameConfig.weapons.get(GameData.selected_weapon)
-	if weapon_res:
-		_weapon.initialize(weapon_res, GameData.player_stats["damage_mult"], GameData.player_stats["attack_speed_mult"])
-	else:
-		# 向后兼容：从字典读取
-		var weapon_dict: Dictionary = GameConfig.WEAPONS[GameData.selected_weapon]
-		_weapon.fire_rate = weapon_dict["fire_rate"] / GameData.player_stats["attack_speed_mult"]
-		_weapon.weapon_damage = weapon_dict["damage"] * GameData.player_stats["damage_mult"]
-		_weapon.weapon_range = weapon_dict["range"]
+	_weapon.initialize(weapon_res, GameData.player_stats["damage_mult"], GameData.player_stats["attack_speed_mult"])
 
 	# 同步金币
 	coins = GameData.coins
 
 	# 连接组件信号
-	_health.died.connect(_on_died)
+	health.died.connect(_on_died)
 
 	# 设置精灵
 	var character: String = GameData.current_character
@@ -64,7 +57,7 @@ func _process(delta: float) -> void:
 		hp_regen_timer = 0.0
 		var regen_amount: float = GameData.character_hp_regen + GameData.player_stats["hp_regen"]
 		if regen_amount > 0:
-			_health.heal(regen_amount)
+			health.heal(regen_amount)
 
 func _physics_process(_delta: float) -> void:
 	var input_vector: Vector2 = Vector2.ZERO
@@ -101,13 +94,13 @@ func check_enemy_collision() -> void:
 				invincible_timer = invincible_duration
 
 func take_damage(amount: float) -> void:
-	_health.take_damage_no_sparks(amount)
+	health.take_damage_no_sparks(amount)
 	# 受击闪白 + 无敌帧
 	_flash_white()
 	# 屏幕震动
 	var shake_config: Dictionary = GameConfig.EFFECTS["camera_shake"]["player_hit"]
 	EventBus.camera_shake_requested.emit(shake_config["intensity"], shake_config["duration"])
-	print("Player HP: ", _health.current_hp)
+	print("Player HP: ", health.current_hp)
 
 func _on_died() -> void:
 	print("Player died!")
@@ -133,16 +126,3 @@ func _start_invincible_blink() -> void:
 		_blink_tween.tween_property(self, "modulate:a", config["alpha_low"], config["interval"])
 		_blink_tween.tween_property(self, "modulate:a", config["alpha_high"], config["interval"])
 	_blink_tween.tween_property(self, "modulate:a", 1.0, 0.01)
-
-# 向后兼容属性（供外部代码读取）
-var current_hp: float:
-	get: return _health.current_hp if _health else 0.0
-	set(value):
-		if _health:
-			_health.current_hp = value
-
-var max_hp: float:
-	get: return _health.max_hp if _health else 0.0
-	set(value):
-		if _health:
-			_health.max_hp = value

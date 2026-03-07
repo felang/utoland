@@ -18,39 +18,31 @@ var target_tower = null
 var attack_timer: float = 0.0
 var player: Node2D = null
 
-@onready var _health: HealthComponent = $HealthComponent
+@onready var health: HealthComponent = $HealthComponent
 @onready var _knockback: KnockbackHandler = $KnockbackHandler
-@onready var _slow: SlowHandler = $SlowHandler
+@onready var slow_handler: SlowHandler = $SlowHandler
 @onready var _sprite_animator: SpriteAnimator = $SpriteAnimator
 
 func _ready():
 	# 从注入的 Resource 初始化（SceneFactory 设置 data）
-	if data:
-		_health.initialize(data.hp)
-		speed = data.speed
-		tower_attack_damage = data.damage
-		_slow.initialize(data.speed)
-	else:
-		# 向后兼容：如果没有注入 data，从 GameConfig 读取
-		var enemy_config: Dictionary = GameConfig.ENEMIES[enemy_type]
-		_health.initialize(enemy_config["hp"])
-		speed = enemy_config["speed"]
-		tower_attack_damage = enemy_config["damage"]
-		_slow.initialize(enemy_config["speed"])
+	health.initialize(data.hp)
+	speed = data.speed
+	tower_attack_damage = data.damage
+	slow_handler.initialize(data.speed)
 
 	add_to_group("enemies")
 	player = get_tree().get_first_node_in_group("player")
 
 	# 连接组件信号
-	_health.died.connect(_on_died)
-	_slow.speed_changed.connect(_on_speed_changed)
+	health.died.connect(_on_died)
+	slow_handler.speed_changed.connect(_on_speed_changed)
 
 	# 设置精灵
 	var sprite_config: Dictionary = GameConfig.SPRITES["enemies"].get(enemy_type, {})
 	var target_size: float = float(GameConfig.ENTITY_SIZE_TANK if enemy_type == "tank" else GameConfig.ENTITY_SIZE_STANDARD)
 	_sprite_animator._sprite = null  # 确保重新创建
 	# 获取死亡特效颜色（从旧 Visual）
-	_health.death_color = _sprite_animator.get_death_color_from_visual()
+	health.death_color = _sprite_animator.get_death_color_from_visual()
 	_sprite_animator.setup_enemy_sprite(sprite_config, target_size)
 
 func _physics_process(delta):
@@ -85,7 +77,7 @@ func attack_tower(_delta):
 		attack_timer = tower_attack_rate
 
 func take_damage(amount: float):
-	_health.take_damage(amount)
+	health.take_damage(amount)
 
 func die() -> void:
 	_on_died()
@@ -104,17 +96,7 @@ func drop_coins():
 	if not parent:
 		return
 
-	var coin_min: int
-	var coin_max: int
-	if data:
-		coin_min = data.coin_drop_min
-		coin_max = data.coin_drop_max
-	else:
-		var enemy_config: Dictionary = GameConfig.ENEMIES[enemy_type]
-		coin_min = enemy_config["coin_drop_min"]
-		coin_max = enemy_config["coin_drop_max"]
-
-	var coin_count: int = randi_range(coin_min, coin_max)
+	var coin_count: int = randi_range(data.coin_drop_min, data.coin_drop_max)
 	for i in coin_count:
 		var coin = SceneFactory.create_coin()
 		coin.global_position = global_position + Vector2(randf_range(-20, 20), randf_range(-20, 20))
@@ -127,29 +109,10 @@ func _flash_white() -> void:
 	EffectsManager.flash_white(self)
 
 func apply_slow(slow_percent: float):
-	_slow.apply_slow(slow_percent)
+	slow_handler.apply_slow(slow_percent)
 
 func remove_slow(slow_percent: float):
-	_slow.remove_slow(slow_percent)
+	slow_handler.remove_slow(slow_percent)
 
 func _on_speed_changed(new_speed: float) -> void:
 	speed = new_speed
-
-# 向后兼容属性（供外部代码和测试读取）
-var current_hp: float:
-	get: return _health.current_hp if _health else 0.0
-	set(value):
-		if _health:
-			_health.current_hp = value
-
-var max_hp: float:
-	get: return _health.max_hp if _health else 0.0
-	set(value):
-		if _health:
-			_health.max_hp = value
-
-var base_speed: float:
-	get: return _slow.base_speed if _slow else 0.0
-	set(value):
-		if _slow:
-			_slow.base_speed = value

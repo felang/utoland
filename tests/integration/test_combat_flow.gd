@@ -36,19 +36,19 @@ func test_enemy_takes_damage():
 	var enemy = SceneFactory.create_enemy("normal")
 	test_scene.add_child(enemy)
 
-	var initial_hp = enemy.current_hp
+	var initial_hp = enemy.health.current_hp
 	var damage_amount = 10.0
 
 	enemy.take_damage(damage_amount)
 
-	assert_eq(enemy.current_hp, initial_hp - damage_amount, "Enemy HP should decrease by damage amount")
+	assert_eq(enemy.health.current_hp, initial_hp - damage_amount, "Enemy HP should decrease by damage amount")
 
 func test_enemy_dies_at_zero_hp():
 	# Test that enemy dies when HP reaches zero
 	var enemy = SceneFactory.create_enemy("normal")
 	test_scene.add_child(enemy)
 
-	var initial_hp = enemy.current_hp
+	var initial_hp = enemy.health.current_hp
 
 	# Deal enough damage to kill enemy
 	enemy.take_damage(initial_hp)
@@ -82,12 +82,10 @@ func test_coin_drop_amount_from_config():
 	var enemy = SceneFactory.create_enemy("normal")
 	test_scene.add_child(enemy)
 
-	var config = GameConfig.ENEMIES["normal"]
-	var min_coins = config["coin_drop_min"]
-	var max_coins = config["coin_drop_max"]
+	var enemy_data: EnemyData = GameConfig.enemies["normal"]
 
-	assert_gte(min_coins, 1, "Min coin drop should be at least 1")
-	assert_gte(max_coins, min_coins, "Max coin drop should be >= min")
+	assert_gte(enemy_data.coin_drop_min, 1, "Min coin drop should be at least 1")
+	assert_gte(enemy_data.coin_drop_max, enemy_data.coin_drop_min, "Max coin drop should be >= min")
 
 func test_bullet_damages_enemy():
 	# Test that bullet can damage enemy
@@ -100,7 +98,7 @@ func test_bullet_damages_enemy():
 	test_scene.add_child(enemy)
 	enemy.global_position = Vector2(100, 100)
 
-	var initial_hp = enemy.current_hp
+	var initial_hp = enemy.health.current_hp
 
 	# Simulate bullet hitting enemy
 	if bullet.has_signal("body_entered"):
@@ -109,7 +107,7 @@ func test_bullet_damages_enemy():
 		# Manually trigger damage
 		enemy.take_damage(bullet.damage)
 
-	assert_lt(enemy.current_hp, initial_hp, "Enemy HP should decrease after bullet hit")
+	assert_lt(enemy.health.current_hp, initial_hp, "Enemy HP should decrease after bullet hit")
 
 func test_coin_collection():
 	# Test coin collection mechanism
@@ -129,14 +127,14 @@ func test_multiple_enemies_take_damage():
 	test_scene.add_child(enemy1)
 	test_scene.add_child(enemy2)
 
-	var initial_hp1 = enemy1.current_hp
-	var initial_hp2 = enemy2.current_hp
+	var initial_hp1 = enemy1.health.current_hp
+	var initial_hp2 = enemy2.health.current_hp
 
 	enemy1.take_damage(10.0)
 	enemy2.take_damage(15.0)
 
-	assert_eq(enemy1.current_hp, initial_hp1 - 10.0, "Enemy1 HP should decrease by 10")
-	assert_eq(enemy2.current_hp, initial_hp2 - 15.0, "Enemy2 HP should decrease by 15")
+	assert_eq(enemy1.health.current_hp, initial_hp1 - 10.0, "Enemy1 HP should decrease by 10")
+	assert_eq(enemy2.health.current_hp, initial_hp2 - 15.0, "Enemy2 HP should decrease by 15")
 
 func test_tower_damage_from_config():
 	# Test that tower damage is loaded from GameConfig
@@ -145,7 +143,7 @@ func test_tower_damage_from_config():
 
 	await wait_frames(2)
 
-	var expected_damage = GameConfig.TOWERS["shooter"]["damage"] * GameData.player_stats["tower_mult"]
+	var expected_damage = GameConfig.towers["shooter"].damage * GameData.player_stats["tower_mult"]
 	assert_eq(tower.attack_damage, expected_damage, "Tower damage should match config")
 
 func test_bullet_has_damage_property():
@@ -161,9 +159,9 @@ func test_enemy_drops_correct_coin_count():
 	var enemy = SceneFactory.create_enemy("tank")
 	test_scene.add_child(enemy)
 
-	var config = GameConfig.ENEMIES["tank"]
-	var min_coins = config["coin_drop_min"]
-	var max_coins = config["coin_drop_max"]
+	var enemy_data: EnemyData = GameConfig.enemies["tank"]
+	var min_coins = enemy_data.coin_drop_min
+	var max_coins = enemy_data.coin_drop_max
 
 	# Kill enemy and count coins
 	var initial_coins = test_scene.get_tree().get_nodes_in_group("coins").size()
@@ -182,19 +180,19 @@ func test_tower_takes_damage_from_enemy():
 	var tower = SceneFactory.create_tower("wall")
 	test_scene.add_child(tower)
 
-	var initial_hp = tower.current_hp
+	var initial_hp = tower.health.current_hp
 	var damage_amount = 20.0
 
 	tower.take_damage(damage_amount)
 
-	assert_eq(tower.current_hp, initial_hp - damage_amount, "Tower HP should decrease by damage amount")
+	assert_eq(tower.health.current_hp, initial_hp - damage_amount, "Tower HP should decrease by damage amount")
 
 func test_tower_destroyed_at_zero_hp():
 	# Test that tower is destroyed when HP reaches zero
 	var tower = SceneFactory.create_tower("wall")
 	test_scene.add_child(tower)
 
-	var initial_hp = tower.current_hp
+	var initial_hp = tower.health.current_hp
 
 	# Deal enough damage to destroy tower
 	tower.take_damage(initial_hp)
@@ -217,7 +215,7 @@ func test_combat_full_cycle():
 	test_scene.add_child(enemy)
 	enemy.global_position = Vector2(250, 200)
 
-	var initial_enemy_hp = enemy.current_hp
+	var initial_enemy_hp = enemy.health.current_hp
 
 	# Manually damage enemy to simulate combat
 	enemy.take_damage(initial_enemy_hp)
