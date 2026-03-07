@@ -24,6 +24,7 @@ utoland 是一个基于 **Godot 4.6** 的 2D 塔防 + 射击混合类游戏。�
 - **SceneFactory** (`scripts/core/scene_factory.gd`) — 集中管理场景实例化，提供 `create_tower()`, `create_enemy()`, `create_bullet()`, `create_coin()` 等工厂方法。创建实体必须通过此工厂。
 - **EffectsManager** (`scripts/systems/effects_manager.gd`) — 特效管理：伤害数字、击中火花、死亡爆炸、闪白等视觉效果。
 - **EventBus** (`scripts/core/event_bus.gd`) — 全局事件总线，用于跨系统解耦通信（如波次事件、商店事件等）。
+- **SceneManager** (`scripts/core/scene_manager.gd`) — 集中管理场景切换，提供 `go_to(scene_name)` 方法。所有场景路径在此统一维护，禁止直接调用 `get_tree().change_scene_to_file()`。
 
 ### 游戏流程 (场景切换)
 

@@ -7,6 +7,8 @@
 # 插件（通过包管理器安装，不提交）
 addons/gut/
 addons/gdai-mcp-plugin-godot/
+addons/AsepriteWizard/
+
 
 # 测试输出
 tests/results.xml
