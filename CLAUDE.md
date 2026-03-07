@@ -17,11 +17,13 @@ utoland 是一个基于 **Godot 4.6** 的 2D 塔防 + 射击混合类游戏。�
 
 ## 架构
 
-### Autoload 单例 (全局可用)
+### Autoload 单例 (全局可用，加载顺序有依赖)
 
-- **GameConfig** (`game_config.gd`) — 所有游戏数值的配置中心，包含武器、敌人、塔、波次、玩家、角色、商店、地图的常量配置。修改数值只需改这里。
+- **GameConfig** (`scripts/core/game_config.gd`) — 资源注册表，运行时从 `resources/` 目录加载 `.tres` 配置文件（武器、敌人、塔、波次、角色、商店、地图、特效、精灵等）。必须最先加载（GameData 依赖它）。
 - **GameData** (`scripts/core/game_data.gd`) — 运行时游戏状态，存储当前角色属性、金币、波次、已购买的塔等。跨场景传递数据。
-- **SceneFactory** (`scripts/core/scene_factory.gd`) — 集中管理场景实例化，提供 `create_tower()`, `create_enemy()`, `create_bullet()`, `create_coin()` 等静态工厂方法。创建实体必须通过此工厂。
+- **SceneFactory** (`scripts/core/scene_factory.gd`) — 集中管理场景实例化，提供 `create_tower()`, `create_enemy()`, `create_bullet()`, `create_coin()` 等工厂方法。创建实体必须通过此工厂。
+- **EffectsManager** (`scripts/systems/effects_manager.gd`) — 特效管理：伤害数字、击中火花、死亡爆炸、闪白等视觉效果。
+- **EventBus** (`scripts/core/event_bus.gd`) — 全局事件总线，用于跨系统解耦通信（如波次事件、商店事件等）。
 
 ### 游戏流程 (场景切换)
 
@@ -35,17 +37,23 @@ start_menu → character_selection → weapon_select → map_select → main (�
 
 ### 代码组织
 
-- `scripts/core/` — 核心系统 (GameData, SceneFactory)
+- `scripts/core/` — 核心系统 (GameConfig, GameData, SceneFactory, EventBus, SpriteLoader)
+- `scripts/resources/` — 自定义 Resource 类定义 (WeaponData, EnemyData, TowerData, WaveData, CharacterData 等)
 - `scripts/entities/` — 游戏实体 (player, enemy, bullet, coin, towers/)
-- `scripts/systems/` — 游戏系统 (wave_manager, enemy_spawner, shop_manager)
+- `scripts/systems/` — 游戏系统 (wave_manager, enemy_spawner, shop_manager, effects_manager)
 - `scripts/ui/` — UI 脚本 (hud, start_menu, result, 各选择界面, main 场景控制)
-- `scenes/` — 对应的 .tscn 场景文件
+- `resources/` — `.tres` 配置数据文件 (weapons/, enemies/, towers/, waves/, characters/, maps/, shop/, effects/, spawn/)
+- `scenes/entities/` — 实体场景 (player, bullet, coin, boomerang, laser_beam, enemies/, towers/)
+- `scenes/levels/` — 关卡场景 (main, placement)
+- `scenes/ui/` — UI 场景 (start_menu, hud, shop, result, character_selection, weapon_select, map_select)
+- `scenes/shared/` — 共用场景 (map_boundary)
 
 ### 关键模式
 
-- **配置驱动**: 所有数值在 `GameConfig` 中定义，实体在 `_ready()` 中从 GameConfig 读取配置
+- **配置驱动**: 游戏数值通过 Resource 类定义 (`scripts/resources/`)，以 `.tres` 文件存储 (`resources/`)，由 `GameConfig` 在运行时加载。修改数值编辑对应 `.tres` 文件即可。
 - **工厂模式**: 通过 `SceneFactory` 创建所有实体，不直接 preload/instantiate 场景
-- **信号通信**: `WaveManager` 通过信号 (`wave_started`, `wave_completed`, `game_won`, `game_lost`) 驱动游戏流程
+- **事件总线**: 跨系统通信通过 `EventBus` 全局事件总线，避免系统间直接耦合
+- **信号通信**: 局部信号用于父子节点间通信；跨系统事件通过 `EventBus`
 - **分组管理**: 实体通过 Godot 分组 (`towers`, `enemies`, `coins`) 进行批量操作
 
 ## 开发流程
@@ -68,10 +76,10 @@ start_menu → character_selection → weapon_select → map_select → main (�
 
 ### 架构规范
 
-- **禁止硬编码数值** — 所有游戏数值在 `GameConfig` 中定义
+- **禁止硬编码数值** — 所有游戏数值通过 `.tres` 资源文件定义，由 `GameConfig` 加载
 - **禁止直接实例化场景** — 通过 `SceneFactory` 创建实体
-- **禁止系统间直接调用** — 系统之间通过信号通信
-- 新增实体流程：GameConfig 配置 → 脚本 → 场景 → SceneFactory 注册 → 测试
+- **禁止系统间直接调用** — 跨系统通信通过 `EventBus` 事件总线，不直接引用其他系统
+- 新增实体流程：Resource 类定义 (`scripts/resources/`) → `.tres` 数据文件 (`resources/`) → GameConfig 注册加载 → 脚本 → 场景 → SceneFactory 注册 → 测试
 
 ### 测试规范
 
