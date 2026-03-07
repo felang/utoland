@@ -48,6 +48,11 @@ func _input(event: InputEvent) -> void:
 		var grid_pos: Vector2 = _get_grid_position(get_global_mouse_position())
 		preview_tower.global_position = grid_pos
 		_range_indicator.global_position = grid_pos
+		# 合法性颜色反馈
+		if _can_place_at(grid_pos):
+			preview_tower.modulate = Color(1, 1, 1, 0.5)
+		else:
+			preview_tower.modulate = Color(1, 0.3, 0.3, 0.5)
 
 	if event is InputEventMouseButton and event.pressed:
 		if event.button_index == MOUSE_BUTTON_LEFT:
