@@ -21,11 +21,16 @@ func _add_weapon(data: WeaponData) -> void:
 	_weapons.append(weapon)
 
 func tick(delta: float) -> void:
-	var target: Node2D = _find_closest_enemy()
+	# 取所有武器中最大的射程作为搜索范围
+	var max_range: float = 0.0
+	for weapon in _weapons:
+		if weapon.weapon_data and weapon.weapon_data.weapon_range > max_range:
+			max_range = weapon.weapon_data.weapon_range
+	var target: Node2D = _find_closest_enemy(max_range)
 	for weapon in _weapons:
 		weapon.tick(delta, target)
 
-func _find_closest_enemy() -> Node2D:
+func _find_closest_enemy(range_limit: float = INF) -> Node2D:
 	if not is_inside_tree():
 		return null
 	var owner_node: Node2D = get_parent() as Node2D
@@ -33,7 +38,7 @@ func _find_closest_enemy() -> Node2D:
 		return null
 	var enemies: Array[Node] = get_tree().get_nodes_in_group("enemies")
 	var closest: Node2D = null
-	var min_dist: float = INF
+	var min_dist: float = range_limit  # 只考虑射程内的敌人
 	for enemy in enemies:
 		if enemy is Node2D:
 			var dist: float = owner_node.global_position.distance_to(enemy.global_position)

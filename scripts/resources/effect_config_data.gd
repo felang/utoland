@@ -65,7 +65,9 @@ extends Resource
 @export var boomerang_return_distance: float = 15.0
 
 # 激光特效
-@export var laser_beam_width: float = 4.0
+@export var laser_beam_width: float = 3.0
+@export var laser_beam_color: Color = Color(1, 0.2, 0.2, 0.9)
+@export var laser_beam_hitbox_height: float = 8.0
 @export var laser_core_color: Color = Color(1, 1, 1, 0.9)
 @export var laser_edge_color: Color = Color(1, 0.2, 0.2, 0.7)
 @export var laser_flash_alpha: float = 0.03

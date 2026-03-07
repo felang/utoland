@@ -1,7 +1,6 @@
 extends CharacterBody2D
 
 var speed: float = 0.0  # 从 GameData 初始化
-@export var weapon_range: float = 300.0
 @export var invincible_duration: float = 0.5
 var coins: int = 0
 var invincible_timer: float = 0.0
@@ -87,6 +86,7 @@ func _on_hurtbox_hit(damage: float, _knockback: Vector2) -> void:
 	var fx: EffectConfigData = GameConfig.effects
 	EventBus.camera_shake_requested.emit(fx.camera_shake_player_hit_intensity, fx.camera_shake_player_hit_duration)
 
+# 保留供塔攻击等外部系统调用；投射物伤害通过 Hurtbox 信号处理
 func take_damage(amount: float) -> void:
 	if invincible_timer > 0:
 		return
