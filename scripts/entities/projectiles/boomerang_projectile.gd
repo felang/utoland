@@ -6,7 +6,7 @@ extends Projectile
 var speed: float = 350.0
 var outbound_distance: float = 200.0
 var return_speed_mult: float = 1.3
-var max_lifetime: float = 5.0
+var max_lifetime: float = 5.0  # TODO: 待 WeaponData 扩展 boomerang_max_lifetime 字段后改为配置驱动
 
 var _state: String = "OUTBOUND"
 var _traveled: float = 0.0
@@ -16,7 +16,8 @@ var _player: Node2D = null
 var _trail: Line2D = null
 var _trail_positions: Array[Vector2] = []
 var _trail_max_points: int = 8
-var _rotation_speed: float = 0.0
+var _rotation_speed: float = 0.0          # 出程旋转速度
+var _return_rotation_speed: float = 0.0   # 回程旋转速度（更快）
 var _return_dist_threshold: float = 30.0
 
 func _on_setup(direction: Vector2) -> void:
@@ -24,6 +25,7 @@ func _on_setup(direction: Vector2) -> void:
 	_state = "OUTBOUND"
 	_traveled = 0.0
 	_elapsed = 0.0
+	assert(GameConfig.weapons.has("boomerang"), "缺少 boomerang 武器配置，请检查 resources/weapons/")
 	# 从 WeaponData 读取回旋镖配置
 	var w: WeaponData = GameConfig.weapons["boomerang"]
 	speed = w.boomerang_speed
@@ -33,6 +35,7 @@ func _on_setup(direction: Vector2) -> void:
 	var fx: EffectConfigData = GameConfig.effects
 	_trail_max_points = fx.boomerang_trail_points
 	_rotation_speed = deg_to_rad(fx.boomerang_rotation_speed)
+	_return_rotation_speed = _rotation_speed * fx.boomerang_return_rotation_mult
 	_return_dist_threshold = fx.boomerang_return_distance
 	# 创建拖尾
 	_trail = Line2D.new()
@@ -50,7 +53,8 @@ func _physics_process(delta: float) -> void:
 	if _elapsed >= max_lifetime:
 		_cleanup_and_free()
 		return
-	rotation += _rotation_speed * delta
+	var rot_speed: float = _return_rotation_speed if _state == "RETURNING" else _rotation_speed
+	rotation += rot_speed * delta
 	_update_trail()
 	match _state:
 		"OUTBOUND":  _process_outbound(delta)
