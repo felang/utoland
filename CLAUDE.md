@@ -39,13 +39,13 @@ start_menu → character_selection → weapon_select → map_select → main (�
 ### 代码组织
 
 - `scripts/core/` — 核心系统 (GameConfig, GameData, SceneFactory, EventBus, SpriteLoader)
-- `scripts/components/` — 可复用组件 (HealthComponent, SpriteAnimator, WeaponSystem, KnockbackHandler, SlowHandler)
+- `scripts/components/` — 可复用组件 (HealthComponent, SpriteAnimator, Hitbox, Hurtbox, KnockbackHandler, SlowHandler)
 - `scripts/resources/` — 自定义 Resource 类定义 (WeaponData, EnemyData, TowerData, WaveData, CharacterData 等)
-- `scripts/entities/` — 游戏实体 (player, enemy, bullet, coin, towers/)
+- `scripts/entities/` — 游戏实体 (player, enemy, coin, towers/, weapons/, projectiles/)
 - `scripts/systems/` — 游戏系统 (wave_manager, enemy_spawner, shop_manager, effects_manager)
 - `scripts/ui/` — UI 脚本 (hud, start_menu, result, 各选择界面, main 场景控制)
 - `resources/` — `.tres` 配置数据文件 (weapons/, enemies/, towers/, waves/, characters/, maps/, shop/, effects/, spawn/)
-- `scenes/entities/` — 实体场景 (player, bullet, coin, boomerang, laser_beam, enemies/, towers/)
+- `scenes/entities/` — 实体场景 (player, coin, enemies/, towers/, projectiles/)
 - `scenes/levels/` — 关卡场景 (main, placement)
 - `scenes/ui/` — UI 场景 (start_menu, hud, shop, result, character_selection, weapon_select, map_select)
 - `scenes/shared/` — 共用场景 (map_boundary)
@@ -54,7 +54,7 @@ start_menu → character_selection → weapon_select → map_select → main (�
 
 - **配置驱动**: 游戏数值通过 Resource 类定义 (`scripts/resources/`)，以 `.tres` 文件存储 (`resources/`)，由 `GameConfig` 在运行时加载。修改数值编辑对应 `.tres` 文件即可。
 - **工厂 + Resource 注入**: `SceneFactory` 创建实体时注入对应的 Resource 数据（`EnemyData`、`TowerData`），实体不再直接依赖 `GameConfig` 字典
-- **组件化实体**: 共享行为提取为可复用组件（`HealthComponent`、`SpriteAnimator`），专用行为提取为独立组件（`WeaponSystem`、`KnockbackHandler`、`SlowHandler`），通过场景树子节点挂载
+- **组件化实体**: 共享行为提取为可复用组件（`HealthComponent`、`SpriteAnimator`），专用行为提取为独立组件（`WeaponManager`、`KnockbackHandler`、`SlowHandler`），伤害通过 `Hitbox`/`Hurtbox` Area2D 体系处理，通过场景树子节点挂载
 - **事件总线**: 跨系统通信通过 `EventBus` 全局事件总线，避免系统间直接耦合
 - **信号通信**: 组件通过信号与宿主通信（如 `HealthComponent.died`）；跨系统事件通过 `EventBus`
 - **分组管理**: 实体通过 Godot 分组 (`towers`, `enemies`, `coins`) 进行批量操作
