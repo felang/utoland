@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://scripts/ui/character_selection.gd" id="1_xxxxx"]
 
-[node name="root" type="Control" unique_id=282648690]
+[node name="root" type="Control"]
 script = ExtResource("1_xxxxx")
 layout_mode = 3
 anchors_preset = 15
@@ -11,41 +11,27 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="TitleLabel" type="Label" parent="." unique_id=289252906]
+[node name="TitleLabel" type="Label" parent="."]
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
-offset_top = 50.0
-offset_bottom = 100.0
+offset_top = 30.0
+offset_bottom = 60.0
 grow_horizontal = 2
 text = "选择角色"
 horizontal_alignment = 1
 
-[node name="CharacterContainer" type="HBoxContainer" parent="." unique_id=1179168628]
+[node name="CharacterContainer" type="HBoxContainer" parent="."]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -240.0
-offset_top = -50.0
-offset_right = 240.0
-offset_bottom = 50.0
+offset_left = -260.0
+offset_top = -90.0
+offset_right = 260.0
+offset_bottom = 90.0
 grow_horizontal = 2
 grow_vertical = 2
-
-[node name="WarriorButton" type="Button" parent="CharacterContainer" unique_id=1448305146]
-custom_minimum_size = Vector2(140, 36)
-layout_mode = 2
-text = "战士"
-
-[node name="RangerButton" type="Button" parent="CharacterContainer" unique_id=122718274]
-custom_minimum_size = Vector2(140, 36)
-layout_mode = 2
-text = "游侠"
-
-[node name="TankButton" type="Button" parent="CharacterContainer" unique_id=763154529]
-custom_minimum_size = Vector2(140, 36)
-layout_mode = 2
-text = "坦克"
+theme_override_constants/separation = 20
