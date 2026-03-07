@@ -3,11 +3,15 @@
 [ext_resource type="Script" uid="uid://bmd64dp53aq51" path="res://scripts/entities/player.gd" id="1_3vyb7"]
 [ext_resource type="Script" path="res://scripts/systems/camera_shake.gd" id="2_shake"]
 [ext_resource type="Script" path="res://scripts/components/health_component.gd" id="3_health"]
-[ext_resource type="Script" path="res://scripts/components/weapon_system.gd" id="4_weapon"]
 [ext_resource type="Script" path="res://scripts/components/sprite_animator.gd" id="5_sprite"]
+[ext_resource type="Script" path="res://scripts/entities/weapons/weapon_manager.gd" id="6_wmanager"]
+[ext_resource type="Script" path="res://scripts/components/hurtbox.gd" id="7_hurtbox"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_3vyb7"]
 size = Vector2(30, 30)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_hurtbox"]
+radius = 12.0
 
 [node name="Player" type="CharacterBody2D" unique_id=2056081713]
 collision_mask = 18
@@ -29,8 +33,16 @@ script = ExtResource("2_shake")
 [node name="HealthComponent" type="Node" parent="."]
 script = ExtResource("3_health")
 
-[node name="WeaponSystem" type="Node" parent="."]
-script = ExtResource("4_weapon")
-
 [node name="SpriteAnimator" type="Node" parent="."]
 script = ExtResource("5_sprite")
+
+[node name="WeaponManager" type="Node" parent="."]
+script = ExtResource("6_wmanager")
+
+[node name="Hurtbox" type="Area2D" parent="."]
+collision_layer = 64
+collision_mask = 32
+script = ExtResource("7_hurtbox")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox"]
+shape = SubResource("CircleShape2D_hurtbox")
