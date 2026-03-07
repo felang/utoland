@@ -1,0 +1,18 @@
+[gd_scene load_steps=4 format=3 uid="uid://bullet_projectile"]
+
+[ext_resource type="Script" path="res://scripts/entities/projectiles/bullet_projectile.gd" id="1_bullet"]
+[ext_resource type="Script" uid="uid://bx7m3k2vpqn4r" path="res://scripts/components/hitbox.gd" id="2_hitbox"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_bullet"]
+radius = 4.0
+
+[node name="BulletProjectile" type="Node2D"]
+script = ExtResource("1_bullet")
+
+[node name="Hitbox" type="Area2D" parent="." groups=["hitboxes"]]
+collision_layer = 4
+collision_mask = 128
+script = ExtResource("2_hitbox")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
+shape = SubResource("CircleShape2D_bullet")
