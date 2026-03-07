@@ -22,13 +22,13 @@ func test_boomerang_switches_to_returning_after_distance():
 	b.setup(10.0, 50.0, Vector2.ZERO, Vector2.RIGHT)
 	b._traveled = b.outbound_distance + 1.0
 	b._physics_process(0.016)
-	assert_eq(b._state, "RETURNING")
+	assert_eq(b._state, Enums.BoomerangState.RETURNING)
 
 func test_boomerang_returns_toward_player():
 	var b = _make_boomerang()
 	await get_tree().process_frame
 	b.setup(10.0, 50.0, Vector2(100, 0), Vector2.RIGHT)
-	b._state = "RETURNING"
+	b._state = Enums.BoomerangState.RETURNING
 	var player_node = Node2D.new()
 	player_node.global_position = Vector2(-100, 0)
 	add_child_autofree(player_node)
