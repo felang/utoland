@@ -70,6 +70,6 @@ func create_boomerang() -> Area2D:
 func create_laser_beam() -> Node2D:
 	return _laser_beam_scene.instantiate()
 
-# BulletProjectile creation (新投射物系统)
+# BulletProjectile creation — 新投射物系统
 func create_bullet_projectile() -> BulletProjectile:
 	return _bullet_projectile_scene.instantiate()
