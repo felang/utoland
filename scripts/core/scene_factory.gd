@@ -16,6 +16,7 @@ var _enemy_scenes: Dictionary = {
 var _bullet_scene: PackedScene = preload("res://scenes/entities/bullet.tscn")
 var _bullet_projectile_scene: PackedScene = preload("res://scenes/entities/projectiles/bullet_projectile.tscn")
 var _boomerang_projectile_scene: PackedScene = preload("res://scenes/entities/projectiles/boomerang_projectile.tscn")
+var _laser_projectile_scene: PackedScene = preload("res://scenes/entities/projectiles/laser_projectile.tscn")
 var _coin_scene: PackedScene = preload("res://scenes/entities/coin.tscn")
 var _boomerang_scene: PackedScene = preload("res://scenes/entities/boomerang.tscn")
 var _laser_beam_scene: PackedScene = preload("res://scenes/entities/laser_beam.tscn")
@@ -78,3 +79,7 @@ func create_bullet_projectile() -> BulletProjectile:
 # BoomerangProjectile creation — 新投射物系统
 func create_boomerang_projectile() -> BoomerangProjectile:
 	return _boomerang_projectile_scene.instantiate()
+
+# LaserProjectile creation — 新投射物系统
+func create_laser_projectile() -> LaserProjectile:
+	return _laser_projectile_scene.instantiate()
