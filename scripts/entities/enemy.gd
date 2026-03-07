@@ -22,10 +22,12 @@ var player: Node2D = null
 @onready var _knockback: KnockbackHandler = $KnockbackHandler
 @onready var slow_handler: SlowHandler = $SlowHandler
 @onready var _sprite_animator: SpriteAnimator = $SpriteAnimator
+@onready var _hitbox: Hitbox = $Hitbox
 
 func _ready():
 	# 从注入的 Resource 初始化（SceneFactory 设置 data）
 	health.initialize(data.hp)
+	_hitbox.damage = data.damage
 	speed = data.speed
 	tower_attack_damage = data.damage
 	slow_handler.initialize(data.speed)
@@ -36,6 +38,7 @@ func _ready():
 	# 连接组件信号
 	health.died.connect(_on_died)
 	slow_handler.speed_changed.connect(_on_speed_changed)
+	$Hurtbox.hit_taken.connect(_on_hurtbox_hit)
 
 	# 设置精灵
 	var sprite_config: Dictionary = GameConfig.SPRITES["enemies"].get(enemy_type, {})
@@ -110,6 +113,11 @@ func _flash_white() -> void:
 
 func apply_slow(slow_percent: float):
 	slow_handler.apply_slow(slow_percent)
+
+func _on_hurtbox_hit(damage: float, knockback_dir: Vector2) -> void:
+	health.take_damage(damage)
+	if knockback_dir.length() > 0:
+		_knockback.apply_knockback(knockback_dir.normalized())
 
 func remove_slow(slow_percent: float):
 	slow_handler.remove_slow(slow_percent)
