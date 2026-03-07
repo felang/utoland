@@ -65,7 +65,10 @@ func _input(event: InputEvent) -> void:
 				else:
 					_deselect_tower()
 		elif event.button_index == MOUSE_BUTTON_RIGHT:
-			_cancel_placement()
+			if preview_tower:
+				_cancel_placement()
+			else:
+				_remove_tower_at(get_global_mouse_position())
 
 func _select_tower(type: String) -> void:
 	_deselect_tower()
@@ -156,6 +159,17 @@ func _select_placed_tower(tower: Node2D) -> void:
 func _deselect_tower() -> void:
 	_selected_placed_tower = null
 	_range_indicator.hide_range()
+
+func _remove_tower_at(pos: Vector2) -> void:
+	var tower: Node2D = _find_tower_at(pos)
+	if not tower:
+		return
+
+	var cost: int = SceneFactory.get_tower_cost(tower.tower_type)
+	GameData.coins += cost
+	tower.queue_free()
+	_deselect_tower()
+	_update_ui()
 
 func _update_ui() -> void:
 	$UI/CoinsLabel.text = "金币: %d" % GameData.coins

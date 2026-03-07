@@ -80,3 +80,21 @@ func test_deselect_tower_hides_range():
 
 	assert_null(placement._selected_placed_tower, "取消选中后应清空 _selected_placed_tower")
 	assert_false(placement._range_indicator.visible, "取消选中后范围圈应隐藏")
+
+func test_remove_tower_refunds_coins():
+	GameData.coins = 60
+
+	var tower = SceneFactory.create_tower(Enums.TowerId.SHOOTER)
+	tower.global_position = Vector2(105, 105)
+	tower.add_to_group(Enums.Group.TOWERS)
+	placement.add_child(tower)
+
+	var cost: int = SceneFactory.get_tower_cost(Enums.TowerId.SHOOTER)
+	placement._remove_tower_at(Vector2(110, 110))
+
+	assert_eq(GameData.coins, 60 + cost, "移除塔应退还金币")
+
+func test_remove_tower_at_empty_does_nothing():
+	GameData.coins = 60
+	placement._remove_tower_at(Vector2(500, 500))
+	assert_eq(GameData.coins, 60, "空位置不应改变金币")
