@@ -56,3 +56,27 @@ func test_find_tower_at_returns_null_when_too_far():
 
 	var found = placement._find_tower_at(Vector2(300, 300))
 	assert_null(found, "距离太远应返回 null")
+
+func test_select_placed_tower_shows_range_for_shooter():
+	var tower = SceneFactory.create_tower(Enums.TowerId.SHOOTER)
+	tower.global_position = Vector2(150, 150)
+	tower.add_to_group(Enums.Group.TOWERS)
+	placement.add_child(tower)
+
+	placement._select_placed_tower(tower)
+
+	assert_eq(placement._selected_placed_tower, tower, "应记录选中的塔")
+	assert_true(placement._range_indicator.visible, "射手塔攻击范围圈应可见")
+	assert_gt(placement._range_indicator.radius, 0.0, "范围圈半径应大于 0")
+
+func test_deselect_tower_hides_range():
+	var tower = SceneFactory.create_tower(Enums.TowerId.SHOOTER)
+	tower.global_position = Vector2(150, 150)
+	tower.add_to_group(Enums.Group.TOWERS)
+	placement.add_child(tower)
+
+	placement._select_placed_tower(tower)
+	placement._deselect_tower()
+
+	assert_null(placement._selected_placed_tower, "取消选中后应清空 _selected_placed_tower")
+	assert_false(placement._range_indicator.visible, "取消选中后范围圈应隐藏")
