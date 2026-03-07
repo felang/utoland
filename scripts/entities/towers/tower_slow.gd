@@ -9,12 +9,17 @@ func _ready():
 	# 设置塔类型
 	tower_type = "slow"
 
-	# 从 GameConfig 读取配置
-	var tower_data = GameConfig.TOWERS[tower_type]
-	max_hp = tower_data["hp"]
-	current_hp = tower_data["hp"]
-	slow_radius = tower_data["range"]
-	slow_percent = tower_data["slow_percent"]
+	# 从注入的 Resource 初始化（HP 由 super._ready() 处理）
+	if data:
+		_initial_max_hp = data.hp
+		slow_radius = data.attack_range
+		slow_percent = data.slow_percent
+	else:
+		# 向后兼容
+		var tower_config: Dictionary = GameConfig.TOWERS[tower_type]
+		_initial_max_hp = tower_config["hp"]
+		slow_radius = tower_config["range"]
+		slow_percent = tower_config["slow_percent"]
 
 	super._ready()
 

@@ -1,7 +1,8 @@
-[gd_scene load_steps=5 format=3 uid="uid://5uhjfg5l2l8i"]
+[gd_scene load_steps=6 format=3 uid="uid://5uhjfg5l2l8i"]
 
 [ext_resource type="Script" uid="uid://ckwxfmslcyshb" path="res://scripts/entities/towers/tower_shooter.gd" id="1_15q5k"]
 [ext_resource type="Texture2D" path="res://assets/sprites/towers/tileset_towers.png" id="2_tileset"]
+[ext_resource type="Script" path="res://scripts/components/health_component.gd" id="3_health"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_dgv38"]
 size = Vector2(30, 30)
@@ -34,3 +35,6 @@ shape = SubResource("CircleShape2D_detect")
 wait_time = 1.0
 one_shot = false
 autostart = false
+
+[node name="HealthComponent" type="Node" parent="."]
+script = ExtResource("3_health")

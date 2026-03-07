@@ -1,6 +1,10 @@
 [gd_scene format=3 uid="uid://bxlj77kpxroab"]
 
 [ext_resource type="Script" uid="uid://b1ohisgqjft26" path="res://scripts/entities/enemy.gd" id="1_onop2"]
+[ext_resource type="Script" path="res://scripts/components/health_component.gd" id="2_health"]
+[ext_resource type="Script" path="res://scripts/components/knockback_handler.gd" id="3_knockback"]
+[ext_resource type="Script" path="res://scripts/components/slow_handler.gd" id="4_slow"]
+[ext_resource type="Script" path="res://scripts/components/sprite_animator.gd" id="5_sprite"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_t5l71"]
 size = Vector2(30, 30)
@@ -9,8 +13,6 @@ size = Vector2(30, 30)
 collision_layer = 2
 collision_mask = 5
 script = ExtResource("1_onop2")
-speed = 250.0
-max_hp = 20.0
 touch_damage = 8.0
 
 [node name="Visual" type="ColorRect" parent="." unique_id=274199104]
@@ -22,3 +24,15 @@ color = Color(0, 0, 1, 1)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=404462319]
 shape = SubResource("RectangleShape2D_t5l71")
+
+[node name="HealthComponent" type="Node" parent="."]
+script = ExtResource("2_health")
+
+[node name="KnockbackHandler" type="Node" parent="."]
+script = ExtResource("3_knockback")
+
+[node name="SlowHandler" type="Node" parent="."]
+script = ExtResource("4_slow")
+
+[node name="SpriteAnimator" type="Node" parent="."]
+script = ExtResource("5_sprite")

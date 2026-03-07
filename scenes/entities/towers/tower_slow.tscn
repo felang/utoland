@@ -1,7 +1,8 @@
-[gd_scene load_steps=5 format=3 uid="uid://ucsglghc6mnm"]
+[gd_scene load_steps=6 format=3 uid="uid://ucsglghc6mnm"]
 
 [ext_resource type="Script" uid="uid://numv2t5y702l" path="res://scripts/entities/towers/tower_slow.gd" id="1_scoor"]
 [ext_resource type="Texture2D" path="res://assets/sprites/towers/tileset_towers.png" id="2_tileset"]
+[ext_resource type="Script" path="res://scripts/components/health_component.gd" id="3_health"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_3hf2r"]
 size = Vector2(30, 30)
@@ -29,3 +30,6 @@ collision_mask = 2
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="SlowArea"]
 shape = SubResource("CircleShape2D_slow")
+
+[node name="HealthComponent" type="Node" parent="."]
+script = ExtResource("3_health")

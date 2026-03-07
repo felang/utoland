@@ -18,7 +18,7 @@ var _coin_scene: PackedScene = preload("res://scenes/entities/coin.tscn")
 var _boomerang_scene: PackedScene = preload("res://scenes/entities/boomerang.tscn")
 var _laser_beam_scene: PackedScene = preload("res://scenes/entities/laser_beam.tscn")
 
-# Tower creation
+# Tower creation — 注入 TowerData Resource
 func create_tower(type: String) -> Node2D:
 	if not _tower_scenes.has(type):
 		push_error("Unknown tower type: " + type)
@@ -26,7 +26,9 @@ func create_tower(type: String) -> Node2D:
 
 	var tower = _tower_scenes[type].instantiate()
 	tower.tower_type = type
-	# Config is applied in tower._ready()
+	# 注入 Resource 数据
+	if GameConfig.towers.has(type):
+		tower.data = GameConfig.towers[type]
 	return tower
 
 func get_tower_cost(type: String) -> int:
@@ -38,7 +40,7 @@ func get_tower_cost(type: String) -> int:
 	# Use average of min/max for consistent pricing
 	return (config["shop_price_min"] + config["shop_price_max"]) / 2
 
-# Enemy creation
+# Enemy creation — 注入 EnemyData Resource
 func create_enemy(type: String) -> CharacterBody2D:
 	if not _enemy_scenes.has(type):
 		push_error("Unknown enemy type: " + type)
@@ -46,8 +48,9 @@ func create_enemy(type: String) -> CharacterBody2D:
 
 	var enemy = _enemy_scenes[type].instantiate()
 	enemy.enemy_type = type
-	# Config is applied in enemy._ready()
-
+	# 注入 Resource 数据
+	if GameConfig.enemies.has(type):
+		enemy.data = GameConfig.enemies[type]
 	return enemy
 
 # Bullet creation

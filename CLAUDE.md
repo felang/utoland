@@ -38,6 +38,7 @@ start_menu → character_selection → weapon_select → map_select → main (�
 ### 代码组织
 
 - `scripts/core/` — 核心系统 (GameConfig, GameData, SceneFactory, EventBus, SpriteLoader)
+- `scripts/components/` — 可复用组件 (HealthComponent, SpriteAnimator, WeaponSystem, KnockbackHandler, SlowHandler)
 - `scripts/resources/` — 自定义 Resource 类定义 (WeaponData, EnemyData, TowerData, WaveData, CharacterData 等)
 - `scripts/entities/` — 游戏实体 (player, enemy, bullet, coin, towers/)
 - `scripts/systems/` — 游戏系统 (wave_manager, enemy_spawner, shop_manager, effects_manager)
@@ -51,9 +52,10 @@ start_menu → character_selection → weapon_select → map_select → main (�
 ### 关键模式
 
 - **配置驱动**: 游戏数值通过 Resource 类定义 (`scripts/resources/`)，以 `.tres` 文件存储 (`resources/`)，由 `GameConfig` 在运行时加载。修改数值编辑对应 `.tres` 文件即可。
-- **工厂模式**: 通过 `SceneFactory` 创建所有实体，不直接 preload/instantiate 场景
+- **工厂 + Resource 注入**: `SceneFactory` 创建实体时注入对应的 Resource 数据（`EnemyData`、`TowerData`），实体不再直接依赖 `GameConfig` 字典
+- **组件化实体**: 共享行为提取为可复用组件（`HealthComponent`、`SpriteAnimator`），专用行为提取为独立组件（`WeaponSystem`、`KnockbackHandler`、`SlowHandler`），通过场景树子节点挂载
 - **事件总线**: 跨系统通信通过 `EventBus` 全局事件总线，避免系统间直接耦合
-- **信号通信**: 局部信号用于父子节点间通信；跨系统事件通过 `EventBus`
+- **信号通信**: 组件通过信号与宿主通信（如 `HealthComponent.died`）；跨系统事件通过 `EventBus`
 - **分组管理**: 实体通过 Godot 分组 (`towers`, `enemies`, `coins`) 进行批量操作
 
 ## 开发流程
@@ -79,7 +81,9 @@ start_menu → character_selection → weapon_select → map_select → main (�
 - **禁止硬编码数值** — 所有游戏数值通过 `.tres` 资源文件定义，由 `GameConfig` 加载
 - **禁止直接实例化场景** — 通过 `SceneFactory` 创建实体
 - **禁止系统间直接调用** — 跨系统通信通过 `EventBus` 事件总线，不直接引用其他系统
-- 新增实体流程：Resource 类定义 (`scripts/resources/`) → `.tres` 数据文件 (`resources/`) → GameConfig 注册加载 → 脚本 → 场景 → SceneFactory 注册 → 测试
+- **实体不直接读 GameConfig** — 实体通过 SceneFactory 注入的 Resource 数据初始化，不直接依赖 GameConfig 字典
+- 新增实体流程：Resource 类定义 (`scripts/resources/`) → `.tres` 数据文件 (`resources/`) → GameConfig 注册加载 → 脚本 → 场景（挂载组件子节点） → SceneFactory 注册（注入 Resource） → 测试
+- 新增组件流程：`scripts/components/` 中创建组件脚本 → 在 `.tscn` 场景中添加为子节点 → 实体 `_ready()` 中通过 `@onready` 引用并初始化
 
 ### 测试规范
 
