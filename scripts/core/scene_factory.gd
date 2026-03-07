@@ -2,21 +2,21 @@ extends Node
 
 # Scene preloads - centralized
 var _tower_scenes: Dictionary = {
-	"shooter": preload("res://scenes/towers/tower_shooter.tscn"),
-	"wall": preload("res://scenes/towers/tower_wall.tscn"),
-	"slow": preload("res://scenes/towers/tower_slow.tscn")
+	"shooter": preload("res://scenes/entities/towers/tower_shooter.tscn"),
+	"wall": preload("res://scenes/entities/towers/tower_wall.tscn"),
+	"slow": preload("res://scenes/entities/towers/tower_slow.tscn")
 }
 
 var _enemy_scenes: Dictionary = {
-	"normal": preload("res://scenes/enemies/enemy_normal.tscn"),
-	"fast": preload("res://scenes/enemies/enemy_fast.tscn"),
-	"tank": preload("res://scenes/enemies/enemy_tank.tscn")
+	"normal": preload("res://scenes/entities/enemies/enemy_normal.tscn"),
+	"fast": preload("res://scenes/entities/enemies/enemy_fast.tscn"),
+	"tank": preload("res://scenes/entities/enemies/enemy_tank.tscn")
 }
 
-var _bullet_scene: PackedScene = preload("res://scenes/bullet.tscn")
-var _coin_scene: PackedScene = preload("res://scenes/coin.tscn")
-var _boomerang_scene: PackedScene = preload("res://scenes/boomerang.tscn")
-var _laser_beam_scene: PackedScene = preload("res://scenes/laser_beam.tscn")
+var _bullet_scene: PackedScene = preload("res://scenes/entities/bullet.tscn")
+var _coin_scene: PackedScene = preload("res://scenes/entities/coin.tscn")
+var _boomerang_scene: PackedScene = preload("res://scenes/entities/boomerang.tscn")
+var _laser_beam_scene: PackedScene = preload("res://scenes/entities/laser_beam.tscn")
 
 # Tower creation
 func create_tower(type: String) -> Node2D:

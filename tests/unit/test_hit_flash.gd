@@ -17,7 +17,7 @@ func test_enemy_flash_changes_modulate():
 	assert_ne(enemy.modulate, original, "闪白瞬间 modulate 应改变")
 
 func test_player_has_blink_method():
-	var player_scene = preload("res://scenes/player.tscn")
+	var player_scene = preload("res://scenes/entities/player.tscn")
 	var player = player_scene.instantiate()
 	add_child_autoqfree(player)
 	assert_true(player.has_method("_start_invincible_blink"), "玩家应有 _start_invincible_blink 方法")
