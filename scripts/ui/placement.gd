@@ -4,6 +4,7 @@ const GRID_SIZE = GameConfig.GRID_SIZE
 @onready var background_sprite: Sprite2D = $Background/BackgroundSprite
 var selected_tower_type: String = ""
 var preview_tower: Node2D = null
+var _range_indicator: RangeIndicator = null
 
 func _ready() -> void:
 	_load_map_background()
@@ -12,6 +13,10 @@ func _ready() -> void:
 	var grid_overlay: Node2D = preload("res://scripts/ui/grid_overlay.gd").new()
 	grid_overlay.z_index = -50
 	add_child(grid_overlay)
+
+	_range_indicator = RangeIndicator.new()
+	_range_indicator.z_index = -40
+	add_child(_range_indicator)
 
 	# 恢复之前布置的塔
 	for tower_data in GameData.tower_inventory:
@@ -41,6 +46,7 @@ func _input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion and preview_tower:
 		var grid_pos: Vector2 = _get_grid_position(get_global_mouse_position())
 		preview_tower.global_position = grid_pos
+		_range_indicator.global_position = grid_pos
 
 	if event is InputEventMouseButton and event.pressed:
 		if event.button_index == MOUSE_BUTTON_LEFT and preview_tower:
@@ -49,6 +55,7 @@ func _input(event: InputEvent) -> void:
 			_cancel_placement()
 
 func _select_tower(type: String) -> void:
+	_range_indicator.hide_range()
 	var cost: int = SceneFactory.get_tower_cost(type)
 	if GameData.coins < cost:
 		return
@@ -61,6 +68,8 @@ func _select_tower(type: String) -> void:
 	if preview_tower:
 		preview_tower.modulate = Color(1, 1, 1, 0.5)
 		add_child(preview_tower)
+		var td: TowerData = GameConfig.towers[type]
+		_range_indicator.set_range(td.attack_range)
 
 func _place_tower() -> void:
 	if not preview_tower:
@@ -75,6 +84,7 @@ func _place_tower() -> void:
 	preview_tower.add_to_group(Enums.Group.TOWERS)
 	preview_tower = null
 	selected_tower_type = ""
+	_range_indicator.hide_range()
 	_update_ui()
 
 func _can_place_at(pos: Vector2) -> bool:
@@ -106,6 +116,7 @@ func _cancel_placement() -> void:
 		preview_tower.queue_free()
 		preview_tower = null
 		selected_tower_type = ""
+		_range_indicator.hide_range()
 
 func _update_ui() -> void:
 	$UI/CoinsLabel.text = "金币: %d" % GameData.coins
