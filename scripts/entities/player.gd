@@ -86,16 +86,15 @@ func _on_hurtbox_hit(damage: float, _knockback: Vector2) -> void:
 	invincible_timer = invincible_duration
 	var fx: EffectConfigData = GameConfig.effects
 	EventBus.camera_shake_requested.emit(fx.camera_shake_player_hit_intensity, fx.camera_shake_player_hit_duration)
-	print("Player HP: ", health.current_hp)
 
 func take_damage(amount: float) -> void:
+	if invincible_timer > 0:
+		return
 	health.take_damage_no_sparks(amount)
-	# 受击闪白 + 无敌帧
 	_flash_white()
-	# 屏幕震动
+	invincible_timer = invincible_duration
 	var fx: EffectConfigData = GameConfig.effects
 	EventBus.camera_shake_requested.emit(fx.camera_shake_player_hit_intensity, fx.camera_shake_player_hit_duration)
-	print("Player HP: ", health.current_hp)
 
 func _on_died() -> void:
 	print("Player died!")
