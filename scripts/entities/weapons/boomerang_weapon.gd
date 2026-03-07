@@ -15,4 +15,4 @@ func fire(target: Node2D) -> void:
 		return
 	scene_parent.add_child(boomerang)
 	boomerang.set_player(owner_node)
-	boomerang.setup(final_damage, 60.0, owner_node.global_position, direction)
+	boomerang.setup(final_damage, weapon_data.knockback_force, owner_node.global_position, direction)

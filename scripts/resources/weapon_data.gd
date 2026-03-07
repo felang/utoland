@@ -17,6 +17,9 @@ extends Resource
 @export var outbound_distance: float = 200.0
 @export var return_speed_mult: float = 1.3
 
+# 通用
+@export var knockback_force: float = 80.0
+
 # 激光特有
 @export var beam_range: float = 400.0
 @export var beam_width: float = 2.0

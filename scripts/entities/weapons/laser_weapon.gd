@@ -24,10 +24,10 @@ func _spawn_laser_flash(owner_node: Node2D, scene_parent: Node) -> void:
 	var flash: ColorRect = ColorRect.new()
 	flash.color = Color(1, 0, 0, fx.laser_flash_alpha)
 	flash.size = fx.laser_flash_size
-	flash.position = owner_node.global_position - fx.laser_flash_size / 2
 	flash.z_index = fx.laser_flash_z_index
 	flash.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	scene_parent.add_child(flash)
+	flash.global_position = owner_node.global_position - fx.laser_flash_size / 2
 	var tween: Tween = owner_node.create_tween()
 	tween.tween_property(flash, "modulate:a", 0.0, fx.laser_flash_duration)
 	tween.tween_callback(flash.queue_free)
