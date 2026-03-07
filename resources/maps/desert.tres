@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="MapData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/map_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "desert"
+display_name = "沙漠"
+description = "炎热的沙漠地带"
+preview_image = "res://assets/maps/desert_preview.png"
+background = "res://assets/maps/desert_bg.png"
+fallback_color = "#d4a574"

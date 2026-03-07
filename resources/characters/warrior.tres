@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="CharacterData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/character_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "warrior"
+display_name = "战士"
+description = "高生命值，低速度"
+max_hp = 150.0
+speed = 180.0
+damage_mult = 1.2
+move_speed_mult = 0.9
