@@ -3,7 +3,6 @@ class_name BoomerangWeapon
 extends Weapon
 
 func fire(target: Node2D) -> void:
-	var owner_node: Node2D = get_parent() as Node2D
 	if not owner_node:
 		return
 	var final_damage: float = weapon_data.damage * GameData.player_stats.get("damage_mult", 1.0)

@@ -4,6 +4,7 @@ class_name Weapon
 extends Node
 
 var weapon_data: WeaponData = null
+var owner_node: Node2D = null
 var _cooldown: float = 0.0
 
 func initialize(data: WeaponData) -> void:

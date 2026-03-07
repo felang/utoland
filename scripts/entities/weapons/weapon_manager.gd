@@ -17,6 +17,7 @@ func _add_weapon(data: WeaponData) -> void:
 	if not weapon:
 		return
 	weapon.initialize(data)
+	weapon.owner_node = get_parent() as Node2D
 	add_child(weapon)
 	_weapons.append(weapon)
 
