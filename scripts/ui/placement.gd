@@ -138,7 +138,7 @@ func start_battle():
 	# 更新 tower_inventory 为当前所有塔（包括之前的和新布置的）
 	GameData.tower_inventory = current_towers
 
-	get_tree().change_scene_to_file("res://scenes/main.tscn")
+	get_tree().change_scene_to_file("res://scenes/levels/main.tscn")
 
 func load_map_background():
 	# 获取选择的地图

@@ -12,7 +12,7 @@ func before_each():
 	GameData.purchased_towers.clear()
 	GameData.coins = 100
 
-	var placement_scene = load("res://scenes/placement.tscn")
+	var placement_scene = load("res://scenes/levels/placement.tscn")
 	placement = placement_scene.instantiate()
 	add_child_autofree(placement)
 

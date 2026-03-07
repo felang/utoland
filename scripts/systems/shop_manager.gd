@@ -106,10 +106,10 @@ func on_refresh_pressed() -> void:
 	update_ui()
 
 func on_confirm_pressed() -> void:
-	get_tree().change_scene_to_file("res://scenes/placement.tscn")
+	get_tree().change_scene_to_file("res://scenes/levels/placement.tscn")
 
 func start_next_wave() -> void:
-	get_tree().change_scene_to_file("res://scenes/main.tscn")
+	get_tree().change_scene_to_file("res://scenes/levels/main.tscn")
 
 func update_ui() -> void:
 	coin_label.text = "金币: %d" % GameData.coins
