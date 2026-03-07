@@ -3,16 +3,11 @@
 class_name Projectile
 extends Node2D
 
-var hitbox: Hitbox
-
-func _ready() -> void:
-	if has_node("Hitbox"):
-		hitbox = $Hitbox
+@onready var hitbox: Hitbox = $Hitbox
 
 func setup(damage: float, knockback_force: float, from: Vector2, direction: Vector2) -> void:
+	assert(hitbox != null, "Projectile.setup: 缺少 Hitbox 子节点，请检查场景配置")
 	global_position = from
-	if hitbox == null and has_node("Hitbox"):
-		hitbox = $Hitbox
 	hitbox.damage = damage
 	hitbox.knockback_force = knockback_force
 	_on_setup(direction)

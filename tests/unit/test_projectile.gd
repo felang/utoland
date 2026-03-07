@@ -1,3 +1,4 @@
+# test_projectile.gd — Projectile 基类单元测试
 extends GutTest
 
 func test_projectile_setup_sets_position_and_hitbox():
@@ -6,6 +7,7 @@ func test_projectile_setup_sets_position_and_hitbox():
 	hitbox.name = "Hitbox"
 	proj.add_child(hitbox)
 	add_child_autofree(proj)
+	await get_tree().process_frame
 
 	proj.setup(30.0, 80.0, Vector2(100, 200), Vector2.RIGHT)
 
