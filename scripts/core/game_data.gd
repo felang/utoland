@@ -52,7 +52,9 @@ func reset() -> void:
 	# 初始化角色（使用当前选择的角色）
 	init_character(current_character)
 
-	selected_weapon = Enums.WeaponId.RIFLE
+	# 从角色配置读取默认武器
+	var char_data: CharacterData = GameConfig.characters[current_character]
+	selected_weapon = char_data.default_weapon
 	selected_map = Enums.Map.FOREST
 	# 将角色属性同步到 player_stats
 	player_stats = {
