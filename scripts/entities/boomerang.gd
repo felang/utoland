@@ -72,7 +72,8 @@ func _process_returning(delta: float) -> void:
 	var return_speed: float = speed * return_speed_mult
 	var to_player: Vector2 = player.global_position - global_position
 	var distance: float = to_player.length()
-	if distance < 15.0:
+	var return_dist: float = GameConfig.effects.boomerang_return_distance if GameConfig.effects else 15.0
+	if distance < return_dist:
 		queue_free()
 		return
 	var move_dir: Vector2 = to_player.normalized()

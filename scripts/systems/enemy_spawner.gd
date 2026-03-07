@@ -10,10 +10,13 @@ var map_min_x: float = -GameConfig.MAP_HALF_WIDTH
 var map_max_x: float = GameConfig.MAP_HALF_WIDTH
 var map_min_y: float = -GameConfig.MAP_HALF_HEIGHT
 var map_max_y: float = GameConfig.MAP_HALF_HEIGHT
-var min_distance_from_player = 200.0
+var min_distance_from_player: float = 200.0
 
 func _ready():
 	player = get_tree().get_first_node_in_group("player")
+	# 从配置读取生成距离
+	if GameConfig.spawn:
+		min_distance_from_player = GameConfig.spawn.min_distance_from_player
 	# 连接 EventBus 信号
 	EventBus.wave_started.connect(_on_wave_started)
 	EventBus.wave_completed.connect(_on_wave_completed)

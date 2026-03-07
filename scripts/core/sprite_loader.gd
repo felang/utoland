@@ -91,7 +91,7 @@ static func create_atlas_texture(tileset_path: String, region: Rect2) -> AtlasTe
 
 # 根据移动方向获取动画名称
 # current_anim 用于方向滞后：对角移动时保持当前方向，避免快速切换
-static func get_walk_animation(velocity: Vector2, current_anim: String = "") -> String:
+static func get_walk_animation(velocity: Vector2, current_anim: String = "", hysteresis_keep: float = 0.7, hysteresis_switch: float = 1.4) -> String:
 	if velocity.length_squared() < 1.0:
 		return "idle"
 
@@ -105,10 +105,10 @@ static func get_walk_animation(velocity: Vector2, current_anim: String = "") -> 
 	var use_horizontal: bool
 	if is_current_horizontal:
 		# 当前是水平方向，垂直轴需要明显更大才切换
-		use_horizontal = abs_x >= abs_y * 0.7
+		use_horizontal = abs_x >= abs_y * hysteresis_keep
 	elif is_current_vertical:
 		# 当前是垂直方向，水平轴需要明显更大才切换
-		use_horizontal = abs_x > abs_y * 1.4
+		use_horizontal = abs_x > abs_y * hysteresis_switch
 	else:
 		# 无当前方向（idle），正常判断
 		use_horizontal = abs_x > abs_y

@@ -173,8 +173,9 @@ func _shoot_laser(target_pos: Vector2) -> void:
 
 	# 射线查询：检测线上所有敌人（贯穿）
 	var space_state: PhysicsDirectSpaceState2D = get_world_2d().direct_space_state
+	var laser_mask: int = GameConfig.effects.laser_collision_mask if GameConfig.effects else 2
 	var query: PhysicsRayQueryParameters2D = PhysicsRayQueryParameters2D.create(
-		global_position, end_pos, 2  # collision_mask = 2 (enemies layer)
+		global_position, end_pos, laser_mask  # collision_mask (enemies layer)
 	)
 	query.collide_with_areas = false
 	query.collide_with_bodies = true
@@ -182,7 +183,8 @@ func _shoot_laser(target_pos: Vector2) -> void:
 	# 循环射线查询实现贯穿
 	var hit_enemies: Array = []
 	var from: Vector2 = global_position
-	for i in range(20):  # 安全上限
+	var ray_limit: int = GameConfig.effects.laser_ray_query_limit if GameConfig.effects else 20
+	for i in range(ray_limit):  # 安全上限
 		query.from = from
 		var result: Dictionary = space_state.intersect_ray(query)
 		if result.is_empty():
@@ -207,9 +209,10 @@ func _shoot_laser(target_pos: Vector2) -> void:
 		var flash_config: Dictionary = GameConfig.EFFECTS["laser"]
 		var flash: ColorRect = ColorRect.new()
 		flash.color = Color(1, 0, 0, flash_config["flash_alpha"])
-		flash.size = Vector2(2000, 2000)
-		flash.position = global_position - Vector2(1000, 1000)
-		flash.z_index = 90
+		var flash_size: Vector2 = GameConfig.effects.laser_flash_size if GameConfig.effects else Vector2(2000, 2000)
+		flash.size = flash_size
+		flash.position = global_position - flash_size / 2
+		flash.z_index = GameConfig.effects.laser_flash_z_index if GameConfig.effects else 90
 		flash.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		parent.add_child(flash)
 		var flash_tween: Tween = create_tween()
@@ -258,16 +261,20 @@ func add_coins(amount: int) -> void:
 	GameData.coins = coins  # 同步到 GameData
 
 func _spawn_muzzle_flash(pos: Vector2) -> void:
+	var mf_size: Vector2 = GameConfig.effects.muzzle_flash_size if GameConfig.effects else Vector2(6, 6)
+	var mf_color: Color = GameConfig.effects.muzzle_flash_color if GameConfig.effects else Color(1, 1, 0.8, 0.9)
+	var mf_z_index: int = GameConfig.effects.muzzle_flash_z_index if GameConfig.effects else 10
+	var mf_duration: float = GameConfig.effects.muzzle_flash_duration if GameConfig.effects else 0.05
 	var flash: ColorRect = ColorRect.new()
-	flash.size = Vector2(6, 6)
-	flash.position = pos - Vector2(3, 3)
-	flash.color = Color(1, 1, 0.8, 0.9)
-	flash.z_index = 10
+	flash.size = mf_size
+	flash.position = pos - mf_size / 2
+	flash.color = mf_color
+	flash.z_index = mf_z_index
 	var parent_node: Node = get_parent()
 	if parent_node:
 		parent_node.add_child(flash)
 		var tween: Tween = create_tween()
-		tween.tween_property(flash, "scale", Vector2(0.1, 0.1), 0.05).set_ease(Tween.EASE_OUT)
+		tween.tween_property(flash, "scale", Vector2(0.1, 0.1), mf_duration).set_ease(Tween.EASE_OUT)
 		tween.tween_callback(flash.queue_free)
 
 func _flash_white() -> void:

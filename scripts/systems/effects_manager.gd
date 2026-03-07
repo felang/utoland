@@ -16,7 +16,7 @@ func spawn_damage_number(pos: Vector2, damage: float) -> void:
 	label.text = str(int(damage))
 	label.add_to_group("damage_numbers")
 	label.global_position = pos
-	label.z_index = 100
+	label.z_index = GameConfig.effects.damage_number_z_index if GameConfig.effects else 100
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 
 	# 大伤害特殊样式
@@ -53,8 +53,7 @@ func spawn_hit_sparks(pos: Vector2, color: Color = Color.YELLOW) -> void:
 		spark.size = Vector2(2, 2)
 		spark.position = pos - Vector2(1, 1)
 		spark.color = color
-		spark.z_index = 50
-
+		spark.z_index = GameConfig.effects.hit_spark_z_index if GameConfig.effects else 50
 		var tree: SceneTree = get_tree()
 		if tree and tree.current_scene:
 			tree.current_scene.add_child(spark)
@@ -79,7 +78,7 @@ func spawn_death_effect(pos: Vector2, entity_color: Color) -> void:
 		particle.size = Vector2(3, 3)
 		particle.position = pos - Vector2(1.5, 1.5)
 		particle.color = entity_color
-		particle.z_index = 50
+		particle.z_index = GameConfig.effects.death_particle_z_index if GameConfig.effects else 50
 
 		var tree: SceneTree = get_tree()
 		if tree and tree.current_scene:
@@ -88,7 +87,11 @@ func spawn_death_effect(pos: Vector2, entity_color: Color) -> void:
 			add_child(particle)
 
 		var angle: float = randf() * TAU
-		var speed: float = randf_range(50.0, 120.0)
+		var speed: float
+		if GameConfig.effects:
+			speed = randf_range(GameConfig.effects.death_particle_speed_min, GameConfig.effects.death_particle_speed_max)
+		else:
+			speed = randf_range(50.0, 120.0)
 		var spread_dir: Vector2 = Vector2.from_angle(angle)
 		var target: Vector2 = pos + spread_dir * speed * config["lifetime"]
 		target.y += config["gravity"] * config["lifetime"] * config["lifetime"] * 0.5
