@@ -6,9 +6,9 @@ func test_weapon_system_exists_on_player():
 	var player_scene = preload("res://scenes/entities/player.tscn")
 	var player = player_scene.instantiate()
 	add_child_autoqfree(player)
-	var weapon = player.get_node_or_null("WeaponSystem")
-	assert_not_null(weapon, "Player 应有 WeaponSystem 子节点")
-	assert_true(weapon is WeaponSystem, "应为 WeaponSystem 类型")
+	var weapon = player.get_node_or_null("WeaponManager")
+	assert_not_null(weapon, "Player 应有 WeaponManager 子节点")
+	assert_true(weapon is WeaponManager, "应为 WeaponManager 类型")
 
 func test_initialize_from_weapon_data():
 	var ws = WeaponSystem.new()

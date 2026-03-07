@@ -9,7 +9,7 @@ var hp_regen_timer: float = 0.0
 var _blink_tween: Tween = null
 
 @onready var health: HealthComponent = $HealthComponent
-@onready var _weapon: WeaponSystem = $WeaponSystem
+@onready var _weapon_manager: WeaponManager = $WeaponManager
 @onready var _sprite_animator: SpriteAnimator = $SpriteAnimator
 
 func _ready() -> void:
@@ -29,14 +29,14 @@ func _ready() -> void:
 		GameData.pending_heal = 0
 
 	# 初始化武器系统
-	var weapon_res: WeaponData = GameConfig.weapons.get(GameData.selected_weapon)
-	_weapon.initialize(weapon_res, GameData.player_stats["damage_mult"], GameData.player_stats["attack_speed_mult"])
+	_weapon_manager.initialize([GameData.selected_weapon])
 
 	# 同步金币
 	coins = GameData.coins
 
 	# 连接组件信号
 	health.died.connect(_on_died)
+	$Hurtbox.hit_taken.connect(_on_hurtbox_hit)
 
 	# 设置精灵
 	var character: String = GameData.current_character
@@ -49,7 +49,7 @@ func _process(delta: float) -> void:
 		invincible_timer -= delta
 
 	# 武器系统更新
-	_weapon.process(delta)
+	_weapon_manager.tick(delta)
 
 	# 生命回复机制
 	hp_regen_timer += delta
@@ -78,20 +78,15 @@ func _physics_process(_delta: float) -> void:
 	if camera and camera.has_method("update_look_ahead"):
 		camera.update_look_ahead(velocity)
 
-	check_enemy_collision()
-
-func check_enemy_collision() -> void:
-	for i in get_slide_collision_count():
-		var collision: KinematicCollision2D = get_slide_collision(i)
-		var collider: Object = collision.get_collider()
-		if collider and collider.is_in_group("enemies"):
-			if invincible_timer <= 0:
-				var enemy: Node = collider
-				if "touch_damage" in enemy:
-					take_damage(enemy.touch_damage)
-				else:
-					take_damage(GameConfig.PLAYER["default_enemy_touch_damage"])
-				invincible_timer = invincible_duration
+func _on_hurtbox_hit(damage: float, _knockback: Vector2) -> void:
+	if invincible_timer > 0:
+		return
+	health.take_damage_no_sparks(damage)
+	_flash_white()
+	invincible_timer = invincible_duration
+	var fx: EffectConfigData = GameConfig.effects
+	EventBus.camera_shake_requested.emit(fx.camera_shake_player_hit_intensity, fx.camera_shake_player_hit_duration)
+	print("Player HP: ", health.current_hp)
 
 func take_damage(amount: float) -> void:
 	health.take_damage_no_sparks(amount)
