@@ -4,7 +4,7 @@
 class_name Hurtbox
 extends Area2D
 
-signal hit_taken(damage: float, knockback_dir: Vector2)
+signal hit_taken(damage: float, knockback: Vector2)
 
 func _ready() -> void:
 	area_entered.connect(_on_area_entered)
