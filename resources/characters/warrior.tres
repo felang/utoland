@@ -11,3 +11,4 @@ max_hp = 150.0
 speed = 180.0
 damage_mult = 1.2
 move_speed_mult = 0.9
+default_weapon = "rifle"

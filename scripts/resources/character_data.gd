@@ -10,3 +10,5 @@ extends Resource
 @export var attack_speed_mult: float = 1.0
 @export var move_speed_mult: float = 1.0
 @export var hp_regen: float = 0.0
+## 角色默认武器 ID（对应 Enums.WeaponId）
+@export var default_weapon: String = ""

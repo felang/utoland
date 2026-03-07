@@ -13,3 +13,4 @@ damage_mult = 0.8
 attack_speed_mult = 0.9
 move_speed_mult = 0.75
 hp_regen = 1.0
+default_weapon = "laser"

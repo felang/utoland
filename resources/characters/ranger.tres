@@ -12,3 +12,4 @@ speed = 250.0
 damage_mult = 0.9
 attack_speed_mult = 1.1
 move_speed_mult = 1.25
+default_weapon = "boomerang"

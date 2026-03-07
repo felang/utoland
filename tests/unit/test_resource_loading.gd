@@ -10,11 +10,11 @@ func test_weapons_loaded_count() -> void:
 	assert_eq(GameConfig.weapons.size(), 3, "应加载 3 种武器")
 
 func test_weapon_rifle_resource() -> void:
-	assert_true(GameConfig.weapons.has(Enums.Weapon.RIFLE), "应包含 rifle")
-	var w: WeaponData = GameConfig.weapons[Enums.Weapon.RIFLE]
-	assert_eq(w.id, Enums.Weapon.RIFLE)
+	assert_true(GameConfig.weapons.has(Enums.WeaponId.RIFLE), "应包含 rifle")
+	var w: WeaponData = GameConfig.weapons[Enums.WeaponId.RIFLE]
+	assert_eq(w.id, Enums.WeaponId.RIFLE)
 	assert_eq(w.display_name, "步枪")
-	assert_eq(w.projectile_type, Enums.Projectile.BULLET)
+	assert_eq(w.projectile_type, Enums.ProjectileId.BULLET)
 	assert_eq(w.fire_rate, 0.1)
 	assert_eq(w.damage, 10.0)
 	assert_eq(w.weapon_range, 300.0)
@@ -22,9 +22,9 @@ func test_weapon_rifle_resource() -> void:
 	assert_eq(w.bullet_speed, 600.0)
 
 func test_weapon_boomerang_resource() -> void:
-	assert_true(GameConfig.weapons.has(Enums.Weapon.BOOMERANG), "应包含 boomerang")
-	var w: WeaponData = GameConfig.weapons[Enums.Weapon.BOOMERANG]
-	assert_eq(w.projectile_type, Enums.Projectile.BOOMERANG)
+	assert_true(GameConfig.weapons.has(Enums.WeaponId.BOOMERANG), "应包含 boomerang")
+	var w: WeaponData = GameConfig.weapons[Enums.WeaponId.BOOMERANG]
+	assert_eq(w.projectile_type, Enums.ProjectileId.BOOMERANG)
 	assert_eq(w.fire_rate, 0.8)
 	assert_eq(w.damage, 15.0)
 	assert_eq(w.boomerang_speed, 350.0)
@@ -32,9 +32,9 @@ func test_weapon_boomerang_resource() -> void:
 	assert_eq(w.return_speed_mult, 1.3)
 
 func test_weapon_laser_resource() -> void:
-	assert_true(GameConfig.weapons.has(Enums.Weapon.LASER), "应包含 laser")
-	var w: WeaponData = GameConfig.weapons[Enums.Weapon.LASER]
-	assert_eq(w.projectile_type, Enums.Projectile.LASER)
+	assert_true(GameConfig.weapons.has(Enums.WeaponId.LASER), "应包含 laser")
+	var w: WeaponData = GameConfig.weapons[Enums.WeaponId.LASER]
+	assert_eq(w.projectile_type, Enums.ProjectileId.LASER)
 	assert_eq(w.fire_rate, 0.15)
 	assert_eq(w.damage, 8.0)
 	assert_eq(w.beam_range, 400.0)
@@ -78,7 +78,7 @@ func test_towers_loaded_count() -> void:
 	assert_eq(GameConfig.towers.size(), 3, "应加载 3 种塔")
 
 func test_tower_shooter_resource() -> void:
-	var t: TowerData = GameConfig.towers[Enums.Tower.SHOOTER]
+	var t: TowerData = GameConfig.towers[Enums.TowerId.SHOOTER]
 	assert_eq(t.display_name, "射手塔")
 	assert_eq(t.hp, 80.0)
 	assert_eq(t.damage, 15.0)
@@ -86,12 +86,12 @@ func test_tower_shooter_resource() -> void:
 	assert_eq(t.attack_range, 300.0)
 
 func test_tower_wall_resource() -> void:
-	var t: TowerData = GameConfig.towers[Enums.Tower.WALL]
+	var t: TowerData = GameConfig.towers[Enums.TowerId.WALL]
 	assert_eq(t.hp, 300.0)
 	assert_eq(t.damage, 0.0)
 
 func test_tower_slow_resource() -> void:
-	var t: TowerData = GameConfig.towers[Enums.Tower.SLOW]
+	var t: TowerData = GameConfig.towers[Enums.TowerId.SLOW]
 	assert_eq(t.hp, 70.0)
 	assert_eq(t.slow_percent, 0.3)
 	assert_eq(t.attack_range, 200.0)
@@ -141,6 +141,18 @@ func test_character_tank_resource() -> void:
 	var c: CharacterData = GameConfig.characters[Enums.Character.TANK]
 	assert_eq(c.max_hp, 200.0)
 	assert_eq(c.hp_regen, 1.0)
+
+func test_character_warrior_has_default_weapon() -> void:
+	var c: CharacterData = GameConfig.characters[Enums.Character.WARRIOR]
+	assert_eq(c.default_weapon, Enums.WeaponId.RIFLE, "战士默认武器应为步枪")
+
+func test_character_ranger_has_default_weapon() -> void:
+	var c: CharacterData = GameConfig.characters[Enums.Character.RANGER]
+	assert_eq(c.default_weapon, Enums.WeaponId.BOOMERANG, "游侠默认武器应为回旋镖")
+
+func test_character_tank_has_default_weapon() -> void:
+	var c: CharacterData = GameConfig.characters[Enums.Character.TANK]
+	assert_eq(c.default_weapon, Enums.WeaponId.LASER, "坦克默认武器应为激光枪")
 
 
 # ===== 地图资源加载 =====
