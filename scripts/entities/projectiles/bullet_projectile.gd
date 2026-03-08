@@ -48,6 +48,21 @@ func _cleanup_and_free() -> void:
 		_trail.queue_free()
 	queue_free()
 
+func _spawn_split_bullets() -> void:
+	var scene_parent: Node = get_parent()
+	if not scene_parent:
+		return
+	var split_damage: float = hitbox.damage * GameData.split_damage_mult
+	for i in GameData.split_count:
+		var angle: float = randf_range(-PI / 2, PI / 2)
+		var split_dir: Vector2 = _direction.rotated(angle)
+		var split_bullet: BulletProjectile = SceneFactory.create_bullet_projectile()
+		split_bullet.speed = speed * 0.8
+		split_bullet.lifetime = 1.5
+		split_bullet.set_meta("is_split", true)
+		scene_parent.add_child(split_bullet)
+		split_bullet.setup(split_damage, hitbox.knockback_force * 0.5, global_position, split_dir)
+
 func _on_hitbox_area_entered(area: Area2D) -> void:
 	if area is Hurtbox:
 		EffectsManager.spawn_hit_sparks(global_position)
@@ -56,6 +71,9 @@ func _on_hitbox_area_entered(area: Area2D) -> void:
 			var player_node: Node = get_tree().get_first_node_in_group(Enums.Group.PLAYER)
 			if player_node and player_node.has_method("heal_hp"):
 				player_node.heal_hp(hitbox.damage * GameData.lifesteal_ratio)
+		# 弹道分裂：命中后生成小弹（仅主弹分裂，防止无限递归）
+		if GameData.split_count > 0 and not get_meta("is_split", false):
+			_spawn_split_bullets()
 		# 穿甲弹：记录穿透次数，未超出时不销毁
 		_hit_count += 1
 		if _hit_count > GameData.pierce_count:

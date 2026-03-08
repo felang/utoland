@@ -28,5 +28,5 @@ func _on_map_selected(map_id: String) -> void:
 	var md: MapData = GameConfig.maps[map_id]
 	print("选择地图: ", md.display_name)
 
-	# 跳转到塔布置场景
-	SceneManager.go_to(Enums.Scene.PLACEMENT)
+	# 跳转到战斗场景
+	SceneManager.go_to(Enums.Scene.MAIN)

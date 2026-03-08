@@ -18,7 +18,7 @@ func _process(delta: float) -> void:
 		if not player:
 			return
 
-	if global_position.distance_to(player.global_position) < attract_range:
+	if global_position.distance_to(player.global_position) < attract_range * GameData.coin_magnet_mult:
 		is_attracted = true
 
 	if is_attracted:

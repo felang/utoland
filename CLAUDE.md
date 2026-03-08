@@ -31,10 +31,12 @@ utoland 是一个基于 **Godot 4.6** 的 2D 塔防 + 射击混合类游戏。�
 ```
 start_menu → character_selection → map_select → main (战斗)
     ↓ (波次结束)
-  shop (商店) → placement (布置塔) → main (下一波战斗)
+  shop (商店) → main (下一波战斗)
     ↓ (全部波次完成或玩家死亡)
   result (结算)
 ```
+
+> **注意**: 塔布置(placement)阶段暂时跳过，商店中塔相关物品已过滤。后续版本恢复塔防玩法。
 
 ### 代码组织
 

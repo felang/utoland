@@ -104,4 +104,15 @@ class ItemEffect:
 	const TOWER_REGEN   = "tower_regen"    # 纳米修复
 	const SYMBIOSIS     = "symbiosis"      # 共生
 	const WAR_MACHINE   = "war_machine"    # 战争机器
+	const BULLET_SPEED     = "bullet_speed"
+	const WEAPON_RANGE     = "weapon_range"
+	const CRIT             = "crit"
+	const SPLIT            = "split"
+	const WAVE_SHIELD      = "wave_shield"
+	const WAVE_HEAL_PLAYER = "wave_heal_player"
+	const DAMAGE_REDUCTION = "damage_reduction"
+	const DODGE            = "dodge"
+	const MAGNET           = "magnet"
+	const SLOW_AURA        = "slow_aura"
+	const AUTO_DASH        = "auto_dash"
 	const DESTINY       = "destiny"        # 天命

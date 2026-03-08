@@ -60,6 +60,38 @@ var tower_hp_mult: float = 1.0
 var tower_range_mult: float = 1.0
 var tower_attack_speed_mult: float = 1.0
 var tower_cost_mult: float = 1.0
+## 弹速倍率（1.0 = 不变）
+var bullet_speed_mult: float = 1.0
+## 武器射程倍率
+var weapon_range_mult: float = 1.0
+## 暴击率（0.0-1.0）
+var crit_chance: float = 0.0
+## 暴击伤害倍率
+var crit_damage_mult: float = 2.0
+## 弹道分裂数（0 = 不分裂）
+var split_count: int = 0
+## 分裂弹伤害倍率
+var split_damage_mult: float = 0.5
+## 每波护盾层数（每波开始重置）
+var wave_shield_count: int = 0
+## 当前护盾层数
+var current_shield: int = 0
+## 每波回血比例（最大HP的百分比）
+var wave_heal_ratio: float = 0.0
+## 减伤比例（0.0-1.0）
+var damage_reduction: float = 0.0
+## 闪避率（0.0-1.0）
+var dodge_chance: float = 0.0
+## 金币磁铁范围倍率
+var coin_magnet_mult: float = 1.0
+## 减速光环
+var slow_aura_active: bool = false
+var slow_aura_ratio: float = 0.0
+var slow_aura_range: float = 100.0
+## 自动冲刺
+var auto_dash_active: bool = false
+var auto_dash_interval: float = 10.0
+var auto_dash_distance: float = 80.0
 
 func _ready() -> void:
 	# 游戏启动时初始化默认角色
@@ -128,3 +160,21 @@ func reset() -> void:
 	tower_range_mult = 1.0
 	tower_attack_speed_mult = 1.0
 	tower_cost_mult = 1.0
+	bullet_speed_mult = 1.0
+	weapon_range_mult = 1.0
+	crit_chance = 0.0
+	crit_damage_mult = 2.0
+	split_count = 0
+	split_damage_mult = 0.5
+	wave_shield_count = 0
+	current_shield = 0
+	wave_heal_ratio = 0.0
+	damage_reduction = 0.0
+	dodge_chance = 0.0
+	coin_magnet_mult = 1.0
+	slow_aura_active = false
+	slow_aura_ratio = 0.0
+	slow_aura_range = 100.0
+	auto_dash_active = false
+	auto_dash_interval = 10.0
+	auto_dash_distance = 80.0

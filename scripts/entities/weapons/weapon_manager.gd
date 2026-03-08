@@ -27,6 +27,7 @@ func tick(delta: float) -> void:
 	for weapon in _weapons:
 		if weapon.weapon_data and weapon.weapon_data.weapon_range > max_range:
 			max_range = weapon.weapon_data.weapon_range
+	max_range *= GameData.weapon_range_mult
 	var target: Node2D = _find_closest_enemy(max_range)
 	for weapon in _weapons:
 		weapon.tick(delta, target)

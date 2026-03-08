@@ -39,7 +39,20 @@ func _on_wave_completed(wave_number: int) -> void:
 				var heal_amount: float = tower.health.max_hp * GameData.wave_tower_heal_ratio
 				tower.health.heal(heal_amount)
 
+	# 波次回血：回复玩家最大HP的百分比
+	if GameData.wave_heal_ratio > 0.0:
+		var players: Array[Node] = get_tree().get_nodes_in_group(Enums.Group.PLAYER)
+		if not players.is_empty():
+			var player: Node = players[0]
+			if player.get("health") != null:
+				var heal_amount: float = player.health.max_hp * GameData.wave_heal_ratio
+				player.health.heal(heal_amount)
+
 func _on_wave_started(_wave_number: int, _wave_data: WaveData) -> void:
+	# 护盾：每波开始重置
+	if GameData.wave_shield_count > 0:
+		GameData.current_shield = GameData.wave_shield_count
+
 	# 战争机器：每波开始扣HP（最低保留1HP，不触发死亡）
 	if GameData.war_machine_active and GameData.war_machine_wave_hp_cost > 0:
 		var players: Array[Node] = get_tree().get_nodes_in_group(Enums.Group.PLAYER)

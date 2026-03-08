@@ -6,6 +6,13 @@ var coins: int = 0
 var invincible_timer: float = 0.0
 var hp_regen_timer: float = 0.0
 var _blink_tween: Tween = null
+var _aura_slowed_enemies: Array[Node] = []
+var _dash_timer: float = 0.0
+var _is_dashing: bool = false
+var _dash_direction: Vector2 = Vector2.ZERO
+var _dash_remaining: float = 0.0
+var _dash_speed: float = 800.0
+var _slow_aura_timer: float = 0.0
 
 @onready var health: HealthComponent = $HealthComponent
 @onready var _weapon_manager: WeaponManager = $WeaponManager
@@ -58,7 +65,28 @@ func _process(delta: float) -> void:
 		if regen_amount > 0:
 			health.heal(regen_amount)
 
-func _physics_process(_delta: float) -> void:
+	# 减速光环
+	if GameData.slow_aura_active:
+		_slow_aura_timer += delta
+		if _slow_aura_timer >= 0.25:
+			_slow_aura_timer = 0.0
+			_apply_slow_aura()
+
+	# 自动冲刺
+	if GameData.auto_dash_active:
+		_update_auto_dash(delta)
+
+func _physics_process(delta: float) -> void:
+	# 冲刺移动覆盖
+	if _is_dashing:
+		velocity = _dash_direction * _dash_speed
+		move_and_slide()
+		_dash_remaining -= _dash_speed * delta
+		if _dash_remaining <= 0:
+			_end_dash()
+		_sprite_animator.update_animation(velocity)
+		return
+
 	var input_vector: Vector2 = Vector2.ZERO
 	input_vector.x = Input.get_axis("move_left", "move_right")
 	input_vector.y = Input.get_axis("move_up", "move_down")
@@ -80,17 +108,26 @@ func _physics_process(_delta: float) -> void:
 func _on_hurtbox_hit(damage: float, _knockback: Vector2) -> void:
 	if invincible_timer > 0:
 		return
-	health.take_damage_no_sparks(damage)
-	_flash_white()
-	invincible_timer = invincible_duration
-	var fx: EffectConfigData = GameConfig.effects
-	EventBus.camera_shake_requested.emit(fx.camera_shake_player_hit_intensity, fx.camera_shake_player_hit_duration)
+	_apply_damage(damage)
 
 # 保留供塔攻击等外部系统调用；投射物伤害通过 Hurtbox 信号处理
 func take_damage(amount: float) -> void:
 	if invincible_timer > 0:
 		return
-	health.take_damage_no_sparks(amount)
+	_apply_damage(amount)
+
+## 处理伤害减免（闪避/护盾/减伤）并应用最终伤害
+func _apply_damage(raw_damage: float) -> void:
+	# 闪避判定
+	if GameData.dodge_chance > 0.0 and randf() < minf(GameData.dodge_chance, 0.75):
+		return
+	# 护盾判定
+	if GameData.current_shield > 0:
+		GameData.current_shield -= 1
+		return
+	# 减伤
+	var final_damage: float = raw_damage * (1.0 - clampf(GameData.damage_reduction, 0.0, 0.9))
+	health.take_damage_no_sparks(final_damage)
 	_flash_white()
 	invincible_timer = invincible_duration
 	var fx: EffectConfigData = GameConfig.effects
@@ -110,6 +147,49 @@ func add_coins(amount: int) -> void:
 func heal_hp(amount: float) -> void:
 	if amount > 0.0:
 		health.heal(amount)
+
+func _update_auto_dash(delta: float) -> void:
+	if _is_dashing:
+		return
+	_dash_timer += delta
+	if _dash_timer >= GameData.auto_dash_interval:
+		_dash_timer = 0.0
+		_start_dash()
+
+func _start_dash() -> void:
+	var input_vec := Vector2(
+		Input.get_axis("move_left", "move_right"),
+		Input.get_axis("move_up", "move_down")
+	)
+	if input_vec.length() > 0:
+		_dash_direction = input_vec.normalized()
+	else:
+		_dash_direction = Vector2.RIGHT.rotated(randf() * TAU)
+	_is_dashing = true
+	_dash_remaining = GameData.auto_dash_distance
+	invincible_timer = GameData.auto_dash_distance / _dash_speed + 0.1
+
+func _end_dash() -> void:
+	_is_dashing = false
+
+func _apply_slow_aura() -> void:
+	var enemies: Array[Node] = get_tree().get_nodes_in_group(Enums.Group.ENEMIES)
+	var still_in_range: Array[Node] = []
+	for enemy in enemies:
+		if not is_instance_valid(enemy) or not enemy is Node2D:
+			continue
+		var dist: float = global_position.distance_to(enemy.global_position)
+		if dist <= GameData.slow_aura_range:
+			still_in_range.append(enemy)
+			if enemy not in _aura_slowed_enemies:
+				if enemy.get("slow_handler") != null:
+					enemy.slow_handler.apply_slow(GameData.slow_aura_ratio)
+	# 移除离开范围的敌人的减速
+	for enemy in _aura_slowed_enemies:
+		if is_instance_valid(enemy) and enemy not in still_in_range:
+			if enemy.get("slow_handler") != null:
+				enemy.slow_handler.remove_slow(GameData.slow_aura_ratio)
+	_aura_slowed_enemies = still_in_range
 
 func _flash_white() -> void:
 	var tween: Tween = EffectsManager.flash_white(self)
