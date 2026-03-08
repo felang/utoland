@@ -22,8 +22,8 @@ func test_result_panel_and_buttons_fit_640x360():
 func test_shop_main_panel_fits_640x360():
 	var scene = load("res://scenes/ui/shop.tscn").instantiate()
 	add_child_autofree(scene)
-	var panel: Control = scene.get_node("VBoxContainer")
-	assert_eq(_control_size(panel), Vector2(560, 300))
+	var panel: Control = scene.get_node("MainPanel")
+	assert_eq(_control_size(panel), Vector2(500, 380))
 
 func test_start_menu_button_uses_standard_size():
 	var scene = load("res://scenes/ui/start_menu.tscn").instantiate()
