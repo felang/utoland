@@ -33,8 +33,8 @@ func _process(delta: float) -> void:
 func _update_hp() -> void:
 	if not player or not is_instance_valid(player):
 		return
-	var current := player.health.current_hp
-	var max_hp := player.health.max_hp
+	var current: float = player.health.current_hp
+	var max_hp: float = player.health.max_hp
 	hp_progress.max_value = max_hp
 	hp_progress.value = current
 	hp_text.text = "%d/%d" % [int(current), int(max_hp)]
