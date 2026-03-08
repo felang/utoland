@@ -18,4 +18,4 @@ func test_shop_item_default_values():
 	var item := ShopItemData.new()
 	assert_eq(item.rarity, Enums.ItemRarity.COMMON)
 	assert_eq(item.max_stack, 1)
-	assert_gt(item.cost_max, 0)
+	assert_eq(item.cost_max, 35)
