@@ -101,6 +101,59 @@ var max_kill_streak: int = 0
 var current_kill_streak: int = 0
 var purchased_item_list: Array[String] = []
 
+## reset() 的唯一真值源 — 所有需要重置的字段及其默认值
+const _DEFAULTS: Dictionary = {
+	"current_wave": 0,
+	"tower_inventory": [],
+	"purchased_towers": [],
+	"pending_heal": 0,
+	"purchased_items": {},
+	"wave_gold_bonus": 0,
+	"pierce_count": 0,
+	"multishot_active": false,
+	"multishot_damage_mult": 1.0,
+	"lifesteal_ratio": 0.0,
+	"kill_stack_count": 0,
+	"kill_stack_max": 0,
+	"kill_stack_damage_per_stack": 0.0,
+	"tower_link_damage_per_tower": 0.0,
+	"wave_tower_heal_ratio": 0.0,
+	"tower_regen_active": false,
+	"tower_regen_hp": 0.0,
+	"tower_regen_interval": 5.0,
+	"symbiosis_hp_threshold": 0.0,
+	"symbiosis_tower_bonus": 0.0,
+	"war_machine_active": false,
+	"war_machine_wave_hp_cost": 0,
+	"tower_hp_mult": 1.0,
+	"tower_range_mult": 1.0,
+	"tower_attack_speed_mult": 1.0,
+	"tower_cost_mult": 1.0,
+	"bullet_speed_mult": 1.0,
+	"weapon_range_mult": 1.0,
+	"crit_chance": 0.0,
+	"crit_damage_mult": 2.0,
+	"split_count": 0,
+	"split_damage_mult": 0.5,
+	"wave_shield_count": 0,
+	"current_shield": 0,
+	"wave_heal_ratio": 0.0,
+	"damage_reduction": 0.0,
+	"dodge_chance": 0.0,
+	"coin_magnet_mult": 1.0,
+	"slow_aura_active": false,
+	"slow_aura_ratio": 0.0,
+	"slow_aura_range": 100.0,
+	"auto_dash_active": false,
+	"auto_dash_interval": 10.0,
+	"auto_dash_distance": 80.0,
+	"total_kills": 0,
+	"total_coins_earned": 0,
+	"total_damage_taken": 0.0,
+	"max_kill_streak": 0,
+	"current_kill_streak": 0,
+}
+
 func _ready() -> void:
 	# 游戏启动时初始化默认角色
 	init_character(current_character)
@@ -142,55 +195,16 @@ func reset() -> void:
 		Enums.Stat.TOWER_MULT: 1.0
 	}
 	coins = GameConfig.PLAYER["initial_coins"]
-	current_wave = 0
-	tower_inventory = []
-	purchased_towers = []
-	pending_heal = 0
-	purchased_items = {}
-	wave_gold_bonus = 0
-	pierce_count = 0
-	multishot_active = false
-	multishot_damage_mult = 1.0
-	lifesteal_ratio = 0.0
-	kill_stack_count = 0
-	kill_stack_max = 0
-	kill_stack_damage_per_stack = 0.0
-	tower_link_damage_per_tower = 0.0
-	wave_tower_heal_ratio = 0.0
-	tower_regen_active = false
-	tower_regen_hp = 0.0
-	tower_regen_interval = 5.0
-	symbiosis_hp_threshold = 0.0
-	symbiosis_tower_bonus = 0.0
-	war_machine_active = false
-	war_machine_wave_hp_cost = 0
-	tower_hp_mult = 1.0
-	tower_range_mult = 1.0
-	tower_attack_speed_mult = 1.0
-	tower_cost_mult = 1.0
-	bullet_speed_mult = 1.0
-	weapon_range_mult = 1.0
-	crit_chance = 0.0
-	crit_damage_mult = 2.0
-	split_count = 0
-	split_damage_mult = 0.5
-	wave_shield_count = 0
-	current_shield = 0
-	wave_heal_ratio = 0.0
-	damage_reduction = 0.0
-	dodge_chance = 0.0
-	coin_magnet_mult = 1.0
-	slow_aura_active = false
-	slow_aura_ratio = 0.0
-	slow_aura_range = 100.0
-	auto_dash_active = false
-	auto_dash_interval = 10.0
-	auto_dash_distance = 80.0
-	total_kills = 0
-	total_coins_earned = 0
-	total_damage_taken = 0.0
-	max_kill_streak = 0
-	current_kill_streak = 0
+
+	# 从 _DEFAULTS 批量重置所有字段（Array/Dictionary 需 duplicate 避免引用共享）
+	for key: String in _DEFAULTS:
+		var val: Variant = _DEFAULTS[key]
+		if val is Array or val is Dictionary:
+			set(key, val.duplicate())
+		else:
+			set(key, val)
+
+	# typed Array[String] 无法放入无类型 Dictionary，单独重置
 	purchased_item_list = []
 
 func record_kill() -> void:
