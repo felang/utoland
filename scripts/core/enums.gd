@@ -37,6 +37,9 @@ class Enemy:
 	const NORMAL = "normal"
 	const FAST = "fast"
 	const TANK = "tank"
+	const BOSS_BRUTE = "boss_brute"
+	const BOSS_SUMMONER = "boss_summoner"
+	const BOSS_GUARDIAN = "boss_guardian"
 
 # 塔类型
 class TowerId:

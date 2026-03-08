@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/enemy_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "boss_brute"
+display_name = "蛮兽"
+hp = 500.0
+speed = 60.0
+damage = 30.0
+coin_drop_min = 15
+coin_drop_max = 25

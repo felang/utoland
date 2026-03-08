@@ -45,7 +45,7 @@ func test_weapon_laser_resource() -> void:
 # ===== 敌人资源加载 =====
 
 func test_enemies_loaded_count() -> void:
-	assert_eq(GameConfig.enemies.size(), 3, "应加载 3 种敌人")
+	assert_eq(GameConfig.enemies.size(), 4, "应加载 4 种敌人")
 
 func test_enemy_normal_resource() -> void:
 	var e: EnemyData = GameConfig.enemies[Enums.Enemy.NORMAL]
