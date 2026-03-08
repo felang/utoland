@@ -230,7 +230,7 @@ func _connect_slot_buy_button(i: int) -> void:
 		buy_btn.pressed.connect(_buy_item.bind(i))
 
 func _connect_slot_lock_button(i: int) -> void:
-	var container := item_containers[i]
+	var container: Node = item_containers[i]
 	var lock_btn_name := "LockButton" if i == 0 else "LockButton" + str(i + 1)
 	if container.has_node(lock_btn_name):
 		container.get_node(lock_btn_name).pressed.connect(_toggle_lock.bind(i))
