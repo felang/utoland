@@ -4,7 +4,7 @@ const VICTORY_DELAY: float = 1.0       # 胜利后跳转延迟（秒）
 const WAVE_CLEANUP_DELAY: float = 2.0   # 波次结束清理延迟（秒）
 const SHOP_TRANSITION_DELAY: float = 1.0 # 进入商店延迟（秒）
 
-var total_waves: int = GameConfig.waves.size()
+var total_waves: int = 0
 var current_wave: int = 0
 var wave_time_left: float = 0.0
 var is_wave_active: bool = false
@@ -16,6 +16,11 @@ func _ready() -> void:
 	EventBus.player_died.connect(_on_player_died)
 	EventBus.enemy_killed.connect(_on_enemy_killed)
 	EventBus.boss_killed.connect(_on_boss_killed)
+	# 按选择的地图加载波次
+	var map_waves: Array = GameConfig.get_waves_for_map(GameData.selected_map)
+	if map_waves.size() > 0:
+		GameConfig.waves = map_waves
+	total_waves = GameConfig.waves.size()
 	if GameData.current_wave > 0:
 		current_wave = GameData.current_wave
 	start_next_wave()

@@ -126,7 +126,8 @@ const SPRITES = {
 var weapons: Dictionary = {}
 var enemies: Dictionary = {}
 var towers: Dictionary = {}
-var waves: Array = []  # Array of WaveData，按 wave_number 排序
+var waves: Array = []  # 当前地图的波次（向后兼容）
+var waves_by_map: Dictionary = {}  # {map_id: Array[WaveData]}
 var characters: Dictionary = {}
 var maps: Dictionary = {}
 var effects: EffectConfigData = null
@@ -139,7 +140,7 @@ func _ready() -> void:
 	_load_resources_from_dir("res://resources/weapons/", weapons)
 	_load_resources_from_dir("res://resources/enemies/", enemies)
 	_load_resources_from_dir("res://resources/towers/", towers)
-	_load_waves("res://resources/waves/")
+	_load_waves_by_map("res://resources/waves/")
 	_load_resources_from_dir("res://resources/characters/", characters)
 	_load_resources_from_dir("res://resources/maps/", maps)
 	effects = load("res://resources/effects/default_effects.tres")
@@ -163,10 +164,32 @@ func _load_resources_from_dir(path: String, target: Dictionary) -> void:
 		file_name = dir.get_next()
 
 
-func _load_waves(path: String) -> void:
+func _load_waves_by_map(base_path: String) -> void:
+	var dir := DirAccess.open(base_path)
+	if not dir:
+		push_error("无法打开波次目录: " + base_path)
+		return
+	dir.list_dir_begin()
+	var entry := dir.get_next()
+	while entry != "":
+		if dir.current_is_dir() and entry != "." and entry != "..":
+			var map_waves: Array = []
+			_load_wave_files(base_path + entry + "/", map_waves)
+			if map_waves.size() > 0:
+				waves_by_map[entry] = map_waves
+		entry = dir.get_next()
+
+	# 向后兼容：如果没有子目录结构，直接从根目录加载
+	if waves_by_map.is_empty():
+		_load_wave_files(base_path, waves)
+	else:
+		# 默认加载 forest
+		if waves_by_map.has("forest"):
+			waves = waves_by_map["forest"]
+
+func _load_wave_files(path: String, target: Array) -> void:
 	var dir := DirAccess.open(path)
 	if not dir:
-		push_error("无法打开波次目录: " + path)
 		return
 	dir.list_dir_begin()
 	var file_name := dir.get_next()
@@ -174,6 +197,11 @@ func _load_waves(path: String) -> void:
 		if file_name.ends_with(".tres"):
 			var res: Resource = load(path + file_name)
 			if res is WaveData:
-				waves.append(res)
+				target.append(res)
 		file_name = dir.get_next()
-	waves.sort_custom(func(a: WaveData, b: WaveData) -> bool: return a.wave_number < b.wave_number)
+	target.sort_custom(func(a: WaveData, b: WaveData) -> bool: return a.wave_number < b.wave_number)
+
+func get_waves_for_map(map_id: String) -> Array:
+	if waves_by_map.has(map_id):
+		return waves_by_map[map_id]
+	return waves

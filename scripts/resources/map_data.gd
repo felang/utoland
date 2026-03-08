@@ -7,3 +7,4 @@ extends Resource
 @export var preview_image: String = ""
 @export var background: String = ""
 @export var fallback_color: String = "#2d5016"
+@export var wave_count: int = 10
