@@ -19,8 +19,8 @@ utoland 是一个基于 **Godot 4.6** 的 2D 塔防 + 射击混合类游戏。�
 
 ### Autoload 单例 (全局可用，加载顺序有依赖)
 
-- **GameConfig** (`scripts/core/game_config.gd`) — 资源注册表，运行时从 `resources/` 目录加载 `.tres` 配置文件（武器、敌人、塔、波次、角色、商店、地图、特效、精灵等）。必须最先加载（GameData 依赖它）。
-- **GameData** (`scripts/core/game_data.gd`) — 运行时游戏状态，存储当前角色属性、金币、波次、已购买的塔等。跨场景传递数据。
+- **GameConfig** (`scripts/core/game_config.gd`) — 资源注册表，运行时从 `resources/` 目录加载 `.tres` 配置文件（武器、敌人、塔、波次、角色、商店物品、地图、特效、精灵等）。必须最先加载（GameData 依赖它）。
+- **GameData** (`scripts/core/game_data.gd`) — 运行时游戏状态，存储当前角色属性、金币、波次、已购买物品效果状态（pierce_count、multishot_active、lifesteal_ratio 等）、塔属性倍率等。跨场景传递数据。
 - **SceneFactory** (`scripts/core/scene_factory.gd`) — 集中管理场景实例化，提供 `create_tower()`, `create_enemy()`, `create_bullet()`, `create_coin()` 等工厂方法。创建实体必须通过此工厂。
 - **EffectsManager** (`scripts/systems/effects_manager.gd`) — 特效管理：伤害数字、击中火花、死亡爆炸、闪白等视觉效果。
 - **EventBus** (`scripts/core/event_bus.gd`) — 全局事件总线，用于跨系统解耦通信（如波次事件、商店事件等）。
@@ -40,11 +40,11 @@ start_menu → character_selection → map_select → main (战斗)
 
 - `scripts/core/` — 核心系统 (GameConfig, GameData, SceneFactory, EventBus, SpriteLoader)
 - `scripts/components/` — 可复用组件 (HealthComponent, SpriteAnimator, Hitbox, Hurtbox, KnockbackHandler, SlowHandler)
-- `scripts/resources/` — 自定义 Resource 类定义 (WeaponData, EnemyData, TowerData, WaveData, CharacterData 等)
+- `scripts/resources/` — 自定义 Resource 类定义 (WeaponData, EnemyData, TowerData, WaveData, CharacterData, ShopItemData 等)
 - `scripts/entities/` — 游戏实体 (player, enemy, coin, towers/, weapons/, projectiles/)
-- `scripts/systems/` — 游戏系统 (wave_manager, enemy_spawner, shop_manager, effects_manager)
+- `scripts/systems/` — 游戏系统 (wave_manager, enemy_spawner, shop_manager, effects_manager, item_effect_manager)
 - `scripts/ui/` — UI 脚本 (hud, start_menu, result, 各选择界面, main 场景控制)
-- `resources/` — `.tres` 配置数据文件 (weapons/, enemies/, towers/, waves/, characters/, maps/, shop/, effects/, spawn/)
+- `resources/` — `.tres` 配置数据文件 (weapons/, enemies/, towers/, waves/, characters/, maps/, shop/, effects/, spawn/, items/)
 - `scenes/entities/` — 实体场景 (player, coin, enemies/, towers/, projectiles/)
 - `scenes/levels/` — 关卡场景 (main, placement)
 - `scenes/ui/` — UI 场景 (start_menu, hud, shop, result, character_selection, map_select)
@@ -91,6 +91,7 @@ start_menu → character_selection → map_select → main (战斗)
 - 核心模块必须有单元测试，新功能/bugfix 必须附带测试
 - 文件：`test_<模块>.gd`，方法：`test_<行为描述>()`，继承 `GutTest`
 - Bug 修复先写失败测试再修复（TDD）
+- **headless 测试注意**: 新增带 `class_name` 的脚本后，若无法打开 Godot 编辑器自动刷新，需手动在 `.godot/global_script_class_cache.cfg` 中补充对应条目，否则 headless 测试无法识别该类名
 
 ## MCP 插件
 
