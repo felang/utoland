@@ -7,6 +7,11 @@ var invincible_timer: float = 0.0
 var hp_regen_timer: float = 0.0
 var _blink_tween: Tween = null
 var _aura_slowed_enemies: Array[Node] = []
+var _dash_timer: float = 0.0
+var _is_dashing: bool = false
+var _dash_direction: Vector2 = Vector2.ZERO
+var _dash_remaining: float = 0.0
+var _dash_speed: float = 800.0
 
 @onready var health: HealthComponent = $HealthComponent
 @onready var _weapon_manager: WeaponManager = $WeaponManager
@@ -63,7 +68,21 @@ func _process(delta: float) -> void:
 	if GameData.slow_aura_active:
 		_apply_slow_aura()
 
-func _physics_process(_delta: float) -> void:
+	# 自动冲刺
+	if GameData.auto_dash_active:
+		_update_auto_dash(delta)
+
+func _physics_process(delta: float) -> void:
+	# 冲刺移动覆盖
+	if _is_dashing:
+		velocity = _dash_direction * _dash_speed
+		move_and_slide()
+		_dash_remaining -= _dash_speed * delta
+		if _dash_remaining <= 0:
+			_end_dash()
+		_sprite_animator.update_animation(velocity)
+		return
+
 	var input_vector: Vector2 = Vector2.ZERO
 	input_vector.x = Input.get_axis("move_left", "move_right")
 	input_vector.y = Input.get_axis("move_up", "move_down")
@@ -130,6 +149,30 @@ func add_coins(amount: int) -> void:
 func heal_hp(amount: float) -> void:
 	if amount > 0.0:
 		health.heal(amount)
+
+func _update_auto_dash(delta: float) -> void:
+	if _is_dashing:
+		return
+	_dash_timer += delta
+	if _dash_timer >= GameData.auto_dash_interval:
+		_dash_timer = 0.0
+		_start_dash()
+
+func _start_dash() -> void:
+	var input_vec := Vector2(
+		Input.get_axis("move_left", "move_right"),
+		Input.get_axis("move_up", "move_down")
+	)
+	if input_vec.length() > 0:
+		_dash_direction = input_vec.normalized()
+	else:
+		_dash_direction = Vector2.RIGHT.rotated(randf() * TAU)
+	_is_dashing = true
+	_dash_remaining = GameData.auto_dash_distance
+	invincible_timer = GameData.auto_dash_distance / _dash_speed + 0.1
+
+func _end_dash() -> void:
+	_is_dashing = false
 
 func _apply_slow_aura() -> void:
 	var enemies: Array[Node] = get_tree().get_nodes_in_group(Enums.Group.ENEMIES)
