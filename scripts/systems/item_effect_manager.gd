@@ -9,6 +9,10 @@ extends Node
 
 var _regen_timer: float = 0.0
 
+func _ready() -> void:
+	EventBus.wave_completed.connect(_on_wave_completed)
+	EventBus.wave_started.connect(_on_wave_started)
+
 func _process(delta: float) -> void:
 	# 纳米修复：战斗中塔定时自愈
 	if not GameData.tower_regen_active:
@@ -20,10 +24,6 @@ func _process(delta: float) -> void:
 		for tower in towers:
 			if tower.get("health") != null:
 				tower.health.heal(GameData.tower_regen_hp)
-
-func _ready() -> void:
-	EventBus.wave_completed.connect(_on_wave_completed)
-	EventBus.wave_started.connect(_on_wave_started)
 
 func _on_wave_completed(wave_number: int) -> void:
 	# 金矿：给玩家加金币

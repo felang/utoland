@@ -3,9 +3,14 @@ extends Node
 # 特效管理器 — 统一管理伤害数字、击中火花、死亡爆炸等视觉特效
 # 作为 Autoload 单例全局可用
 
+const FLASH_WHITE_COLOR := Color(2, 2, 2, 1)         # 闪白叠加颜色
+const HIT_SPARK_SIZE := Vector2(2, 2)                  # 击中火花粒子尺寸
+const DEATH_PARTICLE_SIZE := Vector2(3, 3)             # 死亡粒子尺寸
+const GRAVITY_FACTOR: float = 0.5                      # 重力位移公式的 1/2 系数
+
 func flash_white(node: Node2D) -> Tween:
 	var original_modulate: Color = node.modulate
-	node.modulate = Color(2, 2, 2, 1)
+	node.modulate = FLASH_WHITE_COLOR
 	var tween: Tween = create_tween()
 	tween.tween_property(node, "modulate", original_modulate, GameConfig.effects.hit_flash_duration)
 	return tween
@@ -50,8 +55,8 @@ func spawn_hit_sparks(pos: Vector2, color: Color = Color.YELLOW) -> void:
 	var fx: EffectConfigData = GameConfig.effects
 	for i in fx.hit_spark_count:
 		var spark: ColorRect = ColorRect.new()
-		spark.size = Vector2(2, 2)
-		spark.position = pos - Vector2(1, 1)
+		spark.size = HIT_SPARK_SIZE
+		spark.position = pos - HIT_SPARK_SIZE / 2
 		spark.color = color
 		spark.z_index = fx.hit_spark_z_index
 		var tree: SceneTree = get_tree()
@@ -66,7 +71,7 @@ func spawn_hit_sparks(pos: Vector2, color: Color = Color.YELLOW) -> void:
 
 		var tween: Tween = create_tween()
 		tween.set_parallel(true)
-		tween.tween_property(spark, "position", target - Vector2(1, 1), fx.hit_spark_lifetime)
+		tween.tween_property(spark, "position", target - HIT_SPARK_SIZE / 2, fx.hit_spark_lifetime)
 		tween.tween_property(spark, "modulate:a", 0.0, fx.hit_spark_lifetime)
 		tween.set_parallel(false)
 		tween.tween_callback(spark.queue_free)
@@ -75,8 +80,8 @@ func spawn_death_effect(pos: Vector2, entity_color: Color) -> void:
 	var fx: EffectConfigData = GameConfig.effects
 	for i in fx.death_particle_count:
 		var particle: ColorRect = ColorRect.new()
-		particle.size = Vector2(3, 3)
-		particle.position = pos - Vector2(1.5, 1.5)
+		particle.size = DEATH_PARTICLE_SIZE
+		particle.position = pos - DEATH_PARTICLE_SIZE / 2
 		particle.color = entity_color
 		particle.z_index = fx.death_particle_z_index
 
@@ -90,11 +95,11 @@ func spawn_death_effect(pos: Vector2, entity_color: Color) -> void:
 		var speed: float = randf_range(fx.death_particle_speed_min, fx.death_particle_speed_max)
 		var spread_dir: Vector2 = Vector2.from_angle(angle)
 		var target: Vector2 = pos + spread_dir * speed * fx.death_particle_lifetime
-		target.y += fx.death_particle_gravity * fx.death_particle_lifetime * fx.death_particle_lifetime * 0.5
+		target.y += fx.death_particle_gravity * fx.death_particle_lifetime * fx.death_particle_lifetime * GRAVITY_FACTOR
 
 		var tween: Tween = create_tween()
 		tween.set_parallel(true)
-		tween.tween_property(particle, "position", target - Vector2(1.5, 1.5), fx.death_particle_lifetime).set_ease(Tween.EASE_OUT)
+		tween.tween_property(particle, "position", target - DEATH_PARTICLE_SIZE / 2, fx.death_particle_lifetime).set_ease(Tween.EASE_OUT)
 		tween.tween_property(particle, "modulate:a", 0.0, fx.death_particle_lifetime * 0.5).set_delay(fx.death_particle_lifetime * 0.5)
 		tween.set_parallel(false)
 		tween.tween_callback(particle.queue_free)

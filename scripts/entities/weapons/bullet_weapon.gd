@@ -2,6 +2,8 @@
 class_name BulletWeapon
 extends Weapon
 
+const MULTISHOT_SPREAD_ANGLES: Array[float] = [-15.0, 0.0, 15.0]  # 弹幕各发偏转角度（度）
+
 func _get_tower_link_bonus() -> float:
 	if GameData.tower_link_damage_per_tower <= 0.0:
 		return 1.0
@@ -34,7 +36,7 @@ func fire(target: Node2D) -> void:
 
 	# 弹幕：激活时发射 3 发，各偏转 -15°/0°/+15°，每发伤害乘以倍率
 	if GameData.multishot_active:
-		for angle_offset: float in [-15.0, 0.0, 15.0]:
+		for angle_offset: float in MULTISHOT_SPREAD_ANGLES:
 			var rotated_dir: Vector2 = base_dir.rotated(deg_to_rad(angle_offset))
 			_spawn_bullet(scene_parent, rotated_dir, base_damage * GameData.multishot_damage_mult)
 	else:

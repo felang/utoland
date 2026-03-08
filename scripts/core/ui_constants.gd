@@ -28,6 +28,7 @@ const FONT_SIZE_TITLE := 32
 const FONT_SIZE_SUBTITLE := 24
 const FONT_SIZE_BODY := 18
 const FONT_SIZE_SMALL := 14
+const FONT_SIZE_TINY := 12
 
 # ===== 间距 =====
 const MARGIN_SCREEN := 12
@@ -38,6 +39,10 @@ const GAP_SECTIONS := 20
 # ===== 圆角 =====
 const CORNER_RADIUS_BUTTON := 8
 const CORNER_RADIUS_PANEL := 12
+
+# ===== 按钮内边距 =====
+const BUTTON_PADDING_H := 12
+const BUTTON_PADDING_V := 8
 
 # ===== 辅助方法 =====
 
@@ -76,8 +81,8 @@ static func create_button_stylebox(color: Color, corner := CORNER_RADIUS_BUTTON)
 	style.corner_radius_top_right = corner
 	style.corner_radius_bottom_left = corner
 	style.corner_radius_bottom_right = corner
-	style.content_margin_left = 12
-	style.content_margin_right = 12
-	style.content_margin_top = 8
-	style.content_margin_bottom = 8
+	style.content_margin_left = BUTTON_PADDING_H
+	style.content_margin_right = BUTTON_PADDING_H
+	style.content_margin_top = BUTTON_PADDING_V
+	style.content_margin_bottom = BUTTON_PADDING_V
 	return style

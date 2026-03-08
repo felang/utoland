@@ -2,6 +2,8 @@ extends CharacterBody2D
 
 enum State { CHASE_PLAYER, ATTACK_TOWER }
 
+const COIN_SCATTER_RANGE: float = 20.0  # 金币掉落散布范围（像素）
+
 # 由 SceneFactory 注入的 Resource 数据
 var data: EnemyData = null
 
@@ -103,7 +105,7 @@ func _drop_coins() -> void:
 	var coin_count: int = randi_range(data.coin_drop_min, data.coin_drop_max)
 	for i in coin_count:
 		var coin = SceneFactory.create_coin()
-		coin.global_position = global_position + Vector2(randf_range(-20, 20), randf_range(-20, 20))
+		coin.global_position = global_position + Vector2(randf_range(-COIN_SCATTER_RANGE, COIN_SCATTER_RANGE), randf_range(-COIN_SCATTER_RANGE, COIN_SCATTER_RANGE))
 		parent.call_deferred("add_child", coin)
 
 func apply_knockback(dir: Vector2) -> void:

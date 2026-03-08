@@ -1,5 +1,13 @@
 extends CharacterBody2D
 
+const MAX_DODGE_CHANCE: float = 0.75          # 闪避率上限
+const MAX_DAMAGE_REDUCTION: float = 0.9       # 减伤比例上限
+const SLOW_AURA_TICK_INTERVAL: float = 0.25   # 减速光环检测间隔（秒）
+const DASH_SPEED: float = 800.0               # 冲刺速度（像素/秒）
+const DASH_INVINCIBLE_BUFFER: float = 0.1     # 冲刺无敌额外时间（秒）
+const DEATH_TRANSITION_DELAY: float = 1.0     # 死亡后跳转延迟（秒）
+const BLINK_RESET_DURATION: float = 0.01      # 闪烁结束后恢复透明度时间
+
 var speed: float = 0.0  # 从 GameData 初始化
 @export var invincible_duration: float = 0.5
 var coins: int = 0
@@ -11,7 +19,6 @@ var _dash_timer: float = 0.0
 var _is_dashing: bool = false
 var _dash_direction: Vector2 = Vector2.ZERO
 var _dash_remaining: float = 0.0
-var _dash_speed: float = 800.0
 var _slow_aura_timer: float = 0.0
 
 @onready var health: HealthComponent = $HealthComponent
@@ -68,7 +75,7 @@ func _process(delta: float) -> void:
 	# 减速光环
 	if GameData.slow_aura_active:
 		_slow_aura_timer += delta
-		if _slow_aura_timer >= 0.25:
+		if _slow_aura_timer >= SLOW_AURA_TICK_INTERVAL:
 			_slow_aura_timer = 0.0
 			_apply_slow_aura()
 
@@ -79,9 +86,9 @@ func _process(delta: float) -> void:
 func _physics_process(delta: float) -> void:
 	# 冲刺移动覆盖
 	if _is_dashing:
-		velocity = _dash_direction * _dash_speed
+		velocity = _dash_direction * DASH_SPEED
 		move_and_slide()
-		_dash_remaining -= _dash_speed * delta
+		_dash_remaining -= DASH_SPEED * delta
 		if _dash_remaining <= 0:
 			_end_dash()
 		_sprite_animator.update_animation(velocity)
@@ -119,14 +126,14 @@ func take_damage(amount: float) -> void:
 ## 处理伤害减免（闪避/护盾/减伤）并应用最终伤害
 func _apply_damage(raw_damage: float) -> void:
 	# 闪避判定
-	if GameData.dodge_chance > 0.0 and randf() < minf(GameData.dodge_chance, 0.75):
+	if GameData.dodge_chance > 0.0 and randf() < minf(GameData.dodge_chance, MAX_DODGE_CHANCE):
 		return
 	# 护盾判定
 	if GameData.current_shield > 0:
 		GameData.current_shield -= 1
 		return
 	# 减伤
-	var final_damage: float = raw_damage * (1.0 - clampf(GameData.damage_reduction, 0.0, 0.9))
+	var final_damage: float = raw_damage * (1.0 - clampf(GameData.damage_reduction, 0.0, MAX_DAMAGE_REDUCTION))
 	health.take_damage_no_sparks(final_damage)
 	GameData.record_damage_taken(final_damage)
 	_flash_white()
@@ -138,7 +145,7 @@ func _on_died() -> void:
 	print("Player died!")
 	GameData.reset_kill_streak()
 	EventBus.player_died.emit()
-	await get_tree().create_timer(1.0).timeout
+	await get_tree().create_timer(DEATH_TRANSITION_DELAY).timeout
 	SceneManager.go_to(Enums.Scene.RESULT)
 
 func add_coins(amount: int) -> void:
@@ -169,7 +176,7 @@ func _start_dash() -> void:
 		_dash_direction = Vector2.RIGHT.rotated(randf() * TAU)
 	_is_dashing = true
 	_dash_remaining = GameData.auto_dash_distance
-	invincible_timer = GameData.auto_dash_distance / _dash_speed + 0.1
+	invincible_timer = GameData.auto_dash_distance / DASH_SPEED + DASH_INVINCIBLE_BUFFER
 
 func _end_dash() -> void:
 	_is_dashing = false
@@ -206,4 +213,4 @@ func _start_invincible_blink() -> void:
 	for i in blink_count:
 		_blink_tween.tween_property(self, "modulate:a", fx.invincible_blink_alpha_low, fx.invincible_blink_interval)
 		_blink_tween.tween_property(self, "modulate:a", fx.invincible_blink_alpha_high, fx.invincible_blink_interval)
-	_blink_tween.tween_property(self, "modulate:a", 1.0, 0.01)
+	_blink_tween.tween_property(self, "modulate:a", 1.0, BLINK_RESET_DURATION)

@@ -96,7 +96,7 @@ func _update_ui() -> void:
 	if not coin_label:
 		return
 	coin_label.text = "金币: %d" % GameData.coins
-	wave_label.text = "Wave %d/10" % (GameData.current_wave + 1)
+	wave_label.text = "Wave %d/%d" % [GameData.current_wave + 1, GameConfig.waves.size()]
 	var refresh_cost := _get_refresh_cost()
 	refresh_button.disabled = GameData.coins < refresh_cost
 	refresh_button.text = "刷新 (%d)" % refresh_cost

@@ -44,7 +44,7 @@ func spawn_enemy() -> void:
 func get_random_spawn_position() -> Vector2:
 	var spawn_pos = Vector2.ZERO
 	var attempts = 0
-	var max_attempts = 10
+	var max_attempts: int = GameConfig.spawn.max_spawn_attempts if GameConfig.spawn else 10
 
 	while attempts < max_attempts:
 		spawn_pos.x = randf_range(map_min_x, map_max_x)

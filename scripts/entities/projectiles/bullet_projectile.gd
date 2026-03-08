@@ -3,6 +3,11 @@
 class_name BulletProjectile
 extends Projectile
 
+const SPLIT_SPEED_MULT: float = 0.8           # 分裂弹速度倍率
+const SPLIT_LIFETIME: float = 1.5             # 分裂弹存活时间（秒）
+const SPLIT_KNOCKBACK_MULT: float = 0.5       # 分裂弹击退倍率
+const SPLIT_SPREAD_ANGLE: float = PI / 2      # 分裂弹扩散角度（弧度，±90°）
+
 var speed: float = 600.0
 var lifetime: float = 5.0
 var _elapsed: float = 0.0
@@ -54,14 +59,14 @@ func _spawn_split_bullets() -> void:
 		return
 	var split_damage: float = hitbox.damage * GameData.split_damage_mult
 	for i in GameData.split_count:
-		var angle: float = randf_range(-PI / 2, PI / 2)
+		var angle: float = randf_range(-SPLIT_SPREAD_ANGLE, SPLIT_SPREAD_ANGLE)
 		var split_dir: Vector2 = _direction.rotated(angle)
 		var split_bullet: BulletProjectile = SceneFactory.create_bullet_projectile()
-		split_bullet.speed = speed * 0.8
-		split_bullet.lifetime = 1.5
+		split_bullet.speed = speed * SPLIT_SPEED_MULT
+		split_bullet.lifetime = SPLIT_LIFETIME
 		split_bullet.set_meta("is_split", true)
 		scene_parent.add_child(split_bullet)
-		split_bullet.setup(split_damage, hitbox.knockback_force * 0.5, global_position, split_dir)
+		split_bullet.setup(split_damage, hitbox.knockback_force * SPLIT_KNOCKBACK_MULT, global_position, split_dir)
 
 func _on_hitbox_area_entered(area: Area2D) -> void:
 	if area is Hurtbox:

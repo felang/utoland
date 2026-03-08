@@ -3,7 +3,8 @@ extends Control
 func _ready() -> void:
 	$Background.color = Color(0, 0, 0, 0.85)
 	var vbox := $CenterContainer/VBoxContainer
-	var is_victory := GameData.current_wave > 10
+	var total_waves := GameConfig.waves.size()
+	var is_victory := GameData.current_wave > total_waves
 
 	# 标题
 	var title: Label = vbox.get_node("TitleLabel")
@@ -14,11 +15,11 @@ func _ready() -> void:
 	# 波次进度条
 	var wave_label: Label = vbox.get_node("WaveProgress/WaveLabel")
 	var wave_bar: ProgressBar = vbox.get_node("WaveProgress/WaveBar")
-	wave_label.text = "存活波次: %d/10" % mini(GameData.current_wave, 10)
+	wave_label.text = "存活波次: %d/%d" % [mini(GameData.current_wave, total_waves), total_waves]
 	wave_label.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_BODY)
 	wave_label.add_theme_color_override("font_color", UIConstants.COLOR_TEXT_PRIMARY)
-	wave_bar.max_value = 10
-	wave_bar.value = mini(GameData.current_wave, 10)
+	wave_bar.max_value = total_waves
+	wave_bar.value = mini(GameData.current_wave, total_waves)
 
 	# 统计面板
 	var stats_panel: PanelContainer = vbox.get_node("StatsPanel")

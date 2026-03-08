@@ -1,5 +1,9 @@
 extends Node
 
+const VICTORY_DELAY: float = 1.0       # 胜利后跳转延迟（秒）
+const WAVE_CLEANUP_DELAY: float = 2.0   # 波次结束清理延迟（秒）
+const SHOP_TRANSITION_DELAY: float = 1.0 # 进入商店延迟（秒）
+
 var total_waves: int = GameConfig.waves.size()
 var current_wave: int = 0
 var wave_time_left: float = 0.0
@@ -25,7 +29,7 @@ func start_next_wave() -> void:
 	if current_wave > total_waves:
 		EventBus.game_won.emit()
 		print("Victory! You completed all waves!")
-		await get_tree().create_timer(1.0).timeout
+		await get_tree().create_timer(VICTORY_DELAY).timeout
 		SceneManager.go_to(Enums.Scene.RESULT)
 		return
 
@@ -40,12 +44,12 @@ func start_next_wave() -> void:
 func complete_wave() -> void:
 	is_wave_active = false
 	attract_all_coins()
-	await get_tree().create_timer(2.0).timeout
+	await get_tree().create_timer(WAVE_CLEANUP_DELAY).timeout
 	clear_all_enemies()
 	EventBus.wave_completed.emit(current_wave)
 	print("Wave ", current_wave, " completed!")
 
-	await get_tree().create_timer(1.0).timeout
+	await get_tree().create_timer(SHOP_TRANSITION_DELAY).timeout
 	SceneManager.go_to(Enums.Scene.SHOP)
 
 func attract_all_coins() -> void:

@@ -73,8 +73,8 @@ func _apply_base_style() -> void:
 	name_label.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_BODY)
 	for label in [hp_label, speed_label, damage_label]:
 		label.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_SMALL)
-	affinity_label.add_theme_font_size_override("font_size", 12)
+	affinity_label.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_TINY)
 	affinity_label.add_theme_color_override("font_color", UIConstants.COLOR_TEXT_SECONDARY)
 	affinity_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-	weapon_label.add_theme_font_size_override("font_size", 12)
+	weapon_label.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_TINY)
 	weapon_label.add_theme_color_override("font_color", UIConstants.COLOR_TEXT_SECONDARY)

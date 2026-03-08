@@ -1,5 +1,12 @@
 extends CanvasLayer
 
+const HP_COLOR_HIGH_THRESHOLD: float = 0.6   # HP比例 > 此值显示绿色
+const HP_COLOR_LOW_THRESHOLD: float = 0.3    # HP比例 > 此值显示黄色，否则红色
+const TIMER_WARNING_SECONDS: int = 5         # 倒计时最后N秒变红
+const BUFF_CORNER_RADIUS: int = 6            # 增益标签圆角
+const BUFF_PADDING_H: int = 6               # 增益标签水平内边距
+const BUFF_PADDING_V: int = 2               # 增益标签垂直内边距
+
 @onready var hp_progress: ProgressBar = $TopBar/MarginContainer/HBoxContainer/HPBar/HPProgress
 @onready var hp_text: Label = $TopBar/MarginContainer/HBoxContainer/HPBar/HPText
 @onready var hp_icon: Label = $TopBar/MarginContainer/HBoxContainer/HPBar/HPIcon
@@ -41,9 +48,9 @@ func _update_hp() -> void:
 	# HP 颜色编码：绿 → 黄 → 红
 	var ratio := current / max_hp if max_hp > 0 else 0.0
 	var color: Color
-	if ratio > 0.6:
+	if ratio > HP_COLOR_HIGH_THRESHOLD:
 		color = UIConstants.COLOR_POSITIVE
-	elif ratio > 0.3:
+	elif ratio > HP_COLOR_LOW_THRESHOLD:
 		color = UIConstants.COLOR_GOLD
 	else:
 		color = UIConstants.COLOR_ACCENT_DANGER
@@ -60,9 +67,9 @@ func _update_timer(delta: float) -> void:
 			_wave_time_left = 0.0
 	var seconds := int(_wave_time_left)
 	timer_display.text = "%ds" % seconds
-	wave_display.text = "Wave %d/10" % GameData.current_wave
+	wave_display.text = "Wave %d/%d" % [GameData.current_wave, GameConfig.waves.size()]
 	# 最后 5 秒变红
-	if _is_wave_active and seconds <= 5:
+	if _is_wave_active and seconds <= TIMER_WARNING_SECONDS:
 		timer_display.add_theme_color_override("font_color", UIConstants.COLOR_ACCENT_DANGER)
 	else:
 		timer_display.add_theme_color_override("font_color", UIConstants.COLOR_TEXT_PRIMARY)
@@ -137,14 +144,14 @@ func _update_buffs() -> void:
 		var panel := PanelContainer.new()
 		var style := StyleBoxFlat.new()
 		style.bg_color = Color(0.0, 0.0, 0.0, 0.6)
-		style.corner_radius_top_left = 6
-		style.corner_radius_top_right = 6
-		style.corner_radius_bottom_left = 6
-		style.corner_radius_bottom_right = 6
-		style.content_margin_left = 6
-		style.content_margin_right = 6
-		style.content_margin_top = 2
-		style.content_margin_bottom = 2
+		style.corner_radius_top_left = BUFF_CORNER_RADIUS
+		style.corner_radius_top_right = BUFF_CORNER_RADIUS
+		style.corner_radius_bottom_left = BUFF_CORNER_RADIUS
+		style.corner_radius_bottom_right = BUFF_CORNER_RADIUS
+		style.content_margin_left = BUFF_PADDING_H
+		style.content_margin_right = BUFF_PADDING_H
+		style.content_margin_top = BUFF_PADDING_V
+		style.content_margin_bottom = BUFF_PADDING_V
 		panel.add_theme_stylebox_override("panel", style)
 		panel.add_child(label)
 		buff_container.add_child(panel)

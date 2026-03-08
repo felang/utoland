@@ -1,5 +1,7 @@
 extends Area2D
 
+const FORCE_ATTRACT_SPEED_MULT: float = 1.6  # 波次结束强制吸引时的速度倍率
+
 @export var value: int = 1
 @export var attract_speed: float = 500.0
 @export var attract_range: float = 150.0
@@ -43,4 +45,4 @@ func _play_pickup_effect() -> void:
 
 func force_attract() -> void:
 	is_attracted = true
-	attract_speed = attract_speed * 1.6
+	attract_speed = attract_speed * FORCE_ATTRACT_SPEED_MULT
