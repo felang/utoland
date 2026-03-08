@@ -65,11 +65,16 @@ func set_selected(is_selected: bool) -> void:
 
 func _apply_base_style() -> void:
 	var style := UIConstants.create_panel_stylebox()
+	style.content_margin_left = 8
+	style.content_margin_right = 8
+	style.content_margin_top = 8
+	style.content_margin_bottom = 8
 	add_theme_stylebox_override("panel", style)
-	name_label.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_SUBTITLE)
+	name_label.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_BODY)
 	for label in [hp_label, speed_label, damage_label]:
-		label.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_BODY)
-	affinity_label.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_SMALL)
+		label.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_SMALL)
+	affinity_label.add_theme_font_size_override("font_size", 12)
 	affinity_label.add_theme_color_override("font_color", UIConstants.COLOR_TEXT_SECONDARY)
-	weapon_label.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_SMALL)
+	affinity_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	weapon_label.add_theme_font_size_override("font_size", 12)
 	weapon_label.add_theme_color_override("font_color", UIConstants.COLOR_TEXT_SECONDARY)

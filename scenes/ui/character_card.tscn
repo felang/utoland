@@ -3,14 +3,14 @@
 [ext_resource type="Script" path="res://scripts/ui/character_card.gd" id="1_script"]
 
 [node name="CharacterCard" type="PanelContainer"]
-custom_minimum_size = Vector2(160, 240)
+custom_minimum_size = Vector2(130, 220)
 script = ExtResource("1_script")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
 theme_override_constants/separation = 4
 
 [node name="PortraitRect" type="ColorRect" parent="VBoxContainer"]
-custom_minimum_size = Vector2(140, 50)
+custom_minimum_size = Vector2(110, 50)
 color = Color(0.15, 0.15, 0.25, 1)
 
 [node name="NameLabel" type="Label" parent="VBoxContainer"]
