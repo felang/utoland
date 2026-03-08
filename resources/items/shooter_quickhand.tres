@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ShopItemData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/shop_item_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "quick_hand"
+display_name = "快手"
+description = "攻击速度+20%"
+tags = PackedStringArray("shooter")
+rarity = "common"
+effect_type = "stat_boost"
+effect_params = {"stat": "attack_speed_mult", "value": 0.2}
+cost_min = 20
+cost_max = 30
+max_stack = 3

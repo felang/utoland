@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ShopItemData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/shop_item_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "nano_regen"
+display_name = "纳米修复"
+description = "战斗中塔每5秒自动回复5HP"
+tags = PackedStringArray("engineer")
+rarity = "rare"
+effect_type = "tower_regen"
+effect_params = {"hp_per_interval": 5, "interval": 5.0}
+cost_min = 45
+cost_max = 60
+max_stack = 1

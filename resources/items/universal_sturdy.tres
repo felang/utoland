@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ShopItemData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/shop_item_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "sturdy"
+display_name = "强壮"
+description = "玩家HP+15%，塔HP+15%"
+tags = PackedStringArray("universal")
+rarity = "common"
+effect_type = "tower_stat"
+effect_params = {"stats": [{"stat": "hp_mult", "value": 0.15}, {"stat": "tower_hp_mult", "value": 0.15}]}
+cost_min = 22
+cost_max = 32
+max_stack = 2

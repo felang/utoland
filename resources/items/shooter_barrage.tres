@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ShopItemData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/shop_item_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "barrage"
+display_name = "弹幕"
+description = "同时发射3发，单发伤害-25%"
+tags = PackedStringArray("shooter")
+rarity = "rare"
+effect_type = "multishot"
+effect_params = {"count": 3, "damage_mult": 0.75}
+cost_min = 45
+cost_max = 60
+max_stack = 1
