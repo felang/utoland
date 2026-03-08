@@ -1,56 +1,56 @@
 extends Control
+## 角色选择界面 — 数据驱动，从 GameConfig.characters 生成卡片
 
-# 角色选择界面 — 数据驱动，从 GameConfig.characters 生成卡片
+const CARD_SCENE = preload("res://scenes/ui/character_card.tscn")
 
-@onready var _container: HBoxContainer = $CharacterContainer
+@onready var _container: HBoxContainer = $VBoxContainer/CardContainer
+@onready var _desc_label: Label = $VBoxContainer/DescPanel/DescLabel
+@onready var _back_button: Button = $VBoxContainer/BackButton
+
+var _cards: Array = []
+
 
 func _ready() -> void:
-	# 清除编辑器中的占位节点
+	# 背景与标题样式
+	$Background.color = UIConstants.COLOR_BG_PRIMARY
+	$VBoxContainer/TitleLabel.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_TITLE)
+	$VBoxContainer/TitleLabel.add_theme_color_override("font_color", UIConstants.COLOR_TEXT_PRIMARY)
+
+	# 描述面板样式
+	_desc_label.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_SMALL)
+	_desc_label.add_theme_color_override("font_color", UIConstants.COLOR_TEXT_SECONDARY)
+	$VBoxContainer/DescPanel.add_theme_stylebox_override("panel", UIConstants.create_panel_stylebox())
+
+	# 返回按钮
+	_back_button.pressed.connect(func(): SceneManager.go_to(Enums.Scene.START_MENU))
+	_back_button.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_SMALL)
+
+	# 清除并生成卡片
 	for child in _container.get_children():
 		child.queue_free()
-
-	# 从 GameConfig 动态生成角色卡片
+	_cards.clear()
 	for character_id in GameConfig.characters:
 		var char_data: CharacterData = GameConfig.characters[character_id]
 		var weapon_data: WeaponData = GameConfig.weapons[char_data.default_weapon]
-		_container.add_child(_create_card(character_id, char_data, weapon_data))
+		var card = CARD_SCENE.instantiate()
+		_container.add_child(card)
+		card.setup(character_id, char_data, weapon_data)
+		card.selected.connect(_on_character_selected)
+		card.mouse_entered.connect(_on_card_hovered.bind(character_id))
+		_cards.append(card)
 
 
-func _create_card(character_id: String, char_data: CharacterData, weapon_data: WeaponData) -> PanelContainer:
-	var card := PanelContainer.new()
-	card.custom_minimum_size = Vector2(160, 180)
-
-	var vbox := VBoxContainer.new()
-	card.add_child(vbox)
-
-	# 角色名称
-	var name_label := Label.new()
-	name_label.text = char_data.display_name
-	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	vbox.add_child(name_label)
-
-	# 属性信息
-	var stats_label := Label.new()
-	stats_label.text = "生命: %d\n速度: %d\n伤害: x%.1f" % [
-		int(char_data.max_hp), int(char_data.speed), char_data.damage_mult
-	]
-	vbox.add_child(stats_label)
-
-	# 武器名称
-	var weapon_label := Label.new()
-	weapon_label.text = "武器: " + weapon_data.display_name
-	vbox.add_child(weapon_label)
-
-	# 选择按钮
-	var button := Button.new()
-	button.text = "选择"
-	button.pressed.connect(_on_character_selected.bind(character_id))
-	vbox.add_child(button)
-
-	return card
+func _on_card_hovered(character_id: String) -> void:
+	var char_data: CharacterData = GameConfig.characters[character_id]
+	if char_data.passive_description != "":
+		_desc_label.text = char_data.passive_description
+	else:
+		_desc_label.text = char_data.display_name
 
 
 func _on_character_selected(character_id: String) -> void:
+	for card in _cards:
+		card.set_selected(card._character_id == character_id)
 	var char_data: CharacterData = GameConfig.characters[character_id]
 	GameData.current_character = character_id
 	GameData.selected_weapon = char_data.default_weapon

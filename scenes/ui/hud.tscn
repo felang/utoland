@@ -5,16 +5,80 @@
 [node name="HUD" type="CanvasLayer" unique_id=1731831904]
 script = ExtResource("1_0mwgc")
 
-[node name="HPLabel" type="Label" parent="." unique_id=79499495]
-offset_left = 10.0
-offset_top = 10.0
-offset_right = 68.0
-offset_bottom = 33.0
-text = "HP: 100"
+[node name="TopBar" type="PanelContainer" parent="."]
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 30.0
+grow_horizontal = 2
 
-[node name="TimerLabel" type="Label" parent="." unique_id=1404888428]
-offset_left = 10.0
-offset_top = 40.0
-offset_right = 89.0
-offset_bottom = 63.0
-text = "Time: 0:00"
+[node name="MarginContainer" type="MarginContainer" parent="TopBar"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="TopBar/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="HPBar" type="HBoxContainer" parent="TopBar/MarginContainer/HBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="HPIcon" type="Label" parent="TopBar/MarginContainer/HBoxContainer/HPBar"]
+layout_mode = 2
+text = "HP"
+
+[node name="HPProgress" type="ProgressBar" parent="TopBar/MarginContainer/HBoxContainer/HPBar"]
+custom_minimum_size = Vector2(100, 12)
+layout_mode = 2
+size_flags_vertical = 4
+max_value = 100.0
+value = 100.0
+show_percentage = false
+
+[node name="HPText" type="Label" parent="TopBar/MarginContainer/HBoxContainer/HPBar"]
+layout_mode = 2
+text = "100/100"
+
+[node name="CoinDisplay" type="HBoxContainer" parent="TopBar/MarginContainer/HBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="CoinIcon" type="Label" parent="TopBar/MarginContainer/HBoxContainer/CoinDisplay"]
+layout_mode = 2
+text = "$"
+
+[node name="CoinText" type="Label" parent="TopBar/MarginContainer/HBoxContainer/CoinDisplay"]
+layout_mode = 2
+text = "0"
+
+[node name="Spacer" type="Control" parent="TopBar/MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="WaveDisplay" type="Label" parent="TopBar/MarginContainer/HBoxContainer"]
+layout_mode = 2
+text = "Wave 0/10"
+
+[node name="TimerDisplay" type="Label" parent="TopBar/MarginContainer/HBoxContainer"]
+layout_mode = 2
+text = "0s"
+
+[node name="KillDisplay" type="Label" parent="TopBar/MarginContainer/HBoxContainer"]
+layout_mode = 2
+text = "Kill: 0"
+
+[node name="BottomBar" type="PanelContainer" parent="."]
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -30.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="MarginContainer" type="MarginContainer" parent="BottomBar"]
+layout_mode = 2
+
+[node name="BuffContainer" type="HBoxContainer" parent="BottomBar/MarginContainer"]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 8

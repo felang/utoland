@@ -93,6 +93,14 @@ var auto_dash_active: bool = false
 var auto_dash_interval: float = 10.0
 var auto_dash_distance: float = 80.0
 
+## ===== 本局统计 =====
+var total_kills: int = 0
+var total_coins_earned: int = 0
+var total_damage_taken: float = 0.0
+var max_kill_streak: int = 0
+var current_kill_streak: int = 0
+var purchased_item_list: Array[String] = []
+
 func _ready() -> void:
 	# 游戏启动时初始化默认角色
 	init_character(current_character)
@@ -178,3 +186,27 @@ func reset() -> void:
 	auto_dash_active = false
 	auto_dash_interval = 10.0
 	auto_dash_distance = 80.0
+	total_kills = 0
+	total_coins_earned = 0
+	total_damage_taken = 0.0
+	max_kill_streak = 0
+	current_kill_streak = 0
+	purchased_item_list = []
+
+func record_kill() -> void:
+	total_kills += 1
+	current_kill_streak += 1
+	if current_kill_streak > max_kill_streak:
+		max_kill_streak = current_kill_streak
+
+func reset_kill_streak() -> void:
+	current_kill_streak = 0
+
+func record_damage_taken(amount: float) -> void:
+	total_damage_taken += amount
+
+func record_coins_earned(amount: int) -> void:
+	total_coins_earned += amount
+
+func record_item_purchased(item_id: String) -> void:
+	purchased_item_list.append(item_id)

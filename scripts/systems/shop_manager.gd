@@ -23,24 +23,28 @@ var shop_items: Array[ShopItemData] = []
 var shop_prices: Array[int] = []
 var locked_slots: Array[bool] = [false, false, false, false]
 
-@onready var coin_label = $VBoxContainer/CoinLabel
-@onready var refresh_button = $VBoxContainer/ButtonsContainer/RefreshButton
-@onready var confirm_button = $VBoxContainer/ButtonsContainer/ConfirmButton
-@onready var item_containers: Array = [
-	$VBoxContainer/ItemsContainer/Item1,
-	$VBoxContainer/ItemsContainer/Item2,
-	$VBoxContainer/ItemsContainer/Item3,
-	$VBoxContainer/ItemsContainer/Item4,
-]
+const SHOP_CARD_SCENE = preload("res://scenes/ui/shop_item_card.tscn")
+var _card_nodes: Array = []
+
+@onready var coin_label: Label = $MainPanel/VBoxContainer/HeaderRow/CoinLabel
+@onready var wave_label: Label = $MainPanel/VBoxContainer/HeaderRow/WaveLabel
+@onready var title_label: Label = $MainPanel/VBoxContainer/HeaderRow/TitleLabel
+@onready var card_grid: GridContainer = $MainPanel/VBoxContainer/CardGrid
+@onready var stats_grid: GridContainer = $MainPanel/VBoxContainer/StatsPanel/StatsGrid
+@onready var stats_panel: PanelContainer = $MainPanel/VBoxContainer/StatsPanel
+@onready var refresh_button: Button = $MainPanel/VBoxContainer/ButtonRow/RefreshButton
+@onready var confirm_button: Button = $MainPanel/VBoxContainer/ButtonRow/ConfirmButton
 
 func _ready() -> void:
+	# Guard: 测试环境中 script-only 实例化时无场景树
+	if not card_grid:
+		return
 	refresh_button.pressed.connect(_on_refresh_pressed)
 	confirm_button.pressed.connect(_on_confirm_pressed)
-	for i in range(4):
-		_connect_slot_buy_button(i)
-		_connect_slot_lock_button(i)
 	_generate_shop()
+	_create_card_nodes()
 	_update_ui()
+	_style_ui()
 
 # ===== 公共逻辑方法（供测试调用）=====
 
@@ -157,6 +161,7 @@ func _buy_item(index: int) -> void:
 
 	GameData.coins -= price
 	GameData.purchased_items[item.id] = GameData.purchased_items.get(item.id, 0) + 1
+	GameData.record_item_purchased(item.id)
 	_apply_item_effect(item)
 	_update_ui()
 
@@ -256,94 +261,76 @@ func _set_tower_stat(stat: String, value: float) -> void:
 
 # ===== UI =====
 
-func _connect_slot_buy_button(i: int) -> void:
-	var container: Node = item_containers[i]
-	var buy_btn: Button
-	# Item1 节点命名为 BuyButton，Item2/3/4 节点命名为 BuyButton2
-	if i == 0:
-		buy_btn = container.get_node("BuyButton")
-	else:
-		buy_btn = container.get_node("BuyButton2")
-	if buy_btn:
-		buy_btn.pressed.connect(_buy_item.bind(i))
+func _create_card_nodes() -> void:
+	for child in card_grid.get_children():
+		child.queue_free()
+	_card_nodes.clear()
+	for i in range(4):
+		var card = SHOP_CARD_SCENE.instantiate()
+		card.buy_pressed.connect(_buy_item)
+		card.lock_toggled.connect(_on_lock_toggled)
+		card_grid.add_child(card)
+		_card_nodes.append(card)
 
-func _connect_slot_lock_button(i: int) -> void:
-	var container: Node = item_containers[i]
-	var lock_btn_name := "LockButton" if i == 0 else "LockButton" + str(i + 1)
-	if container.has_node(lock_btn_name):
-		container.get_node(lock_btn_name).pressed.connect(_toggle_lock.bind(i))
-
-func _toggle_lock(index: int) -> void:
+func _on_lock_toggled(index: int) -> void:
 	locked_slots[index] = not locked_slots[index]
-	_update_ui()
 
 func _update_ui() -> void:
+	if not coin_label:
+		return
 	coin_label.text = "金币: %d" % GameData.coins
+	wave_label.text = "Wave %d/10" % (GameData.current_wave + 1)
 	var refresh_cost := _get_refresh_cost()
 	refresh_button.disabled = GameData.coins < refresh_cost
 	refresh_button.text = "刷新 (%d)" % refresh_cost
 	_display_items()
+	_update_stats_panel()
 
 func _display_items() -> void:
-	for i in range(min(shop_items.size(), 4)):
+	for i in range(min(shop_items.size(), _card_nodes.size())):
 		var item := shop_items[i]
 		var price := shop_prices[i]
-		var container: Node = item_containers[i]
-		var name_label: Label
-		var price_label: Label
-		var buy_btn: Button
-		# Item1 节点命名为 NameLabel/PriceLabel/BuyButton，Item2/3/4 命名为 NameLabel2/PriceLabel2/BuyButton2
-		if i == 0:
-			name_label = container.get_node("NameLabel")
-			price_label = container.get_node("PriceLabel")
-			buy_btn = container.get_node("BuyButton")
-		else:
-			name_label = container.get_node("NameLabel2")
-			price_label = container.get_node("PriceLabel2")
-			buy_btn = container.get_node("BuyButton2")
-		if name_label:
-			name_label.text = item.display_name
-		if price_label:
-			price_label.text = "价格: %d" % price
-		if buy_btn:
-			buy_btn.disabled = GameData.coins < price or not _can_buy(item)
-		# 锁定按钮状态
-		var lock_btn_name := "LockButton" if i == 0 else "LockButton" + str(i + 1)
-		if container.has_node(lock_btn_name):
-			container.get_node(lock_btn_name).text = "🔒" if locked_slots[i] else "🔓"
-		# 稀有度/亲和边框色（通过 Panel 背景）
-		_update_slot_color(container, item)
+		var card = _card_nodes[i]
+		card.setup(i, item, price, locked_slots[i],
+			GameData.coins >= price, _can_buy(item))
 
-func _update_slot_color(container: Node, item: ShopItemData) -> void:
-	if not container is PanelContainer:
-		return
-	var color := _get_slot_color(item)
-	var style: StyleBox = container.get_theme_stylebox("panel")
-	if style == null:
-		return
-	var new_style: StyleBox = style.duplicate()
-	if new_style is StyleBoxFlat:
-		var flat_style := new_style as StyleBoxFlat
-		flat_style.border_color = color
-		flat_style.border_width_left = 3
-		flat_style.border_width_right = 3
-		flat_style.border_width_top = 3
-		flat_style.border_width_bottom = 3
-		container.add_theme_stylebox_override("panel", flat_style)
+func _update_stats_panel() -> void:
+	for child in stats_grid.get_children():
+		child.queue_free()
+	var stats: Array[String] = [
+		"HP %d" % int(GameData.player_stats[Enums.Stat.MAX_HP] * GameData.player_stats[Enums.Stat.HP_MULT]),
+		"攻击 x%.1f" % GameData.player_stats[Enums.Stat.DAMAGE_MULT],
+		"速度 x%.1f" % GameData.player_stats[Enums.Stat.MOVE_SPEED_MULT],
+		"暴击 %d%%" % int(GameData.crit_chance * 100),
+		"穿甲 x%d" % GameData.pierce_count,
+		"吸血 %d%%" % int(GameData.lifesteal_ratio * 100),
+		"减伤 %d%%" % int(GameData.damage_reduction * 100),
+		"闪避 %d%%" % int(GameData.dodge_chance * 100),
+	]
+	for stat_text in stats:
+		var label := Label.new()
+		label.text = stat_text
+		label.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_SMALL)
+		label.add_theme_color_override("font_color", UIConstants.COLOR_TEXT_SECONDARY)
+		stats_grid.add_child(label)
 
-func _get_slot_color(item: ShopItemData) -> Color:
-	# 亲和色优先
-	var affinity_tags := _get_affinity_tags()
-	for tag in item.tags:
-		if tag in affinity_tags:
-			match tag:
-				Enums.ItemTag.SHOOTER:  return Color(0.2, 0.5, 1.0)
-				Enums.ItemTag.ENGINEER: return Color(0.2, 0.8, 0.3)
-	# 稀有度色
-	match item.rarity:
-		Enums.ItemRarity.RARE: return Color(0.3, 0.6, 1.0)
-		Enums.ItemRarity.EPIC: return Color(0.7, 0.3, 1.0)
-		_: return Color(0.5, 0.5, 0.5)
+func _style_ui() -> void:
+	# 背景
+	$Background.color = UIConstants.COLOR_BG_PRIMARY
+	# 标题
+	title_label.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_SUBTITLE)
+	title_label.add_theme_color_override("font_color", UIConstants.COLOR_TEXT_PRIMARY)
+	# 金币
+	coin_label.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_SUBTITLE)
+	coin_label.add_theme_color_override("font_color", UIConstants.COLOR_GOLD)
+	# 波次
+	wave_label.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_BODY)
+	wave_label.add_theme_color_override("font_color", UIConstants.COLOR_TEXT_SECONDARY)
+	# 属性面板
+	stats_panel.add_theme_stylebox_override("panel", UIConstants.create_panel_stylebox())
+	# 按钮
+	confirm_button.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_BODY)
+	refresh_button.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_BODY)
 
 func _get_refresh_cost() -> int:
 	var wave := GameData.current_wave + 1

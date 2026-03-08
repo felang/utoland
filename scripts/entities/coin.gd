@@ -28,6 +28,7 @@ func _process(delta: float) -> void:
 func _on_body_entered(body: Node2D) -> void:
 	if body.is_in_group(Enums.Group.PLAYER):
 		body.add_coins(value)
+		GameData.record_coins_earned(value)
 		_play_pickup_effect()
 
 func _play_pickup_effect() -> void:

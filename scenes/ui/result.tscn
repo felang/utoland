@@ -2,52 +2,76 @@
 
 [ext_resource type="Script" path="res://scripts/ui/result.gd" id="1_3dhtb"]
 
-[sub_resource type="LabelSettings" id="LabelSettings_pa8dr"]
-
-[sub_resource type="LabelSettings" id="LabelSettings_3dhtb"]
-
-[node name="Result" type="Control" unique_id=1718775285]
+[node name="Result" type="Control"]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 script = ExtResource("1_3dhtb")
 
-[node name="Background" type="ColorRect" parent="." unique_id=302831996]
-layout_mode = 0
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-color = Color(0, 0, 0, 0.8)
+grow_horizontal = 2
+grow_vertical = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=798752750]
-layout_mode = 0
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -160.0
-offset_top = -110.0
-offset_right = 160.0
-offset_bottom = 110.0
+[node name="CenterContainer" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
-[node name="TitleLabel" type="Label" parent="VBoxContainer" unique_id=1295650147]
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer"]
 layout_mode = 2
-text = "胜利！"
-label_settings = SubResource("LabelSettings_pa8dr")
+custom_minimum_size = Vector2(400, 0)
+theme_override_constants/separation = 16
+
+[node name="TitleLabel" type="Label" parent="CenterContainer/VBoxContainer"]
+layout_mode = 2
 horizontal_alignment = 1
 
-[node name="WaveLabel" type="Label" parent="VBoxContainer" unique_id=1755270384]
+[node name="WaveProgress" type="HBoxContainer" parent="CenterContainer/VBoxContainer"]
 layout_mode = 2
-text = "存活波次: 0"
-label_settings = SubResource("LabelSettings_3dhtb")
-horizontal_alignment = 1
+alignment = 1
+theme_override_constants/separation = 8
 
-[node name="RestartButton" type="Button" parent="VBoxContainer" unique_id=1830073469]
-custom_minimum_size = Vector2(160, 36)
+[node name="WaveLabel" type="Label" parent="CenterContainer/VBoxContainer/WaveProgress"]
 layout_mode = 2
-text = "重新开始"
 
-[node name="QuitButton" type="Button" parent="VBoxContainer" unique_id=347955461]
-custom_minimum_size = Vector2(160, 36)
+[node name="WaveBar" type="ProgressBar" parent="CenterContainer/VBoxContainer/WaveProgress"]
 layout_mode = 2
-text = "退出游戏"
+custom_minimum_size = Vector2(200, 16)
+
+[node name="StatsPanel" type="PanelContainer" parent="CenterContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="StatsGrid" type="GridContainer" parent="CenterContainer/VBoxContainer/StatsPanel"]
+layout_mode = 2
+columns = 2
+
+[node name="ItemsPanel" type="PanelContainer" parent="CenterContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="ItemsFlow" type="HFlowContainer" parent="CenterContainer/VBoxContainer/ItemsPanel"]
+layout_mode = 2
+
+[node name="ButtonRow" type="HBoxContainer" parent="CenterContainer/VBoxContainer"]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 20
+
+[node name="RestartButton" type="Button" parent="CenterContainer/VBoxContainer/ButtonRow"]
+custom_minimum_size = Vector2(140, 36)
+layout_mode = 2
+text = "再来一局"
+
+[node name="MenuButton" type="Button" parent="CenterContainer/VBoxContainer/ButtonRow"]
+custom_minimum_size = Vector2(140, 36)
+layout_mode = 2
+text = "主菜单"

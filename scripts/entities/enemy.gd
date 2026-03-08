@@ -90,6 +90,7 @@ func _on_died() -> void:
 	# 屏幕震动
 	var fx: EffectConfigData = GameConfig.effects
 	EventBus.camera_shake_requested.emit(fx.camera_shake_enemy_kill_intensity, fx.camera_shake_enemy_kill_duration)
+	GameData.record_kill()
 	EventBus.enemy_killed.emit(enemy_type, global_position)
 	_drop_coins()
 	queue_free()

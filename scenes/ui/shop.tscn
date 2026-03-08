@@ -11,133 +11,83 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_ahsc1")
 
-[node name="Background" type="ColorRect" parent="." unique_id=1229250608]
-layout_mode = 0
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-color = Color(0.1, 0.1, 0.15, 1)
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.102, 0.102, 0.18, 1)
 
-[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=916336108]
-layout_mode = 0
+[node name="MainPanel" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -280.0
-offset_top = -150.0
-offset_right = 280.0
-offset_bottom = 150.0
+offset_left = -250.0
+offset_top = -190.0
+offset_right = 250.0
+offset_bottom = 190.0
+grow_horizontal = 2
+grow_vertical = 2
+custom_minimum_size = Vector2(500, 380)
 
-[node name="Title" type="Label" parent="VBoxContainer" unique_id=1921872584]
+[node name="VBoxContainer" type="VBoxContainer" parent="MainPanel"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="HeaderRow" type="HBoxContainer" parent="MainPanel/VBoxContainer"]
+layout_mode = 2
+
+[node name="CoinLabel" type="Label" parent="MainPanel/VBoxContainer/HeaderRow"]
+layout_mode = 2
+text = "金币: 0"
+
+[node name="HSpacer" type="Control" parent="MainPanel/VBoxContainer/HeaderRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="TitleLabel" type="Label" parent="MainPanel/VBoxContainer/HeaderRow"]
 layout_mode = 2
 text = "商店"
 horizontal_alignment = 1
 
-[node name="CoinLabel" type="Label" parent="VBoxContainer" unique_id=1050445792]
+[node name="HSpacer2" type="Control" parent="MainPanel/VBoxContainer/HeaderRow"]
 layout_mode = 2
-text = "金币: 0"
-horizontal_alignment = 1
+size_flags_horizontal = 3
 
-[node name="ItemsContainer" type="VBoxContainer" parent="VBoxContainer" unique_id=1256485593]
+[node name="WaveLabel" type="Label" parent="MainPanel/VBoxContainer/HeaderRow"]
 layout_mode = 2
+text = "Wave 1/10"
 
-[node name="Item1" type="HBoxContainer" parent="VBoxContainer/ItemsContainer" unique_id=1425419475]
-layout_mode = 2
-
-[node name="NameLabel" type="Label" parent="VBoxContainer/ItemsContainer/Item1" unique_id=745582618]
-custom_minimum_size = Vector2(180, 0)
-layout_mode = 2
-text = "商品名称"
-
-[node name="PriceLabel" type="Label" parent="VBoxContainer/ItemsContainer/Item1" unique_id=1596893343]
-custom_minimum_size = Vector2(80, 0)
-layout_mode = 2
-text = "价格: 0"
-
-[node name="BuyButton" type="Button" parent="VBoxContainer/ItemsContainer/Item1" unique_id=959698697]
-custom_minimum_size = Vector2(80, 0)
-layout_mode = 2
-text = "购买"
-
-[node name="LockButton" type="Button" parent="VBoxContainer/ItemsContainer/Item1" unique_id=393905881]
-layout_mode = 2
-text = "🔓"
-
-[node name="Item2" type="HBoxContainer" parent="VBoxContainer/ItemsContainer" unique_id=1588136614]
+[node name="HSeparator" type="HSeparator" parent="MainPanel/VBoxContainer"]
 layout_mode = 2
 
-[node name="PriceLabel2" type="Label" parent="VBoxContainer/ItemsContainer/Item2" unique_id=686209700]
-custom_minimum_size = Vector2(80, 0)
+[node name="CardGrid" type="GridContainer" parent="MainPanel/VBoxContainer"]
 layout_mode = 2
-text = "价格: 0"
+columns = 2
 
-[node name="BuyButton2" type="Button" parent="VBoxContainer/ItemsContainer/Item2" unique_id=682105134]
-custom_minimum_size = Vector2(80, 0)
-layout_mode = 2
-text = "购买"
-
-[node name="NameLabel2" type="Label" parent="VBoxContainer/ItemsContainer/Item2" unique_id=1694751994]
-custom_minimum_size = Vector2(180, 0)
-layout_mode = 2
-text = "商品名称"
-
-[node name="LockButton2" type="Button" parent="VBoxContainer/ItemsContainer/Item2" unique_id=385242338]
-layout_mode = 2
-text = "🔓"
-
-[node name="Item3" type="HBoxContainer" parent="VBoxContainer/ItemsContainer" unique_id=1363586919]
+[node name="StatsPanel" type="PanelContainer" parent="MainPanel/VBoxContainer"]
 layout_mode = 2
 
-[node name="NameLabel2" type="Label" parent="VBoxContainer/ItemsContainer/Item3" unique_id=504576354]
-custom_minimum_size = Vector2(180, 0)
+[node name="StatsGrid" type="GridContainer" parent="MainPanel/VBoxContainer/StatsPanel"]
 layout_mode = 2
-text = "商品名称"
+columns = 4
 
-[node name="PriceLabel2" type="Label" parent="VBoxContainer/ItemsContainer/Item3" unique_id=1366710136]
-custom_minimum_size = Vector2(80, 0)
+[node name="ButtonRow" type="HBoxContainer" parent="MainPanel/VBoxContainer"]
 layout_mode = 2
-text = "价格: 0"
+alignment = 1
+theme_override_constants/separation = 20
 
-[node name="BuyButton2" type="Button" parent="VBoxContainer/ItemsContainer/Item3" unique_id=2100005327]
-custom_minimum_size = Vector2(80, 0)
+[node name="RefreshButton" type="Button" parent="MainPanel/VBoxContainer/ButtonRow"]
+custom_minimum_size = Vector2(140, 36)
 layout_mode = 2
-text = "购买"
+text = "刷新 (5)"
 
-[node name="LockButton3" type="Button" parent="VBoxContainer/ItemsContainer/Item3" unique_id=1366611473]
+[node name="ConfirmButton" type="Button" parent="MainPanel/VBoxContainer/ButtonRow"]
+custom_minimum_size = Vector2(140, 36)
 layout_mode = 2
-text = "🔓"
-
-[node name="Item4" type="HBoxContainer" parent="VBoxContainer/ItemsContainer" unique_id=581606594]
-layout_mode = 2
-
-[node name="PriceLabel2" type="Label" parent="VBoxContainer/ItemsContainer/Item4" unique_id=421674279]
-custom_minimum_size = Vector2(80, 0)
-layout_mode = 2
-text = "价格: 0"
-
-[node name="NameLabel2" type="Label" parent="VBoxContainer/ItemsContainer/Item4" unique_id=325585939]
-custom_minimum_size = Vector2(180, 0)
-layout_mode = 2
-text = "商品名称"
-
-[node name="BuyButton2" type="Button" parent="VBoxContainer/ItemsContainer/Item4" unique_id=152792192]
-custom_minimum_size = Vector2(80, 0)
-layout_mode = 2
-text = "购买"
-
-[node name="LockButton4" type="Button" parent="VBoxContainer/ItemsContainer/Item4" unique_id=627632063]
-layout_mode = 2
-text = "🔓"
-
-[node name="ButtonsContainer" type="HBoxContainer" parent="VBoxContainer" unique_id=1147900147]
-layout_mode = 2
-
-[node name="RefreshButton" type="Button" parent="VBoxContainer/ButtonsContainer" unique_id=987082711]
-custom_minimum_size = Vector2(120, 32)
-layout_mode = 2
-text = "刷新 (10金币)"
-
-[node name="ConfirmButton" type="Button" parent="VBoxContainer/ButtonsContainer" unique_id=1471049955]
-custom_minimum_size = Vector2(120, 32)
-layout_mode = 2
-text = "确认"
+text = "出发"
