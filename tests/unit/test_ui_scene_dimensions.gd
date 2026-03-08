@@ -28,5 +28,5 @@ func test_shop_main_panel_fits_640x360():
 func test_start_menu_button_uses_standard_size():
 	var scene = load("res://scenes/ui/start_menu.tscn").instantiate()
 	add_child_autofree(scene)
-	var start_btn: Button = scene.get_node("VBoxContainer/StartButton")
-	assert_eq(start_btn.custom_minimum_size, Vector2(160, 36))
+	var start_btn: Button = scene.get_node("CenterContainer/VBoxContainer/StartButton")
+	assert_eq(start_btn.custom_minimum_size, Vector2(200, 44))
