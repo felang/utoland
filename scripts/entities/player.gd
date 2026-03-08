@@ -6,6 +6,7 @@ var coins: int = 0
 var invincible_timer: float = 0.0
 var hp_regen_timer: float = 0.0
 var _blink_tween: Tween = null
+var _aura_slowed_enemies: Array[Node] = []
 
 @onready var health: HealthComponent = $HealthComponent
 @onready var _weapon_manager: WeaponManager = $WeaponManager
@@ -57,6 +58,10 @@ func _process(delta: float) -> void:
 		var regen_amount: float = GameData.character_hp_regen + GameData.player_stats[Enums.Stat.HP_REGEN]
 		if regen_amount > 0:
 			health.heal(regen_amount)
+
+	# 减速光环
+	if GameData.slow_aura_active:
+		_apply_slow_aura()
 
 func _physics_process(_delta: float) -> void:
 	var input_vector: Vector2 = Vector2.ZERO
@@ -125,6 +130,25 @@ func add_coins(amount: int) -> void:
 func heal_hp(amount: float) -> void:
 	if amount > 0.0:
 		health.heal(amount)
+
+func _apply_slow_aura() -> void:
+	var enemies: Array[Node] = get_tree().get_nodes_in_group(Enums.Group.ENEMIES)
+	var still_in_range: Array[Node] = []
+	for enemy in enemies:
+		if not is_instance_valid(enemy) or not enemy is Node2D:
+			continue
+		var dist: float = global_position.distance_to(enemy.global_position)
+		if dist <= GameData.slow_aura_range:
+			still_in_range.append(enemy)
+			if enemy not in _aura_slowed_enemies:
+				if enemy.get("slow_handler") != null:
+					enemy.slow_handler.apply_slow(GameData.slow_aura_ratio)
+	# 移除离开范围的敌人的减速
+	for enemy in _aura_slowed_enemies:
+		if is_instance_valid(enemy) and enemy not in still_in_range:
+			if enemy.get("slow_handler") != null:
+				enemy.slow_handler.remove_slow(GameData.slow_aura_ratio)
+	_aura_slowed_enemies = still_in_range
 
 func _flash_white() -> void:
 	var tween: Tween = EffectsManager.flash_white(self)
