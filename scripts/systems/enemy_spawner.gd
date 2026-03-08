@@ -1,6 +1,7 @@
 extends Node
 
 var spawn_timer: float = 0.0
+var enemies_spawned: int = 0
 var player: Node2D
 var _current_wave_data: WaveData = null
 var _is_wave_active: bool = false
@@ -28,17 +29,35 @@ func _process(delta: float) -> void:
 		return
 
 	spawn_timer -= delta
-	if spawn_timer <= 0:
+	if spawn_timer <= 0 and _should_spawn():
 		spawn_enemy()
 		spawn_timer = _current_wave_data.spawn_interval
 
-func spawn_enemy() -> void:
-	var enemy_types: Array = _current_wave_data.enemy_weights.keys()
-	var random_type: String = enemy_types[randi() % enemy_types.size()]
-	var enemy: Node = SceneFactory.create_enemy(random_type)
+func _should_spawn() -> bool:
+	if not _current_wave_data:
+		return false
+	return enemies_spawned < _current_wave_data.total_enemies
 
+func pick_weighted_enemy(weights: Dictionary) -> String:
+	var total_weight: int = 0
+	for w: int in weights.values():
+		total_weight += w
+	var roll: int = randi() % total_weight
+	var cumulative: int = 0
+	for enemy_id: String in weights:
+		cumulative += weights[enemy_id]
+		if roll < cumulative:
+			return enemy_id
+	return weights.keys()[0]
+
+func spawn_enemy() -> void:
+	var enemy_type: String = pick_weighted_enemy(_current_wave_data.enemy_weights)
+	var enemy: Node = SceneFactory.create_enemy(enemy_type)
+	if not enemy:
+		return
 	var spawn_pos: Vector2 = get_random_spawn_position()
 	enemy.global_position = spawn_pos
+	enemies_spawned += 1
 	get_parent().add_child(enemy)
 
 func get_random_spawn_position() -> Vector2:
@@ -60,6 +79,7 @@ func _on_wave_started(_wave_number: int, wave_data: WaveData) -> void:
 	_current_wave_data = wave_data
 	_is_wave_active = true
 	spawn_timer = 0.0
+	enemies_spawned = 0
 
 func _on_wave_completed(_wave_number: int) -> void:
 	_is_wave_active = false
