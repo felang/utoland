@@ -4,8 +4,6 @@ extends RefCounted
 # 精灵加载工具类 — 从 sprite sheet 创建 SpriteFrames 资源
 # 方向约定：Walk sprite sheet 4行 = 下(0)、上(1)、左(2)、右(3)
 
-enum Direction { DOWN = 0, UP = 1, LEFT = 2, RIGHT = 3 }
-
 # 从玩家配置创建带 idle/walk 动画的 SpriteFrames
 # idle: 1行4帧(64×16)，walk: 4行4帧(64×64)
 static func create_player_sprite_frames(config: Dictionary) -> SpriteFrames:
@@ -74,19 +72,6 @@ static func create_enemy_sprite_frames(config: Dictionary) -> SpriteFrames:
 		frames.remove_animation(Enums.Anim.DEFAULT)
 
 	return frames
-
-
-# 加载静态纹理
-static func load_texture(texture_path: String) -> Texture2D:
-	return load(texture_path)
-
-
-# 从图集创建 AtlasTexture（用于塔精灵裁切）
-static func create_atlas_texture(tileset_path: String, region: Rect2) -> AtlasTexture:
-	var atlas := AtlasTexture.new()
-	atlas.atlas = load(tileset_path)
-	atlas.region = region
-	return atlas
 
 
 # 根据移动方向获取动画名称

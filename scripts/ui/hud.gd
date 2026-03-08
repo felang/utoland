@@ -157,6 +157,3 @@ func _on_wave_started(_wave_number: int, wave_data: WaveData) -> void:
 
 func _on_wave_completed(_wave_number: int) -> void:
 	_is_wave_active = false
-
-func add_kill() -> void:
-	_wave_kills += 1

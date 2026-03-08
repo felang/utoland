@@ -62,10 +62,5 @@ func clear_all_enemies() -> void:
 			enemy.set_process(false)
 		enemy.queue_free()
 
-func get_current_wave_data() -> WaveData:
-	if current_wave > 0 and current_wave <= total_waves:
-		return GameConfig.waves[current_wave - 1]
-	return null
-
 func _on_player_died() -> void:
 	EventBus.game_lost.emit()
