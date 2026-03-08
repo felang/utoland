@@ -8,10 +8,14 @@ var total_waves: int = GameConfig.waves.size()
 var current_wave: int = 0
 var wave_time_left: float = 0.0
 var is_wave_active: bool = false
+var enemies_killed: int = 0
+var _current_wave_data: WaveData = null
 
 func _ready() -> void:
 	add_to_group(Enums.Group.WAVE_MANAGER)
 	EventBus.player_died.connect(_on_player_died)
+	EventBus.enemy_killed.connect(_on_enemy_killed)
+	EventBus.boss_killed.connect(_on_boss_killed)
 	if GameData.current_wave > 0:
 		current_wave = GameData.current_wave
 	start_next_wave()
@@ -34,21 +38,19 @@ func start_next_wave() -> void:
 		return
 
 	var wave_data: WaveData = GameConfig.waves[current_wave - 1]
-	wave_time_left = wave_data.time_limit
-	is_wave_active = true
-	EventBus.wave_started.emit(current_wave, wave_data)
-	var fx: EffectConfigData = GameConfig.effects
-	EventBus.camera_shake_requested.emit(fx.camera_shake_wave_start_intensity, fx.camera_shake_wave_start_duration)
-	print("Wave ", current_wave, " started!")
+	_start_wave_with_data(current_wave, wave_data)
 
 func complete_wave() -> void:
+	if not is_wave_active:
+		return
 	is_wave_active = false
+	EventBus.wave_completed.emit(current_wave)
+	print("Wave ", current_wave, " completed!")
+	if not is_inside_tree():
+		return
 	attract_all_coins()
 	await get_tree().create_timer(WAVE_CLEANUP_DELAY).timeout
 	clear_all_enemies()
-	EventBus.wave_completed.emit(current_wave)
-	print("Wave ", current_wave, " completed!")
-
 	await get_tree().create_timer(SHOP_TRANSITION_DELAY).timeout
 	SceneManager.go_to(Enums.Scene.SHOP)
 
@@ -65,6 +67,30 @@ func clear_all_enemies() -> void:
 			enemy.set_physics_process(false)
 			enemy.set_process(false)
 		enemy.queue_free()
+
+func _start_wave_with_data(wave_num: int, wave_data: WaveData) -> void:
+	_current_wave_data = wave_data
+	enemies_killed = 0
+	wave_time_left = wave_data.time_limit
+	is_wave_active = true
+	EventBus.wave_started.emit(wave_num, wave_data)
+	var fx: EffectConfigData = GameConfig.effects
+	if fx:
+		EventBus.camera_shake_requested.emit(fx.camera_shake_wave_start_intensity, fx.camera_shake_wave_start_duration)
+	print("Wave ", wave_num, " started!")
+
+func _on_enemy_killed(_enemy_type: String, _position: Vector2, _is_elite: bool) -> void:
+	if not is_wave_active:
+		return
+	enemies_killed += 1
+	if _current_wave_data and not _current_wave_data.is_boss_wave:
+		if enemies_killed >= _current_wave_data.total_enemies:
+			complete_wave()
+
+func _on_boss_killed(_boss_id: String) -> void:
+	if not is_wave_active:
+		return
+	complete_wave()
 
 func _on_player_died() -> void:
 	EventBus.game_lost.emit()
