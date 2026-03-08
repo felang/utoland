@@ -26,6 +26,41 @@ var tower_inventory: Array = []  # 已布置的塔 {type, position}
 var purchased_towers: Array = []  # 商店购买的塔类型（字符串数组）
 var pending_heal: int = 0  # 待应用的治疗量
 
+## 本局已购买的物品 id → 购买次数
+var purchased_items: Dictionary = {}
+## 本局可用的金矿加成（每波额外金币）
+var wave_gold_bonus: int = 0
+## 穿甲弹穿透数（0 = 不穿透）
+var pierce_count: int = 0
+## 弹幕激活（true = 3发）及伤害倍率
+var multishot_active: bool = false
+var multishot_damage_mult: float = 1.0
+## 吸血比例（0.0 = 未激活）
+var lifesteal_ratio: float = 0.0
+## 蓄力当前层数
+var kill_stack_count: int = 0
+var kill_stack_max: int = 0
+var kill_stack_damage_per_stack: float = 0.0
+## 联动系统：每塔玩家伤害加成
+var tower_link_damage_per_tower: float = 0.0
+## 战场维修：每波塔HP回复比例
+var wave_tower_heal_ratio: float = 0.0
+## 纳米修复已激活
+var tower_regen_active: bool = false
+var tower_regen_hp: float = 0.0
+var tower_regen_interval: float = 5.0
+## 共生：低血量塔伤害加成
+var symbiosis_hp_threshold: float = 0.0
+var symbiosis_tower_bonus: float = 0.0
+## 战争机器激活
+var war_machine_active: bool = false
+var war_machine_wave_hp_cost: int = 0
+## 额外塔属性倍率
+var tower_hp_mult: float = 1.0
+var tower_range_mult: float = 1.0
+var tower_attack_speed_mult: float = 1.0
+var tower_cost_mult: float = 1.0
+
 func _ready() -> void:
 	# 游戏启动时初始化默认角色
 	init_character(current_character)
@@ -71,3 +106,25 @@ func reset() -> void:
 	tower_inventory = []
 	purchased_towers = []
 	pending_heal = 0
+	purchased_items = {}
+	wave_gold_bonus = 0
+	pierce_count = 0
+	multishot_active = false
+	multishot_damage_mult = 1.0
+	lifesteal_ratio = 0.0
+	kill_stack_count = 0
+	kill_stack_max = 0
+	kill_stack_damage_per_stack = 0.0
+	tower_link_damage_per_tower = 0.0
+	wave_tower_heal_ratio = 0.0
+	tower_regen_active = false
+	tower_regen_hp = 0.0
+	tower_regen_interval = 5.0
+	symbiosis_hp_threshold = 0.0
+	symbiosis_tower_bonus = 0.0
+	war_machine_active = false
+	war_machine_wave_hp_cost = 0
+	tower_hp_mult = 1.0
+	tower_range_mult = 1.0
+	tower_attack_speed_mult = 1.0
+	tower_cost_mult = 1.0
