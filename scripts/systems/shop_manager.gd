@@ -127,7 +127,7 @@ func _update_stats_panel() -> void:
 	for stat_text in stats:
 		var label := Label.new()
 		label.text = stat_text
-		label.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_SMALL)
+		label.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_TINY)
 		label.add_theme_color_override("font_color", UIConstants.COLOR_TEXT_SECONDARY)
 		stats_grid.add_child(label)
 
@@ -135,19 +135,19 @@ func _style_ui() -> void:
 	# 背景
 	$Background.color = UIConstants.COLOR_BG_PRIMARY
 	# 标题
-	title_label.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_SUBTITLE)
+	title_label.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_SMALL)
 	title_label.add_theme_color_override("font_color", UIConstants.COLOR_TEXT_PRIMARY)
 	# 金币
-	coin_label.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_SUBTITLE)
+	coin_label.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_SMALL)
 	coin_label.add_theme_color_override("font_color", UIConstants.COLOR_GOLD)
 	# 波次
-	wave_label.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_BODY)
+	wave_label.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_TINY)
 	wave_label.add_theme_color_override("font_color", UIConstants.COLOR_TEXT_SECONDARY)
 	# 属性面板
 	stats_panel.add_theme_stylebox_override("panel", UIConstants.create_panel_stylebox())
 	# 按钮
-	confirm_button.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_BODY)
-	refresh_button.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_BODY)
+	confirm_button.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_TINY)
+	refresh_button.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_TINY)
 
 func _get_refresh_cost() -> int:
 	var wave := GameData.current_wave + 1

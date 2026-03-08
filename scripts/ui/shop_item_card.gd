@@ -34,11 +34,11 @@ func setup(index: int, item: ShopItemData, price: int, locked: bool, can_afford:
 
 
 func _apply_base_style() -> void:
-	name_label.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_BODY)
-	desc_label.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_SMALL)
+	name_label.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_SMALL)
+	desc_label.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_TINY)
 	desc_label.add_theme_color_override("font_color", UIConstants.COLOR_TEXT_SECONDARY)
-	price_label.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_BODY)
-	buy_button.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_SMALL)
+	price_label.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_SMALL)
+	buy_button.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_TINY)
 
 
 func _apply_rarity_style(item: ShopItemData) -> void:

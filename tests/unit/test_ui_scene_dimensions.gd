@@ -30,11 +30,13 @@ func test_result_panel_and_buttons_fit_640x360():
 	assert_eq(restart_btn.custom_minimum_size, Vector2(140, 36))
 	assert_eq(menu_btn.custom_minimum_size, Vector2(140, 36))
 
-func test_shop_main_panel_fits_640x360():
+func test_shop_main_panel_fills_viewport():
 	var scene = load("res://scenes/ui/shop.tscn").instantiate()
 	add_child_autofree(scene)
 	var panel: Control = scene.get_node("MainPanel")
-	assert_eq(_control_size(panel), Vector2(500, 380))
+	# MainPanel 使用全屏锚点 + 左右边距，不再使用固定尺寸
+	assert_eq(panel.anchor_right, 1.0, "MainPanel 应使用全屏锚点")
+	assert_eq(panel.anchor_bottom, 1.0, "MainPanel 应使用全屏锚点")
 
 func test_start_menu_button_uses_standard_size():
 	var scene = load("res://scenes/ui/start_menu.tscn").instantiate()
