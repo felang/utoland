@@ -10,7 +10,8 @@ signal game_won()
 signal game_lost()
 
 # 战斗事件
-signal enemy_killed(enemy_type: String, position: Vector2)
+signal enemy_killed(enemy_type: String, position: Vector2, is_elite: bool)
+signal boss_killed(boss_id: String)
 signal player_damaged(damage: float, current_hp: float)
 signal player_died()
 

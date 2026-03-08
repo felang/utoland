@@ -14,7 +14,7 @@ func initialize(data: WeaponData) -> void:
 	if not EventBus.enemy_killed.is_connected(_on_enemy_killed):
 		EventBus.enemy_killed.connect(_on_enemy_killed)
 
-func _on_enemy_killed(_enemy_type: String, _position: Vector2) -> void:
+func _on_enemy_killed(_enemy_type: String, _position: Vector2, _is_elite: bool) -> void:
 	# 蓄力：击杀时叠加层数（未达上限则增加）
 	if GameData.kill_stack_max > 0 and GameData.kill_stack_count < GameData.kill_stack_max:
 		GameData.kill_stack_count += 1

@@ -43,8 +43,13 @@ func test_camera_shake_requested_signal():
 
 func test_enemy_killed_signal():
 	watch_signals(EventBus)
-	EventBus.enemy_killed.emit(Enums.Enemy.NORMAL, Vector2(100, 200))
+	EventBus.enemy_killed.emit(Enums.Enemy.NORMAL, Vector2(100, 200), false)
 	assert_signal_emitted(EventBus, "enemy_killed")
+
+func test_boss_killed_signal():
+	watch_signals(EventBus)
+	EventBus.boss_killed.emit("boss_brute")
+	assert_signal_emitted(EventBus, "boss_killed")
 
 func test_coins_changed_signal():
 	watch_signals(EventBus)

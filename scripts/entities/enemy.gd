@@ -9,6 +9,8 @@ var data: EnemyData = null
 
 # 敌人类型（由 SceneFactory 设置）
 var enemy_type: String = "normal"
+# 精英怪标识（由 SceneFactory 或生成逻辑设置）
+var is_elite: bool = false
 
 @export var tower_attack_rate: float = 1.0
 
@@ -93,7 +95,7 @@ func _on_died() -> void:
 	var fx: EffectConfigData = GameConfig.effects
 	EventBus.camera_shake_requested.emit(fx.camera_shake_enemy_kill_intensity, fx.camera_shake_enemy_kill_duration)
 	GameData.record_kill()
-	EventBus.enemy_killed.emit(enemy_type, global_position)
+	EventBus.enemy_killed.emit(enemy_type, global_position, is_elite)
 	_drop_coins()
 	queue_free()
 
