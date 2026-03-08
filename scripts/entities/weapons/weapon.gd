@@ -10,6 +10,14 @@ var _cooldown: float = 0.0
 func initialize(data: WeaponData) -> void:
 	weapon_data = data
 	_cooldown = 0.0
+	# 蓄力：监听敌人击杀事件，累计层数
+	if not EventBus.enemy_killed.is_connected(_on_enemy_killed):
+		EventBus.enemy_killed.connect(_on_enemy_killed)
+
+func _on_enemy_killed(_enemy_type: String, _position: Vector2) -> void:
+	# 蓄力：击杀时叠加层数（未达上限则增加）
+	if GameData.kill_stack_max > 0 and GameData.kill_stack_count < GameData.kill_stack_max:
+		GameData.kill_stack_count += 1
 
 func tick(delta: float, target: Node2D) -> void:
 	_cooldown -= delta

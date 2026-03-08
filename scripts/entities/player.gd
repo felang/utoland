@@ -106,6 +106,11 @@ func add_coins(amount: int) -> void:
 	coins += amount
 	GameData.coins = coins  # 同步到 GameData
 
+## 吸血回复：供投射物命中敌人后调用
+func heal_hp(amount: float) -> void:
+	if amount > 0.0:
+		health.heal(amount)
+
 func _flash_white() -> void:
 	var tween: Tween = EffectsManager.flash_white(self)
 	tween.tween_callback(_start_invincible_blink)

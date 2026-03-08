@@ -10,6 +10,8 @@ var _direction: Vector2 = Vector2.RIGHT
 var _trail: Line2D = null
 var _trail_positions: Array[Vector2] = []
 var _trail_max_points: int = 4
+## 穿甲弹：当前已穿透的敌人数
+var _hit_count: int = 0
 
 func _on_setup(direction: Vector2) -> void:
 	_direction = direction
@@ -49,4 +51,12 @@ func _cleanup_and_free() -> void:
 func _on_hitbox_area_entered(area: Area2D) -> void:
 	if area is Hurtbox:
 		EffectsManager.spawn_hit_sparks(global_position)
-		_cleanup_and_free()
+		# 吸血：对敌人造成伤害后回复玩家HP
+		if GameData.lifesteal_ratio > 0.0:
+			var player_node: Node = get_tree().get_first_node_in_group(Enums.Group.PLAYER)
+			if player_node and player_node.has_method("heal_hp"):
+				player_node.heal_hp(hitbox.damage * GameData.lifesteal_ratio)
+		# 穿甲弹：记录穿透次数，未超出时不销毁
+		_hit_count += 1
+		if _hit_count > GameData.pierce_count:
+			_cleanup_and_free()
