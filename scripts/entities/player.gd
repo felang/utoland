@@ -128,6 +128,7 @@ func _apply_damage(raw_damage: float) -> void:
 	# 减伤
 	var final_damage: float = raw_damage * (1.0 - clampf(GameData.damage_reduction, 0.0, 0.9))
 	health.take_damage_no_sparks(final_damage)
+	GameData.record_damage_taken(final_damage)
 	_flash_white()
 	invincible_timer = invincible_duration
 	var fx: EffectConfigData = GameConfig.effects
@@ -135,6 +136,7 @@ func _apply_damage(raw_damage: float) -> void:
 
 func _on_died() -> void:
 	print("Player died!")
+	GameData.reset_kill_streak()
 	EventBus.player_died.emit()
 	await get_tree().create_timer(1.0).timeout
 	SceneManager.go_to(Enums.Scene.RESULT)

@@ -1,5 +1,8 @@
 extends GutTest
 
+func before_each() -> void:
+	GameData.reset()
+
 func test_stats_fields_exist() -> void:
 	assert_eq(GameData.total_kills, 0)
 	assert_eq(GameData.total_coins_earned, 0)

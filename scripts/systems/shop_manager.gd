@@ -157,6 +157,7 @@ func _buy_item(index: int) -> void:
 
 	GameData.coins -= price
 	GameData.purchased_items[item.id] = GameData.purchased_items.get(item.id, 0) + 1
+	GameData.record_item_purchased(item.id)
 	_apply_item_effect(item)
 	_update_ui()
 
