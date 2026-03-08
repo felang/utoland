@@ -16,3 +16,4 @@ tests/results.xml
 # 临时测试文件
 *test*.tscn
 auto_*.tscn
+.worktrees/
