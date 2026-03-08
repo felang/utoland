@@ -15,15 +15,17 @@ static func create_player_sprite_frames(config: Dictionary) -> SpriteFrames:
 	var idle_tex: Texture2D = load(config["idle"])
 	var walk_tex: Texture2D = load(config["walk"])
 
-	# idle 动画（单行，4帧）
-	frames.add_animation(Enums.Anim.IDLE)
-	frames.set_animation_speed(Enums.Anim.IDLE, fps)
-	frames.set_animation_loop(Enums.Anim.IDLE, true)
-	for i in config["idle_frames"]:
+	# idle 动画（4方向，每方向1帧）— 按列读取方向
+	var idle_names: Array[String] = [Enums.Anim.IDLE_DOWN, Enums.Anim.IDLE_UP, Enums.Anim.IDLE_LEFT, Enums.Anim.IDLE_RIGHT]
+	for dir_idx in config["idle_frames"]:
+		var anim_name: String = idle_names[dir_idx]
+		frames.add_animation(anim_name)
+		frames.set_animation_speed(anim_name, fps)
+		frames.set_animation_loop(anim_name, true)
 		var atlas := AtlasTexture.new()
 		atlas.atlas = idle_tex
-		atlas.region = Rect2(i * frame_size.x, 0, frame_size.x, frame_size.y)
-		frames.add_frame(Enums.Anim.IDLE, atlas)
+		atlas.region = Rect2(dir_idx * frame_size.x, 0, frame_size.x, frame_size.y)
+		frames.add_frame(anim_name, atlas)
 
 	# walk 动画（4方向，每方向4帧）
 	var dir_names: Array[String] = [Enums.Anim.WALK_DOWN, Enums.Anim.WALK_UP, Enums.Anim.WALK_LEFT, Enums.Anim.WALK_RIGHT]
@@ -35,7 +37,7 @@ static func create_player_sprite_frames(config: Dictionary) -> SpriteFrames:
 		for frame_idx in config["walk_frames"]:
 			var atlas := AtlasTexture.new()
 			atlas.atlas = walk_tex
-			atlas.region = Rect2(frame_idx * frame_size.x, dir_idx * frame_size.y, frame_size.x, frame_size.y)
+			atlas.region = Rect2(dir_idx * frame_size.x, frame_idx * frame_size.y, frame_size.x, frame_size.y)
 			frames.add_frame(anim_name, atlas)
 
 	# 删除默认的 "default" 动画
@@ -64,7 +66,7 @@ static func create_enemy_sprite_frames(config: Dictionary) -> SpriteFrames:
 		for frame_idx in config["walk_frames"]:
 			var atlas := AtlasTexture.new()
 			atlas.atlas = spritesheet
-			atlas.region = Rect2(frame_idx * frame_size.x, dir_idx * frame_size.y, frame_size.x, frame_size.y)
+			atlas.region = Rect2(dir_idx * frame_size.x, frame_idx * frame_size.y, frame_size.x, frame_size.y)
 			frames.add_frame(anim_name, atlas)
 
 	# 删除默认的 "default" 动画
@@ -78,14 +80,25 @@ static func create_enemy_sprite_frames(config: Dictionary) -> SpriteFrames:
 # current_anim 用于方向滞后：对角移动时保持当前方向，避免快速切换
 static func get_walk_animation(velocity: Vector2, current_anim: String = "", hysteresis_keep: float = 0.7, hysteresis_switch: float = 1.4) -> String:
 	if velocity.length_squared() < 1.0:
-		return Enums.Anim.IDLE
+		# 根据当前动画推断最后朝向，返回对应方向的 idle
+		match current_anim:
+			Enums.Anim.WALK_DOWN, Enums.Anim.IDLE_DOWN:
+				return Enums.Anim.IDLE_DOWN
+			Enums.Anim.WALK_UP, Enums.Anim.IDLE_UP:
+				return Enums.Anim.IDLE_UP
+			Enums.Anim.WALK_LEFT, Enums.Anim.IDLE_LEFT:
+				return Enums.Anim.IDLE_LEFT
+			Enums.Anim.WALK_RIGHT, Enums.Anim.IDLE_RIGHT:
+				return Enums.Anim.IDLE_RIGHT
+			_:
+				return Enums.Anim.IDLE_DOWN
 
 	var abs_x: float = abs(velocity.x)
 	var abs_y: float = abs(velocity.y)
 
 	# 滞后阈值：当前方向轴需要比另一轴小 30% 以上才切换
-	var is_current_horizontal: bool = current_anim in [Enums.Anim.WALK_LEFT, Enums.Anim.WALK_RIGHT]
-	var is_current_vertical: bool = current_anim in [Enums.Anim.WALK_UP, Enums.Anim.WALK_DOWN]
+	var is_current_horizontal: bool = current_anim in [Enums.Anim.WALK_LEFT, Enums.Anim.WALK_RIGHT, Enums.Anim.IDLE_LEFT, Enums.Anim.IDLE_RIGHT]
+	var is_current_vertical: bool = current_anim in [Enums.Anim.WALK_UP, Enums.Anim.WALK_DOWN, Enums.Anim.IDLE_UP, Enums.Anim.IDLE_DOWN]
 
 	var use_horizontal: bool
 	if is_current_horizontal:

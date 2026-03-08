@@ -13,8 +13,8 @@ func setup_player_sprite(sprite_config: Dictionary, target_size: float) -> void:
 	_create_sprite()
 	_sprite.sprite_frames = SpriteLoader.create_player_sprite_frames(sprite_config)
 	_apply_scale(sprite_config["frame_size"].x, target_size)
-	_sprite.play("idle")
-	_current_anim = "idle"
+	_sprite.play("idle_down")
+	_current_anim = "idle_down"
 
 func setup_enemy_sprite(sprite_config: Dictionary, target_size: float) -> void:
 	# 创建敌人 AnimatedSprite2D（walk 4方向）
@@ -39,7 +39,7 @@ func update_animation_no_idle(velocity: Vector2) -> void:
 	if not _sprite:
 		return
 	var anim: String = SpriteLoader.get_walk_animation(velocity, _current_anim)
-	if anim == "idle":
+	if anim.begins_with("idle"):
 		return
 	if anim != _current_anim and _sprite.sprite_frames.has_animation(anim):
 		_sprite.play(anim)

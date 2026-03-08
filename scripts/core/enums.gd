@@ -71,6 +71,10 @@ enum BoomerangState { OUTBOUND, RETURNING }
 # 动画名
 class Anim:
 	const IDLE = "idle"
+	const IDLE_DOWN = "idle_down"
+	const IDLE_UP = "idle_up"
+	const IDLE_LEFT = "idle_left"
+	const IDLE_RIGHT = "idle_right"
 	const WALK_DOWN = "walk_down"
 	const WALK_UP = "walk_up"
 	const WALK_LEFT = "walk_left"
