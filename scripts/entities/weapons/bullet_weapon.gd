@@ -18,6 +18,10 @@ func fire(target: Node2D) -> void:
 		base_damage *= (1.0 + GameData.kill_stack_count * GameData.kill_stack_damage_per_stack)
 		GameData.kill_stack_count = 0
 
+	# 暴击判定
+	if GameData.crit_chance > 0.0 and randf() < GameData.crit_chance:
+		base_damage *= GameData.crit_damage_mult
+
 	# 联动系统：每座塔给玩家武器伤害加成
 	base_damage *= _get_tower_link_bonus()
 
@@ -40,7 +44,7 @@ func fire(target: Node2D) -> void:
 
 func _spawn_bullet(scene_parent: Node, direction: Vector2, damage: float) -> void:
 	var bullet: BulletProjectile = SceneFactory.create_bullet_projectile()
-	bullet.speed = weapon_data.bullet_speed
+	bullet.speed = weapon_data.bullet_speed * GameData.bullet_speed_mult
 	scene_parent.add_child(bullet)
 	bullet.setup(damage, weapon_data.knockback_force, owner_node.global_position, direction)
 

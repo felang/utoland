@@ -80,7 +80,16 @@ func _physics_process(_delta: float) -> void:
 func _on_hurtbox_hit(damage: float, _knockback: Vector2) -> void:
 	if invincible_timer > 0:
 		return
-	health.take_damage_no_sparks(damage)
+	# 闪避判定
+	if GameData.dodge_chance > 0.0 and randf() < GameData.dodge_chance:
+		return
+	# 护盾判定
+	if GameData.current_shield > 0:
+		GameData.current_shield -= 1
+		return
+	# 减伤
+	var final_damage: float = damage * (1.0 - GameData.damage_reduction)
+	health.take_damage_no_sparks(final_damage)
 	_flash_white()
 	invincible_timer = invincible_duration
 	var fx: EffectConfigData = GameConfig.effects
@@ -90,7 +99,13 @@ func _on_hurtbox_hit(damage: float, _knockback: Vector2) -> void:
 func take_damage(amount: float) -> void:
 	if invincible_timer > 0:
 		return
-	health.take_damage_no_sparks(amount)
+	if GameData.dodge_chance > 0.0 and randf() < GameData.dodge_chance:
+		return
+	if GameData.current_shield > 0:
+		GameData.current_shield -= 1
+		return
+	var final_damage: float = amount * (1.0 - GameData.damage_reduction)
+	health.take_damage_no_sparks(final_damage)
 	_flash_white()
 	invincible_timer = invincible_duration
 	var fx: EffectConfigData = GameConfig.effects
