@@ -9,6 +9,15 @@ const RARITY_TABLE: Array = [
 ]
 # 刷新费用（index = 波次数）
 const REFRESH_COSTS: Array = [0, 5, 5, 5, 5, 8, 8, 8, 8, 12, 12]
+# 塔相关 effect_type 黑名单（幸存者模式下过滤）
+const TOWER_EFFECT_TYPES: Array = [
+	Enums.ItemEffect.TOWER_STAT,
+	Enums.ItemEffect.TOWER_LINK,
+	Enums.ItemEffect.WAVE_HEAL_TOWERS,
+	Enums.ItemEffect.TOWER_REGEN,
+	Enums.ItemEffect.SYMBIOSIS,
+	Enums.ItemEffect.WAR_MACHINE,
+]
 
 var shop_items: Array[ShopItemData] = []
 var shop_prices: Array[int] = []
@@ -96,6 +105,8 @@ func _generate_shop() -> void:
 		Enums.ItemRarity.EPIC: [],
 	}
 	for item in GameConfig.items.values():
+		if item.effect_type in TOWER_EFFECT_TYPES:
+			continue
 		if by_rarity.has(item.rarity):
 			by_rarity[item.rarity].append(item)
 
