@@ -29,3 +29,8 @@ func test_warrior_has_affinity():
 func test_ranger_has_strong_discount():
 	var r: CharacterData = GameConfig.characters["ranger"]
 	assert_eq(r.affinity_discount, 0.25)
+
+func test_tank_has_dual_affinity():
+	var t: CharacterData = GameConfig.characters["tank"]
+	assert_true(t.affinity_tags.has("shooter"))
+	assert_true(t.affinity_tags.has("engineer"))

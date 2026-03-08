@@ -73,6 +73,15 @@ const SPRITES = {
 			"walk_frames": 4,
 			"walk_directions": 4,
 			"fps": 8.0
+		},
+		"engineer": {
+			"idle": "res://assets/sprites/player/knight_idle.png",
+			"walk": "res://assets/sprites/player/knight_walk.png",
+			"frame_size": Vector2(16, 16),
+			"idle_frames": 4,
+			"walk_frames": 4,
+			"walk_directions": 4,
+			"fps": 8.0
 		}
 	},
 	"enemies": {
