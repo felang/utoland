@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ShopItemData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/shop_item_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "slow_aura"
+display_name = "寒霜领域"
+description = "周围敌人减速15%"
+tags = PackedStringArray("universal")
+rarity = "rare"
+effect_type = "slow_aura"
+effect_params = {"ratio": 0.15, "range": 100.0}
+cost_min = 35
+cost_max = 50
+max_stack = 2

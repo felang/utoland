@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ShopItemData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/shop_item_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "auto_dash"
+display_name = "闪电冲锋"
+description = "每10秒自动冲刺（冲刺时无敌）"
+tags = PackedStringArray("universal")
+rarity = "epic"
+effect_type = "auto_dash"
+effect_params = {"interval": 10.0, "distance": 80.0}
+cost_min = 50
+cost_max = 70
+max_stack = 1

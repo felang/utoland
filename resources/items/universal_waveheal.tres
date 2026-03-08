@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="ShopItemData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/shop_item_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "wave_heal"
+display_name = "战后修整"
+description = "每波结束回复10%最大生命"
+tags = PackedStringArray("universal")
+rarity = "common"
+effect_type = "wave_heal_player"
+effect_params = {"ratio": 0.1}
+cost_min = 15
+cost_max = 25
+max_stack = 3
