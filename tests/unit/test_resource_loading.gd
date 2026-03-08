@@ -122,7 +122,7 @@ func test_wave_6_values() -> void:
 # ===== 角色资源加载 =====
 
 func test_characters_loaded_count() -> void:
-	assert_eq(GameConfig.characters.size(), 3, "应加载 3 种角色")
+	assert_eq(GameConfig.characters.size(), 4, "应加载 4 种角色")
 
 func test_character_warrior_resource() -> void:
 	var c: CharacterData = GameConfig.characters[Enums.Character.WARRIOR]

@@ -12,3 +12,9 @@ extends Resource
 @export var hp_regen: float = 0.0
 ## 角色默认武器 ID（对应 Enums.WeaponId）
 @export var default_weapon: String = ""
+## 亲和标签数组（对应 Enums.ItemTag 常量）
+@export var affinity_tags: PackedStringArray = PackedStringArray()
+## 亲和折扣倍率（0.15 = 亲和物品降价15%）
+@export var affinity_discount: float = 0.15
+## 角色特色被动描述（展示用）
+@export var passive_description: String = ""

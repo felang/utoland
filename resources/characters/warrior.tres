@@ -12,3 +12,6 @@ speed = 180.0
 damage_mult = 1.2
 move_speed_mult = 0.9
 default_weapon = "rifle"
+affinity_tags = PackedStringArray("shooter")
+affinity_discount = 0.15
+passive_description = "击杀敌人回复3HP"

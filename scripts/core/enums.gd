@@ -24,6 +24,7 @@ class Character:
 	const WARRIOR = "warrior"
 	const RANGER = "ranger"
 	const TANK = "tank"
+	const ENGINEER = "engineer"
 
 # 武器 ID
 class WeaponId:

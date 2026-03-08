@@ -14,3 +14,6 @@ attack_speed_mult = 0.9
 move_speed_mult = 0.75
 hp_regen = 1.0
 default_weapon = "laser"
+affinity_tags = PackedStringArray("shooter", "engineer")
+affinity_discount = 0.15
+passive_description = "无特殊被动"
