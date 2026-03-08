@@ -7,6 +7,8 @@ layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 script = ExtResource("1_ahsc1")
 
 [node name="Background" type="ColorRect" parent="." unique_id=1229250608]
@@ -57,6 +59,10 @@ custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
 text = "购买"
 
+[node name="LockButton" type="Button" parent="VBoxContainer/ItemsContainer/Item1" unique_id=393905881]
+layout_mode = 2
+text = "🔓"
+
 [node name="Item2" type="HBoxContainer" parent="VBoxContainer/ItemsContainer" unique_id=1588136614]
 layout_mode = 2
 
@@ -74,6 +80,10 @@ text = "购买"
 custom_minimum_size = Vector2(180, 0)
 layout_mode = 2
 text = "商品名称"
+
+[node name="LockButton2" type="Button" parent="VBoxContainer/ItemsContainer/Item2" unique_id=385242338]
+layout_mode = 2
+text = "🔓"
 
 [node name="Item3" type="HBoxContainer" parent="VBoxContainer/ItemsContainer" unique_id=1363586919]
 layout_mode = 2
@@ -93,6 +103,10 @@ custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
 text = "购买"
 
+[node name="LockButton3" type="Button" parent="VBoxContainer/ItemsContainer/Item3" unique_id=1366611473]
+layout_mode = 2
+text = "🔓"
+
 [node name="Item4" type="HBoxContainer" parent="VBoxContainer/ItemsContainer" unique_id=581606594]
 layout_mode = 2
 
@@ -110,6 +124,10 @@ text = "商品名称"
 custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
 text = "购买"
+
+[node name="LockButton4" type="Button" parent="VBoxContainer/ItemsContainer/Item4" unique_id=627632063]
+layout_mode = 2
+text = "🔓"
 
 [node name="ButtonsContainer" type="HBoxContainer" parent="VBoxContainer" unique_id=1147900147]
 layout_mode = 2

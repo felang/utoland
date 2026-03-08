@@ -29,6 +29,7 @@ func _ready() -> void:
 	confirm_button.pressed.connect(_on_confirm_pressed)
 	for i in range(4):
 		_connect_slot_buy_button(i)
+		_connect_slot_lock_button(i)
 	_generate_shop()
 	_update_ui()
 
@@ -228,6 +229,16 @@ func _connect_slot_buy_button(i: int) -> void:
 	if buy_btn:
 		buy_btn.pressed.connect(_buy_item.bind(i))
 
+func _connect_slot_lock_button(i: int) -> void:
+	var container := item_containers[i]
+	var lock_btn_name := "LockButton" if i == 0 else "LockButton" + str(i + 1)
+	if container.has_node(lock_btn_name):
+		container.get_node(lock_btn_name).pressed.connect(_toggle_lock.bind(i))
+
+func _toggle_lock(index: int) -> void:
+	locked_slots[index] = not locked_slots[index]
+	_update_ui()
+
 func _update_ui() -> void:
 	coin_label.text = "金币: %d" % GameData.coins
 	var refresh_cost := _get_refresh_cost()
@@ -258,6 +269,43 @@ func _display_items() -> void:
 			price_label.text = "价格: %d" % price
 		if buy_btn:
 			buy_btn.disabled = GameData.coins < price or not _can_buy(item)
+		# 锁定按钮状态
+		var lock_btn_name := "LockButton" if i == 0 else "LockButton" + str(i + 1)
+		if container.has_node(lock_btn_name):
+			container.get_node(lock_btn_name).text = "🔒" if locked_slots[i] else "🔓"
+		# 稀有度/亲和边框色（通过 Panel 背景）
+		_update_slot_color(container, item)
+
+func _update_slot_color(container: Node, item: ShopItemData) -> void:
+	if not container is PanelContainer:
+		return
+	var color := _get_slot_color(item)
+	var style: StyleBox = container.get_theme_stylebox("panel")
+	if style == null:
+		return
+	var new_style: StyleBox = style.duplicate()
+	if new_style is StyleBoxFlat:
+		var flat_style := new_style as StyleBoxFlat
+		flat_style.border_color = color
+		flat_style.border_width_left = 3
+		flat_style.border_width_right = 3
+		flat_style.border_width_top = 3
+		flat_style.border_width_bottom = 3
+		container.add_theme_stylebox_override("panel", flat_style)
+
+func _get_slot_color(item: ShopItemData) -> Color:
+	# 亲和色优先
+	var affinity_tags := _get_affinity_tags()
+	for tag in item.tags:
+		if tag in affinity_tags:
+			match tag:
+				Enums.ItemTag.SHOOTER:  return Color(0.2, 0.5, 1.0)
+				Enums.ItemTag.ENGINEER: return Color(0.2, 0.8, 0.3)
+	# 稀有度色
+	match item.rarity:
+		Enums.ItemRarity.RARE: return Color(0.3, 0.6, 1.0)
+		Enums.ItemRarity.EPIC: return Color(0.7, 0.3, 1.0)
+		_: return Color(0.5, 0.5, 0.5)
 
 func _get_refresh_cost() -> int:
 	var wave := GameData.current_wave + 1
