@@ -70,6 +70,8 @@ var crit_chance: float = 0.0
 var crit_damage_mult: float = 2.0
 ## 弹道分裂数（0 = 不分裂）
 var split_count: int = 0
+## 分裂弹伤害倍率
+var split_damage_mult: float = 0.5
 ## 每波护盾层数（每波开始重置）
 var wave_shield_count: int = 0
 ## 当前护盾层数
@@ -163,6 +165,7 @@ func reset() -> void:
 	crit_chance = 0.0
 	crit_damage_mult = 2.0
 	split_count = 0
+	split_damage_mult = 0.5
 	wave_shield_count = 0
 	current_shield = 0
 	wave_heal_ratio = 0.0

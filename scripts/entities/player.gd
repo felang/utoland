@@ -12,6 +12,7 @@ var _is_dashing: bool = false
 var _dash_direction: Vector2 = Vector2.ZERO
 var _dash_remaining: float = 0.0
 var _dash_speed: float = 800.0
+var _slow_aura_timer: float = 0.0
 
 @onready var health: HealthComponent = $HealthComponent
 @onready var _weapon_manager: WeaponManager = $WeaponManager
@@ -66,7 +67,10 @@ func _process(delta: float) -> void:
 
 	# 减速光环
 	if GameData.slow_aura_active:
-		_apply_slow_aura()
+		_slow_aura_timer += delta
+		if _slow_aura_timer >= 0.25:
+			_slow_aura_timer = 0.0
+			_apply_slow_aura()
 
 	# 自动冲刺
 	if GameData.auto_dash_active:
@@ -104,31 +108,25 @@ func _physics_process(delta: float) -> void:
 func _on_hurtbox_hit(damage: float, _knockback: Vector2) -> void:
 	if invincible_timer > 0:
 		return
+	_apply_damage(damage)
+
+# 保留供塔攻击等外部系统调用；投射物伤害通过 Hurtbox 信号处理
+func take_damage(amount: float) -> void:
+	if invincible_timer > 0:
+		return
+	_apply_damage(amount)
+
+## 处理伤害减免（闪避/护盾/减伤）并应用最终伤害
+func _apply_damage(raw_damage: float) -> void:
 	# 闪避判定
-	if GameData.dodge_chance > 0.0 and randf() < GameData.dodge_chance:
+	if GameData.dodge_chance > 0.0 and randf() < minf(GameData.dodge_chance, 0.75):
 		return
 	# 护盾判定
 	if GameData.current_shield > 0:
 		GameData.current_shield -= 1
 		return
 	# 减伤
-	var final_damage: float = damage * (1.0 - GameData.damage_reduction)
-	health.take_damage_no_sparks(final_damage)
-	_flash_white()
-	invincible_timer = invincible_duration
-	var fx: EffectConfigData = GameConfig.effects
-	EventBus.camera_shake_requested.emit(fx.camera_shake_player_hit_intensity, fx.camera_shake_player_hit_duration)
-
-# 保留供塔攻击等外部系统调用；投射物伤害通过 Hurtbox 信号处理
-func take_damage(amount: float) -> void:
-	if invincible_timer > 0:
-		return
-	if GameData.dodge_chance > 0.0 and randf() < GameData.dodge_chance:
-		return
-	if GameData.current_shield > 0:
-		GameData.current_shield -= 1
-		return
-	var final_damage: float = amount * (1.0 - GameData.damage_reduction)
+	var final_damage: float = raw_damage * (1.0 - clampf(GameData.damage_reduction, 0.0, 0.9))
 	health.take_damage_no_sparks(final_damage)
 	_flash_white()
 	invincible_timer = invincible_duration

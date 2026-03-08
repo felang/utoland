@@ -52,7 +52,7 @@ func _spawn_split_bullets() -> void:
 	var scene_parent: Node = get_parent()
 	if not scene_parent:
 		return
-	var split_damage: float = hitbox.damage * 0.5
+	var split_damage: float = hitbox.damage * GameData.split_damage_mult
 	for i in GameData.split_count:
 		var angle: float = randf_range(-PI / 2, PI / 2)
 		var split_dir: Vector2 = _direction.rotated(angle)

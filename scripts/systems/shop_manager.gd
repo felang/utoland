@@ -210,6 +210,7 @@ func _apply_item_effect(item: ShopItemData) -> void:
 			GameData.crit_chance += p.get("chance", 0.10)
 		Enums.ItemEffect.SPLIT:
 			GameData.split_count += p.get("count", 2)
+			GameData.split_damage_mult = p.get("damage_mult", 0.5)
 		Enums.ItemEffect.WAVE_SHIELD:
 			GameData.wave_shield_count += p.get("count", 1)
 		Enums.ItemEffect.WAVE_HEAL_PLAYER:
