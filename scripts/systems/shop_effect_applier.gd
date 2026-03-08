@@ -68,6 +68,8 @@ func apply_effect(item: ShopItemData) -> void:
 			GameData.auto_dash_distance = max(GameData.auto_dash_distance, p.get("distance", 80.0))
 		Enums.ItemEffect.DESTINY:
 			pass  # 天命效果在 _generate_shop 时处理（购买后重新刷新出额外稀有物品）
+		_:
+			push_warning("未知效果类型: %s" % item.effect_type)
 
 func _apply_stat_boost(p: Dictionary) -> void:
 	if p.has("stat"):
@@ -97,3 +99,5 @@ func _set_tower_stat(stat: String, value: float) -> void:
 			GameData.player_stats[Enums.Stat.TOWER_MULT] += value
 		"hp_mult":
 			GameData.player_stats[Enums.Stat.HP_MULT] += value
+		_:
+			push_warning("未知塔属性: %s" % stat)
