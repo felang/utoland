@@ -40,4 +40,18 @@ func _shoot_nearest_enemy() -> void:
 		var bullet: BulletProjectile = SceneFactory.create_bullet_projectile()
 		var direction: Vector2 = global_position.direction_to(closest.global_position)
 		get_parent().add_child(bullet)
-		bullet.setup(attack_damage, 0.0, global_position, direction)
+		bullet.setup(attack_damage * _get_symbiosis_bonus(), 0.0, global_position, direction)
+
+func _get_symbiosis_bonus() -> float:
+	if GameData.symbiosis_hp_threshold <= 0.0:
+		return 1.0
+	var players: Array[Node] = get_tree().get_nodes_in_group(Enums.Group.PLAYER)
+	if players.is_empty():
+		return 1.0
+	var player: Node = players[0]
+	if player.get("health") == null:
+		return 1.0
+	var hp_ratio: float = player.health.current_hp / player.health.max_hp
+	if hp_ratio < GameData.symbiosis_hp_threshold:
+		return 1.0 + GameData.symbiosis_tower_bonus
+	return 1.0

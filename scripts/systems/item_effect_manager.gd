@@ -5,6 +5,21 @@ extends Node
 ## - 金矿：每波结束给玩家加金币（GameData.wave_gold_bonus）
 ## - 战场维修：每波结束给所有塔回HP（GameData.wave_tower_heal_ratio）
 ## - 战争机器：每波开始扣玩家HP（GameData.war_machine_wave_hp_cost）
+## - 纳米修复：战斗中塔定时自愈（GameData.tower_regen_active）
+
+var _regen_timer: float = 0.0
+
+func _process(delta: float) -> void:
+	# 纳米修复：战斗中塔定时自愈
+	if not GameData.tower_regen_active:
+		return
+	_regen_timer += delta
+	if _regen_timer >= GameData.tower_regen_interval:
+		_regen_timer = 0.0
+		var towers: Array[Node] = get_tree().get_nodes_in_group(Enums.Group.TOWERS)
+		for tower in towers:
+			if tower.get("health") != null:
+				tower.health.heal(GameData.tower_regen_hp)
 
 func _ready() -> void:
 	EventBus.wave_completed.connect(_on_wave_completed)

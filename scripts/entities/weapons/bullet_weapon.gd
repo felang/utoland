@@ -2,6 +2,12 @@
 class_name BulletWeapon
 extends Weapon
 
+func _get_tower_link_bonus() -> float:
+	if GameData.tower_link_damage_per_tower <= 0.0:
+		return 1.0
+	var towers: Array[Node] = get_tree().get_nodes_in_group(Enums.Group.TOWERS)
+	return 1.0 + towers.size() * GameData.tower_link_damage_per_tower
+
 func fire(target: Node2D) -> void:
 	if not owner_node:
 		return
@@ -11,6 +17,9 @@ func fire(target: Node2D) -> void:
 	if GameData.kill_stack_count > 0:
 		base_damage *= (1.0 + GameData.kill_stack_count * GameData.kill_stack_damage_per_stack)
 		GameData.kill_stack_count = 0
+
+	# 联动系统：每座塔给玩家武器伤害加成
+	base_damage *= _get_tower_link_bonus()
 
 	var scene_parent: Node = owner_node.get_parent()
 	if not scene_parent:
