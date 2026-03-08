@@ -75,3 +75,32 @@ class Anim:
 	const WALK_LEFT = "walk_left"
 	const WALK_RIGHT = "walk_right"
 	const DEFAULT = "default"
+
+# 物品标签
+class ItemTag:
+	const SHOOTER  = "shooter"   # 射手
+	const ENGINEER = "engineer"  # 工程
+	const UNIVERSAL = "universal" # 通用
+
+# 物品稀有度
+class ItemRarity:
+	const COMMON = "common"
+	const RARE   = "rare"
+	const EPIC   = "epic"
+
+# 物品效果类型
+class ItemEffect:
+	const STAT_BOOST    = "stat_boost"     # 修改 player_stats
+	const TOWER_STAT    = "tower_stat"     # 修改塔属性倍率（存 player_stats）
+	const CONSUMABLE    = "consumable"     # 一次性效果
+	const PIERCE        = "pierce"         # 穿甲弹：子弹穿透
+	const MULTISHOT     = "multishot"      # 弹幕：多发
+	const KILL_STACK    = "kill_stack"     # 蓄力：击杀叠层
+	const LIFESTEAL     = "lifesteal"      # 吸血
+	const TOWER_LINK    = "tower_link"     # 联动系统
+	const WAVE_GOLD     = "wave_gold"      # 金矿：波次结束给金币
+	const WAVE_HEAL_TOWERS = "wave_heal_towers"  # 战场维修
+	const TOWER_REGEN   = "tower_regen"    # 纳米修复
+	const SYMBIOSIS     = "symbiosis"      # 共生
+	const WAR_MACHINE   = "war_machine"    # 战争机器
+	const DESTINY       = "destiny"        # 天命
