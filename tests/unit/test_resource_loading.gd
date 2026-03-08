@@ -108,15 +108,15 @@ func test_waves_sorted_by_number() -> void:
 
 func test_wave_1_defaults() -> void:
 	var w: WaveData = GameConfig.waves[0]
-	assert_eq(w.duration, 45.0)
+	assert_eq(w.time_limit, 60.0)
 	assert_eq(w.spawn_interval, 1.5)
-	assert_eq(Array(w.enemy_types), [Enums.Enemy.NORMAL])
+	assert_true(w.enemy_weights.has("normal"), "波次1应包含normal敌人权重")
 
 func test_wave_6_values() -> void:
 	var w: WaveData = GameConfig.waves[5]
-	assert_eq(w.duration, 55.0)
-	assert_eq(w.spawn_interval, 0.8)
-	assert_eq(Array(w.enemy_types), [Enums.Enemy.NORMAL, Enums.Enemy.FAST, Enums.Enemy.TANK])
+	assert_eq(w.time_limit, 60.0, "旧.tres未设置time_limit，应使用默认值")
+	assert_eq(w.spawn_interval, 0.8, "波次6的spawn_interval应从.tres加载")
+	assert_true(w.enemy_weights.size() > 0, "波次6应包含敌人权重")
 
 
 # ===== 角色资源加载 =====

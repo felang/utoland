@@ -34,7 +34,7 @@ func start_next_wave() -> void:
 		return
 
 	var wave_data: WaveData = GameConfig.waves[current_wave - 1]
-	wave_time_left = wave_data.duration
+	wave_time_left = wave_data.time_limit
 	is_wave_active = true
 	EventBus.wave_started.emit(current_wave, wave_data)
 	var fx: EffectConfigData = GameConfig.effects

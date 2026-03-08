@@ -158,7 +158,7 @@ func _update_buffs() -> void:
 
 func _on_wave_started(_wave_number: int, wave_data: WaveData) -> void:
 	_is_wave_active = true
-	_wave_time_left = wave_data.duration
+	_wave_time_left = wave_data.time_limit
 	_wave_kills = 0
 	_update_buffs()
 

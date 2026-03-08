@@ -33,7 +33,7 @@ func _process(delta: float) -> void:
 		spawn_timer = _current_wave_data.spawn_interval
 
 func spawn_enemy() -> void:
-	var enemy_types: Array = _current_wave_data.enemy_types
+	var enemy_types: Array = _current_wave_data.enemy_weights.keys()
 	var random_type: String = enemy_types[randi() % enemy_types.size()]
 	var enemy: Node = SceneFactory.create_enemy(random_type)
 
