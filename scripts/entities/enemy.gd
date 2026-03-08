@@ -11,6 +11,7 @@ var data: EnemyData = null
 var enemy_type: String = "normal"
 # 精英怪标识（由 SceneFactory 或生成逻辑设置）
 var is_elite: bool = false
+var _elite_coin_mult: float = 1.0
 
 @export var tower_attack_rate: float = 1.0
 
@@ -105,10 +106,21 @@ func _drop_coins() -> void:
 		return
 
 	var coin_count: int = randi_range(data.coin_drop_min, data.coin_drop_max)
+	coin_count = int(coin_count * _elite_coin_mult)
 	for i in coin_count:
 		var coin = SceneFactory.create_coin()
 		coin.global_position = global_position + Vector2(randf_range(-COIN_SCATTER_RANGE, COIN_SCATTER_RANGE), randf_range(-COIN_SCATTER_RANGE, COIN_SCATTER_RANGE))
 		parent.call_deferred("add_child", coin)
+
+func apply_elite(hp_mult: float, damage_mult: float, coin_mult: float, scale_mult: float) -> void:
+	is_elite = true
+	_elite_coin_mult = coin_mult
+	health.max_hp *= hp_mult
+	health.current_hp = health.max_hp
+	tower_attack_damage *= damage_mult
+	_hitbox.damage *= damage_mult
+	scale *= scale_mult
+	add_to_group("elites")
 
 func apply_knockback(dir: Vector2) -> void:
 	_knockback.apply_knockback(dir)

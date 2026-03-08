@@ -59,6 +59,14 @@ func spawn_enemy() -> void:
 	enemy.global_position = spawn_pos
 	enemies_spawned += 1
 	get_parent().add_child(enemy)
+	# 精英怪检查（必须在 add_child 之后，_ready 已执行）
+	if _current_wave_data.elite_chance > 0.0 and randf() < _current_wave_data.elite_chance:
+		enemy.apply_elite(
+			_current_wave_data.elite_hp_mult,
+			_current_wave_data.elite_damage_mult,
+			_current_wave_data.elite_coin_mult,
+			_current_wave_data.elite_scale
+		)
 
 func get_random_spawn_position() -> Vector2:
 	var spawn_pos = Vector2.ZERO
