@@ -22,10 +22,13 @@ func test_map_select_cards_fit_640x360():
 func test_result_panel_and_buttons_fit_640x360():
 	var scene = load("res://scenes/ui/result.tscn").instantiate()
 	add_child_autofree(scene)
-	var panel: Control = scene.get_node("VBoxContainer")
-	assert_eq(_control_size(panel), Vector2(320, 220))
-	assert_eq(scene.get_node("VBoxContainer/RestartButton").custom_minimum_size, Vector2(160, 36))
-	assert_eq(scene.get_node("VBoxContainer/QuitButton").custom_minimum_size, Vector2(160, 36))
+	var vbox: VBoxContainer = scene.get_node("CenterContainer/VBoxContainer")
+	assert_not_null(vbox, "VBoxContainer 应存在")
+	assert_eq(vbox.custom_minimum_size, Vector2(400, 0), "VBox 最小宽度应为 400")
+	var restart_btn: Button = scene.get_node("CenterContainer/VBoxContainer/ButtonRow/RestartButton")
+	var menu_btn: Button = scene.get_node("CenterContainer/VBoxContainer/ButtonRow/MenuButton")
+	assert_eq(restart_btn.custom_minimum_size, Vector2(140, 36))
+	assert_eq(menu_btn.custom_minimum_size, Vector2(140, 36))
 
 func test_shop_main_panel_fits_640x360():
 	var scene = load("res://scenes/ui/shop.tscn").instantiate()
