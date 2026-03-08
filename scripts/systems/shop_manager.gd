@@ -322,4 +322,4 @@ func _on_refresh_pressed() -> void:
 	_update_ui()
 
 func _on_confirm_pressed() -> void:
-	SceneManager.go_to(Enums.Scene.PLACEMENT)
+	SceneManager.go_to(Enums.Scene.MAIN)
