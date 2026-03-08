@@ -119,8 +119,6 @@ func _generate_shop() -> void:
 					weighted_pool.append(item)
 					break
 		if weighted_pool.is_empty():
-			weighted_pool = pool
-		if weighted_pool.is_empty():
 			weighted_pool = by_rarity[Enums.ItemRarity.COMMON]
 		if weighted_pool.is_empty():
 			continue
@@ -272,7 +270,6 @@ func _on_refresh_pressed() -> void:
 	if GameData.coins < cost:
 		return
 	GameData.coins -= cost
-	locked_slots = [false, false, false, false]
 	_generate_shop()
 	_update_ui()
 
