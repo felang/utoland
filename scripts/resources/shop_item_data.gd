@@ -3,6 +3,7 @@ extends Resource
 
 @export var id: String = ""
 @export var display_name: String = ""
+@export var description: String = ""
 ## 标签数组，对应 Enums.ItemTag 常量
 @export var tags: PackedStringArray = PackedStringArray()
 @export var rarity: String = Enums.ItemRarity.COMMON
