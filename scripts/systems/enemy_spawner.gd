@@ -1,10 +1,14 @@
 extends Node
 
+enum BossPhase { NONE, ESCORT, BOSS, DONE }
+
 var spawn_timer: float = 0.0
 var enemies_spawned: int = 0
 var player: Node2D
 var _current_wave_data: WaveData = null
 var _is_wave_active: bool = false
+var _boss_phase: int = BossPhase.NONE
+var _boss_spawned: bool = false
 
 # Map boundaries
 var map_min_x: float = -GameConfig.MAP_HALF_WIDTH
@@ -28,6 +32,11 @@ func _process(delta: float) -> void:
 	if not _is_wave_active:
 		return
 
+	if _current_wave_data.is_boss_wave:
+		_process_boss_wave(delta)
+		return
+
+	# 普通波
 	spawn_timer -= delta
 	if spawn_timer <= 0 and _should_spawn():
 		spawn_enemy()
@@ -83,11 +92,45 @@ func get_random_spawn_position() -> Vector2:
 
 	return spawn_pos
 
+func _process_boss_wave(delta: float) -> void:
+	match _boss_phase:
+		BossPhase.ESCORT:
+			spawn_timer -= delta
+			if spawn_timer <= 0 and _should_spawn_escort():
+				spawn_enemy()
+				spawn_timer = _current_wave_data.spawn_interval
+			if not _should_spawn_escort():
+				_boss_phase = BossPhase.BOSS
+		BossPhase.BOSS:
+			if not _boss_spawned:
+				_spawn_boss()
+				_boss_phase = BossPhase.DONE
+		BossPhase.DONE:
+			pass
+
+func _should_spawn_escort() -> bool:
+	return enemies_spawned < _current_wave_data.boss_escort_count
+
+func _spawn_boss() -> void:
+	var boss: Node = SceneFactory.create_enemy(_current_wave_data.boss_id)
+	if not boss:
+		push_error("无法创建 Boss: " + _current_wave_data.boss_id)
+		return
+	var spawn_pos: Vector2 = get_random_spawn_position()
+	boss.global_position = spawn_pos
+	_boss_spawned = true
+	get_parent().add_child(boss)
+
 func _on_wave_started(_wave_number: int, wave_data: WaveData) -> void:
 	_current_wave_data = wave_data
 	_is_wave_active = true
 	spawn_timer = 0.0
 	enemies_spawned = 0
+	_boss_spawned = false
+	if wave_data.is_boss_wave:
+		_boss_phase = BossPhase.ESCORT
+	else:
+		_boss_phase = BossPhase.NONE
 
 func _on_wave_completed(_wave_number: int) -> void:
 	_is_wave_active = false
