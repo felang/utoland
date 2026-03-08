@@ -5,6 +5,10 @@
 [resource]
 script = ExtResource("1")
 wave_number = 8
-duration = 60.0
-spawn_interval = 0.8
-enemy_types = PackedStringArray("normal", "fast", "tank")
+total_enemies = 10
+time_limit = 90.0
+spawn_interval = 1.0
+enemy_weights = { "fast": 60, "tank": 40 }
+is_boss_wave = true
+boss_id = "boss_brute"
+boss_escort_count = 10

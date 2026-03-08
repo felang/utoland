@@ -4,3 +4,7 @@
 
 [resource]
 script = ExtResource("1")
+wave_number = 1
+total_enemies = 10
+time_limit = 45.0
+spawn_interval = 2.0
