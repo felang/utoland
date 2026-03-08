@@ -1,7 +1,7 @@
 extends GutTest
 
 func test_items_are_loaded():
-	assert_eq(GameConfig.items.size(), 25, "应加载25个物品")
+	assert_eq(GameConfig.items.size(), 37, "应加载37个物品")
 
 func test_shooter_common_items_exist():
 	assert_true(GameConfig.items.has("sharp_bullet"))
