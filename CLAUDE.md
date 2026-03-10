@@ -23,6 +23,7 @@ utoland 是一个基于 **Godot 4.6** 的 2D 塔防 + 射击混合类游戏。�
 - **GameData** (`scripts/core/game_data.gd`) — 运行时游戏状态，存储当前角色属性、金币、波次、已购买物品效果状态（pierce_count、multishot_active、lifesteal_ratio 等）、塔属性倍率等。跨场景传递数据。
 - **SceneFactory** (`scripts/core/scene_factory.gd`) — 集中管理场景实例化，提供 `create_tower()`, `create_enemy()`, `create_bullet()`, `create_coin()` 等工厂方法。创建实体必须通过此工厂。
 - **EffectsManager** (`scripts/systems/effects_manager.gd`) — 特效管理：伤害数字、击中火花、死亡爆炸、闪白等视觉效果。
+- **AudioManager** (`scripts/systems/audio_manager.gd`) — 音效管理：AudioStreamPlayer 池化播放，通过 `play(sound_id)` 统一触发。音效文件放 `assets/sfx/`。
 - **EventBus** (`scripts/core/event_bus.gd`) — 全局事件总线，用于跨系统解耦通信（如波次事件、商店事件等）。
 - **SceneManager** (`scripts/core/scene_manager.gd`) — 集中管理场景切换，提供 `go_to(scene_name)` 方法。所有场景路径在此统一维护，禁止直接调用 `get_tree().change_scene_to_file()`。
 
@@ -44,7 +45,7 @@ start_menu → character_selection → map_select → main (战斗)
 - `scripts/components/` — 可复用组件 (HealthComponent, SpriteAnimator, Hitbox, Hurtbox, KnockbackHandler, SlowHandler)
 - `scripts/resources/` — 自定义 Resource 类定义 (WeaponData, EnemyData, TowerData, WaveData, CharacterData, ShopItemData 等)
 - `scripts/entities/` — 游戏实体 (player, enemy, boss_base, boss_brute, coin, towers/, weapons/, projectiles/)
-- `scripts/systems/` — 游戏系统 (wave_manager, enemy_spawner, shop_manager, shop_item_generator, shop_effect_applier, effects_manager, item_effect_manager)
+- `scripts/systems/` — 游戏系统 (wave_manager, enemy_spawner, shop_manager, shop_item_generator, shop_effect_applier, effects_manager, audio_manager, item_effect_manager)
 - `scripts/ui/` — UI 脚本 (hud, start_menu, result, 各选择界面, main 场景控制)
 - `resources/` — `.tres` 配置数据文件 (weapons/, enemies/, towers/, waves/<map_id>/, characters/, maps/, shop/, effects/, spawn/, items/)
 - `scenes/entities/` — 实体场景 (player, coin, enemies/, towers/, projectiles/)
