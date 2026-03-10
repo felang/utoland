@@ -13,3 +13,7 @@ tile_set = ExtResource("1_vawev")
 [node name="Decoration" type="TileMapLayer" parent="." unique_id=72026641]
 z_index = -1
 position = Vector2(-640, -480)
+
+[node name="Border" type="TileMapLayer" parent="." unique_id=609977425]
+z_index = -1
+position = Vector2(-640, -480)
