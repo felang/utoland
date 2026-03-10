@@ -11,3 +11,4 @@ preview_image = "res://assets/maps/desert_preview.png"
 background = "res://assets/maps/desert_bg.png"
 fallback_color = "#d4a574"
 map_scene = "res://scenes/levels/maps/desert.tscn"
+wave_count = 0
