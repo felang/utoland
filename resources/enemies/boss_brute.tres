@@ -11,3 +11,7 @@ speed = 60.0
 damage = 30.0
 coin_drop_min = 15
 coin_drop_max = 25
+charge_cooldown = 8.0
+charge_speed_mult = 4.0
+charge_damage_mult = 2.0
+charge_windup_time = 0.8
