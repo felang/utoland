@@ -8,6 +8,7 @@ signal died()
 
 @export var max_hp: float = 100.0
 var current_hp: float = 0.0
+var invincible: bool = false
 
 # 死亡特效颜色（可由宿主设置）
 var death_color: Color = Color.RED
@@ -24,6 +25,8 @@ func initialize(hp: float) -> void:
 	current_hp = hp
 
 func take_damage(amount: float) -> void:
+	if invincible:
+		return
 	current_hp -= amount
 	# 闪白
 	var owner_node: Node2D = get_parent() as Node2D
@@ -40,6 +43,8 @@ func take_damage(amount: float) -> void:
 
 func take_damage_no_sparks(amount: float) -> void:
 	# 用于 Player — 不需要击中火花，需要自定义闪白后续（无敌帧）
+	if invincible:
+		return
 	current_hp -= amount
 	damaged.emit(amount, current_hp)
 	if current_hp <= 0:
