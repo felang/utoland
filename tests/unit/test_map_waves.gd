@@ -38,3 +38,8 @@ func test_desert_map_scene_configured():
 	var md: MapData = GameConfig.maps.get("desert")
 	assert_not_null(md, "desert MapData 应存在")
 	assert_ne(md.map_scene, "", "desert.tres 应配置 map_scene 路径")
+
+func test_forest_map_scene_file_exists():
+	var md: MapData = GameConfig.maps.get("forest")
+	# FileAccess.file_exists 支持 res:// 路径，在 headless 模式下直接检查文件系统
+	assert_true(FileAccess.file_exists(md.map_scene), "forest 地图场景文件应存在于磁盘")
