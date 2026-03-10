@@ -23,3 +23,18 @@ func test_game_config_fallback_for_unknown_map():
 
 func test_waves_by_map_has_forest():
 	assert_true(GameConfig.waves_by_map.has("forest"), "waves_by_map 应包含 forest")
+
+func test_map_data_has_map_scene_field():
+	var md := MapData.new()
+	assert_true("map_scene" in md, "MapData 应有 map_scene 字段")
+	assert_eq(md.map_scene, "", "map_scene 默认值应为空字符串")
+
+func test_forest_map_scene_configured():
+	var md: MapData = GameConfig.maps.get("forest")
+	assert_not_null(md, "forest MapData 应存在")
+	assert_ne(md.map_scene, "", "forest.tres 应配置 map_scene 路径")
+
+func test_desert_map_scene_configured():
+	var md: MapData = GameConfig.maps.get("desert")
+	assert_not_null(md, "desert MapData 应存在")
+	assert_ne(md.map_scene, "", "desert.tres 应配置 map_scene 路径")

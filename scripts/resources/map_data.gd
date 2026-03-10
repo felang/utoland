@@ -8,3 +8,4 @@ extends Resource
 @export var background: String = ""
 @export var fallback_color: String = "#2d5016"
 @export var wave_count: int = 10
+@export var map_scene: String = ""  # 指向对应地图场景，如 res://scenes/levels/maps/forest.tscn
