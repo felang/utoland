@@ -115,6 +115,7 @@ func _physics_process(delta: float) -> void:
 func _on_hurtbox_hit(damage: float, _knockback: Vector2) -> void:
 	if invincible_timer > 0:
 		return
+	AudioManager.play("player_hit")
 	_apply_damage(damage)
 
 # 保留供塔攻击等外部系统调用；投射物伤害通过 Hurtbox 信号处理

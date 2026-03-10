@@ -97,6 +97,7 @@ func _on_died() -> void:
 	EventBus.camera_shake_requested.emit(fx.camera_shake_enemy_kill_intensity, fx.camera_shake_enemy_kill_duration)
 	GameData.record_kill()
 	EventBus.enemy_killed.emit(enemy_type, global_position, is_elite)
+	AudioManager.play("enemy_die")
 	_drop_coins()
 	queue_free()
 
@@ -132,6 +133,7 @@ func apply_slow(slow_percent: float) -> void:
 	slow_handler.apply_slow(slow_percent)
 
 func _on_hurtbox_hit(damage: float, knockback_dir: Vector2) -> void:
+	AudioManager.play("hit", -6.0)
 	health.take_damage(damage)
 	if knockback_dir.length() > 0:
 		_knockback.apply_knockback(knockback_dir.normalized())

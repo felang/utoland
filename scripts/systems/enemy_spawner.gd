@@ -120,6 +120,7 @@ func _spawn_boss() -> void:
 	boss.global_position = spawn_pos
 	_boss_spawned = true
 	get_parent().add_child(boss)
+	AudioManager.play("boss_appear")
 
 func _on_wave_started(_wave_number: int, wave_data: WaveData) -> void:
 	_current_wave_data = wave_data

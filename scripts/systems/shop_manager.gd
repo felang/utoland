@@ -74,6 +74,7 @@ func _buy_item(index: int) -> void:
 	GameData.purchased_items[item.id] = GameData.purchased_items.get(item.id, 0) + 1
 	GameData.record_item_purchased(item.id)
 	_effect_applier.apply_effect(item)
+	AudioManager.play("shop_buy")
 	_update_ui()
 
 # ===== UI =====

@@ -50,6 +50,7 @@ func complete_wave() -> void:
 		return
 	is_wave_active = false
 	EventBus.wave_completed.emit(current_wave)
+	AudioManager.play("wave_complete")
 	print("Wave ", current_wave, " completed!")
 	if not is_inside_tree():
 		return
@@ -79,6 +80,7 @@ func _start_wave_with_data(wave_num: int, wave_data: WaveData) -> void:
 	wave_time_left = wave_data.time_limit
 	is_wave_active = true
 	EventBus.wave_started.emit(wave_num, wave_data)
+	AudioManager.play("wave_start")
 	var fx: EffectConfigData = GameConfig.effects
 	if fx:
 		EventBus.camera_shake_requested.emit(fx.camera_shake_wave_start_intensity, fx.camera_shake_wave_start_duration)

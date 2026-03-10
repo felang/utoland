@@ -43,6 +43,7 @@ func fire(target: Node2D) -> void:
 		_spawn_bullet(scene_parent, base_dir, base_damage)
 
 	_spawn_muzzle_flash(owner_node)
+	AudioManager.play("shoot")
 
 func _spawn_bullet(scene_parent: Node, direction: Vector2, damage: float) -> void:
 	var bullet: BulletProjectile = SceneFactory.create_bullet_projectile()
