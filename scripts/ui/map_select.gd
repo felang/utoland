@@ -47,7 +47,6 @@ func _create_map_card(map_id: String, map_data: MapData, unlocked: bool) -> Pane
 		bg_color = base_color.darkened(0.3)
 	else:
 		bg_color = base_color.darkened(0.6)
-		bg_color.a = 0.4
 	card.add_theme_stylebox_override("panel", UIConstants.create_panel_stylebox(bg_color, UIConstants.CORNER_RADIUS_PANEL))
 
 	# 锁定状态整体降低透明度
