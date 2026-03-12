@@ -14,8 +14,9 @@
 
 - 首波时 `GameData.current_wave == 0`，商店 Tab 隐藏
 - 波次结束后进入 placement，`current_wave >= 1`，商店 Tab 可见，默认激活商店 Tab
-- `map_select.gd` 改为 `go_to(PLACEMENT)`
+- `map_select.gd` 改为 `go_to(PLACEMENT)`（`GameData.reset()` 仍在进入 placement 前调用）
 - `main.gd` 波次结束后改为 `go_to(PLACEMENT)`
+- `placement._start_battle()` 不修改 `current_wave`，波次推进由 `wave_manager.start_next_wave()` 负责
 
 ## 场景结构
 
@@ -44,7 +45,8 @@ Placement (Node2D)
 - `SidePanel` 锚定左侧全高，固定 120px 宽
 - `PlacementContent` 和 `ShopContent` 通过 `visible` 切换
 - `CoinsLabel` 和 `StartBattleButton` 两个 Tab 共享
-- 鼠标在 SidePanel 区域内不触发地图交互
+- 输入路由：SidePanel 设 `mouse_filter = STOP` 阻断输入穿透；`placement.gd._input()` 中鼠标事件需检查 `get_global_mouse_position().x > 120` 再处理地图交互；滚轮缩放同理跳过侧栏区域
+- ESC 键：有预览时取消放置；无预览时打开暂停菜单（复用 PauseOverlay）
 
 ## 脚本拆分
 
@@ -60,7 +62,7 @@ scripts/ui/shop_panel.gd         — 商店侧栏：复用 ShopItemGenerator + S
 - 场景初始化：加载地图背景、网格覆层、范围指示器、相机
 - Tab 切换：控制 PlacementContent / ShopContent 的 visible
 - 相机控制：WASD 平移、滚轮缩放（复用现有逻辑）
-- `_start_battle()`：收集塔写入 `GameData.tower_inventory`，设 `is_first_wave = false`，跳转 main
+- `_start_battle()`：收集塔写入 `GameData.tower_inventory`，跳转 main（不修改 `current_wave`）
 - 首波/非首波判断：控制商店 Tab 是否显示
 
 ### placement_panel.gd（布置侧栏）
@@ -81,7 +83,7 @@ scripts/ui/shop_panel.gd         — 商店侧栏：复用 ShopItemGenerator + S
 挂在 `ShopContent` 节点上。
 
 职责：
-- 复用 `ShopItemGenerator.generate_items()` 生成 4 件物品
+- 复用 `ShopItemGenerator.generate_items()` 生成 4 件物品（`locked_slots` 传 `[false, false, false, false]`，不支持锁定槽）
 - 物品卡片紧凑纵向列表（名称 + 简述 + 价格），带稀有度颜色条
 - 点击购买，复用 `ShopEffectApplier.apply_effect()` 应用效果
 - 刷新按钮：花费金币重新生成物品
@@ -113,9 +115,9 @@ scripts/ui/shop_panel.gd         — 商店侧栏：复用 ShopItemGenerator + S
 ## 商店 Tab 集成
 
 - 复用现有 `ShopItemGenerator` 和 `ShopEffectApplier`，不重新实现
-- 移除 `shop_item_generator.gd` 中的 `TOWER_EFFECT_TYPES` 过滤，让塔升级类物品（塔再生、塔链接、共生、战争机器等）重新出现
+- 永久移除 `shop_item_generator.gd` 中的 `TOWER_EFFECT_TYPES` 过滤，塔升级类物品（塔再生、塔链接、共生、战争机器等）重新出现在商店中
 - 不再需要锁定槽功能（侧栏空间有限）
-- 现有 `shop_manager.gd` 不再作为独立场景控制器使用，核心逻辑迁移到 `shop_panel.gd`
+- 退役独立商店场景：删除 `scenes/ui/shop.tscn`，从 `SceneManager.SCENES` 中移除 `SHOP` 条目，`shop_manager.gd` 保留但不再被路由调用（核心逻辑迁移到 `shop_panel.gd`）
 
 ## 数据持久化
 
@@ -123,7 +125,11 @@ scripts/ui/shop_panel.gd         — 商店侧栏：复用 ShopItemGenerator + S
 
 - 现有 `tower_inventory: Array`（`{type, position}` 字典数组）保持不变
 - 现有 `purchased_towers: Array` 保持不变
-- 新增 `is_first_wave: bool = true`，首波放置完毕后设为 `false`
+- 不新增字段，首波判断用 `current_wave == 0`
+
+### 塔 HP 策略
+
+- 塔在波间全回满 HP。`placement` 从 `tower_inventory` 恢复塔时创建全新实例，不保存战斗中的 HP 状态。这简化了实现，也给玩家一个波间喘息机会。
 
 ### main.gd 改动
 
@@ -139,3 +145,11 @@ scripts/ui/shop_panel.gd         — 商店侧栏：复用 ShopItemGenerator + S
 - **流程测试**：map_select → placement → main → placement(含商店) 场景切换
 - **拖放测试**：拖放阈值、网格吸附、越界取消
 - **商店过滤恢复测试**：塔相关物品不再被过滤
+- **输入路由测试**：侧栏区域点击不触发地图交互
+
+## 音效
+
+- 塔放置：`AudioManager.play("tower_place")`（新增音效）
+- 塔移除：`AudioManager.play("tower_remove")`（新增音效）
+- 商店购买：复用现有 `shop_buy`
+- Tab 切换：无音效（轻量操作）
