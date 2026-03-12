@@ -21,18 +21,18 @@ func test_rarity_weights_final_wave():
 	assert_gt(weights.get("epic", 0), 0)
 
 func test_affinity_discount_applied():
-	GameData.current_character = "warrior"
+	GameData.current_character = "dora"
 	var item: ShopItemData = GameConfig.items["sharp_bullet"]
-	var tags: PackedStringArray = GameConfig.characters["warrior"].affinity_tags
-	var discount: float = GameConfig.characters["warrior"].affinity_discount
+	var tags: PackedStringArray = GameConfig.characters["dora"].affinity_tags
+	var discount: float = GameConfig.characters["dora"].affinity_discount
 	var price: int = generator.calculate_price(item, tags, discount)
 	assert_lt(price, item.cost_max)
 
 func test_no_discount_for_non_affinity():
-	GameData.current_character = "warrior"
+	GameData.current_character = "dora"
 	var item: ShopItemData = GameConfig.items["engineer_manual"]
-	var tags: PackedStringArray = GameConfig.characters["warrior"].affinity_tags
-	var discount: float = GameConfig.characters["warrior"].affinity_discount
+	var tags: PackedStringArray = GameConfig.characters["dora"].affinity_tags
+	var discount: float = GameConfig.characters["dora"].affinity_discount
 	var price: int = generator.calculate_price(item, tags, discount)
 	assert_gte(price, item.cost_min)
 	assert_lte(price, item.cost_max)

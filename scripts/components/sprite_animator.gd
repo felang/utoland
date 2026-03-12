@@ -6,6 +6,15 @@ extends Node
 var _sprite: AnimatedSprite2D = null
 var _current_anim: String = ""
 
+func setup_from_sprite_frames(sprite_frames: SpriteFrames, sprite_pixel_size: float, target_size: float) -> void:
+	# 从预制 SpriteFrames 资源初始化（Aseprite Wizard 导出）
+	_create_sprite()
+	_sprite.sprite_frames = sprite_frames
+	_apply_scale(sprite_pixel_size, target_size)
+	var initial: String = Enums.Anim.IDLE_DOWN if sprite_frames.has_animation(Enums.Anim.IDLE_DOWN) else Enums.Anim.IDLE
+	_sprite.play(initial)
+	_current_anim = initial
+
 func setup_player_sprite(sprite_config: Dictionary, target_size: float) -> void:
 	# 创建玩家 AnimatedSprite2D（idle + walk 4方向）
 	if sprite_config.is_empty():
@@ -30,9 +39,14 @@ func update_animation(velocity: Vector2) -> void:
 	if not _sprite:
 		return
 	var anim: String = SpriteLoader.get_walk_animation(velocity, _current_anim)
-	if anim != _current_anim and _sprite.sprite_frames.has_animation(anim):
-		_sprite.play(anim)
-		_current_anim = anim
+	if anim != _current_anim:
+		if _sprite.sprite_frames.has_animation(anim):
+			_sprite.play(anim)
+			_current_anim = anim
+		elif anim.begins_with("idle_") and _sprite.sprite_frames.has_animation(Enums.Anim.IDLE):
+			if _current_anim != Enums.Anim.IDLE:
+				_sprite.play(Enums.Anim.IDLE)
+				_current_anim = Enums.Anim.IDLE
 
 func update_animation_no_idle(velocity: Vector2) -> void:
 	# 敌人版本：忽略 idle 动画（敌人始终在移动）

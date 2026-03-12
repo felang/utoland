@@ -1,0 +1,14 @@
+[remap]
+
+importer="aseprite_wizard.plugin.noop"
+type="PackedDataContainer"
+uid="uid://cwdvmtrvxq3vd"
+path="res://.godot/imported/dora-portrait.ase-43d354dcbdab9f7e15ec3e7e95b8140b.res"
+
+[deps]
+
+source_file="res://assets/characters/dora-portrait.ase"
+dest_files=["res://.godot/imported/dora-portrait.ase-43d354dcbdab9f7e15ec3e7e95b8140b.res"]
+
+[params]
+

@@ -44,46 +44,8 @@ const PLAYER = {
 	"default_enemy_touch_damage": 10.0  # 敌人没有 touch_damage 属性时的默认伤害
 }
 
-# ===== 精灵图配置（暂保留 const，后续资源化） =====
+# ===== 精灵图配置（玩家精灵已迁移到 CharacterData.sprite_frames_path） =====
 const SPRITES = {
-	"player": {
-		"warrior": {
-			"idle": "res://assets/sprites/player/knight_idle.png",
-			"walk": "res://assets/sprites/player/knight_walk.png",
-			"frame_size": Vector2(16, 16),
-			"idle_frames": 4,
-			"walk_frames": 4,
-			"walk_directions": 4,
-			"fps": 8.0
-		},
-		"ranger": {
-			"idle": "res://assets/sprites/player/hunter_idle.png",
-			"walk": "res://assets/sprites/player/hunter_walk.png",
-			"frame_size": Vector2(16, 16),
-			"idle_frames": 4,
-			"walk_frames": 4,
-			"walk_directions": 4,
-			"fps": 8.0
-		},
-		"tank": {
-			"idle": "res://assets/sprites/player/monk_idle.png",
-			"walk": "res://assets/sprites/player/monk_walk.png",
-			"frame_size": Vector2(16, 16),
-			"idle_frames": 4,
-			"walk_frames": 4,
-			"walk_directions": 4,
-			"fps": 8.0
-		},
-		"engineer": {
-			"idle": "res://assets/sprites/player/knight_idle.png",
-			"walk": "res://assets/sprites/player/knight_walk.png",
-			"frame_size": Vector2(16, 16),
-			"idle_frames": 4,
-			"walk_frames": 4,
-			"walk_directions": 4,
-			"fps": 8.0
-		}
-	},
 	"enemies": {
 		"normal": {
 			"spritesheet": "res://assets/sprites/enemies/slime.png",

@@ -21,10 +21,11 @@ class Scene:
 
 # 角色 ID
 class Character:
-	const WARRIOR = "warrior"
-	const RANGER = "ranger"
-	const TANK = "tank"
-	const ENGINEER = "engineer"
+	const DORA = "dora"
+	const GORG = "gorg"
+	const KAZE = "kaze"
+	const MERLIN = "merlin"
+	const NEMO = "nemo"
 
 # 武器 ID
 class WeaponId:
@@ -82,6 +83,8 @@ class Anim:
 	const WALK_UP = "walk_up"
 	const WALK_LEFT = "walk_left"
 	const WALK_RIGHT = "walk_right"
+	const ATTACK = "attack"
+	const DEAD = "dead"
 	const DEFAULT = "default"
 
 # 物品标签

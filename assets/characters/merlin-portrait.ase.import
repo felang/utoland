@@ -1,0 +1,14 @@
+[remap]
+
+importer="aseprite_wizard.plugin.noop"
+type="PackedDataContainer"
+uid="uid://bev6axy0qijmd"
+path="res://.godot/imported/merlin-portrait.ase-923056c3c5a1db55c1da84665100fc24.res"
+
+[deps]
+
+source_file="res://assets/characters/merlin-portrait.ase"
+dest_files=["res://.godot/imported/merlin-portrait.ase-923056c3c5a1db55c1da84665100fc24.res"]
+
+[params]
+

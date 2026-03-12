@@ -1,7 +1,7 @@
 extends Node
 
 # 角色系统
-var current_character: String = Enums.Character.WARRIOR  # 当前选择的角色
+var current_character: String = Enums.Character.DORA  # 当前选择的角色
 var character_max_hp: float = 0.0
 var character_speed: float = 0.0
 var character_damage_mult: float = 1.0
@@ -162,7 +162,7 @@ func _ready() -> void:
 func init_character(character_id: String) -> void:
 	if not GameConfig.characters.has(character_id):
 		push_error("未知角色: " + character_id)
-		character_id = Enums.Character.WARRIOR  # 回退到默认角色
+		character_id = Enums.Character.DORA  # 回退到默认角色
 
 	current_character = character_id
 	var char_data: CharacterData = GameConfig.characters[character_id]

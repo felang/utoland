@@ -122,37 +122,40 @@ func test_wave_6_values() -> void:
 # ===== 角色资源加载 =====
 
 func test_characters_loaded_count() -> void:
-	assert_eq(GameConfig.characters.size(), 4, "应加载 4 种角色")
+	assert_eq(GameConfig.characters.size(), 5, "应加载 5 种角色")
 
-func test_character_warrior_resource() -> void:
-	var c: CharacterData = GameConfig.characters[Enums.Character.WARRIOR]
-	assert_eq(c.display_name, "战士")
-	assert_eq(c.max_hp, 150.0)
-	assert_eq(c.speed, 180.0)
-	assert_eq(c.damage_mult, 1.2)
+func test_character_dora_resource() -> void:
+	var c: CharacterData = GameConfig.characters[Enums.Character.DORA]
+	assert_eq(c.display_name, "朵拉")
+	assert_eq(c.max_hp, 100.0)
+	assert_eq(c.speed, 200.0)
+	assert_eq(c.damage_mult, 1.0)
+	assert_eq(c.default_weapon, Enums.WeaponId.RIFLE)
 
-func test_character_ranger_resource() -> void:
-	var c: CharacterData = GameConfig.characters[Enums.Character.RANGER]
-	assert_eq(c.max_hp, 80.0)
-	assert_eq(c.attack_speed_mult, 1.1)
-	assert_eq(c.move_speed_mult, 1.25)
+func test_character_gorg_resource() -> void:
+	var c: CharacterData = GameConfig.characters[Enums.Character.GORG]
+	assert_eq(c.display_name, "格格")
+	assert_eq(c.default_weapon, Enums.WeaponId.RIFLE)
 
-func test_character_tank_resource() -> void:
-	var c: CharacterData = GameConfig.characters[Enums.Character.TANK]
-	assert_eq(c.max_hp, 200.0)
-	assert_eq(c.hp_regen, 1.0)
+func test_character_kaze_resource() -> void:
+	var c: CharacterData = GameConfig.characters[Enums.Character.KAZE]
+	assert_eq(c.display_name, "风")
+	assert_eq(c.default_weapon, Enums.WeaponId.RIFLE)
 
-func test_character_warrior_has_default_weapon() -> void:
-	var c: CharacterData = GameConfig.characters[Enums.Character.WARRIOR]
-	assert_eq(c.default_weapon, Enums.WeaponId.RIFLE, "战士默认武器应为步枪")
+func test_character_merlin_resource() -> void:
+	var c: CharacterData = GameConfig.characters[Enums.Character.MERLIN]
+	assert_eq(c.display_name, "梅林")
+	assert_eq(c.default_weapon, Enums.WeaponId.RIFLE)
 
-func test_character_ranger_has_default_weapon() -> void:
-	var c: CharacterData = GameConfig.characters[Enums.Character.RANGER]
-	assert_eq(c.default_weapon, Enums.WeaponId.BOOMERANG, "游侠默认武器应为回旋镖")
+func test_character_nemo_resource() -> void:
+	var c: CharacterData = GameConfig.characters[Enums.Character.NEMO]
+	assert_eq(c.display_name, "尼莫")
+	assert_eq(c.default_weapon, Enums.WeaponId.RIFLE)
 
-func test_character_tank_has_default_weapon() -> void:
-	var c: CharacterData = GameConfig.characters[Enums.Character.TANK]
-	assert_eq(c.default_weapon, Enums.WeaponId.LASER, "坦克默认武器应为激光枪")
+func test_character_has_sprite_frames_path() -> void:
+	var c: CharacterData = GameConfig.characters[Enums.Character.DORA]
+	assert_ne(c.sprite_frames_path, "", "角色应有 sprite_frames_path")
+	assert_true(c.sprite_frames_path.ends_with(".res"), "路径应为 .res 文件")
 
 
 # ===== 地图资源加载 =====
@@ -193,7 +196,7 @@ func test_player_const_unchanged() -> void:
 	assert_eq(GameConfig.PLAYER["initial_speed"], 200.0)
 
 func test_sprites_const_unchanged() -> void:
-	# SPRITES 保持 const
-	assert_true(GameConfig.SPRITES.has(Enums.Group.PLAYER))
+	# SPRITES 保持 const（玩家精灵已迁移到 CharacterData）
+	assert_false(GameConfig.SPRITES.has(Enums.Group.PLAYER), "玩家精灵已移除")
 	assert_true(GameConfig.SPRITES.has(Enums.Group.ENEMIES))
 	assert_true(GameConfig.SPRITES.has(Enums.Group.TOWERS))

@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="CharacterData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/character_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "gorg"
+display_name = "格格"
+description = "高生命值，适合近战"
+max_hp = 100.0
+speed = 200.0
+damage_mult = 1.0
+attack_speed_mult = 1.0
+move_speed_mult = 1.0
+hp_regen = 0.0
+default_weapon = "rifle"
+affinity_tags = PackedStringArray("shooter")
+affinity_discount = 0.15
+passive_description = ""
+sprite_frames_path = "res://assets/characters/Gorg-sprite.res"
+portrait_path = "res://assets/characters/Gorg-portrait.png"
+sprite_pixel_size = 16.0

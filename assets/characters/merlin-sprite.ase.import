@@ -1,0 +1,14 @@
+[remap]
+
+importer="aseprite_wizard.plugin.noop"
+type="PackedDataContainer"
+uid="uid://b1gw1x8cf01vx"
+path="res://.godot/imported/merlin-sprite.ase-4b87b7ef3ee25465d764ef2913fd4299.res"
+
+[deps]
+
+source_file="res://assets/characters/merlin-sprite.ase"
+dest_files=["res://.godot/imported/merlin-sprite.ase-4b87b7ef3ee25465d764ef2913fd4299.res"]
+
+[params]
+

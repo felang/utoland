@@ -51,11 +51,10 @@ func _ready() -> void:
 	health.died.connect(_on_died)
 	$Hurtbox.hit_taken.connect(_on_hurtbox_hit)
 
-	# 设置精灵
-	var character: String = GameData.current_character
-	var sprite_config: Dictionary = GameConfig.SPRITES["player"].get(character, {})
-	var target_size: float = GameConfig.ENTITY_SIZE_STANDARD
-	_sprite_animator.setup_player_sprite(sprite_config, target_size)
+	# 设置精灵（从 CharacterData 加载 SpriteFrames）
+	var char_data: CharacterData = GameConfig.characters[GameData.current_character]
+	var sprite_frames: SpriteFrames = load(char_data.sprite_frames_path)
+	_sprite_animator.setup_from_sprite_frames(sprite_frames, char_data.sprite_pixel_size, GameConfig.ENTITY_SIZE_STANDARD)
 
 func _process(delta: float) -> void:
 	if invincible_timer > 0:

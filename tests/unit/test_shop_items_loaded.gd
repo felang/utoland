@@ -17,20 +17,11 @@ func test_epic_items_exist():
 	assert_true(GameConfig.items.has("arsenal"))
 	assert_true(GameConfig.items.has("destiny"))
 
-func test_engineer_character_loaded():
-	assert_true(GameConfig.characters.has("engineer"))
-	var eng: CharacterData = GameConfig.characters["engineer"]
-	assert_true(eng.affinity_tags.has("engineer"))
+func test_dora_character_loaded():
+	assert_true(GameConfig.characters.has("dora"))
+	var c: CharacterData = GameConfig.characters["dora"]
+	assert_true(c.affinity_tags.has("shooter"))
 
-func test_warrior_has_affinity():
-	var w: CharacterData = GameConfig.characters["warrior"]
-	assert_true(w.affinity_tags.has("shooter"))
-
-func test_ranger_has_strong_discount():
-	var r: CharacterData = GameConfig.characters["ranger"]
-	assert_eq(r.affinity_discount, 0.25)
-
-func test_tank_has_dual_affinity():
-	var t: CharacterData = GameConfig.characters["tank"]
-	assert_true(t.affinity_tags.has("shooter"))
-	assert_true(t.affinity_tags.has("engineer"))
+func test_all_new_characters_loaded():
+	for char_id in ["dora", "gorg", "kaze", "merlin", "nemo"]:
+		assert_true(GameConfig.characters.has(char_id), "应包含角色: " + char_id)

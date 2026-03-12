@@ -4,16 +4,19 @@
 
 [resource]
 script = ExtResource("1")
-id = "engineer"
-display_name = "工程师"
-description = "擅长塔防布局，初始携带免费塔"
+id = "kaze"
+display_name = "风"
+description = "高速移动型角色"
 max_hp = 100.0
-speed = 180.0
+speed = 200.0
 damage_mult = 1.0
 attack_speed_mult = 1.0
 move_speed_mult = 1.0
 hp_regen = 0.0
 default_weapon = "rifle"
-affinity_tags = PackedStringArray("engineer")
+affinity_tags = PackedStringArray("shooter")
 affinity_discount = 0.15
-passive_description = "每局初始携带1座免费射击塔"
+passive_description = ""
+sprite_frames_path = "res://assets/characters/kaze-sprite.res"
+portrait_path = "res://assets/characters/kaze-portrait.png"
+sprite_pixel_size = 16.0
