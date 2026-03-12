@@ -3,7 +3,7 @@ extends Control
 
 # 属性基准值（用于颜色标记）
 # 注意：speed 基准值为 200.0（CharacterData 默认值），旧代码误用 100.0 导致速度始终显绿
-const PORTRAIT_BUTTON_SIZE := Vector2(80, 80)
+const PORTRAIT_BUTTON_SIZE := Vector2(56, 56)
 const PORTRAIT_BORDER_WIDTH := 2
 const PORTRAIT_BORDER_RADIUS := 4
 
@@ -128,25 +128,32 @@ func _generate_portrait_list() -> void:
 
 	for character_id in GameConfig.characters:
 		var char_data: CharacterData = GameConfig.characters[character_id]
+
+		# 外层 PanelContainer 用于显示选中边框
+		var panel := PanelContainer.new()
+		panel.custom_minimum_size = PORTRAIT_BUTTON_SIZE
+
+		# 内层 TextureButton 显示头像
 		var btn := TextureButton.new()
-		btn.custom_minimum_size = PORTRAIT_BUTTON_SIZE
 		btn.ignore_texture_size = true
 		btn.stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_COVERED
+		btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		btn.size_flags_vertical = Control.SIZE_EXPAND_FILL
 
 		# 加载头像纹理
 		var portrait: Texture2D = _load_portrait(char_data.portrait_path)
 		if portrait:
 			btn.texture_normal = portrait
 		else:
-			# fallback: 添加占位 ColorRect 作为子节点
 			var placeholder := ColorRect.new()
 			placeholder.color = UIConstants.COLOR_BG_PANEL
 			placeholder.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 			btn.add_child(placeholder)
 
 		btn.pressed.connect(_select_character.bind(character_id))
-		_portrait_list.add_child(btn)
-		_portrait_buttons[character_id] = btn
+		panel.add_child(btn)
+		_portrait_list.add_child(panel)
+		_portrait_buttons[character_id] = panel
 
 
 func _load_portrait(path: String) -> Texture2D:
@@ -163,11 +170,11 @@ func _select_character(character_id: String) -> void:
 
 func _update_portrait_borders() -> void:
 	for cid in _portrait_buttons:
-		var btn: TextureButton = _portrait_buttons[cid]
+		var panel: PanelContainer = _portrait_buttons[cid]
 		if cid == _selected_id:
-			btn.add_theme_stylebox_override("normal", _selected_style)
+			panel.add_theme_stylebox_override("panel", _selected_style)
 		else:
-			btn.add_theme_stylebox_override("normal", _unselected_style)
+			panel.add_theme_stylebox_override("panel", _unselected_style)
 
 
 func _fill_detail_panel(character_id: String) -> void:

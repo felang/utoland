@@ -30,7 +30,7 @@ offset_right = -12.0
 offset_bottom = -12.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 12
+theme_override_constants/separation = 6
 
 [node name="TitleLabel" type="Label" parent="MainVBox"]
 layout_mode = 2
@@ -40,17 +40,17 @@ horizontal_alignment = 1
 [node name="HSplitContent" type="HBoxContainer" parent="MainVBox"]
 layout_mode = 2
 size_flags_vertical = 3
-theme_override_constants/separation = 12
+theme_override_constants/separation = 8
 
 [node name="LeftPanel" type="ScrollContainer" parent="MainVBox/HSplitContent"]
 layout_mode = 2
-custom_minimum_size = Vector2(120, 0)
+custom_minimum_size = Vector2(80, 0)
 
 [node name="PortraitList" type="VBoxContainer" parent="MainVBox/HSplitContent/LeftPanel"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 8
+theme_override_constants/separation = 4
 
 [node name="RightPanel" type="PanelContainer" parent="MainVBox/HSplitContent"]
 unique_name_in_owner = true
@@ -58,110 +58,115 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 4.0
 
-[node name="DetailMargin" type="MarginContainer" parent="MainVBox/HSplitContent/RightPanel"]
+[node name="DetailScroll" type="ScrollContainer" parent="MainVBox/HSplitContent/RightPanel"]
 layout_mode = 2
-theme_override_constants/margin_left = 20
-theme_override_constants/margin_top = 20
-theme_override_constants/margin_right = 20
-theme_override_constants/margin_bottom = 20
+horizontal_scroll_mode = 0
 
-[node name="DetailVBox" type="VBoxContainer" parent="MainVBox/HSplitContent/RightPanel/DetailMargin"]
+[node name="DetailMargin" type="MarginContainer" parent="MainVBox/HSplitContent/RightPanel/DetailScroll"]
 layout_mode = 2
-theme_override_constants/separation = 16
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 8
 
-[node name="HeaderSection" type="HBoxContainer" parent="MainVBox/HSplitContent/RightPanel/DetailMargin/DetailVBox"]
+[node name="DetailVBox" type="VBoxContainer" parent="MainVBox/HSplitContent/RightPanel/DetailScroll/DetailMargin"]
 layout_mode = 2
-theme_override_constants/separation = 16
+theme_override_constants/separation = 6
 
-[node name="LargePortrait" type="TextureRect" parent="MainVBox/HSplitContent/RightPanel/DetailMargin/DetailVBox/HeaderSection"]
+[node name="HeaderSection" type="HBoxContainer" parent="MainVBox/HSplitContent/RightPanel/DetailScroll/DetailMargin/DetailVBox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="LargePortrait" type="TextureRect" parent="MainVBox/HSplitContent/RightPanel/DetailScroll/DetailMargin/DetailVBox/HeaderSection"]
 unique_name_in_owner = true
 layout_mode = 2
-custom_minimum_size = Vector2(120, 120)
+custom_minimum_size = Vector2(60, 60)
 expand_mode = 1
 stretch_mode = 6
 
-[node name="NameAndWeapon" type="VBoxContainer" parent="MainVBox/HSplitContent/RightPanel/DetailMargin/DetailVBox/HeaderSection"]
+[node name="NameAndWeapon" type="VBoxContainer" parent="MainVBox/HSplitContent/RightPanel/DetailScroll/DetailMargin/DetailVBox/HeaderSection"]
 layout_mode = 2
 size_flags_vertical = 1
 
-[node name="CharacterName" type="Label" parent="MainVBox/HSplitContent/RightPanel/DetailMargin/DetailVBox/HeaderSection/NameAndWeapon"]
+[node name="CharacterName" type="Label" parent="MainVBox/HSplitContent/RightPanel/DetailScroll/DetailMargin/DetailVBox/HeaderSection/NameAndWeapon"]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="WeaponLabel" type="Label" parent="MainVBox/HSplitContent/RightPanel/DetailMargin/DetailVBox/HeaderSection/NameAndWeapon"]
+[node name="WeaponLabel" type="Label" parent="MainVBox/HSplitContent/RightPanel/DetailScroll/DetailMargin/DetailVBox/HeaderSection/NameAndWeapon"]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="StatsSection" type="PanelContainer" parent="MainVBox/HSplitContent/RightPanel/DetailMargin/DetailVBox"]
+[node name="StatsSection" type="PanelContainer" parent="MainVBox/HSplitContent/RightPanel/DetailScroll/DetailMargin/DetailVBox"]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="StatsGrid" type="GridContainer" parent="MainVBox/HSplitContent/RightPanel/DetailMargin/DetailVBox/StatsSection"]
+[node name="StatsGrid" type="GridContainer" parent="MainVBox/HSplitContent/RightPanel/DetailScroll/DetailMargin/DetailVBox/StatsSection"]
 layout_mode = 2
 columns = 2
 theme_override_constants/h_separation = 16
 theme_override_constants/v_separation = 4
 
-[node name="HPTitle" type="Label" parent="MainVBox/HSplitContent/RightPanel/DetailMargin/DetailVBox/StatsSection/StatsGrid"]
+[node name="HPTitle" type="Label" parent="MainVBox/HSplitContent/RightPanel/DetailScroll/DetailMargin/DetailVBox/StatsSection/StatsGrid"]
 layout_mode = 2
 text = "生命值"
 
-[node name="HPValue" type="Label" parent="MainVBox/HSplitContent/RightPanel/DetailMargin/DetailVBox/StatsSection/StatsGrid"]
+[node name="HPValue" type="Label" parent="MainVBox/HSplitContent/RightPanel/DetailScroll/DetailMargin/DetailVBox/StatsSection/StatsGrid"]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="SpeedTitle" type="Label" parent="MainVBox/HSplitContent/RightPanel/DetailMargin/DetailVBox/StatsSection/StatsGrid"]
+[node name="SpeedTitle" type="Label" parent="MainVBox/HSplitContent/RightPanel/DetailScroll/DetailMargin/DetailVBox/StatsSection/StatsGrid"]
 layout_mode = 2
 text = "速度"
 
-[node name="SpeedValue" type="Label" parent="MainVBox/HSplitContent/RightPanel/DetailMargin/DetailVBox/StatsSection/StatsGrid"]
+[node name="SpeedValue" type="Label" parent="MainVBox/HSplitContent/RightPanel/DetailScroll/DetailMargin/DetailVBox/StatsSection/StatsGrid"]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="DamageTitle" type="Label" parent="MainVBox/HSplitContent/RightPanel/DetailMargin/DetailVBox/StatsSection/StatsGrid"]
+[node name="DamageTitle" type="Label" parent="MainVBox/HSplitContent/RightPanel/DetailScroll/DetailMargin/DetailVBox/StatsSection/StatsGrid"]
 layout_mode = 2
 text = "伤害倍率"
 
-[node name="DamageValue" type="Label" parent="MainVBox/HSplitContent/RightPanel/DetailMargin/DetailVBox/StatsSection/StatsGrid"]
+[node name="DamageValue" type="Label" parent="MainVBox/HSplitContent/RightPanel/DetailScroll/DetailMargin/DetailVBox/StatsSection/StatsGrid"]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="AttackSpeedTitle" type="Label" parent="MainVBox/HSplitContent/RightPanel/DetailMargin/DetailVBox/StatsSection/StatsGrid"]
+[node name="AttackSpeedTitle" type="Label" parent="MainVBox/HSplitContent/RightPanel/DetailScroll/DetailMargin/DetailVBox/StatsSection/StatsGrid"]
 layout_mode = 2
 text = "攻速倍率"
 
-[node name="AttackSpeedValue" type="Label" parent="MainVBox/HSplitContent/RightPanel/DetailMargin/DetailVBox/StatsSection/StatsGrid"]
+[node name="AttackSpeedValue" type="Label" parent="MainVBox/HSplitContent/RightPanel/DetailScroll/DetailMargin/DetailVBox/StatsSection/StatsGrid"]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="HPRegenTitle" type="Label" parent="MainVBox/HSplitContent/RightPanel/DetailMargin/DetailVBox/StatsSection/StatsGrid"]
+[node name="HPRegenTitle" type="Label" parent="MainVBox/HSplitContent/RightPanel/DetailScroll/DetailMargin/DetailVBox/StatsSection/StatsGrid"]
 layout_mode = 2
 text = "生命回复"
 
-[node name="HPRegenValue" type="Label" parent="MainVBox/HSplitContent/RightPanel/DetailMargin/DetailVBox/StatsSection/StatsGrid"]
+[node name="HPRegenValue" type="Label" parent="MainVBox/HSplitContent/RightPanel/DetailScroll/DetailMargin/DetailVBox/StatsSection/StatsGrid"]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="AffinitySection" type="HBoxContainer" parent="MainVBox/HSplitContent/RightPanel/DetailMargin/DetailVBox"]
+[node name="AffinitySection" type="HBoxContainer" parent="MainVBox/HSplitContent/RightPanel/DetailScroll/DetailMargin/DetailVBox"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="PassiveSection" type="VBoxContainer" parent="MainVBox/HSplitContent/RightPanel/DetailMargin/DetailVBox"]
+[node name="PassiveSection" type="VBoxContainer" parent="MainVBox/HSplitContent/RightPanel/DetailScroll/DetailMargin/DetailVBox"]
 layout_mode = 2
 theme_override_constants/separation = 4
 
-[node name="PassiveTitle" type="Label" parent="MainVBox/HSplitContent/RightPanel/DetailMargin/DetailVBox/PassiveSection"]
+[node name="PassiveTitle" type="Label" parent="MainVBox/HSplitContent/RightPanel/DetailScroll/DetailMargin/DetailVBox/PassiveSection"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "被动技能"
 
-[node name="PassiveDesc" type="Label" parent="MainVBox/HSplitContent/RightPanel/DetailMargin/DetailVBox/PassiveSection"]
+[node name="PassiveDesc" type="Label" parent="MainVBox/HSplitContent/RightPanel/DetailScroll/DetailMargin/DetailVBox/PassiveSection"]
 unique_name_in_owner = true
 layout_mode = 2
 autowrap_mode = 3
 
-[node name="SelectButton" type="Button" parent="MainVBox/HSplitContent/RightPanel/DetailMargin/DetailVBox"]
+[node name="SelectButton" type="Button" parent="MainVBox/HSplitContent/RightPanel/DetailScroll/DetailMargin/DetailVBox"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "选择此角色"
