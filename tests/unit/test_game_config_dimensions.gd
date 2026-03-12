@@ -1,27 +1,25 @@
 extends GutTest
 
-func test_world_size_constants_are_defined():
+func test_viewport_constants_unchanged():
 	assert_eq(GameConfig.BASE_VIEWPORT_WIDTH, 640)
 	assert_eq(GameConfig.BASE_VIEWPORT_HEIGHT, 360)
 	assert_eq(GameConfig.PPU, 32)
 	assert_eq(GameConfig.GRID_SIZE, 32)
-	assert_eq(GameConfig.MAP_COLS, 40)
-	assert_eq(GameConfig.MAP_ROWS, 30)
-	assert_eq(GameConfig.MAP_PIXEL_WIDTH, 1280)
-	assert_eq(GameConfig.MAP_PIXEL_HEIGHT, 960)
 
-func test_map_half_extents_are_correct():
-	assert_eq(GameConfig.MAP_HALF_WIDTH, 640)
-	assert_eq(GameConfig.MAP_HALF_HEIGHT, 480)
+func test_map_dimensions_are_dynamically_computed():
+	var fx: EffectConfigData = GameConfig.effects
+	var expected_w: float = GameConfig.BASE_VIEWPORT_WIDTH / fx.camera_zoom * fx.map_size_ratio
+	var expected_h: float = GameConfig.BASE_VIEWPORT_HEIGHT / fx.camera_zoom * fx.map_size_ratio
+	assert_almost_eq(GameConfig.MAP_PIXEL_WIDTH, expected_w, 0.01, "MAP_PIXEL_WIDTH 应等于 viewport/zoom*ratio")
+	assert_almost_eq(GameConfig.MAP_PIXEL_HEIGHT, expected_h, 0.01, "MAP_PIXEL_HEIGHT 应等于 viewport/zoom*ratio")
 
-func test_viewport_matches_new_standard():
+func test_map_half_extents_are_half_of_full():
+	assert_almost_eq(GameConfig.MAP_HALF_WIDTH, GameConfig.MAP_PIXEL_WIDTH / 2.0, 0.01)
+	assert_almost_eq(GameConfig.MAP_HALF_HEIGHT, GameConfig.MAP_PIXEL_HEIGHT / 2.0, 0.01)
+
+func test_viewport_matches_project_settings():
 	assert_eq(ProjectSettings.get_setting("display/window/size/viewport_width"), 640)
 	assert_eq(ProjectSettings.get_setting("display/window/size/viewport_height"), 360)
-
-func test_new_dimension_standard_values_are_stable():
-	assert_eq(GameConfig.GRID_SIZE, GameConfig.PPU)
-	assert_eq(GameConfig.MAP_PIXEL_WIDTH, 40 * 32)
-	assert_eq(GameConfig.MAP_PIXEL_HEIGHT, 30 * 32)
 
 func test_entity_dimension_constants_are_stable():
 	assert_eq(GameConfig.ENTITY_SIZE_STANDARD, 32)

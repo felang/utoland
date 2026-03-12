@@ -1,5 +1,7 @@
 [gd_scene format=3 uid="uid://5u5tndodgthf"]
 
+[ext_resource type="Script" path="res://scripts/shared/map_boundary.gd" id="Script_boundary"]
+
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_iyhav"]
 size = Vector2(1344, 32)
 
@@ -13,6 +15,7 @@ size = Vector2(32, 1024)
 size = Vector2(32, 1024)
 
 [node name="MapBoundary" type="Node2D" unique_id=1220843918]
+script = ExtResource("Script_boundary")
 
 [node name="TopWall" type="StaticBody2D" parent="." unique_id=1675849148]
 position = Vector2(0, -496)

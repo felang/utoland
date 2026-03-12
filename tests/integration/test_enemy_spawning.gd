@@ -147,8 +147,17 @@ func test_enemy_coin_drop_config():
 		assert_gt(enemy_data.coin_drop_min, 0, "Enemy config should have positive coin_drop_min")
 		assert_gte(enemy_data.coin_drop_max, enemy_data.coin_drop_min, "Max coin drop should be >= min")
 
+func test_spawner_uses_dynamic_map_bounds():
+	var spawner = preload("res://scripts/systems/enemy_spawner.gd").new()
+	add_child_autoqfree(spawner)
+	await get_tree().process_frame
+	assert_almost_eq(spawner.map_min_x, -GameConfig.MAP_HALF_WIDTH, 0.01, "min_x 应等于动态值")
+	assert_almost_eq(spawner.map_max_x, GameConfig.MAP_HALF_WIDTH, 0.01, "max_x 应等于动态值")
+
 func test_spawn_position_is_inside_new_map_bounds():
 	var spawner = preload("res://scripts/systems/enemy_spawner.gd").new()
+	add_child_autoqfree(spawner)
+	await get_tree().process_frame
 	for i in range(20):
 		var pos = spawner.get_random_spawn_position()
 		assert_lte(abs(pos.x), GameConfig.MAP_HALF_WIDTH)

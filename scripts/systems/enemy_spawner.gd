@@ -10,14 +10,18 @@ var _is_wave_active: bool = false
 var _boss_phase: int = BossPhase.NONE
 var _boss_spawned: bool = false
 
-# Map boundaries
-var map_min_x: float = -GameConfig.MAP_HALF_WIDTH
-var map_max_x: float = GameConfig.MAP_HALF_WIDTH
-var map_min_y: float = -GameConfig.MAP_HALF_HEIGHT
-var map_max_y: float = GameConfig.MAP_HALF_HEIGHT
+# Map boundaries（_ready() 中从 GameConfig 读取动态值）
+var map_min_x: float = 0.0
+var map_max_x: float = 0.0
+var map_min_y: float = 0.0
+var map_max_y: float = 0.0
 var min_distance_from_player: float = 200.0
 
 func _ready() -> void:
+	map_min_x = -GameConfig.MAP_HALF_WIDTH
+	map_max_x = GameConfig.MAP_HALF_WIDTH
+	map_min_y = -GameConfig.MAP_HALF_HEIGHT
+	map_max_y = GameConfig.MAP_HALF_HEIGHT
 	player = get_tree().get_first_node_in_group(Enums.Group.PLAYER)
 	# 从配置读取生成距离
 	if GameConfig.spawn:

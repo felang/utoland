@@ -78,10 +78,15 @@ extends Resource
 @export var laser_collision_mask: int = 2
 
 # 摄像机
-@export var camera_zoom: Vector2 = Vector2(0.75, 0.75)
+@export var camera_zoom: float = 0.55
 @export var camera_smoothing_speed: float = 8.0
 @export var camera_look_ahead_distance: float = 40.0
 @export var camera_look_ahead_smoothing: float = 3.0
+@export var camera_dead_zone_width: float = 0.1
+@export var camera_dead_zone_height: float = 0.1
+
+# 地图
+@export var map_size_ratio: float = 1.3
 
 # 枪口闪光
 @export var muzzle_flash_size: Vector2 = Vector2(6, 6)
