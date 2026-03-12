@@ -57,16 +57,28 @@ text = "金币: 0"
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="TowerList" type="VBoxContainer" parent="UI/SidePanel/PlacementContent"]
+[node name="PlacementScroll" type="ScrollContainer" parent="UI/SidePanel/PlacementContent"]
 layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="TowerList" type="VBoxContainer" parent="UI/SidePanel/PlacementContent/PlacementScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
 
 [node name="ShopContent" type="VBoxContainer" parent="UI/SidePanel"]
 layout_mode = 2
 size_flags_vertical = 3
 visible = false
 
-[node name="ShopItemList" type="VBoxContainer" parent="UI/SidePanel/ShopContent"]
+[node name="ShopScroll" type="ScrollContainer" parent="UI/SidePanel/ShopContent"]
 layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="ShopItemList" type="VBoxContainer" parent="UI/SidePanel/ShopContent/ShopScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
 
 [node name="RefreshButton" type="Button" parent="UI/SidePanel/ShopContent"]
 layout_mode = 2

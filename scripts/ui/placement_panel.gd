@@ -30,7 +30,7 @@ func _create_tower_cards() -> void:
 	for tower_type in tower_types:
 		var cost: int = SceneFactory.get_tower_cost(tower_type)
 		var card := _create_card(tower_type, tower_names[tower_type], cost)
-		get_parent().get_node("TowerList").add_child(card)
+		get_parent().get_node("PlacementScroll/TowerList").add_child(card)
 		_tower_buttons[tower_type] = card
 
 func _create_card(tower_type: String, display_name: String, cost: int) -> PanelContainer:

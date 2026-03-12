@@ -27,7 +27,7 @@ func _generate_shop() -> void:
 	shop_prices = result["prices"]
 
 func _create_item_cards() -> void:
-	var item_list: VBoxContainer = get_parent().get_node("ShopItemList")
+	var item_list: VBoxContainer = get_parent().get_node("ShopScroll/ShopItemList")
 	for child in item_list.get_children():
 		child.queue_free()
 	_item_nodes.clear()
@@ -114,7 +114,7 @@ func _on_refresh_pressed() -> void:
 		_main.update_coins_display()
 
 func _recreate_item_cards() -> void:
-	var item_list: VBoxContainer = get_parent().get_node("ShopItemList")
+	var item_list: VBoxContainer = get_parent().get_node("ShopScroll/ShopItemList")
 	for child in item_list.get_children():
 		child.queue_free()
 	_item_nodes.clear()
