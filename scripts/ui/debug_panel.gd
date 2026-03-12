@@ -1,7 +1,11 @@
 # scripts/ui/debug_panel.gd
 extends CanvasLayer
 
-## 调试面板 — F1 显隐，F2 跳波，F3 加钱，F4 无敌
+## 调试面板 — Ctrl+D 显隐，Ctrl+1 跳波，Ctrl+2 加钱，Ctrl+3 无敌，Ctrl+4/5 调 zoom
+
+const ZOOM_STEP: float = 0.05
+const ZOOM_MIN: float = 0.3
+const ZOOM_MAX: float = 1.0
 
 var _label: Label
 var _godmode: bool = false
@@ -24,6 +28,12 @@ func _unhandled_input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 	elif event.is_action_pressed("debug_godmode"):
 		_toggle_godmode()
+		get_viewport().set_input_as_handled()
+	elif event.is_action_pressed("debug_zoom_out"):
+		_adjust_zoom(-ZOOM_STEP)
+		get_viewport().set_input_as_handled()
+	elif event.is_action_pressed("debug_zoom_in"):
+		_adjust_zoom(ZOOM_STEP)
 		get_viewport().set_input_as_handled()
 
 func _process(_delta: float) -> void:
@@ -64,12 +74,22 @@ func _update_info() -> void:
 		hp_text = "%d/%d" % [int(player.health.current_hp), int(player.health.max_hp)]
 	dmg_text = "x%.1f" % GameData.player_stats.get(Enums.Stat.DAMAGE_MULT, 1.0)
 
+	# 摄像机 zoom 信息
+	var zoom_text: String = "N/A"
+	var camera: Camera2D = _get_player_camera()
+	if camera:
+		zoom_text = "%.2f" % camera.zoom.x
+		var visible_w: float = GameConfig.BASE_VIEWPORT_WIDTH / camera.zoom.x
+		var visible_h: float = GameConfig.BASE_VIEWPORT_HEIGHT / camera.zoom.y
+		zoom_text += " (%dx%d)" % [int(visible_w), int(visible_h)]
+
 	var godmode_text: String = " [GOD]" if _godmode else ""
-	_label.text = "Wave: %s/%s | Enemies: %d\nHP: %s | DMG: %s\nCoins: %d | FPS: %d%s" % [
+	_label.text = "Wave: %s/%s | Enemies: %d\nHP: %s | DMG: %s\nCoins: %d | FPS: %d%s\nZoom: %s | Map: %dx%d" % [
 		wave_info, total_info, enemies.size(),
 		hp_text, dmg_text,
 		GameData.coins, Engine.get_frames_per_second(),
-		godmode_text
+		godmode_text,
+		zoom_text, int(GameConfig.MAP_PIXEL_WIDTH), int(GameConfig.MAP_PIXEL_HEIGHT)
 	]
 
 func _skip_wave() -> void:
@@ -82,3 +102,18 @@ func _toggle_godmode() -> void:
 	var player: Node = get_tree().get_first_node_in_group(Enums.Group.PLAYER)
 	if player and player.has_node("HealthComponent"):
 		player.health.invincible = _godmode
+
+func _adjust_zoom(delta: float) -> void:
+	var camera: Camera2D = _get_player_camera()
+	if not camera:
+		return
+	var new_zoom: float = clampf(camera.zoom.x + delta, ZOOM_MIN, ZOOM_MAX)
+	camera.zoom = Vector2(new_zoom, new_zoom)
+
+func _get_player_camera() -> Camera2D:
+	var player: Node = get_tree().get_first_node_in_group(Enums.Group.PLAYER)
+	if player:
+		for child in player.get_children():
+			if child is Camera2D:
+				return child
+	return null

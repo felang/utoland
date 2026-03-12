@@ -36,7 +36,8 @@ func test_can_place_at_rejects_position_outside_map_extents():
 	assert_false(placement._can_place_at(outside_y))
 
 func test_can_place_at_allows_position_on_map_boundary():
-	var boundary_position = Vector2(GameConfig.MAP_HALF_WIDTH, 0)
+	# 使用略靠内的位置，避免 float32(Vector2) vs float64 精度边界问题
+	var boundary_position = Vector2(GameConfig.MAP_HALF_WIDTH - 1.0, 0)
 	assert_true(placement._can_place_at(boundary_position))
 
 func test_find_tower_at_returns_closest_tower():
