@@ -92,6 +92,8 @@ func _select_tower(type: String) -> void:
 	if _preview_tower:
 		_preview_tower.modulate = Color(1, 1, 1, 0.5)
 		_main.add_child(_preview_tower)
+		# 预览塔不应参与碰撞检测，从 TOWERS 组中移除以避免阻挡自身放置
+		_preview_tower.remove_from_group(Enums.Group.TOWERS)
 		var td: TowerData = GameConfig.towers[type]
 		_range_indicator.set_range(td.attack_range)
 
