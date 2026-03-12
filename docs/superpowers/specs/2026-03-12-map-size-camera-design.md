@@ -7,8 +7,8 @@
 ## 当前状态
 
 - 视口：640x360，stretch mode = canvas_items
-- 地图：1200x900 固定像素
-- 摄像机：zoom=0.75（可见区域约 853x480），硬编码在 camera_shake.gd
+- 地图：1280x960 固定像素（MAP_COLS=40, MAP_ROWS=30, GRID_SIZE=32）
+- 摄像机：zoom=Vector2(0.75, 0.75)（可见区域约 853x480），硬编码在 camera_shake.gd
 - 地图边界：map_boundary.tscn 碰撞墙位置硬编码
 - Debug 快捷键：F1~F4，Touch Bar Mac 不友好
 
@@ -16,47 +16,61 @@
 
 ### 1. 摄像机参数配置化
 
-新建 Resource 类 `CameraConfigData`（或扩展 `EffectConfigData`），包含：
+扩展现有 `EffectConfigData`，新增 `dead_zone_width`、`dead_zone_height` 字段，并将 `camera_zoom` 从 `Vector2` 改为 `float`（存储标量，使用时转换为 `Vector2(zoom, zoom)`）。同时新增 `map_size_ratio` 字段（全局，非 per-map）。
+
+完整摄像机相关字段：
 
 | 参数 | 类型 | 默认值 | 说明 |
 |------|------|--------|------|
-| zoom | float | 0.55 | 摄像机缩放，调试范围 0.4~0.8 |
-| smoothing_speed | float | 8.0 | 平滑跟随速度 |
-| look_ahead_distance | float | 40.0 | 前瞻偏移像素 |
-| look_ahead_smoothing | float | 3.0 | 前瞻平滑系数 |
-| dead_zone_width | float | 0.1 | 死区宽度比例（0~1） |
-| dead_zone_height | float | 0.1 | 死区高度比例 |
+| camera_zoom | float | 0.55 | 摄像机缩放标量，使用时转为 Vector2(v, v)，调试范围 0.4~0.8 |
+| camera_smoothing_speed | float | 8.0 | 平滑跟随速度 |
+| camera_look_ahead_distance | float | 40.0 | 前瞻偏移像素 |
+| camera_look_ahead_smoothing | float | 3.0 | 前瞻平滑系数 |
+| camera_dead_zone_width | float | 0.1 | 映射到 Camera2D drag_left_margin / drag_right_margin |
+| camera_dead_zone_height | float | 0.1 | 映射到 Camera2D drag_top_margin / drag_bottom_margin |
+| map_size_ratio | float | 1.3 | 地图与可见区域的比例 |
 
-`camera_shake.gd` 在 `_ready()` 时从配置读取，不再硬编码。
+`camera_shake.gd` 在 `_ready()` 时读取配置：
+- `zoom = Vector2(cfg.camera_zoom, cfg.camera_zoom)`
+- 设置 `drag_horizontal_enabled = true`、`drag_vertical_enabled = true`
+- 设置 `drag_left_margin = drag_right_margin = cfg.camera_dead_zone_width`
+- 设置 `drag_top_margin = drag_bottom_margin = cfg.camera_dead_zone_height`
 
 ### 2. 地图尺寸动态计算
 
 地图尺寸由 zoom 和比例系数动态计算，不再写死像素值：
 
-- `map_size_ratio`：地图与可见区域的比例，默认 1.3，配置化
 - 计算公式：
-  - `MAP_PIXEL_WIDTH = viewport_w / zoom * map_size_ratio`
-  - `MAP_PIXEL_HEIGHT = viewport_h / zoom * map_size_ratio`
-- `GameConfig` 中 `MAP_PIXEL_WIDTH/HEIGHT` 改为计算属性
+  - `MAP_PIXEL_WIDTH = BASE_VIEWPORT_WIDTH / camera_zoom * map_size_ratio`
+  - `MAP_PIXEL_HEIGHT = BASE_VIEWPORT_HEIGHT / camera_zoom * map_size_ratio`
 - 以 zoom=0.55、ratio=1.3 为例：约 1513x851
+
+**`GameConfig` 改造**：保留 `MAP_PIXEL_WIDTH/HEIGHT` 和 `MAP_HALF_WIDTH/HEIGHT` 作为 `var`（非 `const`），在 `_ready()` 中根据 `EffectConfigData` 计算赋值。原有 `MAP_COLS/MAP_ROWS/GRID_SIZE` const 可移除或保留为参考。
+
+**消费者迁移**：所有在变量声明处直接引用 `GameConfig.MAP_HALF_WIDTH` 等的脚本（如 `enemy_spawner.gd`）需改为在 `_ready()` 中读取，因为 autoload `_ready()` 顺序在变量声明之后。需更新的文件：
+- `scripts/systems/enemy_spawner.gd` — `map_min_x/max_x/min_y/max_y` 改到 `_ready()` 赋值
+- `tests/unit/test_game_config_dimensions.gd` — 断言值更新为动态计算结果
 
 ### 3. 边界与摄像机限制自动适配
 
-- `map_boundary.tscn` 碰撞墙位置根据计算出的地图尺寸动态设置
-- 摄像机 limit（上下左右）同步设为地图半宽/半高
-- 调整 zoom 或 ratio 时，边界和限制全部自动跟随
+为 `map_boundary.tscn` 附加脚本 `scripts/shared/map_boundary.gd`：
+- `_ready()` 中读取 `GameConfig.MAP_HALF_WIDTH/HEIGHT`
+- 动态设置四面碰撞墙的 position 和 collision shape size
+- 不再依赖 .tscn 中硬编码的位置
+
+摄像机 limit 由 `camera_shake.gd` 在 `_ready()` 中同步设为 `+/- MAP_HALF_WIDTH/HEIGHT`。
 
 ### 4. 摄像机跟随行为
 
 - 摄像机挂在 Player 节点上（保持不变）
 - position smoothing 开启，速度从配置读取
 - look-ahead：根据玩家移动方向偏移，看到前方更多内容
-- dead zone：玩家在屏幕中心小范围移动时摄像机不跟随
+- dead zone：使用 Godot Camera2D 内置 drag margin 机制实现
 - camera shake 逻辑保持不变，仅初始化参数来源改为配置
 
 ### 5. Debug 快捷键改造
 
-Touch Bar Mac 不支持 F 键，改为 Ctrl 组合键：
+Touch Bar Mac 不支持 F 键，改为 Ctrl 组合键。需同步更新 `project.godot` input map 中的 action 映射。
 
 | 功能 | 当前 | 新键 |
 |------|------|------|
@@ -78,9 +92,13 @@ Zoom 调整步长 0.05，调参时 debug 面板显示当前 zoom 值和可见区
 
 ## 涉及文件
 
-- `scripts/systems/camera_shake.gd` — 读取配置，移除硬编码
-- `scripts/core/game_config.gd` — MAP_PIXEL_WIDTH/HEIGHT 改为计算属性
-- `scripts/resources/` — 新建或扩展 CameraConfigData Resource
-- `resources/` — 新建摄像机配置 .tres 文件
-- `scenes/shared/map_boundary.tscn` 或其脚本 — 动态设置碰撞墙位置
+- `scripts/systems/camera_shake.gd` — 读取配置，移除硬编码，zoom float→Vector2 转换
+- `scripts/core/game_config.gd` — MAP_PIXEL_WIDTH/HEIGHT 改为 var，_ready() 中计算
+- `scripts/resources/effect_config_data.gd` — 扩展字段：camera_zoom 改 float，新增 dead_zone/map_size_ratio
+- `resources/effects/default.tres` — 更新对应字段值
+- `scripts/shared/map_boundary.gd` — 新建，动态设置碰撞墙位置
+- `scenes/shared/map_boundary.tscn` — 附加 map_boundary.gd 脚本
 - `scripts/ui/debug_panel.gd` — 快捷键改为 Ctrl 组合键，新增 zoom 调整
+- `project.godot` — 更新 input map action 映射
+- `scripts/systems/enemy_spawner.gd` — map 边界变量改到 _ready() 读取
+- `tests/unit/test_game_config_dimensions.gd` — 断言值更新
