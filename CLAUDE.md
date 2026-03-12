@@ -30,14 +30,16 @@ utoland 是一个基于 **Godot 4.6** 的 2D 塔防 + 射击混合类游戏。�
 ### 游戏流程 (场景切换)
 
 ```
-start_menu → character_selection → map_select → main (战斗)
+start_menu → character_selection → map_select → placement (布置，仅布置Tab)
+    ↓ (开始战斗)
+  main (战斗)
     ↓ (波次结束)
-  shop (商店) → main (下一波战斗)
+  placement (布置Tab + 商店Tab) → main (下一波战斗)
     ↓ (全部波次完成或玩家死亡)
   result (结算)
 ```
 
-> **注意**: 塔布置(placement)阶段暂时跳过，商店中塔相关物品已过滤。后续版本恢复塔防玩法。
+> **布置阶段**: 每波战斗前进入 placement 场景，左侧 120px 侧栏（Tab 切换布置/商店），右侧地图网格。首波仅布置 Tab（`current_wave == 0`），后续波次商店 Tab 可见。塔在波间全回满 HP。
 
 ### 代码组织
 
@@ -45,12 +47,12 @@ start_menu → character_selection → map_select → main (战斗)
 - `scripts/components/` — 可复用组件 (HealthComponent, SpriteAnimator, Hitbox, Hurtbox, KnockbackHandler, SlowHandler)
 - `scripts/resources/` — 自定义 Resource 类定义 (WeaponData, EnemyData, TowerData, WaveData, CharacterData, ShopItemData 等)
 - `scripts/entities/` — 游戏实体 (player, enemy, boss_base, boss_brute, coin, towers/, weapons/, projectiles/)
-- `scripts/systems/` — 游戏系统 (wave_manager, enemy_spawner, shop_manager, shop_item_generator, shop_effect_applier, effects_manager, audio_manager, item_effect_manager)
-- `scripts/ui/` — UI 脚本 (hud, start_menu, result, 各选择界面, main 场景控制)
+- `scripts/systems/` — 游戏系统 (wave_manager, enemy_spawner, shop_item_generator, shop_effect_applier, effects_manager, audio_manager, item_effect_manager)
+- `scripts/ui/` — UI 脚本 (hud, start_menu, result, 各选择界面, main 场景控制, placement 布置场景控制, placement_panel 塔布置侧栏, shop_panel 商店侧栏)
 - `resources/` — `.tres` 配置数据文件 (weapons/, enemies/, towers/, waves/<map_id>/, characters/, maps/, shop/, effects/, spawn/, items/)
 - `scenes/entities/` — 实体场景 (player, coin, enemies/, towers/, projectiles/)
 - `scenes/levels/` — 关卡场景 (main, placement)
-- `scenes/ui/` — UI 场景 (start_menu, hud, shop, result, character_selection, map_select)
+- `scenes/ui/` — UI 场景 (start_menu, hud, result, character_selection, map_select)
 - `scenes/shared/` — 共用场景 (map_boundary)
 
 ### 关键模式
