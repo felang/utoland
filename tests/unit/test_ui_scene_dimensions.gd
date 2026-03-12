@@ -4,18 +4,18 @@ func _control_size(node: Control) -> Vector2:
 	return Vector2(node.offset_right - node.offset_left, node.offset_bottom - node.offset_top)
 
 func test_map_select_cards_fit_640x360():
-	# 数据驱动：卡片由 _ready() 动态生成到 MapContainer
+	# 数据驱动：卡片由 _ready() 动态生成到 MapList（纵向滚动列表）
 	var scene = load("res://scenes/ui/map_select.tscn").instantiate()
 	add_child_autofree(scene)
 	# 等待 _ready() 执行完成
 	await get_tree().process_frame
-	var container: HBoxContainer = scene.get_node("VBoxContainer/MapContainer")
-	assert_not_null(container, "MapContainer 应存在")
+	var container: VBoxContainer = scene.get_node("MarginContainer/VBoxContainer/ScrollContainer/MapList")
+	assert_not_null(container, "MapList 应存在")
 	# 应为每个 GameConfig.maps 生成一个 PanelContainer 卡片
 	var card_count := 0
 	for child in container.get_children():
 		if child is PanelContainer:
-			assert_eq(child.custom_minimum_size, Vector2(200, 160), "地图卡片尺寸应为 200x160")
+			assert_eq(child.custom_minimum_size, Vector2(0, 64), "地图卡片最小高度应为 64")
 			card_count += 1
 	assert_eq(card_count, GameConfig.maps.size(), "卡片数量应与地图配置一致")
 
