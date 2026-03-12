@@ -128,7 +128,15 @@ func test_camera_drag_margins_from_config():
 @export var map_size_ratio: float = 1.3
 ```
 
-- [ ] **Step 4: 同步修改 camera_shake.gd _ready()**
+- [ ] **Step 4: 清理 default_effects.tres**
+
+当前 `resources/effects/default_effects.tres` 没有显式设置 `camera_zoom` 值（全用脚本默认值）。修改 Resource 类后，如果 .tres 中残留了旧的 Vector2 序列化数据，会导致类型冲突。检查 .tres 文件：
+- 如果文件中没有 `camera_zoom` 行（当前就是这种情况），则无需改动，Godot 会使用脚本中的新默认值 `0.55`
+- 如果 .tres 中显式包含 `camera_zoom = Vector2(...)` 行，需要删除该行或改为 `camera_zoom = 0.55`
+
+当前文件仅包含 `script = ExtResource("1")`，未显式设置任何属性，所以**无需改动 .tres 文件**。
+
+- [ ] **Step 5: 同步修改 camera_shake.gd _ready()**
 
 将 `scripts/systems/camera_shake.gd` 的 `_ready()` 替换为：
 
@@ -156,12 +164,12 @@ func _ready() -> void:
 	EventBus.camera_shake_requested.connect(shake)
 ```
 
-- [ ] **Step 5: 运行测试确认通过**
+- [ ] **Step 6: 运行测试确认通过**
 
 Run: `/Applications/Godot.app/Contents/MacOS/Godot --headless --script addons/gut/gut_cmdln.gd -gdir=res://tests/unit -ginclude_subdirs -gexit`
 Expected: ALL PASS
 
-- [ ] **Step 6: 原子提交（EffectConfigData + camera_shake 同时改）**
+- [ ] **Step 7: 原子提交（EffectConfigData + camera_shake 同时改）**
 
 ```bash
 git add scripts/resources/effect_config_data.gd scripts/systems/camera_shake.gd tests/unit/test_effect_config_camera_fields.gd tests/unit/test_camera_shake.gd
@@ -280,7 +288,7 @@ git commit -m "feat: GameConfig 地图尺寸改为动态计算（viewport/zoom*r
 
 ## Chunk 2: 消费者迁移 + 边界动态化
 
-### Task 4: enemy_spawner.gd 边界变量迁移到 _ready()
+### Task 3: enemy_spawner.gd 边界变量迁移到 _ready()
 
 **Files:**
 - Modify: `scripts/systems/enemy_spawner.gd:13-17`
@@ -359,7 +367,7 @@ git commit -m "refactor: enemy_spawner 地图边界改到 _ready() 读取动态�
 
 ---
 
-### Task 5: placement.gd 摄像机限制迁移
+### Task 4: placement.gd 摄像机限制迁移
 
 **Files:**
 - Modify: `scripts/ui/placement.gd:60-63`
@@ -379,7 +387,7 @@ Expected: ALL PASS（测试中已使用 `GameConfig.MAP_HALF_WIDTH` 动态引用
 
 ---
 
-### Task 6: grid_overlay.gd 移除 MAP_COLS/MAP_ROWS 依赖
+### Task 5: grid_overlay.gd 移除 MAP_COLS/MAP_ROWS 依赖
 
 **Files:**
 - Modify: `scripts/ui/grid_overlay.gd`
@@ -443,7 +451,7 @@ git commit -m "test: grid_overlay 测试移除 MAP_COLS/MAP_ROWS 依赖，改用
 
 ---
 
-### Task 7: map_boundary.gd 动态碰撞墙
+### Task 6: map_boundary.gd 动态碰撞墙
 
 **Files:**
 - Create: `scripts/shared/map_boundary.gd`
@@ -553,7 +561,7 @@ git commit -m "feat: map_boundary 碰撞墙位置和尺寸改为动态计算"
 
 ## Chunk 3: Debug 快捷键改造
 
-### Task 8: project.godot input map 更新
+### Task 7: project.godot input map 更新
 
 **Files:**
 - Modify: `project.godot`
@@ -610,7 +618,7 @@ git commit -m "chore: debug 快捷键改为 Ctrl 组合键，新增 zoom in/out"
 
 ---
 
-### Task 9: debug_panel.gd 支持 Ctrl 快捷键 + zoom 调整
+### Task 8: debug_panel.gd 支持 Ctrl 快捷键 + zoom 调整
 
 **Files:**
 - Modify: `scripts/ui/debug_panel.gd`
@@ -775,7 +783,7 @@ git commit -m "feat: debug_panel 改用 Ctrl 快捷键，新增运行时 zoom �
 
 ## Chunk 4: 全量测试 + 最终验证
 
-### Task 10: 运行全量测试，确认无回归
+### Task 9: 运行全量测试，确认无回归
 
 - [ ] **Step 1: 运行全部测试**
 
