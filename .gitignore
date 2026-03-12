@@ -17,3 +17,4 @@ tests/results.xml
 *test*.tscn
 auto_*.tscn
 .worktrees/
+.superpowers/
