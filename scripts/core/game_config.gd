@@ -14,12 +14,11 @@ const BASE_VIEWPORT_HEIGHT = 360
 const PPU = 32
 const GRID_SIZE = 32
 
-const MAP_COLS = 40
-const MAP_ROWS = 30
-const MAP_PIXEL_WIDTH = MAP_COLS * GRID_SIZE   # 1200
-const MAP_PIXEL_HEIGHT = MAP_ROWS * GRID_SIZE  # 900
-const MAP_HALF_WIDTH = MAP_PIXEL_WIDTH / 2.0     # 600
-const MAP_HALF_HEIGHT = MAP_PIXEL_HEIGHT / 2.0   # 450
+# 地图尺寸（动态计算，_ready() 中赋值）
+var MAP_PIXEL_WIDTH: float = 0.0
+var MAP_PIXEL_HEIGHT: float = 0.0
+var MAP_HALF_WIDTH: float = 0.0
+var MAP_HALF_HEIGHT: float = 0.0
 
 # 实体尺寸标准（像素）
 const ENTITY_SIZE_STANDARD = GRID_SIZE      # 30
@@ -130,6 +129,21 @@ func _ready() -> void:
 	shop = load("res://resources/shop/default_shop.tres")
 	spawn = load("res://resources/spawn/default_spawn.tres")
 	_load_resources_from_dir("res://resources/items/", items)
+	# 动态计算地图尺寸
+	_compute_map_dimensions()
+
+
+func _compute_map_dimensions() -> void:
+	var fx: EffectConfigData = effects
+	if fx:
+		MAP_PIXEL_WIDTH = BASE_VIEWPORT_WIDTH / fx.camera_zoom * fx.map_size_ratio
+		MAP_PIXEL_HEIGHT = BASE_VIEWPORT_HEIGHT / fx.camera_zoom * fx.map_size_ratio
+	else:
+		# fallback：与旧尺寸接近
+		MAP_PIXEL_WIDTH = 1280.0
+		MAP_PIXEL_HEIGHT = 960.0
+	MAP_HALF_WIDTH = MAP_PIXEL_WIDTH / 2.0
+	MAP_HALF_HEIGHT = MAP_PIXEL_HEIGHT / 2.0
 
 
 func _load_resources_from_dir(path: String, target: Dictionary) -> void:
