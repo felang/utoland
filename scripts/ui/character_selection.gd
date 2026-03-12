@@ -3,6 +3,10 @@ extends Control
 
 # 属性基准值（用于颜色标记）
 # 注意：speed 基准值为 200.0（CharacterData 默认值），旧代码误用 100.0 导致速度始终显绿
+const PORTRAIT_BUTTON_SIZE := Vector2(80, 80)
+const PORTRAIT_BORDER_WIDTH := 2
+const PORTRAIT_BORDER_RADIUS := 4
+
 const STAT_BASELINES := {
 	"max_hp": 100.0,
 	"speed": 200.0,
@@ -31,10 +35,12 @@ const STAT_BASELINES := {
 
 var _selected_id: String = ""
 var _portrait_buttons: Dictionary = {}  # character_id → TextureButton
-var _placeholder_texture: Texture2D = null  # 缓存占位纹理
+var _selected_style: StyleBoxFlat
+var _unselected_style: StyleBoxEmpty
 
 
 func _ready() -> void:
+	_init_portrait_styles()
 	_apply_styles()
 	_connect_buttons()
 	_generate_portrait_list()
@@ -42,6 +48,21 @@ func _ready() -> void:
 	if GameConfig.characters.size() > 0:
 		var first_id: String = GameConfig.characters.keys()[0]
 		_select_character(first_id)
+
+
+func _init_portrait_styles() -> void:
+	_selected_style = StyleBoxFlat.new()
+	_selected_style.bg_color = Color.TRANSPARENT
+	_selected_style.border_color = UIConstants.COLOR_GOLD
+	_selected_style.border_width_left = PORTRAIT_BORDER_WIDTH
+	_selected_style.border_width_right = PORTRAIT_BORDER_WIDTH
+	_selected_style.border_width_top = PORTRAIT_BORDER_WIDTH
+	_selected_style.border_width_bottom = PORTRAIT_BORDER_WIDTH
+	_selected_style.corner_radius_top_left = PORTRAIT_BORDER_RADIUS
+	_selected_style.corner_radius_top_right = PORTRAIT_BORDER_RADIUS
+	_selected_style.corner_radius_bottom_left = PORTRAIT_BORDER_RADIUS
+	_selected_style.corner_radius_bottom_right = PORTRAIT_BORDER_RADIUS
+	_unselected_style = StyleBoxEmpty.new()
 
 
 func _apply_styles() -> void:
@@ -108,7 +129,7 @@ func _generate_portrait_list() -> void:
 	for character_id in GameConfig.characters:
 		var char_data: CharacterData = GameConfig.characters[character_id]
 		var btn := TextureButton.new()
-		btn.custom_minimum_size = Vector2(80, 80)
+		btn.custom_minimum_size = PORTRAIT_BUTTON_SIZE
 		btn.ignore_texture_size = true
 		btn.stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_COVERED
 
@@ -119,7 +140,7 @@ func _generate_portrait_list() -> void:
 		else:
 			# fallback: 添加占位 ColorRect 作为子节点
 			var placeholder := ColorRect.new()
-			placeholder.color = Color(0.15, 0.15, 0.25, 1.0)
+			placeholder.color = UIConstants.COLOR_BG_PANEL
 			placeholder.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 			btn.add_child(placeholder)
 
@@ -144,23 +165,9 @@ func _update_portrait_borders() -> void:
 	for cid in _portrait_buttons:
 		var btn: TextureButton = _portrait_buttons[cid]
 		if cid == _selected_id:
-			# 金色边框
-			var style := StyleBoxFlat.new()
-			style.bg_color = Color.TRANSPARENT
-			style.border_color = UIConstants.COLOR_GOLD
-			style.border_width_left = 2
-			style.border_width_right = 2
-			style.border_width_top = 2
-			style.border_width_bottom = 2
-			style.corner_radius_top_left = 4
-			style.corner_radius_top_right = 4
-			style.corner_radius_bottom_left = 4
-			style.corner_radius_bottom_right = 4
-			btn.add_theme_stylebox_override("normal", style)
+			btn.add_theme_stylebox_override("normal", _selected_style)
 		else:
-			# 无边框
-			var style := StyleBoxEmpty.new()
-			btn.add_theme_stylebox_override("normal", style)
+			btn.add_theme_stylebox_override("normal", _unselected_style)
 
 
 func _fill_detail_panel(character_id: String) -> void:
