@@ -86,7 +86,7 @@ extends Resource
 @export var camera_dead_zone_height: float = 0.1
 
 # 地图
-@export var map_size_ratio: float = 1.3
+@export var map_size_ratio: float = 0.95
 
 # 枪口闪光
 @export var muzzle_flash_size: Vector2 = Vector2(6, 6)
