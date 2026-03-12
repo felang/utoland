@@ -45,11 +45,21 @@
   - `MAP_PIXEL_HEIGHT = BASE_VIEWPORT_HEIGHT / camera_zoom * map_size_ratio`
 - 以 zoom=0.55、ratio=1.3 为例：约 1513x851
 
-**`GameConfig` 改造**：保留 `MAP_PIXEL_WIDTH/HEIGHT` 和 `MAP_HALF_WIDTH/HEIGHT` 作为 `var`（非 `const`），在 `_ready()` 中根据 `EffectConfigData` 计算赋值。原有 `MAP_COLS/MAP_ROWS/GRID_SIZE` const 可移除或保留为参考。
+**`GameConfig` 改造**：保留 `MAP_PIXEL_WIDTH/HEIGHT` 和 `MAP_HALF_WIDTH/HEIGHT` 作为 `var`（非 `const`），在 `_ready()` 中根据 `EffectConfigData` 计算赋值。移除 `MAP_COLS/MAP_ROWS` const（不再有意义，地图尺寸不再基于网格），保留 `GRID_SIZE` const（grid_overlay 仍需要）。
 
-**消费者迁移**：所有在变量声明处直接引用 `GameConfig.MAP_HALF_WIDTH` 等的脚本（如 `enemy_spawner.gd`）需改为在 `_ready()` 中读取，因为 autoload `_ready()` 顺序在变量声明之后。需更新的文件：
+**消费者迁移**：所有在变量声明处直接引用 `GameConfig.MAP_HALF_WIDTH` 等的脚本需改为在 `_ready()` 中读取。在函数体/`_ready()` 中读取的引用无需改动（autoload `_ready()` 先于场景节点执行）。
+
+需更新的声明处引用：
 - `scripts/systems/enemy_spawner.gd` — `map_min_x/max_x/min_y/max_y` 改到 `_ready()` 赋值
-- `tests/unit/test_game_config_dimensions.gd` — 断言值更新为动态计算结果
+- `scripts/ui/placement.gd` — 地图边界引用改到 `_ready()`
+- `scripts/ui/grid_overlay.gd` — 地图尺寸引用改到 `_ready()`
+
+测试文件更新（断言策略：验证公式正确性，即 `MAP_PIXEL_WIDTH == BASE_VIEWPORT_WIDTH / zoom * ratio`）：
+- `tests/unit/test_game_config_dimensions.gd` — 断言改为验证动态计算公式
+- `tests/unit/test_placement_grid_rules.gd` — 边界值更新
+- `tests/unit/test_grid_overlay.gd` — 尺寸值更新
+- `tests/unit/test_camera_shake.gd` — 摄像机限制值更新
+- `tests/integration/test_enemy_spawning.gd` — 生成边界值更新
 
 ### 3. 边界与摄像机限制自动适配
 
@@ -101,4 +111,10 @@ Zoom 调整步长 0.05，调参时 debug 面板显示当前 zoom 值和可见区
 - `scripts/ui/debug_panel.gd` — 快捷键改为 Ctrl 组合键，新增 zoom 调整
 - `project.godot` — 更新 input map action 映射
 - `scripts/systems/enemy_spawner.gd` — map 边界变量改到 _ready() 读取
-- `tests/unit/test_game_config_dimensions.gd` — 断言值更新
+- `scripts/ui/placement.gd` — 地图边界引用改到 _ready()
+- `scripts/ui/grid_overlay.gd` — 地图尺寸引用改到 _ready()
+- `tests/unit/test_game_config_dimensions.gd` — 断言改为验证动态公式
+- `tests/unit/test_placement_grid_rules.gd` — 边界值更新
+- `tests/unit/test_grid_overlay.gd` — 尺寸值更新
+- `tests/unit/test_camera_shake.gd` — 摄像机限制值更新
+- `tests/integration/test_enemy_spawning.gd` — 生成边界值更新
