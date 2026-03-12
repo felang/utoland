@@ -51,7 +51,7 @@ DetailContainer (MarginContainer, UIConstants.GAP_SECTIONS)
 
 ### 属性颜色
 
-基准值定义（与现有 character_card.gd 保持一致）：
+基准值定义（基于 CharacterData 默认值，修正旧代码 speed baseline 错误）：
 - max_hp: 100.0
 - speed: 200.0
 - damage_mult: 1.0
