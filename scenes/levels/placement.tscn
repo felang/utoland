@@ -5,7 +5,7 @@
 [ext_resource type="Script" uid="uid://bmd64dp53aq51" path="res://scripts/entities/player.gd" id="2_faaep"]
 [ext_resource type="PackedScene" uid="uid://5u5tndodgthf" path="res://scenes/shared/map_boundary.tscn" id="3_rftas"]
 
-[node name="Placement" type="Node2D" unique_id=1728279217]
+[node name="Placement" type="Node2D"]
 script = ExtResource("1_faaep")
 
 [node name="Background" type="Node2D" parent="."]
@@ -15,47 +15,63 @@ z_index = -100
 position = Vector2(0, 0)
 centered = true
 
-[node name="Player" type="CharacterBody2D" parent="." unique_id=2056081713 instance=ExtResource("1_8iydn")]
+[node name="Player" type="CharacterBody2D" parent="." instance=ExtResource("1_8iydn")]
 position = Vector2(0, 0)
 collision_mask = 18
 script = ExtResource("2_faaep")
 
-[node name="MapBoundary" type="Node2D" parent="." unique_id=1220843918 instance=ExtResource("3_rftas")]
+[node name="MapBoundary" type="Node2D" parent="." instance=ExtResource("3_rftas")]
 
-[node name="UI" type="CanvasLayer" parent="." unique_id=836118506]
+[node name="UI" type="CanvasLayer" parent="."]
 
-[node name="TowerButtons" type="HBoxContainer" parent="UI" unique_id=562435954]
-offset_left = 20.0
-offset_top = 20.0
-offset_right = 52.0
-offset_bottom = 28.0
+[node name="SidePanel" type="VBoxContainer" parent="UI"]
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 1.0
+offset_right = 120.0
+offset_bottom = 0.0
+mouse_filter = 0
 
-[node name="ShooterButton" type="Button" parent="UI/TowerButtons" unique_id=287064566]
-custom_minimum_size = Vector2(120, 32)
+[node name="TabBar" type="HBoxContainer" parent="UI/SidePanel"]
 layout_mode = 2
-text = "射手塔 (30)"
 
-[node name="WallButton" type="Button" parent="UI/TowerButtons" unique_id=1473282645]
-custom_minimum_size = Vector2(120, 32)
+[node name="PlacementTab" type="Button" parent="UI/SidePanel/TabBar"]
 layout_mode = 2
-text = "墙塔 (40)"
+size_flags_horizontal = 3
+toggle_mode = true
+button_pressed = true
+text = "布置"
 
-[node name="SlowButton" type="Button" parent="UI/TowerButtons" unique_id=1521053866]
-custom_minimum_size = Vector2(120, 32)
+[node name="ShopTab" type="Button" parent="UI/SidePanel/TabBar"]
 layout_mode = 2
-text = "减速塔 (35)"
+size_flags_horizontal = 3
+toggle_mode = true
+text = "商店"
 
-[node name="CoinsLabel" type="Label" parent="UI" unique_id=243231077]
-offset_left = 20.0
-offset_top = 80.0
-offset_right = 21.0
-offset_bottom = 103.0
-text = "金币: 50"
+[node name="CoinsLabel" type="Label" parent="UI/SidePanel"]
+layout_mode = 2
+text = "金币: 0"
 
-[node name="StartBattleButton" type="Button" parent="UI" unique_id=1074807471]
-custom_minimum_size = Vector2(160, 36)
-offset_left = 460.0
-offset_top = 300.0
-offset_right = 468.0
-offset_bottom = 308.0
+[node name="PlacementContent" type="VBoxContainer" parent="UI/SidePanel"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="TowerList" type="VBoxContainer" parent="UI/SidePanel/PlacementContent"]
+layout_mode = 2
+
+[node name="ShopContent" type="VBoxContainer" parent="UI/SidePanel"]
+layout_mode = 2
+size_flags_vertical = 3
+visible = false
+
+[node name="ShopItemList" type="VBoxContainer" parent="UI/SidePanel/ShopContent"]
+layout_mode = 2
+
+[node name="RefreshButton" type="Button" parent="UI/SidePanel/ShopContent"]
+layout_mode = 2
+text = "刷新 (5)"
+
+[node name="StartBattleButton" type="Button" parent="UI/SidePanel"]
+layout_mode = 2
 text = "开始战斗"
