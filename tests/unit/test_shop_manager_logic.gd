@@ -48,3 +48,19 @@ func test_cannot_buy_maxed_item():
 	GameData.purchased_items = {"sharp_bullet": 3}
 	var item: ShopItemData = GameConfig.items["sharp_bullet"]
 	assert_false(generator.can_buy(item))  # max_stack = 3，已买满
+
+func test_tower_effect_items_not_filtered():
+	var result := generator.generate_items(
+		5, PackedStringArray(), 0.0,
+		[false, false, false, false], [], [])
+	var all_items: Array = GameConfig.items.values()
+	var tower_items: Array = all_items.filter(func(it: ShopItemData) -> bool:
+		return it.effect_type in [
+			Enums.ItemEffect.TOWER_STAT,
+			Enums.ItemEffect.TOWER_LINK,
+			Enums.ItemEffect.WAVE_HEAL_TOWERS,
+			Enums.ItemEffect.TOWER_REGEN,
+			Enums.ItemEffect.SYMBIOSIS,
+			Enums.ItemEffect.WAR_MACHINE,
+		])
+	assert_gt(tower_items.size(), 0, "GameConfig 应有塔相关物品")

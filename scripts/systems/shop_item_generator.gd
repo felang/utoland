@@ -9,15 +9,6 @@ const RARITY_TABLE: Array = [
 	{"from": 10, "weights": {"common": 20,  "rare": 50, "epic": 30}},
 ]
 
-# 塔相关 effect_type 黑名单（幸存者模式下过滤）
-const TOWER_EFFECT_TYPES: Array = [
-	Enums.ItemEffect.TOWER_STAT,
-	Enums.ItemEffect.TOWER_LINK,
-	Enums.ItemEffect.WAVE_HEAL_TOWERS,
-	Enums.ItemEffect.TOWER_REGEN,
-	Enums.ItemEffect.SYMBIOSIS,
-	Enums.ItemEffect.WAR_MACHINE,
-]
 
 func get_rarity_weights(wave: int) -> Dictionary:
 	var result: Dictionary = {}
@@ -62,8 +53,6 @@ func generate_items(wave: int, affinity_tags: PackedStringArray, affinity_discou
 		Enums.ItemRarity.EPIC: [],
 	}
 	for item in GameConfig.items.values():
-		if item.effect_type in TOWER_EFFECT_TYPES:
-			continue
 		if by_rarity.has(item.rarity):
 			by_rarity[item.rarity].append(item)
 
