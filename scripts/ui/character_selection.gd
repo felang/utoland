@@ -1,58 +1,251 @@
 extends Control
-## 角色选择界面 — 数据驱动，从 GameConfig.characters 生成卡片
+## 角色选择界面 — 左侧头像列表 + 右侧详情面板
 
-const CARD_SCENE = preload("res://scenes/ui/character_card.tscn")
+# 属性基准值（用于颜色标记）
+# 注意：speed 基准值为 200.0（CharacterData 默认值），旧代码误用 100.0 导致速度始终显绿
+const STAT_BASELINES := {
+	"max_hp": 100.0,
+	"speed": 200.0,
+	"damage_mult": 1.0,
+	"attack_speed_mult": 1.0,
+	"hp_regen": 0.0,
+}
 
-@onready var _container: HBoxContainer = $VBoxContainer/CardContainer
-@onready var _desc_label: Label = $VBoxContainer/DescPanel/DescLabel
-@onready var _back_button: Button = $VBoxContainer/BackButton
+# 节点引用
+@onready var _portrait_list: VBoxContainer = %PortraitList
+@onready var _large_portrait: TextureRect = %LargePortrait
+@onready var _character_name: Label = %CharacterName
+@onready var _weapon_label: Label = %WeaponLabel
+@onready var _hp_value: Label = %HPValue
+@onready var _speed_value: Label = %SpeedValue
+@onready var _damage_value: Label = %DamageValue
+@onready var _attack_speed_value: Label = %AttackSpeedValue
+@onready var _hp_regen_value: Label = %HPRegenValue
+@onready var _affinity_section: HBoxContainer = %AffinitySection
+@onready var _passive_desc: Label = %PassiveDesc
+@onready var _select_button: Button = %SelectButton
+@onready var _back_button: Button = %BackButton
+@onready var _right_panel: PanelContainer = %RightPanel
+@onready var _stats_section: PanelContainer = %StatsSection
+@onready var _passive_title: Label = %PassiveTitle
 
-var _cards: Array = []
+var _selected_id: String = ""
+var _portrait_buttons: Dictionary = {}  # character_id → TextureButton
+var _placeholder_texture: Texture2D = null  # 缓存占位纹理
 
 
 func _ready() -> void:
-	# 背景与标题样式
-	$Background.color = UIConstants.COLOR_BG_PRIMARY
-	$VBoxContainer/TitleLabel.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_TITLE)
-	$VBoxContainer/TitleLabel.add_theme_color_override("font_color", UIConstants.COLOR_TEXT_PRIMARY)
+	_apply_styles()
+	_connect_buttons()
+	_generate_portrait_list()
+	# 默认选中第一个角色
+	if GameConfig.characters.size() > 0:
+		var first_id: String = GameConfig.characters.keys()[0]
+		_select_character(first_id)
 
-	# 描述面板样式
-	_desc_label.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_SMALL)
-	_desc_label.add_theme_color_override("font_color", UIConstants.COLOR_TEXT_SECONDARY)
-	$VBoxContainer/DescPanel.add_theme_stylebox_override("panel", UIConstants.create_panel_stylebox())
+
+func _apply_styles() -> void:
+	# 背景
+	$Background.color = UIConstants.COLOR_BG_PRIMARY
+
+	# 标题
+	var title: Label = $MainVBox/TitleLabel
+	title.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_TITLE)
+	title.add_theme_color_override("font_color", UIConstants.COLOR_TEXT_PRIMARY)
+
+	# 右侧面板
+	_right_panel.add_theme_stylebox_override("panel", UIConstants.create_panel_stylebox())
+
+	# 角色名
+	_character_name.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_SUBTITLE)
+	_character_name.add_theme_color_override("font_color", UIConstants.COLOR_GOLD)
+
+	# 武器
+	_weapon_label.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_SMALL)
+	_weapon_label.add_theme_color_override("font_color", UIConstants.COLOR_TEXT_SECONDARY)
+
+	# 属性区域
+	_stats_section.add_theme_stylebox_override("panel", UIConstants.create_panel_stylebox(UIConstants.COLOR_BG_PANEL))
+
+	# 属性标题标签
+	var stats_grid: GridContainer = _stats_section.get_node("StatsGrid")
+	for i in range(0, stats_grid.get_child_count(), 2):
+		var title_label: Label = stats_grid.get_child(i)
+		title_label.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_SMALL)
+		title_label.add_theme_color_override("font_color", UIConstants.COLOR_TEXT_SECONDARY)
+
+	# 属性值标签
+	for value_label in [_hp_value, _speed_value, _damage_value, _attack_speed_value, _hp_regen_value]:
+		value_label.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_SMALL)
+
+	# 被动技能
+	_passive_title.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_BODY)
+	_passive_title.add_theme_color_override("font_color", UIConstants.COLOR_TEXT_PRIMARY)
+	_passive_desc.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_SMALL)
+	_passive_desc.add_theme_color_override("font_color", UIConstants.COLOR_TEXT_SECONDARY)
+
+	# 选择按钮样式
+	_select_button.add_theme_stylebox_override("normal", UIConstants.create_button_stylebox(UIConstants.COLOR_BUTTON_NORMAL))
+	_select_button.add_theme_stylebox_override("hover", UIConstants.create_button_stylebox(UIConstants.COLOR_BUTTON_HOVER))
+	_select_button.add_theme_stylebox_override("pressed", UIConstants.create_button_stylebox(UIConstants.COLOR_BUTTON_PRESSED))
+	_select_button.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_BODY)
+	_select_button.add_theme_color_override("font_color", UIConstants.COLOR_GOLD)
 
 	# 返回按钮
-	_back_button.pressed.connect(func(): SceneManager.go_to(Enums.Scene.START_MENU))
 	_back_button.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_SMALL)
 
-	# 清除并生成卡片
-	for child in _container.get_children():
+
+func _connect_buttons() -> void:
+	_select_button.pressed.connect(_on_select_pressed)
+	_back_button.pressed.connect(func(): SceneManager.go_to(Enums.Scene.START_MENU))
+
+
+func _generate_portrait_list() -> void:
+	for child in _portrait_list.get_children():
 		child.queue_free()
-	_cards.clear()
+	_portrait_buttons.clear()
+
 	for character_id in GameConfig.characters:
 		var char_data: CharacterData = GameConfig.characters[character_id]
-		var weapon_data: WeaponData = GameConfig.weapons[char_data.default_weapon]
-		var card = CARD_SCENE.instantiate()
-		_container.add_child(card)
-		card.setup(character_id, char_data, weapon_data)
-		card.selected.connect(_on_character_selected)
-		card.mouse_entered.connect(_on_card_hovered.bind(character_id))
-		_cards.append(card)
+		var btn := TextureButton.new()
+		btn.custom_minimum_size = Vector2(80, 80)
+		btn.ignore_texture_size = true
+		btn.stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_COVERED
+
+		# 加载头像纹理
+		var portrait: Texture2D = _load_portrait(char_data.portrait_path)
+		if portrait:
+			btn.texture_normal = portrait
+		else:
+			# fallback: 添加占位 ColorRect 作为子节点
+			var placeholder := ColorRect.new()
+			placeholder.color = Color(0.15, 0.15, 0.25, 1.0)
+			placeholder.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+			btn.add_child(placeholder)
+
+		btn.pressed.connect(_select_character.bind(character_id))
+		_portrait_list.add_child(btn)
+		_portrait_buttons[character_id] = btn
 
 
-func _on_card_hovered(character_id: String) -> void:
+func _load_portrait(path: String) -> Texture2D:
+	if path == "" or not ResourceLoader.exists(path):
+		return null
+	return load(path) as Texture2D
+
+
+func _select_character(character_id: String) -> void:
+	_selected_id = character_id
+	_update_portrait_borders()
+	_fill_detail_panel(character_id)
+
+
+func _update_portrait_borders() -> void:
+	for cid in _portrait_buttons:
+		var btn: TextureButton = _portrait_buttons[cid]
+		if cid == _selected_id:
+			# 金色边框
+			var style := StyleBoxFlat.new()
+			style.bg_color = Color.TRANSPARENT
+			style.border_color = UIConstants.COLOR_GOLD
+			style.border_width_left = 2
+			style.border_width_right = 2
+			style.border_width_top = 2
+			style.border_width_bottom = 2
+			style.corner_radius_top_left = 4
+			style.corner_radius_top_right = 4
+			style.corner_radius_bottom_left = 4
+			style.corner_radius_bottom_right = 4
+			btn.add_theme_stylebox_override("normal", style)
+		else:
+			# 无边框
+			var style := StyleBoxEmpty.new()
+			btn.add_theme_stylebox_override("normal", style)
+
+
+func _fill_detail_panel(character_id: String) -> void:
 	var char_data: CharacterData = GameConfig.characters[character_id]
-	if char_data.passive_description != "":
-		_desc_label.text = char_data.passive_description
+	var weapon_data: WeaponData = GameConfig.weapons[char_data.default_weapon]
+
+	# 头像
+	var portrait: Texture2D = _load_portrait(char_data.portrait_path)
+	if portrait:
+		_large_portrait.texture = portrait
 	else:
-		_desc_label.text = char_data.display_name
+		_large_portrait.texture = null
+
+	# 名称与武器
+	_character_name.text = char_data.display_name
+	_weapon_label.text = "默认武器: %s" % weapon_data.display_name
+
+	# 属性
+	_hp_value.text = "%d" % int(char_data.max_hp)
+	_speed_value.text = "%d" % int(char_data.speed)
+	_damage_value.text = "x%.1f" % char_data.damage_mult
+	_attack_speed_value.text = "x%.1f" % char_data.attack_speed_mult
+	_hp_regen_value.text = "%.1f/s" % char_data.hp_regen
+
+	# 属性颜色
+	_color_stat(_hp_value, char_data.max_hp, STAT_BASELINES["max_hp"])
+	_color_stat(_speed_value, char_data.speed, STAT_BASELINES["speed"])
+	_color_stat(_damage_value, char_data.damage_mult, STAT_BASELINES["damage_mult"])
+	_color_stat(_attack_speed_value, char_data.attack_speed_mult, STAT_BASELINES["attack_speed_mult"])
+	_color_stat(_hp_regen_value, char_data.hp_regen, STAT_BASELINES["hp_regen"])
+
+	# 亲和标签
+	_fill_affinity(char_data)
+
+	# 被动技能
+	if char_data.passive_description != "":
+		_passive_desc.text = char_data.passive_description
+	else:
+		_passive_desc.text = "暂无被动技能"
 
 
-func _on_character_selected(character_id: String) -> void:
-	for card in _cards:
-		card.set_selected(card._character_id == character_id)
-	var char_data: CharacterData = GameConfig.characters[character_id]
-	GameData.current_character = character_id
+func _color_stat(label: Label, value: float, baseline: float) -> void:
+	if value > baseline:
+		label.add_theme_color_override("font_color", UIConstants.COLOR_POSITIVE)
+	elif value < baseline:
+		label.add_theme_color_override("font_color", UIConstants.COLOR_ACCENT_DANGER)
+	else:
+		label.add_theme_color_override("font_color", UIConstants.COLOR_TEXT_PRIMARY)
+
+
+func _fill_affinity(char_data: CharacterData) -> void:
+	# 清除旧内容
+	for child in _affinity_section.get_children():
+		child.queue_free()
+
+	if char_data.affinity_tags.size() == 0:
+		return
+
+	for tag in char_data.affinity_tags:
+		var tag_label := Label.new()
+		tag_label.text = tag
+		tag_label.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_TINY)
+		# 根据标签类型着色
+		match tag:
+			"shooter":
+				tag_label.add_theme_color_override("font_color", UIConstants.COLOR_AFFINITY_SHOOTER)
+			"engineer":
+				tag_label.add_theme_color_override("font_color", UIConstants.COLOR_AFFINITY_ENGINEER)
+			_:
+				tag_label.add_theme_color_override("font_color", UIConstants.COLOR_TEXT_SECONDARY)
+		_affinity_section.add_child(tag_label)
+
+	# 折扣标签
+	var discount_label := Label.new()
+	discount_label.text = "折扣%d%%" % int(char_data.affinity_discount * 100)
+	discount_label.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_TINY)
+	discount_label.add_theme_color_override("font_color", UIConstants.COLOR_GOLD)
+	_affinity_section.add_child(discount_label)
+
+
+func _on_select_pressed() -> void:
+	if _selected_id == "":
+		return
+	var char_data: CharacterData = GameConfig.characters[_selected_id]
+	GameData.current_character = _selected_id
 	GameData.selected_weapon = char_data.default_weapon
-	GameData.init_character(character_id)
+	GameData.init_character(_selected_id)
 	SceneManager.go_to(Enums.Scene.MAP_SELECT)
