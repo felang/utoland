@@ -97,7 +97,19 @@ const SPRITES = {
 		"tileset": "res://assets/sprites/towers/tileset_towers.png",
 		"pea_shooter": {"region": Rect2(32, 0, 16, 16)},
 		"stump": {"region": Rect2(64, 32, 16, 16)},
-		"ice_flower": {"region": Rect2(320, 0, 16, 16)}
+		"ice_flower": {"region": Rect2(320, 0, 16, 16)},
+		"cactus": {"region": Rect2(0, 0, 16, 16)},
+		"rose": {"region": Rect2(16, 0, 16, 16)},
+		"mushroom": {"region": Rect2(48, 0, 16, 16)},
+		"vine": {"region": Rect2(64, 0, 16, 16)},
+		"dandelion": {"region": Rect2(80, 0, 16, 16)},
+		"pitcher": {"region": Rect2(96, 0, 16, 16)},
+		"thorn": {"region": Rect2(112, 0, 16, 16)},
+		"oak": {"region": Rect2(128, 0, 16, 16)},
+		"sunflower": {"region": Rect2(144, 0, 16, 16)},
+		"mint": {"region": Rect2(160, 0, 16, 16)},
+		"heal_flower": {"region": Rect2(176, 0, 16, 16)},
+		"bamboo": {"region": Rect2(192, 0, 16, 16)}
 	},
 	"projectiles": {
 		"bullet": "res://assets/sprites/projectiles/kunai.png",
