@@ -31,6 +31,13 @@ class WeaponId:
 	const RIFLE = "rifle"
 	const BOOMERANG = "boomerang"
 	const LASER = "laser"
+	const SHOTGUN = "shotgun"
+	const MINIGUN = "minigun"
+	const ROCKET = "rocket"
+	const FLAMETHROWER = "flamethrower"
+	const LIGHTNING = "lightning"
+	const ICE_GUN = "ice_gun"
+	const BLADE = "blade"
 
 # 敌人类型
 class Enemy:
@@ -46,12 +53,28 @@ class TowerId:
 	const PEA_SHOOTER = "pea_shooter"
 	const STUMP = "stump"
 	const ICE_FLOWER = "ice_flower"
+	const CACTUS = "cactus"
+	const ROSE = "rose"
+	const MUSHROOM = "mushroom"
+	const VINE = "vine"
+	const DANDELION = "dandelion"
+	const PITCHER = "pitcher"
+	const THORN = "thorn"
+	const OAK = "oak"
+	const SUNFLOWER = "sunflower"
+	const MINT = "mint"
+	const HEAL_FLOWER = "heal_flower"
+	const BAMBOO = "bamboo"
 
 # 投射物类型
 class ProjectileId:
 	const BULLET = "bullet"
 	const BOOMERANG = "boomerang"
 	const LASER = "laser"
+	const ROCKET = "rocket"
+	const FLAME = "flame"
+	const CHAIN = "chain"
+	const MELEE = "melee"
 
 # 地图 ID
 class Map:
