@@ -54,6 +54,14 @@ func test_create_tower_vine():
 	assert_not_null(tower.data, "应注入 TowerData")
 	tower.queue_free()
 
+func test_create_tower_dandelion():
+	var tower = SceneFactory.create_tower(Enums.TowerId.DANDELION)
+	assert_not_null(tower, "应能创建蒲公英塔")
+	assert_eq(tower.tower_type, Enums.TowerId.DANDELION)
+	add_child(tower)
+	assert_not_null(tower.data, "应注入 TowerData")
+	tower.queue_free()
+
 func test_create_tower_invalid():
 	var tower = SceneFactory.create_tower("invalid_type")
 	assert_null(tower, "Invalid tower type should return null")
