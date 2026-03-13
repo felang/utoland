@@ -12,6 +12,7 @@ func test_add_weapon_creates_bullet_weapon():
 	var data = WeaponData.new()
 	data.id = "test_bullet"
 	data.projectile_type = Enums.ProjectileId.BULLET
+	data.weapon_type = "bullet"
 	data.fire_rate_per_level = PackedFloat32Array([0.5])
 	data.damage_per_level = PackedFloat32Array([10.0])
 	data.weapon_range_per_level = PackedFloat32Array([300.0])
@@ -27,6 +28,7 @@ func test_add_weapon_creates_boomerang_weapon():
 	var data = WeaponData.new()
 	data.id = "test_boomerang"
 	data.projectile_type = Enums.ProjectileId.BOOMERANG
+	data.weapon_type = "boomerang"
 	data.fire_rate_per_level = PackedFloat32Array([1.0])
 	data.damage_per_level = PackedFloat32Array([15.0])
 	data.weapon_range_per_level = PackedFloat32Array([200.0])
@@ -42,6 +44,7 @@ func test_add_weapon_creates_laser_weapon():
 	var data = WeaponData.new()
 	data.id = "test_laser"
 	data.projectile_type = Enums.ProjectileId.LASER
+	data.weapon_type = "laser"
 	data.fire_rate_per_level = PackedFloat32Array([2.0])
 	data.damage_per_level = PackedFloat32Array([30.0])
 	data.weapon_range_per_level = PackedFloat32Array([400.0])

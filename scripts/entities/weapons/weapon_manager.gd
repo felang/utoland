@@ -13,7 +13,7 @@ func initialize(weapon_ids: Array[String]) -> void:
 		_add_weapon(GameConfig.weapons[id])
 
 func _add_weapon(data: WeaponData) -> void:
-	var weapon: Weapon = _create_weapon(data.projectile_type)
+	var weapon: Weapon = _create_weapon(data.weapon_type)
 	if not weapon:
 		return
 	weapon.initialize(data)
@@ -50,10 +50,11 @@ func _find_closest_enemy(range_limit: float = INF) -> Node2D:
 				closest = enemy
 	return closest
 
-func _create_weapon(projectile_type: String) -> Weapon:
-	match projectile_type:
-		Enums.ProjectileId.BULLET:    return BulletWeapon.new()
-		Enums.ProjectileId.BOOMERANG: return BoomerangWeapon.new()
-		Enums.ProjectileId.LASER:     return LaserWeapon.new()
-	push_error("WeaponManager: 未知 projectile_type: " + projectile_type)
+func _create_weapon(weapon_type: String) -> Weapon:
+	match weapon_type:
+		"bullet":    return BulletWeapon.new()
+		"boomerang": return BoomerangWeapon.new()
+		"laser":     return LaserWeapon.new()
+		# 新武器类型将在后续 Chunk 中添加
+	push_error("WeaponManager: 未知 weapon_type: " + weapon_type)
 	return null

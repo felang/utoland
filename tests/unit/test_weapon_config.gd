@@ -30,3 +30,8 @@ func test_laser_has_required_fields():
 	assert_gt(w.beam_range, 0.0, "激光应有 beam_range")
 	assert_gt(w.beam_width, 0.0, "激光应有 beam_width")
 	assert_gt(w.beam_duration, 0.0, "激光应有 beam_duration")
+
+func test_all_weapons_have_weapon_type():
+	for id in GameConfig.weapons:
+		var w: WeaponData = GameConfig.weapons[id]
+		assert_ne(w.weapon_type, "", id + " 应有 weapon_type")
