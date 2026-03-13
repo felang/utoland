@@ -105,6 +105,7 @@ func _on_died() -> void:
 	EventBus.enemy_killed.emit(enemy_type, global_position, is_elite)
 	AudioManager.play("enemy_die")
 	_drop_coins()
+	EffectsManager.spawn_enhanced_death(global_position, health.death_color)
 	queue_free()
 
 func _drop_coins() -> void:

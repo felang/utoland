@@ -18,3 +18,12 @@ func test_flash_hit_changes_modulate():
 	assert_eq(sprite.modulate, original_mod, "modulate 应恢复原色")
 	sprite.queue_free()
 
+func test_spawn_enhanced_death_creates_nodes():
+	# headless 测试中 current_scene 可能为 null，节点会挂在 EffectsManager 上
+	var tree: SceneTree = get_tree()
+	var target_node: Node = tree.current_scene if tree.current_scene else EffectsManager
+	var before_count: int = target_node.get_child_count()
+	EffectsManager.spawn_enhanced_death(Vector2(100, 100), Color.RED)
+	var after_count: int = target_node.get_child_count()
+	assert_gt(after_count, before_count, "应创建死亡特效节点")
+

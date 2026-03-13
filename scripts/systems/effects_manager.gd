@@ -129,6 +129,26 @@ func spawn_death_effect(pos: Vector2, entity_color: Color) -> void:
 		tween.set_parallel(false)
 		tween.tween_callback(particle.queue_free)
 
+func spawn_enhanced_death(pos: Vector2, _entity_color: Color) -> void:
+	# 白闪缩放弹跳效果（独立 ColorRect 节点）
+	# 注意：不调用 spawn_death_effect()，因为 HealthComponent.die() 已调用过
+	var flash_rect: ColorRect = ColorRect.new()
+	flash_rect.size = Vector2(12, 12)
+	flash_rect.position = pos - flash_rect.size / 2
+	flash_rect.color = Color.WHITE
+	flash_rect.z_index = 50
+	flash_rect.pivot_offset = flash_rect.size / 2
+	var tree: SceneTree = get_tree()
+	if tree and tree.current_scene:
+		tree.current_scene.add_child(flash_rect)
+	else:
+		add_child(flash_rect)
+
+	var flash_tween: Tween = create_tween()
+	flash_tween.tween_property(flash_rect, "scale", Vector2(1.3, 1.3), 0.05)
+	flash_tween.tween_property(flash_rect, "scale", Vector2.ZERO, 0.15).set_ease(Tween.EASE_IN)
+	flash_tween.tween_callback(flash_rect.queue_free)
+
 func hitstop(time_scale: float = 0.05, duration: float = 0.1) -> void:
 	Engine.time_scale = time_scale
 	# ignore_time_scale=true (4th param) 确保计时器按真实时间走
