@@ -38,8 +38,8 @@ func get_tower_cost(type: String) -> int:
 		return 0
 
 	var td: TowerData = GameConfig.towers[type]
-	# Use average of min/max for consistent pricing
-	return (td.shop_price_min + td.shop_price_max) / 2
+	var level: int = GameData.owned_towers.get(type, 1)
+	return td.place_cost_per_level[level - 1]
 
 # Enemy creation — 注入 EnemyData Resource
 func create_enemy(type: String) -> CharacterBody2D:

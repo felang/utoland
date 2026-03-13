@@ -1,5 +1,30 @@
 extends GutTest
 
+var _original_owned_towers: Dictionary
+
+func before_each():
+	_original_owned_towers = GameData.owned_towers.duplicate()
+	GameData.owned_towers = {"shooter": 1}
+
+func after_each():
+	GameData.owned_towers = _original_owned_towers
+
+func test_scene_factory_get_tower_cost_reads_level():
+	GameData.owned_towers = {"shooter": 3}
+	var td: TowerData = GameConfig.towers["shooter"]
+	var expected_cost: int = td.place_cost_per_level[2]
+	assert_eq(SceneFactory.get_tower_cost("shooter"), expected_cost,
+		"Lv3 放置费用应读 place_cost_per_level[2]")
+
+func test_tower_upgrade_applies_globally():
+	var tower: Node2D = SceneFactory.create_tower("shooter")
+	add_child_autofree(tower)
+	var td: TowerData = GameConfig.towers["shooter"]
+	assert_almost_eq(tower.health.max_hp, td.hp_per_level[0], 0.01, "Lv1 HP")
+	GameData.owned_towers["shooter"] = 2
+	EventBus.tower_upgraded.emit("shooter")
+	assert_almost_eq(tower.health.max_hp, td.hp_per_level[1], 0.01, "Lv2 HP 应全局更新")
+
 func test_tower_data_has_level_fields():
 	var td: TowerData = GameConfig.towers["shooter"]
 	assert_eq(td.max_level, 5, "应有最大等级 5")

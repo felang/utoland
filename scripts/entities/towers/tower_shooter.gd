@@ -11,15 +11,20 @@ func _ready() -> void:
 	# 设置塔类型
 	tower_type = Enums.TowerId.SHOOTER
 
-	# 从注入的 Resource 初始化（HP 由 super._ready() 处理）
-	attack_damage = data.damage * GameData.player_stats[Enums.Stat.TOWER_MULT]
-	attack_rate = data.fire_rate
-	attack_range = data.attack_range
-
 	super._ready()
 	shoot_timer.wait_time = attack_rate
 	shoot_timer.timeout.connect(_on_shoot_timer_timeout)
 	shoot_timer.start()
+
+func _apply_level_stats() -> void:
+	super._apply_level_stats()
+	var idx: int = get_current_level() - 1
+	attack_damage = data.damage_per_level[idx] * GameData.player_stats[Enums.Stat.TOWER_MULT]
+	attack_rate = data.fire_rate_per_level[idx]
+	attack_range = data.attack_range_per_level[idx]
+	# 更新射击间隔
+	if is_instance_valid(shoot_timer):
+		shoot_timer.wait_time = attack_rate
 
 func _on_shoot_timer_timeout() -> void:
 	_shoot_nearest_enemy()
@@ -40,18 +45,4 @@ func _shoot_nearest_enemy() -> void:
 		var bullet: BulletProjectile = SceneFactory.create_bullet_projectile()
 		var direction: Vector2 = global_position.direction_to(closest.global_position)
 		get_parent().add_child(bullet)
-		bullet.setup(attack_damage * _get_symbiosis_bonus(), 0.0, global_position, direction)
-
-func _get_symbiosis_bonus() -> float:
-	if GameData.symbiosis_hp_threshold <= 0.0:
-		return 1.0
-	var players: Array[Node] = get_tree().get_nodes_in_group(Enums.Group.PLAYER)
-	if players.is_empty():
-		return 1.0
-	var player: Node = players[0]
-	if player.get("health") == null:
-		return 1.0
-	var hp_ratio: float = player.health.current_hp / player.health.max_hp
-	if hp_ratio < GameData.symbiosis_hp_threshold:
-		return 1.0 + GameData.symbiosis_tower_bonus
-	return 1.0
+		bullet.setup(attack_damage, 0.0, global_position, direction)
