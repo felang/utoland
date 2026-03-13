@@ -1,11 +1,11 @@
 extends Node2D
 
 const GRID_SIZE = GameConfig.GRID_SIZE
-const CAMERA_PAN_SPEED = 600.0
+const CAMERA_PAN_SPEED = 300.0
 const ZOOM_STEP = 1.15
 const ZOOM_MIN = Vector2(0.25, 0.25)
 const ZOOM_MAX = Vector2(2.0, 2.0)
-const PLACEMENT_ZOOM_INIT = Vector2(0.375, 0.375)
+const PLACEMENT_ZOOM_INIT = Vector2(0.75, 0.75)
 const SIDEBAR_WIDTH = 120.0
 
 signal coins_changed
