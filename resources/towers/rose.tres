@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="TowerData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/resources/tower_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = "rose"
+display_name = "玫瑰"
+max_level = 5
+burst_count = 3
+burst_interval = 0.15
+hp_per_level = PackedFloat32Array(70, 95, 125, 165, 215)
+damage_per_level = PackedFloat32Array(10, 14, 19, 25, 34)
+fire_rate_per_level = PackedFloat32Array(3.0, 2.7, 2.4, 2.1, 1.8)
+attack_range_per_level = PackedFloat32Array(150, 165, 180, 200, 225)
+shop_price_per_level = PackedInt32Array(0, 25, 42, 65, 92)
+place_cost_per_level = PackedInt32Array(18, 24, 32, 42, 55)
