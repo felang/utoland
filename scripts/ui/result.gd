@@ -63,6 +63,8 @@ func _ready() -> void:
 	menu_btn.pressed.connect(_on_menu)
 	restart_btn.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_BODY)
 	menu_btn.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_BODY)
+	UIUtils.setup_button_hover(restart_btn)
+	UIUtils.setup_button_hover(menu_btn)
 
 
 func _add_pill(flow: HFlowContainer, text: String) -> void:

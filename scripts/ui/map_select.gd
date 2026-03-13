@@ -17,6 +17,7 @@ func _ready() -> void:
 	# 返回按钮
 	_back_button.pressed.connect(func(): SceneManager.go_to(Enums.Scene.CHARACTER_SELECTION))
 	_back_button.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_SMALL)
+	UIUtils.setup_button_hover(_back_button)
 
 	# 清空占位子节点
 	for child in _map_list.get_children():

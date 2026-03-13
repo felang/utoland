@@ -18,10 +18,11 @@ func _ready() -> void:
 	$VersionLabel.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_SMALL)
 	$VersionLabel.add_theme_color_override("font_color", UIConstants.COLOR_TEXT_SECONDARY)
 
-	# 按钮字号
+	# 按钮字号与 hover 动效
 	for btn_name in ["StartButton", "SettingsButton", "QuitButton"]:
 		var btn: Button = vbox.get_node(btn_name)
 		btn.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_BODY)
+		UIUtils.setup_button_hover(btn)
 
 	# 按钮信号
 	vbox.get_node("StartButton").pressed.connect(_on_start_pressed)

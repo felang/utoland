@@ -118,6 +118,8 @@ func _apply_styles() -> void:
 func _connect_buttons() -> void:
 	_select_button.pressed.connect(_on_select_pressed)
 	_back_button.pressed.connect(func(): SceneManager.go_to(Enums.Scene.START_MENU))
+	UIUtils.setup_button_hover(_select_button)
+	UIUtils.setup_button_hover(_back_button)
 
 
 func _generate_portrait_list() -> void:
