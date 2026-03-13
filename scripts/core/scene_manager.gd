@@ -11,6 +11,15 @@ const SCENES: Dictionary = {
 
 const FADE_DURATION: float = 0.3
 
+const SCENE_BGM: Dictionary = {
+	"start_menu": "menu",
+	"character_selection": "menu",
+	"map_select": "menu",
+	"placement": "placement",
+	"main": "battle",
+	"result": "result",
+}
+
 var _fade_rect: ColorRect
 var _is_transitioning: bool = false
 
@@ -30,7 +39,8 @@ func go_to(scene_name: String) -> void:
 	if _is_transitioning:
 		return
 	_is_transitioning = true
-	# 淡出
+	# 淡出（同步淡出 BGM）
+	AudioManager.fade_bgm(FADE_DURATION)
 	var tween_out: Tween = create_tween()
 	tween_out.tween_property(_fade_rect, "color:a", 1.0, FADE_DURATION)
 	await tween_out.finished
@@ -38,6 +48,9 @@ func go_to(scene_name: String) -> void:
 	get_tree().change_scene_to_file(SCENES[scene_name])
 	# 等一帧让新场景初始化
 	await get_tree().process_frame
+	# 播放新场景 BGM
+	if SCENE_BGM.has(scene_name):
+		AudioManager.play_bgm(SCENE_BGM[scene_name])
 	# 淡入
 	var tween_in: Tween = create_tween()
 	tween_in.tween_property(_fade_rect, "color:a", 0.0, FADE_DURATION)

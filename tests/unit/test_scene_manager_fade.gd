@@ -19,3 +19,8 @@ func test_fade_overlay_initially_transparent():
 	assert_not_null(rect, "应有 ColorRect 遮罩")
 	if rect:
 		assert_eq(rect.color.a, 0.0, "遮罩初始应完全透明")
+
+func test_scene_bgm_mapping_exists():
+	for scene_name in SceneManager.SCENES.keys():
+		assert_true(SceneManager.SCENE_BGM.has(scene_name),
+			"场景 %s 应有 BGM 映射" % scene_name)
