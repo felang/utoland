@@ -83,7 +83,9 @@
 - **新增投射物**: FlameProjectile
   - 以玩家为原点，朝目标方向创建锥形 hitbox（扇形 Area2D）
   - **持续型模式**：FlamethrowerWeapon 维持一个 FlameProjectile 实例（非每次 fire 创建新的），每帧更新方向跟随目标
-  - 每个物理帧对锥形范围内敌人造成 tick 伤害（伤害 = damage_per_level × delta）
+  - 使用内部 tick 计时器（间隔 0.1s），每 tick 对锥形范围内敌人造成 `damage_per_level` 伤害
+  - `damage_per_level` 含义：**每 tick 伤害**（非 DPS），实际 DPS = damage / tick_interval = 3 / 0.1 = 30
+  - `fire_rate_per_level` 字段对火焰喷射无意义（持续型），.tres 中设为 0 表示不使用 cooldown
   - 射程短（100px），扇形角度约 45°
   - 无目标时隐藏火焰，有目标时显示
 - **Weapon 脚本**: 新增 FlamethrowerWeapon（extends Weapon）
@@ -111,11 +113,14 @@
   - IceGunWeapon 在创建 BulletProjectile 后设置这两个属性
 - **Weapon 脚本**: 新增 IceGunWeapon（extends BulletWeapon），override fire() 在创建子弹后注入减速属性
 - **WeaponData 扩展**: 新增 `slow_on_hit: float`（0 = 无减速），`slow_duration: float`
-- **SlowHandler 扩展**: 新增 `apply_timed_slow(percent, duration)` 方法
-  - 现有 SlowHandler 使用计数器模式（apply_slow/remove_slow 配对），适合区域持续效果
-  - `apply_timed_slow` 使用独立机制：创建一次性 Timer，到期后自动 remove
-  - 减速叠加规则：取所有活跃减速效果中的最大值（不累加），避免与冰花塔冲突
-  - 即：若冰花减速 30% + 冰冻枪减速 30%，实际减速 = 30%（取最大值），非 60%
+- **SlowHandler 重构**: 现有计数器模式 (`slow_effects: int`) 无法支持不同百分比的叠加和独立过期，需要重构为效果字典模式：
+  - 内部数据结构改为 `_active_slows: Dictionary`，key 为 source_id（如 "tower_ice_flower_123" 或 "ice_gun_bullet_456"），value 为 `{ percent: float, timed: bool }`
+  - `apply_slow(percent, source_id)` — 注册一个持续减速（区域进入时调用）
+  - `remove_slow(source_id)` — 移除指定来源的减速（区域退出时调用）
+  - `apply_timed_slow(percent, duration, source_id)` — 注册带计时器的临时减速，到期自动 remove
+  - 生效减速 = `max(所有活跃 percent)`，每次增删后重算并 emit `speed_changed`
+  - 现有 TowerSlow 调用处适配：`apply_slow` / `remove_slow` 增加 source_id 参数（可用塔实例 id）
+  - 即：冰花 30% + 冰冻枪 30% → 实际 30%；冰花 30% + 高级冰花 45% → 实际 45%
 
 #### 10. blade（旋刃）
 - **机制**: 以玩家为中心的圆形挥砍，无投射物飞行，命中范围内所有敌人
@@ -258,7 +263,7 @@
 - **定位**: 单体高伤害控制，对精英怪有效
 - **脚本**: 新增 TowerGrab（extends Tower）
   - 状态机：IDLE → GRAB（抓取动画）→ DIGEST（持续伤害）→ IDLE
-  - 被抓敌人不可移动、不可被其他攻击命中（从场景中隐藏）
+  - 被抓敌人隔离处理：移出 "enemies" 组 + 禁用所有碰撞层（`collision_layer = 0, collision_mask = 0`）+ `visible = false`。消化结束后恢复或死亡
   - 消化时间和伤害 per_level 可配
   - Boss 免疫抓取（通过 `EnemyData` 新增 `is_boss: bool` 字段判断，Boss 类型 .tres 设为 true）
 - **TowerData 扩展**: 新增 `grab_dps_per_level: PackedFloat32Array`, `digest_duration_per_level: PackedFloat32Array`
@@ -277,8 +282,9 @@
 - **攻击者追踪方案**:
   - 当前 damaged 信号签名：`damaged(amount: float, current_hp: float)`
   - 扩展为：`damaged(amount: float, current_hp: float, attacker: Node2D)`，attacker 可为 null
-  - 伤害链路修改：`Hurtbox.hit_taken` 信号需传递 Hitbox 的 owner → `HealthComponent.take_damage(amount, attacker)` → `damaged.emit(amount, current_hp, attacker)`
-  - 敌人接触伤害路径：enemy 碰撞 tower 时，enemy 作为 attacker 传入
+  - **主要伤害路径（敌人接触塔）**: `enemy._attack_tower()` 直接调用 `target_tower.take_damage(amount)`。此路径不经过 Hurtbox/Hitbox 系统。改为 `target_tower.take_damage(amount, self)` 传入 enemy 引用
+  - **次要伤害路径（投射物伤害）**: `Hurtbox.hit_taken` → `take_damage()`。此路径传入 Hitbox 的 owner 作为 attacker
+  - `tower.take_damage(amount, attacker)` → `health.take_damage(amount, attacker)` → `damaged.emit(amount, current_hp, attacker)`
   - 所有现有 damaged 信号连接需要适配新签名（增加 attacker 参数）
 - **TowerData 扩展**: 新增 `reflect_ratio_per_level: PackedFloat32Array`
 
@@ -290,7 +296,8 @@
   - 对范围内塔施加减伤 buff
   - 塔离开范围时移除 buff
 - **TowerData 扩展**: 新增 `aura_reduction_per_level: PackedFloat32Array`
-- **HealthComponent 扩展**: 新增 `damage_reduction: float` 字段，受伤时应用
+- **HealthComponent 扩展**: 新增 `damage_reduction: float` 字段，受伤时应用 `amount *= (1.0 - damage_reduction)`
+- **叠加上限**: `damage_reduction` clamp 到 [0.0, 0.75]，防止多橡树重叠导致无敌
 
 #### 12. sunflower（向日葵）
 - **机制**: 每隔 N 秒在自身位置生成可拾取金币
@@ -305,10 +312,14 @@
 - **定位**: 核心辅助，放在攻击塔群中间
 - **脚本**: 新增 TowerBuff（extends Tower）
   - BuffArea（Area2D）检测范围内友方塔
-  - 对攻击型塔施加攻击力/射速加成
+  - 对所有友方塔施加攻击力/射速加成（非攻击塔收到 buff 但无实际效果，简化逻辑）
   - 塔离开范围时移除加成
+  - 动态更新：塔进出薄荷范围时实时调整 `damage_mult` / `speed_mult`
 - **TowerData 扩展**: 新增 `buff_damage_mult_per_level: PackedFloat32Array`, `buff_speed_mult_per_level: PackedFloat32Array`
-- **Tower 基类扩展**: 新增 `damage_mult: float = 1.0`, `speed_mult: float = 1.0`，攻击型塔计算伤害/射速时乘以该值
+- **Tower 基类扩展**: 新增 `damage_mult: float = 1.0`, `speed_mult: float = 1.0`
+  - 攻击塔（TowerShooter/TowerSniper/TowerBurst 等）在计算伤害时乘以 `damage_mult`，射速时乘以 `speed_mult`
+  - 与 `GameData.player_stats[TOWER_MULT]` 乘法叠加：`final_damage = base_damage * TOWER_MULT * damage_mult`
+  - 新增 `apply_buff(dmg_mult, spd_mult)` / `remove_buff(dmg_mult, spd_mult)` 方法
 
 #### 14. heal_flower（治愈花）
 - **机制**: 周期性治疗范围内 HP 最低的友方塔
@@ -326,6 +337,7 @@
   - 状态机：CHARGING（蓄力，渐变颜色提示）→ EXPLODE（范围伤害）→ queue_free()
   - 爆炸对范围内所有敌人造成伤害
   - 蓄力时间和爆炸伤害/范围 per_level 可配
+  - **自毁后补货**: 爆炸后 `owned_towers` 中 bamboo 不移除（保留等级），玩家下轮布置阶段可重新放置。放置费照常扣除。这是设计意图：bamboo 是可重复使用的消耗品，不是一次性物品
 - **TowerData 扩展**: 新增 `charge_time: float`, `explosion_damage_per_level: PackedFloat32Array`, `explosion_range_per_level: PackedFloat32Array`
 
 ### TowerData 扩展字段汇总
@@ -434,14 +446,14 @@ var _tower_scenes: Dictionary = {
 
 | 文件 | 变更 |
 |------|------|
-| `scripts/core/enums.gd` | WeaponId 新增 7 个常量，TowerId 改名 3 个 + 新增 12 个，ProjectileId 新增 4 个 |
+| `scripts/core/enums.gd` | 见下方 Enums 常量清单 |
 | `scripts/resources/weapon_data.gd` | 新增 weapon_type, explosion_radius_per_level, flame_cone_angle, chain_count/decay/range, slow_on_hit/duration |
 | `scripts/resources/tower_data.gd` | 新增多个 per_level 数组和配置字段 |
 | `scripts/resources/enemy_data.gd` | 新增 `is_boss: bool`（猪笼草免疫判断） |
 | `scripts/core/scene_factory.gd` | _tower_scenes 15 项 + 4 个新投射物工厂方法 |
 | `scripts/entities/weapons/weapon_manager.gd` | _create_weapon() 改为按 `weapon_type` 分发，新增 7 种映射 |
 | `scripts/components/health_component.gd` | 新增 damage_reduction, take_damage 增加 attacker 参数, damaged 信号增加 attacker |
-| `scripts/components/slow_handler.gd` | 新增 apply_timed_slow()，减速叠加改为取最大值 |
+| `scripts/components/slow_handler.gd` | **重构**：计数器模式 → 效果字典模式，支持多源减速和定时减速 |
 | `scripts/entities/towers/tower.gd` | 新增 damage_mult, speed_mult |
 | `scripts/entities/enemies/enemy.gd` | 新增 apply_root/remove_root, is_rooted |
 | `scripts/entities/projectiles/bullet_projectile.gd` | 新增 slow_on_hit/slow_duration 属性，命中时检查并应用减速 |
@@ -480,6 +492,55 @@ var _tower_scenes: Dictionary = {
 #### 资源文件（.tres）
 - `resources/weapons/` — 7 个新武器 .tres
 - `resources/towers/` — 12 个新塔 .tres + 3 个改名
+
+### Enums 常量清单
+
+```gdscript
+# WeaponId（新增 7 个）
+class WeaponId:
+    const RIFLE = "rifle"           # 已有
+    const BOOMERANG = "boomerang"   # 已有
+    const LASER = "laser"           # 已有
+    const SHOTGUN = "shotgun"       # 新增
+    const MINIGUN = "minigun"       # 新增
+    const ROCKET = "rocket"         # 新增
+    const FLAMETHROWER = "flamethrower"  # 新增
+    const LIGHTNING = "lightning"    # 新增
+    const ICE_GUN = "ice_gun"       # 新增
+    const BLADE = "blade"           # 新增
+
+# TowerId（改名 3 个 + 新增 12 个）
+class TowerId:
+    const PEA_SHOOTER = "pea_shooter"  # 改名自 SHOOTER
+    const STUMP = "stump"              # 改名自 WALL
+    const ICE_FLOWER = "ice_flower"    # 改名自 SLOW
+    const CACTUS = "cactus"            # 新增
+    const ROSE = "rose"                # 新增
+    const MUSHROOM = "mushroom"        # 新增
+    const VINE = "vine"                # 新增
+    const DANDELION = "dandelion"      # 新增
+    const PITCHER = "pitcher"          # 新增
+    const THORN = "thorn"              # 新增
+    const OAK = "oak"                  # 新增
+    const SUNFLOWER = "sunflower"      # 新增
+    const MINT = "mint"                # 新增
+    const HEAL_FLOWER = "heal_flower"  # 新增
+    const BAMBOO = "bamboo"            # 新增
+
+# ProjectileId（新增 4 个）
+class ProjectileId:
+    const BULLET = "bullet"         # 已有
+    const BOOMERANG = "boomerang"   # 已有
+    const LASER = "laser"           # 已有
+    const ROCKET = "rocket"         # 新增
+    const FLAME = "flame"           # 新增
+    const CHAIN = "chain"           # 新增
+    const MELEE = "melee"           # 新增
+```
+
+### 实施顺序建议
+
+ID 改名（shooter→pea_shooter 等）应作为独立第一步提交，与新增内容分开，保持 diff 可审查。
 
 ### ID 改名迁移
 
