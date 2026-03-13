@@ -22,6 +22,10 @@ var target_tower: Node2D = null
 var attack_timer: float = 0.0
 var player: Node2D = null
 
+# Root（定身）系统
+var is_rooted: bool = false
+var _pre_root_speed: float = 0.0
+
 @onready var health: HealthComponent = $HealthComponent
 @onready var _knockback: KnockbackHandler = $KnockbackHandler
 @onready var slow_handler: SlowHandler = $SlowHandler
@@ -62,6 +66,8 @@ func _physics_process(delta: float) -> void:
 			_attack_tower(delta)
 
 func _chase_player() -> void:
+	if is_rooted:
+		return
 	if player and is_instance_valid(player):
 		velocity = position.direction_to(player.global_position) * speed
 		move_and_slide()
@@ -141,5 +147,22 @@ func _on_hurtbox_hit(damage: float, knockback_dir: Vector2) -> void:
 	if knockback_dir.length() > 0:
 		_knockback.apply_knockback(knockback_dir.normalized())
 
+func apply_root(duration: float) -> void:
+	is_rooted = true
+	_pre_root_speed = speed
+	speed = 0.0
+	velocity = Vector2.ZERO
+	var timer: SceneTreeTimer = get_tree().create_timer(duration)
+	timer.timeout.connect(remove_root)
+
+func remove_root() -> void:
+	if not is_rooted:
+		return
+	is_rooted = false
+	speed = _pre_root_speed
+
 func _on_speed_changed(new_speed: float) -> void:
+	if is_rooted:
+		_pre_root_speed = new_speed  # 保存速度但不覆盖实际速度
+		return
 	speed = new_speed
