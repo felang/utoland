@@ -58,7 +58,7 @@ func complete_wave() -> void:
 	await get_tree().create_timer(WAVE_CLEANUP_DELAY).timeout
 	clear_all_enemies()
 	await get_tree().create_timer(SHOP_TRANSITION_DELAY).timeout
-	SceneManager.go_to(Enums.Scene.PLACEMENT)
+	EventBus.wave_transition_ready.emit()
 
 func attract_all_coins() -> void:
 	var coins: Array[Node] = get_tree().get_nodes_in_group(Enums.Group.COINS)

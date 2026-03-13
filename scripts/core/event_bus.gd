@@ -6,6 +6,7 @@ extends Node
 # 波次系统
 signal wave_started(wave_number: int, wave_data: WaveData)
 signal wave_completed(wave_number: int)
+signal wave_transition_ready()
 signal game_won()
 signal game_lost()
 
