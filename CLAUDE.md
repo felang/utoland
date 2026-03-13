@@ -26,10 +26,10 @@ utoland 是一个基于 **Godot 4.6** 的 2D 塔防 + 射击混合类游戏。�
 - **GameConfig** (`scripts/core/game_config.gd`) — 资源注册表，运行时从 `resources/` 目录加载 `.tres` 配置文件（武器、敌人、塔、波次、角色、地图、特效、精灵等）。必须最先加载（GameData 依赖它）。
 - **GameData** (`scripts/core/game_data.gd`) — 运行时游戏状态，存储当前角色属性、金币、波次、owned_weapons/owned_towers（{id: level} 字典）、经验值/等级（current_level/current_xp/pending_upgrades）。`reset()` 从 CharacterData 初始化默认武器/塔并重置等级。`upgrade_weapon()`/`upgrade_tower()` 管理等级升级。`add_xp()` 累积经验值并触发升级。跨场景传递数据。
 - **SceneFactory** (`scripts/core/scene_factory.gd`) — 集中管理场景实例化，提供 `create_tower()`, `create_enemy()`, `create_bullet()`, `create_coin()` 等工厂方法。创建实体必须通过此工厂。
-- **EffectsManager** (`scripts/systems/effects_manager.gd`) — 特效管理：伤害数字、击中火花、死亡爆炸、闪白等视觉效果。
-- **AudioManager** (`scripts/systems/audio_manager.gd`) — 音效管理：AudioStreamPlayer 池化播放，通过 `play(sound_id)` 统一触发。音效文件放 `assets/sfx/`。
+- **EffectsManager** (`scripts/systems/effects_manager.gd`) — 特效管理：伤害数字、击中火花、死亡爆炸、红闪（flash_hit）、击中抖动（sprite_shake）、增强死亡特效（spawn_enhanced_death）、Boss 击杀慢动作（hitstop）等视觉效果。
+- **AudioManager** (`scripts/systems/audio_manager.gd`) — 音效管理：SFX 通过 AudioStreamPlayer 池化播放 `play(sound_id)`，BGM 通过独立 AudioStreamPlayer 播放 `play_bgm(track_id)` / `stop_bgm()` / `fade_bgm(duration)`。SFX 放 `assets/sfx/`，BGM 放 `assets/bgm/`。
 - **EventBus** (`scripts/core/event_bus.gd`) — 全局事件总线，用于跨系统解耦通信（波次事件、等级事件 player_leveled_up/xp_changed、coins_generated 等）。
-- **SceneManager** (`scripts/core/scene_manager.gd`) — 集中管理场景切换，提供 `go_to(scene_name)` 方法。所有场景路径在此统一维护，禁止直接调用 `get_tree().change_scene_to_file()`。
+- **SceneManager** (`scripts/core/scene_manager.gd`) — 集中管理场景切换，提供 `go_to(scene_name)` 方法（带淡入淡出过渡动画，async）。自动根据 SCENE_BGM 映射切换 BGM。所有场景路径在此统一维护，禁止直接调用 `get_tree().change_scene_to_file()`。
 
 ### 游戏流程 (场景切换)
 
