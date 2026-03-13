@@ -19,6 +19,7 @@ signal player_died()
 # 经济事件
 signal coins_changed(amount: int, total: int)
 signal coin_collected(value: int, position: Vector2)
+signal coins_generated(amount: int, position: Vector2)
 
 # 等级系统
 signal player_leveled_up(level: int)

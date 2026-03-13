@@ -70,6 +70,54 @@ func test_create_tower_pitcher():
 	assert_not_null(tower.data, "应注入 TowerData")
 	tower.queue_free()
 
+func test_create_tower_thorn():
+	var tower = SceneFactory.create_tower(Enums.TowerId.THORN)
+	assert_not_null(tower, "应能创建荆棘塔")
+	assert_eq(tower.tower_type, Enums.TowerId.THORN)
+	add_child(tower)
+	assert_not_null(tower.data, "应注入 TowerData")
+	tower.queue_free()
+
+func test_create_tower_oak():
+	var tower = SceneFactory.create_tower(Enums.TowerId.OAK)
+	assert_not_null(tower, "应能创建橡树塔")
+	assert_eq(tower.tower_type, Enums.TowerId.OAK)
+	add_child(tower)
+	assert_not_null(tower.data, "应注入 TowerData")
+	tower.queue_free()
+
+func test_create_tower_sunflower():
+	var tower = SceneFactory.create_tower(Enums.TowerId.SUNFLOWER)
+	assert_not_null(tower, "应能创建向日葵塔")
+	assert_eq(tower.tower_type, Enums.TowerId.SUNFLOWER)
+	add_child(tower)
+	assert_not_null(tower.data, "应注入 TowerData")
+	tower.queue_free()
+
+func test_create_tower_mint():
+	var tower = SceneFactory.create_tower(Enums.TowerId.MINT)
+	assert_not_null(tower, "应能创建薄荷塔")
+	assert_eq(tower.tower_type, Enums.TowerId.MINT)
+	add_child(tower)
+	assert_not_null(tower.data, "应注入 TowerData")
+	tower.queue_free()
+
+func test_create_tower_heal_flower():
+	var tower = SceneFactory.create_tower(Enums.TowerId.HEAL_FLOWER)
+	assert_not_null(tower, "应能创建治愈花塔")
+	assert_eq(tower.tower_type, Enums.TowerId.HEAL_FLOWER)
+	add_child(tower)
+	assert_not_null(tower.data, "应注入 TowerData")
+	tower.queue_free()
+
+func test_create_tower_bamboo():
+	var tower = SceneFactory.create_tower(Enums.TowerId.BAMBOO)
+	assert_not_null(tower, "应能创建爆竹竹塔")
+	assert_eq(tower.tower_type, Enums.TowerId.BAMBOO)
+	add_child(tower)
+	assert_not_null(tower.data, "应注入 TowerData")
+	tower.queue_free()
+
 func test_create_tower_invalid():
 	var tower = SceneFactory.create_tower("invalid_type")
 	assert_null(tower, "Invalid tower type should return null")

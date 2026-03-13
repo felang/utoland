@@ -75,7 +75,7 @@ func test_enemy_tank_resource() -> void:
 # ===== 塔资源加载 =====
 
 func test_towers_loaded_count() -> void:
-	assert_eq(GameConfig.towers.size(), 9, "应加载 9 种塔")
+	assert_eq(GameConfig.towers.size(), 15, "应加载 15 种塔")
 
 func test_tower_pea_shooter_resource() -> void:
 	var t: TowerData = GameConfig.towers[Enums.TowerId.PEA_SHOOTER]
