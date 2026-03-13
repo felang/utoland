@@ -2,30 +2,10 @@
 class_name BulletWeapon
 extends Weapon
 
-const MULTISHOT_SPREAD_ANGLES: Array[float] = [-15.0, 0.0, 15.0]  # 弹幕各发偏转角度（度）
-
-func _get_tower_link_bonus() -> float:
-	if GameData.tower_link_damage_per_tower <= 0.0:
-		return 1.0
-	var towers: Array[Node] = get_tree().get_nodes_in_group(Enums.Group.TOWERS)
-	return 1.0 + towers.size() * GameData.tower_link_damage_per_tower
-
 func fire(target: Node2D) -> void:
 	if not owner_node:
 		return
-	var base_damage: float = weapon_data.damage * GameData.player_stats.get(Enums.Stat.DAMAGE_MULT, 1.0)
-
-	# 蓄力：若有层数则本次攻击爆发，清零
-	if GameData.kill_stack_count > 0:
-		base_damage *= (1.0 + GameData.kill_stack_count * GameData.kill_stack_damage_per_stack)
-		GameData.kill_stack_count = 0
-
-	# 暴击判定
-	if GameData.crit_chance > 0.0 and randf() < GameData.crit_chance:
-		base_damage *= GameData.crit_damage_mult
-
-	# 联动系统：每座塔给玩家武器伤害加成
-	base_damage *= _get_tower_link_bonus()
+	var base_damage: float = get_damage() * GameData.player_stats.get(Enums.Stat.DAMAGE_MULT, 1.0)
 
 	var scene_parent: Node = owner_node.get_parent()
 	if not scene_parent:
@@ -33,21 +13,14 @@ func fire(target: Node2D) -> void:
 		return
 
 	var base_dir: Vector2 = owner_node.global_position.direction_to(target.global_position)
-
-	# 弹幕：激活时发射 3 发，各偏转 -15°/0°/+15°，每发伤害乘以倍率
-	if GameData.multishot_active:
-		for angle_offset: float in MULTISHOT_SPREAD_ANGLES:
-			var rotated_dir: Vector2 = base_dir.rotated(deg_to_rad(angle_offset))
-			_spawn_bullet(scene_parent, rotated_dir, base_damage * GameData.multishot_damage_mult)
-	else:
-		_spawn_bullet(scene_parent, base_dir, base_damage)
+	_spawn_bullet(scene_parent, base_dir, base_damage)
 
 	_spawn_muzzle_flash(owner_node)
 	AudioManager.play("shoot")
 
 func _spawn_bullet(scene_parent: Node, direction: Vector2, damage: float) -> void:
 	var bullet: BulletProjectile = SceneFactory.create_bullet_projectile()
-	bullet.speed = weapon_data.bullet_speed * GameData.bullet_speed_mult
+	bullet.speed = weapon_data.bullet_speed
 	scene_parent.add_child(bullet)
 	bullet.setup(damage, weapon_data.knockback_force, owner_node.global_position, direction)
 

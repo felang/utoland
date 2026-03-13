@@ -25,9 +25,10 @@ func tick(delta: float) -> void:
 	# 取所有武器中最大的射程作为搜索范围
 	var max_range: float = 0.0
 	for weapon in _weapons:
-		if weapon.weapon_data and weapon.weapon_data.weapon_range > max_range:
-			max_range = weapon.weapon_data.weapon_range
-	max_range *= GameData.weapon_range_mult
+		if weapon.weapon_data:
+			var wr: float = weapon.get_weapon_range()
+			if wr > max_range:
+				max_range = wr
 	var target: Node2D = _find_closest_enemy(max_range)
 	for weapon in _weapons:
 		weapon.tick(delta, target)

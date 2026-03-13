@@ -1,5 +1,13 @@
 extends GutTest
 
+var _original_owned_weapons: Dictionary
+
+func before_each():
+	_original_owned_weapons = GameData.owned_weapons.duplicate()
+
+func after_each():
+	GameData.owned_weapons = _original_owned_weapons
+
 func test_weapon_data_has_level_fields():
 	var wd: WeaponData = GameConfig.weapons["rifle"]
 	assert_eq(wd.max_level, 5, "应有最大等级 5")
@@ -13,3 +21,30 @@ func test_weapon_data_level_values_increase():
 	for i in range(1, wd.damage_per_level.size()):
 		assert_gt(wd.damage_per_level[i], wd.damage_per_level[i - 1],
 			"Lv%d 伤害应大于 Lv%d" % [i + 1, i])
+
+func test_weapon_get_damage_reads_level():
+	GameData.owned_weapons = {"rifle": 3}
+	var weapon := BulletWeapon.new()
+	var wd: WeaponData = GameConfig.weapons["rifle"]
+	weapon.initialize(wd)
+	assert_almost_eq(weapon.get_damage(), wd.damage_per_level[2], 0.01,
+		"Lv3 伤害应读 damage_per_level[2]")
+	add_child_autofree(weapon)
+
+func test_weapon_get_fire_rate_reads_level():
+	GameData.owned_weapons = {"rifle": 1}
+	var weapon := BulletWeapon.new()
+	var wd: WeaponData = GameConfig.weapons["rifle"]
+	weapon.initialize(wd)
+	assert_almost_eq(weapon.get_fire_rate(), wd.fire_rate_per_level[0], 0.01,
+		"Lv1 射速应读 fire_rate_per_level[0]")
+	add_child_autofree(weapon)
+
+func test_weapon_get_weapon_range_reads_level():
+	GameData.owned_weapons = {"rifle": 5}
+	var weapon := BulletWeapon.new()
+	var wd: WeaponData = GameConfig.weapons["rifle"]
+	weapon.initialize(wd)
+	assert_almost_eq(weapon.get_weapon_range(), wd.weapon_range_per_level[4], 0.01,
+		"Lv5 射程应读 weapon_range_per_level[4]")
+	add_child_autofree(weapon)
