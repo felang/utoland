@@ -22,8 +22,7 @@ var _current_target: Node2D = null
 func _ready() -> void:
 	tower_type = Enums.TowerId.ROSE
 	super._ready()
-	_detect_area.body_entered.connect(_on_body_entered)
-	_detect_area.body_exited.connect(_on_body_exited)
+	# 信号连接已在 .tscn 中定义，无需在此重复连接
 
 func _apply_level_stats() -> void:
 	super._apply_level_stats()

@@ -53,7 +53,13 @@ func test_max_level_excluded():
 		"shotgun": 5, "minigun": 5, "ice_gun": 5,
 		"rocket": 5, "lightning": 5, "blade": 5, "flamethrower": 5
 	}
-	GameData.owned_towers = {"pea_shooter": 5, "stump": 5, "ice_flower": 5}
+	GameData.owned_towers = {
+		"pea_shooter": 5, "stump": 5, "ice_flower": 5,
+		"cactus": 5, "rose": 5, "mushroom": 5,
+		"vine": 5, "dandelion": 5, "pitcher": 5,
+		"thorn": 5, "oak": 5, "sunflower": 5,
+		"mint": 5, "heal_flower": 5, "bamboo": 5
+	}
 	var options: Array[Dictionary] = _generator.generate_options()
 	assert_eq(options.size(), 0, "全部满级应返回空")
 

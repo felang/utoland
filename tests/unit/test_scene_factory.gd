@@ -187,3 +187,32 @@ func test_create_laser_projectile():
 	var beam = SceneFactory.create_laser_projectile()
 	assert_not_null(beam, "LaserProjectile should be created")
 	beam.queue_free()
+
+func test_all_towers_can_be_created():
+	var all_ids: Array[String] = [
+		Enums.TowerId.PEA_SHOOTER, Enums.TowerId.STUMP, Enums.TowerId.ICE_FLOWER,
+		Enums.TowerId.CACTUS, Enums.TowerId.ROSE, Enums.TowerId.MUSHROOM,
+		Enums.TowerId.VINE, Enums.TowerId.DANDELION, Enums.TowerId.PITCHER,
+		Enums.TowerId.THORN, Enums.TowerId.OAK, Enums.TowerId.SUNFLOWER,
+		Enums.TowerId.MINT, Enums.TowerId.HEAL_FLOWER, Enums.TowerId.BAMBOO,
+	]
+	for id in all_ids:
+		var tower = SceneFactory.create_tower(id)
+		assert_not_null(tower, "应能创建塔: " + id)
+		add_child(tower)
+		assert_eq(tower.tower_type, id)
+		assert_not_null(tower.data, id + " 应注入 TowerData")
+		tower.queue_free()
+
+func test_all_weapons_loaded():
+	var all_ids: Array[String] = [
+		Enums.WeaponId.RIFLE, Enums.WeaponId.BOOMERANG, Enums.WeaponId.LASER,
+		Enums.WeaponId.SHOTGUN, Enums.WeaponId.MINIGUN, Enums.WeaponId.ROCKET,
+		Enums.WeaponId.FLAMETHROWER, Enums.WeaponId.LIGHTNING,
+		Enums.WeaponId.ICE_GUN, Enums.WeaponId.BLADE,
+	]
+	for id in all_ids:
+		assert_true(GameConfig.weapons.has(id), "应包含武器: " + id)
+		var w: WeaponData = GameConfig.weapons[id]
+		assert_ne(w.weapon_type, "", id + " 应有 weapon_type")
+		assert_eq(w.damage_per_level.size(), w.max_level, id + " damage_per_level 数量应匹配 max_level")

@@ -14,7 +14,7 @@ var _on_cooldown: bool = false
 func _ready() -> void:
 	tower_type = Enums.TowerId.VINE
 	super._ready()
-	_trap_area.body_entered.connect(_on_enemy_entered)
+	# 信号连接已在 .tscn 中定义，无需在此重复连接
 
 func _apply_level_stats() -> void:
 	super._apply_level_stats()
