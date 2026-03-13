@@ -33,6 +33,8 @@ func _register_sounds() -> void:
 		"wave_complete": "wave_complete.wav",
 		"shop_buy": "shop_buy.wav",
 		"boss_appear": "boss_appear.wav",
+		"tower_place": "tower_place.wav",
+		"tower_remove": "tower_remove.wav",
 	}
 	for id: String in sound_map:
 		var path: String = sfx_dir + sound_map[id]

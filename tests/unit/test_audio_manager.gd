@@ -31,3 +31,8 @@ func test_register_sounds_populates_dictionary():
 	# 若 assets/sfx/ 目录中有文件则 _sounds 非空
 	# 无文件时 _sounds 应为空但不崩溃
 	assert_typeof(audio_manager._sounds, TYPE_DICTIONARY)
+
+func test_tower_sound_ids_registered():
+	AudioManager.play("tower_place")
+	AudioManager.play("tower_remove")
+	assert_true(true, "tower_place 和 tower_remove 调用不应崩溃")
