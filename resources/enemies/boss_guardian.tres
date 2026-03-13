@@ -11,3 +11,4 @@ speed = 20.0
 damage = 40.0
 coin_drop_min = 30
 coin_drop_max = 50
+is_boss = true

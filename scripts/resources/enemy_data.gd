@@ -14,3 +14,6 @@ extends Resource
 @export var charge_speed_mult: float = 0.0
 @export var charge_damage_mult: float = 0.0
 @export var charge_windup_time: float = 0.0
+
+# Boss 标识
+@export var is_boss: bool = false

@@ -189,6 +189,15 @@ func test_spawn_loaded() -> void:
 	assert_true(GameConfig.spawn is SpawnConfigData)
 
 
+func test_boss_brute_is_boss():
+	var ed: EnemyData = GameConfig.enemies[Enums.Enemy.BOSS_BRUTE]
+	assert_true(ed.is_boss, "boss_brute 应标记为 is_boss")
+
+func test_normal_enemy_not_boss():
+	var ed: EnemyData = GameConfig.enemies[Enums.Enemy.NORMAL]
+	assert_false(ed.is_boss, "normal 不应标记为 is_boss")
+
+
 func test_weapon_has_weapon_type():
 	var rifle: WeaponData = GameConfig.weapons[Enums.WeaponId.RIFLE]
 	assert_eq(rifle.weapon_type, "bullet", "rifle weapon_type 应为 bullet")
