@@ -48,6 +48,8 @@ func _update_display() -> void:
 	_coins_label.text = "金币: %d" % GameData.coins
 	_rebuild_cards()
 	_update_refresh_button()
+	_animate_popup_in()
+	_animate_cards_in()
 
 func _rebuild_cards() -> void:
 	for child in _cards_container.get_children():
@@ -171,6 +173,8 @@ func _get_stats_text(opt: Dictionary) -> String:
 		return "\n".join(lines)
 
 func _on_option_selected(index: int) -> void:
+	_animate_card_selection(index)
+	await get_tree().create_timer(0.3).timeout
 	var opt: Dictionary = _options[index]
 	if opt["type"] == "weapon":
 		GameData.upgrade_weapon(opt["id"])
@@ -210,6 +214,37 @@ func _update_refresh_button() -> void:
 	else:
 		_refresh_button.text = "🔄 刷新 (%d金币)" % cost
 		_refresh_button.disabled = GameData.coins < cost
+
+func _animate_popup_in() -> void:
+	_container.pivot_offset = _container.size / 2
+	_container.scale = Vector2.ZERO
+	var tween: Tween = create_tween()
+	tween.tween_property(_container, "scale", Vector2.ONE, 0.3).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_BACK)
+
+func _animate_cards_in() -> void:
+	var cards: Array = _cards_container.get_children()
+	for i in cards.size():
+		var card: Control = cards[i]
+		var target_pos: float = card.position.y
+		card.position.y += 50.0
+		card.modulate.a = 0.0
+		var tween: Tween = create_tween()
+		tween.set_parallel(true)
+		tween.tween_property(card, "position:y", target_pos, 0.25).set_ease(Tween.EASE_OUT).set_delay(i * 0.1)
+		tween.tween_property(card, "modulate:a", 1.0, 0.2).set_delay(i * 0.1)
+
+func _animate_card_selection(selected_index: int) -> void:
+	var cards: Array = _cards_container.get_children()
+	for i in cards.size():
+		var card: Control = cards[i]
+		card.pivot_offset = card.size / 2
+		var tween: Tween = create_tween()
+		if i == selected_index:
+			tween.tween_property(card, "scale", Vector2(1.1, 1.1), 0.15)
+		else:
+			tween.set_parallel(true)
+			tween.tween_property(card, "scale", Vector2(0.9, 0.9), 0.15)
+			tween.tween_property(card, "modulate:a", 0.3, 0.15)
 
 func _build_ui() -> void:
 	var overlay := ColorRect.new()
