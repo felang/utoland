@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="WeaponData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/weapon_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "lightning"
+display_name = "闪电链"
+weapon_type = "lightning"
+projectile_type = "chain"
+max_level = 5
+chain_count = 3
+chain_decay = 0.7
+chain_range = 150.0
+knockback_force = 0.0
+damage_per_level = PackedFloat32Array(12, 17, 23, 30, 40)
+fire_rate_per_level = PackedFloat32Array(0.8, 0.72, 0.65, 0.58, 0.5)
+weapon_range_per_level = PackedFloat32Array(300, 320, 340, 370, 400)

@@ -7,7 +7,7 @@ extends GutTest
 # ===== 武器资源加载 =====
 
 func test_weapons_loaded_count() -> void:
-	assert_eq(GameConfig.weapons.size(), 6, "应加载 6 种武器")
+	assert_eq(GameConfig.weapons.size(), 10, "应加载 10 种武器")
 
 func test_weapon_rifle_resource() -> void:
 	assert_true(GameConfig.weapons.has(Enums.WeaponId.RIFLE), "应包含 rifle")

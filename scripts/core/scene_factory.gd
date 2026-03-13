@@ -17,6 +17,10 @@ var _enemy_scenes: Dictionary = {
 var _bullet_projectile_scene: PackedScene = preload("res://scenes/entities/projectiles/bullet_projectile.tscn")
 var _boomerang_projectile_scene: PackedScene = preload("res://scenes/entities/projectiles/boomerang_projectile.tscn")
 var _laser_projectile_scene: PackedScene = preload("res://scenes/entities/projectiles/laser_projectile.tscn")
+var _rocket_projectile_scene: PackedScene = preload("res://scenes/entities/projectiles/rocket_projectile.tscn")
+var _chain_projectile_scene: PackedScene = preload("res://scenes/entities/projectiles/chain_projectile.tscn")
+var _melee_projectile_scene: PackedScene = preload("res://scenes/entities/projectiles/melee_projectile.tscn")
+var _flame_projectile_scene: PackedScene = preload("res://scenes/entities/projectiles/flame_projectile.tscn")
 var _coin_scene: PackedScene = preload("res://scenes/entities/coin.tscn")
 
 # Tower creation — 注入 TowerData Resource
@@ -69,3 +73,19 @@ func create_boomerang_projectile() -> BoomerangProjectile:
 # LaserProjectile creation — 新投射物系统
 func create_laser_projectile() -> LaserProjectile:
 	return _laser_projectile_scene.instantiate()
+
+# RocketProjectile creation
+func create_rocket_projectile() -> RocketProjectile:
+	return _rocket_projectile_scene.instantiate()
+
+# ChainProjectile creation
+func create_chain_projectile() -> ChainProjectile:
+	return _chain_projectile_scene.instantiate()
+
+# MeleeProjectile creation
+func create_melee_projectile() -> MeleeProjectile:
+	return _melee_projectile_scene.instantiate()
+
+# FlameProjectile creation
+func create_flame_projectile() -> FlameProjectile:
+	return _flame_projectile_scene.instantiate()

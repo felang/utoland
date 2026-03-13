@@ -48,7 +48,11 @@ func test_upgrade_has_next_level():
 			assert_eq(opt["current_level"], 3)
 
 func test_max_level_excluded():
-	GameData.owned_weapons = {"rifle": 5, "boomerang": 5, "laser": 5, "shotgun": 5, "minigun": 5, "ice_gun": 5}
+	GameData.owned_weapons = {
+		"rifle": 5, "boomerang": 5, "laser": 5,
+		"shotgun": 5, "minigun": 5, "ice_gun": 5,
+		"rocket": 5, "lightning": 5, "blade": 5, "flamethrower": 5
+	}
 	GameData.owned_towers = {"pea_shooter": 5, "stump": 5, "ice_flower": 5}
 	var options: Array[Dictionary] = _generator.generate_options()
 	assert_eq(options.size(), 0, "全部满级应返回空")

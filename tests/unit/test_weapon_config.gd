@@ -3,7 +3,7 @@ extends GutTest
 # 验证 GameConfig.weapons 包含正确的武器配置
 
 func test_weapons_count():
-	assert_eq(GameConfig.weapons.size(), 6, "应有 6 把武器")
+	assert_eq(GameConfig.weapons.size(), 10, "应有 10 把武器")
 
 func test_rifle_has_projectile_type():
 	assert_eq(GameConfig.weapons[Enums.WeaponId.RIFLE].projectile_type, Enums.ProjectileId.BULLET, "步枪弹道类型应为 bullet")
@@ -54,3 +54,26 @@ func test_ice_gun_resource_loaded():
 	var w: WeaponData = GameConfig.weapons[Enums.WeaponId.ICE_GUN]
 	assert_eq(w.weapon_type, "ice_gun")
 	assert_gt(w.slow_on_hit, 0.0, "冰冻枪应有 slow_on_hit")
+
+func test_rocket_resource_loaded():
+	assert_true(GameConfig.weapons.has(Enums.WeaponId.ROCKET))
+	var w: WeaponData = GameConfig.weapons[Enums.WeaponId.ROCKET]
+	assert_eq(w.weapon_type, "rocket")
+	assert_gt(w.explosion_radius_per_level.size(), 0, "应有爆炸半径配置")
+
+func test_lightning_resource_loaded():
+	assert_true(GameConfig.weapons.has(Enums.WeaponId.LIGHTNING))
+	var w: WeaponData = GameConfig.weapons[Enums.WeaponId.LIGHTNING]
+	assert_eq(w.weapon_type, "lightning")
+	assert_gt(w.chain_count, 0)
+
+func test_blade_resource_loaded():
+	assert_true(GameConfig.weapons.has(Enums.WeaponId.BLADE))
+	var w: WeaponData = GameConfig.weapons[Enums.WeaponId.BLADE]
+	assert_eq(w.weapon_type, "blade")
+
+func test_flamethrower_resource_loaded():
+	assert_true(GameConfig.weapons.has(Enums.WeaponId.FLAMETHROWER))
+	var w: WeaponData = GameConfig.weapons[Enums.WeaponId.FLAMETHROWER]
+	assert_eq(w.weapon_type, "flamethrower")
+	assert_gt(w.flame_cone_angle, 0.0)
