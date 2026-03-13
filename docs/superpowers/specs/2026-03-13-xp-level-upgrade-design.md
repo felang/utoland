@@ -103,7 +103,7 @@ func generate_options(exclude: Array[Dictionary] = []) -> Array[Dictionary]
 #   id: String,                  # 如 "rifle", "shooter"
 #   target_level: int,           # 升级目标等级
 #   is_new: bool,                # 是否新获取
-#   current_level: int           # 当前等级，0 if is_new
+#   current_level: int           # 当前等级，0 if is_new（可从 target_level-1 推导，保留为便于 UI 展示）
 # }
 
 func get_refresh_cost(refresh_count: int) -> int
@@ -147,22 +147,63 @@ func get_refresh_cost(refresh_count: int) -> int
 - `weapon_select_popup.gd` → 重命名为 `upgrade_popup.gd`
 - `weapon_select_popup.tscn` → 重命名为 `upgrade_popup.tscn`
 
+### 弹窗内部状态
+
+```gdscript
+var _total_rounds: int          # 总轮数（= pending_upgrades）
+var _current_round: int = 0     # 当前轮次（从 0 开始）
+var _refresh_count: int = 0     # 当轮已刷新次数
+var _generator: UpgradeGenerator
+```
+
 ### 多轮选择流程
 
 ```
-弹窗接收 pending_upgrades 数量
-  → 显示 "选择升级 (1/N)"
-  → 玩家选择一张卡片
-  → 应用升级（GameData.upgrade_weapon 或 upgrade_tower）
-  → 若还有剩余轮次:
-      refresh_count = 0
-      生成新选项
-      显示 "选择升级 (2/N)"
-  → 全部选完:
-      emit all_upgrades_completed
-      恢复游戏 (get_tree().paused = false)
-      跳转布置阶段
+show_upgrades(count: int):
+  _total_rounds = count
+  _current_round = 0
+  get_tree().paused = true
+  _start_round()
+
+_start_round():
+  _refresh_count = 0
+  生成 3 个选项（_generator.generate_options()）
+  显示 "选择升级 (_current_round+1 / _total_rounds)"
+  显示金币数量（从 GameData.coins 读取）
+
+_on_option_selected(index):
+  var opt = _options[index]
+  if opt.type == "weapon":
+      GameData.upgrade_weapon(opt.id)
+  elif opt.type == "tower":
+      GameData.upgrade_tower(opt.id)
+  emit upgrade_selected(opt.type, opt.id)
+  GameData.pending_upgrades -= 1
+  _current_round += 1
+  if _current_round < _total_rounds:
+      _start_round()  # 下一轮
+  else:
+      _finish()
+
+_on_refresh_pressed():
+  var cost = _generator.get_refresh_cost(_refresh_count)
+  if cost > 0 and GameData.coins < cost:
+      return
+  if cost > 0:
+      GameData.coins -= cost
+  _refresh_count += 1
+  重新生成选项（传入当前选项作为 exclude）
+  更新金币显示
+
+_finish():
+  get_tree().paused = false
+  emit all_upgrades_completed
+  queue_free()
 ```
+
+### 金币显示
+
+弹窗顶部或刷新按钮旁显示当前金币数量 "金币: N"，刷新扣费后实时更新。
 
 ### 卡片样式
 
@@ -179,7 +220,12 @@ func get_refresh_cost(refresh_count: int) -> int
 **卡片内容：**
 - 名称（白色，加粗）
 - 等级信息：新获取 → 绿色 "新武器! Lv1" / "新塔! Lv1"；升级 → 黄色 "Lv2 → Lv3"
-- 属性预览（灰色小字）：伤害、射速、范围等
+- 属性预览（灰色小字）：
+  - 武器：伤害、射速、范围（从 WeaponData 的 per_level 数组读取）
+  - 射击塔：伤害、射速、范围（从 TowerData 的 damage/fire_rate/attack_range_per_level）
+  - 减速塔：减速比例、减速范围（从 TowerData 的 slow_ratio/attack_range_per_level）
+  - 墙塔：HP（从 TowerData 的 hp_per_level）
+  - 通用逻辑：遍历 TowerData 中非空的 per_level 数组，展示有值的属性
 
 ### 刷新按钮
 
@@ -225,7 +271,8 @@ SidePanel (VBoxContainer, 120px)
 
 ### placement_panel.gd
 
-逻辑不变：仍从 `GameData.owned_towers` 生成卡片，监听 `EventBus.tower_purchased`/`tower_upgraded` 刷新卡片列表。
+- 移除 `EventBus.tower_purchased`/`tower_upgraded` 信号监听（塔的购买/升级现在发生在升级弹窗中，在布置场景加载前已完成）
+- `_ready()` 中直接从 `GameData.owned_towers` 生成卡片列表即可，无需动态刷新
 
 ---
 
@@ -294,7 +341,7 @@ SidePanel (VBoxContainer, 120px)
 - `scripts/core/game_data.gd` — 新增 XP/等级字段和方法
 - `scripts/core/event_bus.gd` — 新增 `player_leveled_up`、`xp_changed` 信号
 - `scripts/entities/player.gd` — `add_coins()` 中调用 `GameData.add_xp()`
-- `scripts/ui/main.gd` — 引用 `upgrade_popup` 替代 `weapon_select_popup`，处理多轮逻辑
+- `scripts/ui/main.gd` — 引用 `upgrade_popup` 替代 `weapon_select_popup`。改为连接 `all_upgrades_completed` 和 `skipped` 信号，收到后跳转布置场景。多轮逻辑由 popup 内部管理，main.gd 只需传入 `GameData.pending_upgrades` 并等待完成信号
 - `scripts/ui/placement.gd` — 移除 Tab 切换和商店相关逻辑
 - `scenes/levels/placement.tscn` — 移除商店 UI 节点
 - `scripts/ui/hud.gd` + `scenes/ui/hud.tscn` — 新增经验条和等级显示
