@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="TowerData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/resources/tower_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = "mushroom"
+display_name = "毒蘑菇"
+max_level = 5
+hp_per_level = PackedFloat32Array(90, 120, 160, 210, 270)
+damage_per_level = PackedFloat32Array(5, 7, 10, 14, 19)
+attack_range_per_level = PackedFloat32Array(180, 200, 220, 245, 275)
+shop_price_per_level = PackedInt32Array(0, 22, 38, 58, 82)
+place_cost_per_level = PackedInt32Array(16, 22, 30, 40, 52)
