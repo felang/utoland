@@ -189,6 +189,15 @@ func test_spawn_loaded() -> void:
 	assert_true(GameConfig.spawn is SpawnConfigData)
 
 
+func test_weapon_has_weapon_type():
+	var rifle: WeaponData = GameConfig.weapons[Enums.WeaponId.RIFLE]
+	assert_eq(rifle.weapon_type, "bullet", "rifle weapon_type 应为 bullet")
+	var boom: WeaponData = GameConfig.weapons[Enums.WeaponId.BOOMERANG]
+	assert_eq(boom.weapon_type, "boomerang", "boomerang weapon_type 应为 boomerang")
+	var laser: WeaponData = GameConfig.weapons[Enums.WeaponId.LASER]
+	assert_eq(laser.weapon_type, "laser", "laser weapon_type 应为 laser")
+
+
 func test_player_const_unchanged() -> void:
 	# PLAYER 保持 const，确保 GameData 初始化不受影响
 	assert_eq(GameConfig.PLAYER["initial_coins"], 100)

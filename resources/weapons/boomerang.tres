@@ -6,6 +6,7 @@
 script = ExtResource("1")
 id = "boomerang"
 display_name = "回旋镖"
+weapon_type = "boomerang"
 projectile_type = "boomerang"
 max_level = 5
 damage_per_level = PackedFloat32Array(15, 22, 30, 40, 55)

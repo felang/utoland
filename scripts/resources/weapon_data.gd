@@ -5,6 +5,9 @@ extends Resource
 @export var display_name: String = ""
 @export var projectile_type: String = "bullet"
 
+# 武器类分发
+@export var weapon_type: String = ""
+
 # === 等级系统 ===
 @export var max_level: int = 5
 @export var damage_per_level: PackedFloat32Array = []
@@ -29,3 +32,18 @@ extends Resource
 @export var beam_range: float = 200.0
 @export var beam_width: float = 2.0
 @export var beam_duration: float = 0.08
+
+# 火箭筒
+@export var explosion_radius_per_level: PackedFloat32Array = []
+
+# 火焰喷射
+@export var flame_cone_angle: float = 45.0
+
+# 闪电链
+@export var chain_count: int = 3
+@export var chain_decay: float = 0.7
+@export var chain_range: float = 150.0
+
+# 冰冻枪
+@export var slow_on_hit: float = 0.0
+@export var slow_duration: float = 2.0

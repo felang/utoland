@@ -6,6 +6,7 @@
 script = ExtResource("1")
 id = "laser"
 display_name = "激光枪"
+weapon_type = "laser"
 projectile_type = "laser"
 max_level = 5
 damage_per_level = PackedFloat32Array(8, 12, 17, 23, 30)
