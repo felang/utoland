@@ -10,6 +10,8 @@ const SPLIT_SPREAD_ANGLE: float = PI / 2      # 分裂弹扩散角度（弧度�
 
 var speed: float = 300.0
 var lifetime: float = 5.0
+var slow_on_hit: float = 0.0
+var slow_duration: float = 0.0
 var _elapsed: float = 0.0
 var _direction: Vector2 = Vector2.RIGHT
 var _trail: Line2D = null
@@ -71,6 +73,12 @@ func _spawn_split_bullets() -> void:
 func _on_hitbox_area_entered(area: Area2D) -> void:
 	if area is Hurtbox:
 		EffectsManager.spawn_hit_sparks(global_position)
+		# 冰冻减速
+		if slow_on_hit > 0.0:
+			var enemy: Node2D = area.get_parent() as Node2D
+			if enemy and enemy.has_node("SlowHandler"):
+				var source_id: String = "ice_bullet_" + str(get_instance_id())
+				enemy.slow_handler.apply_timed_slow(slow_on_hit, slow_duration, source_id)
 		# 弹道分裂：命中后生成小弹（仅主弹分裂，防止无限递归）
 		if GameData.split_count > 0 and not get_meta("is_split", false):
 			_spawn_split_bullets()

@@ -57,6 +57,7 @@ func _create_weapon(weapon_type: String) -> Weapon:
 		"laser":     return LaserWeapon.new()
 		"shotgun":   return ShotgunWeapon.new()
 		"minigun":   return BulletWeapon.new()
+		"ice_gun":   return IceGunWeapon.new()
 		# 新武器类型将在后续 Chunk 中添加
 	push_error("WeaponManager: 未知 weapon_type: " + weapon_type)
 	return null
