@@ -19,18 +19,30 @@ func initialize(main: Node2D, range_indicator: RangeIndicator) -> void:
 	_create_tower_cards()
 	_update_buttons()
 	_main.coins_changed.connect(_update_buttons)
+	EventBus.tower_purchased.connect(_on_tower_purchased)
+	EventBus.tower_upgraded.connect(_on_tower_upgraded)
+
+func _on_tower_purchased(_tower_type: String) -> void:
+	_create_tower_cards()
+	_update_buttons()
+
+func _on_tower_upgraded(_tower_type: String) -> void:
+	_create_tower_cards()
+	_update_buttons()
 
 func _create_tower_cards() -> void:
-	var tower_types: Array = [Enums.TowerId.SHOOTER, Enums.TowerId.WALL, Enums.TowerId.SLOW]
-	var tower_names: Dictionary = {
-		Enums.TowerId.SHOOTER: "射手塔",
-		Enums.TowerId.WALL: "墙塔",
-		Enums.TowerId.SLOW: "减速塔",
-	}
-	for tower_type in tower_types:
+	var tower_list: VBoxContainer = get_parent().get_node("PlacementScroll/TowerList")
+	for child in tower_list.get_children():
+		child.queue_free()
+	_tower_buttons.clear()
+
+	for tower_type: String in GameData.owned_towers:
+		var td: TowerData = GameConfig.towers[tower_type]
+		var level: int = GameData.owned_towers[tower_type]
 		var cost: int = SceneFactory.get_tower_cost(tower_type)
-		var card := _create_card(tower_type, tower_names[tower_type], cost)
-		get_parent().get_node("PlacementScroll/TowerList").add_child(card)
+		var display: String = "%s Lv%d" % [td.display_name, level]
+		var card := _create_card(tower_type, display, cost)
+		tower_list.add_child(card)
 		_tower_buttons[tower_type] = card
 
 func _create_card(tower_type: String, display_name: String, cost: int) -> PanelContainer:
@@ -95,7 +107,9 @@ func _select_tower(type: String) -> void:
 		# 预览塔不应参与碰撞检测，从 TOWERS 组中移除以避免阻挡自身放置
 		_preview_tower.remove_from_group(Enums.Group.TOWERS)
 		var td: TowerData = GameConfig.towers[type]
-		_range_indicator.set_range(td.attack_range)
+		var level: int = GameData.owned_towers.get(type, 1)
+		var idx: int = clampi(level - 1, 0, td.attack_range_per_level.size() - 1)
+		_range_indicator.set_range(td.attack_range_per_level[idx])
 
 func _process(_delta: float) -> void:
 	if _preview_tower and _main:
@@ -157,9 +171,14 @@ func _remove_tower_at(pos: Vector2) -> void:
 
 func _select_placed_tower(tower: Node2D) -> void:
 	_selected_placed_tower = tower
-	if tower.data and tower.data.attack_range > 0:
+	var tower_range: float = 0.0
+	if "attack_range" in tower:
+		tower_range = tower.attack_range
+	elif "slow_radius" in tower:
+		tower_range = tower.slow_radius
+	if tower_range > 0:
 		_range_indicator.global_position = tower.global_position
-		_range_indicator.set_range(tower.data.attack_range)
+		_range_indicator.set_range(tower_range)
 	else:
 		_range_indicator.hide_range()
 

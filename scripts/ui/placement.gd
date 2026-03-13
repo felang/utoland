@@ -47,11 +47,6 @@ func _ready() -> void:
 			tower.add_to_group(Enums.Group.TOWERS)
 			add_child(tower)
 
-	# 将商店购买的塔转为金币（遗留兼容）
-	for tower_type in GameData.purchased_towers:
-		GameData.coins += SceneFactory.get_tower_cost(tower_type)
-	GameData.purchased_towers.clear()
-
 	# 初始化布置面板
 	_placement_panel = preload("res://scripts/ui/placement_panel.gd").new()
 	_placement_content.add_child(_placement_panel)

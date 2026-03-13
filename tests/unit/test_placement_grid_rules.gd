@@ -3,13 +3,15 @@ extends GutTest
 var placement: Node2D
 var _original_selected_map: String
 var _original_coins: int
+var _original_owned_towers: Dictionary
 
 func before_each():
 	_original_selected_map = GameData.selected_map
 	_original_coins = GameData.coins
+	_original_owned_towers = GameData.owned_towers.duplicate()
 
 	GameData.tower_inventory.clear()
-	GameData.purchased_towers.clear()
+	GameData.owned_towers = {"shooter": 1, "wall": 1, "slow": 1}
 	GameData.coins = 100
 
 	var placement_scene = load("res://scenes/levels/placement.tscn")
@@ -19,6 +21,7 @@ func before_each():
 func after_each():
 	GameData.selected_map = _original_selected_map
 	GameData.coins = _original_coins
+	GameData.owned_towers = _original_owned_towers
 
 func test_get_grid_position_uses_game_config_grid_size():
 	var gs = float(GameConfig.GRID_SIZE)

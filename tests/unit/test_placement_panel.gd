@@ -3,12 +3,14 @@ extends GutTest
 var placement: Node2D
 var _original_coins: int
 var _original_map: String
+var _original_owned_towers: Dictionary
 
 func before_each():
 	_original_coins = GameData.coins
 	_original_map = GameData.selected_map
+	_original_owned_towers = GameData.owned_towers.duplicate()
 	GameData.tower_inventory.clear()
-	GameData.purchased_towers.clear()
+	GameData.owned_towers = {"shooter": 1, "wall": 1, "slow": 1}
 	GameData.coins = 200
 	# 清理残留在 TOWERS 组中的节点（可能来自其他测试的 queue_free 延迟）
 	for node in get_tree().get_nodes_in_group(Enums.Group.TOWERS):
@@ -20,6 +22,7 @@ func before_each():
 func after_each():
 	GameData.coins = _original_coins
 	GameData.selected_map = _original_map
+	GameData.owned_towers = _original_owned_towers
 
 func test_place_tower_deducts_coins():
 	var cost: int = SceneFactory.get_tower_cost(Enums.TowerId.SHOOTER)
