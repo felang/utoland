@@ -13,6 +13,8 @@ func _ready() -> void:
 	add_child(debug_panel)
 	# 波次结束后升级弹窗
 	EventBus.wave_transition_ready.connect(_on_wave_transition_ready)
+	# 监听 sunflower 产金事件
+	EventBus.coins_generated.connect(_on_coins_generated)
 
 func _load_map() -> void:
 	var map_data: MapData = GameConfig.maps.get(GameData.selected_map)
@@ -56,3 +58,11 @@ func _on_upgrades_completed() -> void:
 
 func _on_upgrades_skipped() -> void:
 	SceneManager.go_to(Enums.Scene.PLACEMENT)
+
+func _on_coins_generated(amount: int, _pos: Vector2) -> void:
+	var player: Node2D = get_tree().get_first_node_in_group(Enums.Group.PLAYER)
+	if player and player.has_method("add_coins"):
+		player.add_coins(amount)
+	else:
+		GameData.coins += amount
+		GameData.add_xp(amount)
