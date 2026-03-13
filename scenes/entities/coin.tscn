@@ -4,7 +4,7 @@
 [ext_resource type="Texture2D" path="res://assets/sprites/items/gold_coin.png" id="2_coin"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_rwqht"]
-radius = 6.0
+radius = 3.0
 
 [node name="Coin" type="Area2D" unique_id=657865110]
 collision_layer = 16
@@ -13,7 +13,7 @@ script = ExtResource("1_rwqht")
 
 [node name="Visual" type="Sprite2D" parent="." unique_id=1448575563]
 texture = ExtResource("2_coin")
-scale = Vector2(1.714, 1.714)
+scale = Vector2(1.0, 1.0)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=648716962]
 shape = SubResource("CircleShape2D_rwqht")

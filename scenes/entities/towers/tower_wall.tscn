@@ -5,7 +5,7 @@
 [ext_resource type="Script" path="res://scripts/components/health_component.gd" id="3_health"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_7nxki"]
-size = Vector2(32, 32)
+size = Vector2(16, 16)
 
 [node name="TowerWall" type="StaticBody2D" unique_id=655985224]
 collision_layer = 8
@@ -14,7 +14,7 @@ script = ExtResource("1_yelwl")
 
 [node name="Visual" type="Sprite2D" parent="." unique_id=1199573255]
 texture = ExtResource("2_tileset")
-scale = Vector2(1.875, 1.875)
+scale = Vector2(1.0, 1.0)
 region_enabled = true
 region_rect = Rect2(64, 32, 16, 16)
 

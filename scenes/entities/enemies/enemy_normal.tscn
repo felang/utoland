@@ -9,13 +9,13 @@
 [ext_resource type="Script" path="res://scripts/components/hurtbox.gd" id="7_hurtbox"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_t5l71"]
-size = Vector2(32, 32)
+size = Vector2(16, 16)
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_hitbox"]
-radius = 13.0
+radius = 6.5
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_hurtbox"]
-radius = 13.0
+radius = 6.5
 
 [node name="EnemyNormal" type="CharacterBody2D" unique_id=1365841566]
 collision_layer = 2
@@ -23,10 +23,10 @@ collision_mask = 8
 script = ExtResource("1_onop2")
 
 [node name="Visual" type="ColorRect" parent="." unique_id=274199104]
-offset_left = -16.0
-offset_top = -16.0
-offset_right = 16.0
-offset_bottom = 16.0
+offset_left = -8.0
+offset_top = -8.0
+offset_right = 8.0
+offset_bottom = 8.0
 color = Color(1, 0, 0, 1)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=404462319]

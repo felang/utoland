@@ -8,7 +8,7 @@ func test_map_boundary_walls_match_game_config():
 
 	var half_w: float = GameConfig.MAP_HALF_WIDTH
 	var half_h: float = GameConfig.MAP_HALF_HEIGHT
-	var wall_thickness: float = 32.0
+	var wall_thickness: float = 16.0
 
 	# 检查墙壁位置（含半个墙厚偏移）
 	var top: StaticBody2D = boundary.get_node("TopWall")
