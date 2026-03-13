@@ -224,7 +224,6 @@ func _color_stat(label: Label, value: float, baseline: float) -> void:
 func _on_select_pressed() -> void:
 	if _selected_id == "":
 		return
-	var char_data: CharacterData = GameConfig.characters[_selected_id]
 	GameData.current_character = _selected_id
-	GameData.init_character(_selected_id)
+	GameData.reset()
 	SceneManager.go_to(Enums.Scene.MAP_SELECT)
