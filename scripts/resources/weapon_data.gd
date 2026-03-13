@@ -4,6 +4,15 @@ extends Resource
 @export var id: String = ""
 @export var display_name: String = ""
 @export var projectile_type: String = "bullet"
+
+# === 等级系统 ===
+@export var max_level: int = 5
+@export var damage_per_level: PackedFloat32Array = []
+@export var fire_rate_per_level: PackedFloat32Array = []
+@export var weapon_range_per_level: PackedFloat32Array = []
+@export var milestones: Dictionary = {}
+
+# === 旧平面字段（暂保留，Task 5 移除）===
 @export var fire_rate: float = 0.1
 @export var damage: float = 10.0
 @export var weapon_range: float = 300.0
