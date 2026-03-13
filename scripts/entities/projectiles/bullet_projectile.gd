@@ -8,7 +8,7 @@ const SPLIT_LIFETIME: float = 1.5             # 分裂弹存活时间（秒）
 const SPLIT_KNOCKBACK_MULT: float = 0.5       # 分裂弹击退倍率
 const SPLIT_SPREAD_ANGLE: float = PI / 2      # 分裂弹扩散角度（弧度，±90°）
 
-var speed: float = 600.0
+var speed: float = 300.0
 var lifetime: float = 5.0
 var _elapsed: float = 0.0
 var _direction: Vector2 = Vector2.RIGHT

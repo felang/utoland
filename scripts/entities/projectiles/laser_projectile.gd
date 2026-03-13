@@ -4,7 +4,7 @@ class_name LaserProjectile
 extends Projectile
 
 var beam_duration: float = 0.08
-var beam_range: float = 400.0
+var beam_range: float = 200.0
 var _elapsed: float = 0.0
 var _line: Line2D = null
 

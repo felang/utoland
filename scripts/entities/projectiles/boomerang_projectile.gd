@@ -3,8 +3,8 @@
 class_name BoomerangProjectile
 extends Projectile
 
-var speed: float = 350.0
-var outbound_distance: float = 200.0
+var speed: float = 175.0
+var outbound_distance: float = 100.0
 var return_speed_mult: float = 1.3
 var max_lifetime: float = 5.0  # 默认值，_on_setup 中从配置覆盖
 
