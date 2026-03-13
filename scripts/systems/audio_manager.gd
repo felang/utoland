@@ -10,9 +10,15 @@ var _sounds: Dictionary = {}  # sound_id -> AudioStream
 var _pool: Array[AudioStreamPlayer] = []
 var _pool_index: int = 0
 
+var _bgm_player: AudioStreamPlayer
+var _bgm_tracks: Dictionary = {}
+var _current_bgm: String = ""
+
 func _ready() -> void:
 	_create_pool()
 	_register_sounds()
+	_create_bgm_player()
+	_register_bgm()
 
 func _create_pool() -> void:
 	for i in POOL_SIZE:
@@ -40,6 +46,46 @@ func _register_sounds() -> void:
 		var path: String = sfx_dir + sound_map[id]
 		if ResourceLoader.exists(path):
 			_sounds[id] = load(path)
+
+func _create_bgm_player() -> void:
+	_bgm_player = AudioStreamPlayer.new()
+	_bgm_player.bus = "Master"
+	_bgm_player.volume_db = -6.0
+	add_child(_bgm_player)
+
+func _register_bgm() -> void:
+	var bgm_dir := "res://assets/bgm/"
+	var bgm_map: Dictionary = {
+		"menu": "menu.ogg",
+		"placement": "placement.ogg",
+		"battle": "battle.ogg",
+		"result": "result.ogg",
+	}
+	for id: String in bgm_map:
+		var path: String = bgm_dir + bgm_map[id]
+		if ResourceLoader.exists(path):
+			_bgm_tracks[id] = load(path)
+
+func play_bgm(track_id: String) -> void:
+	if track_id == _current_bgm and _bgm_player.playing:
+		return
+	if not _bgm_tracks.has(track_id):
+		return
+	_bgm_player.stream = _bgm_tracks[track_id]
+	_bgm_player.volume_db = -6.0
+	_bgm_player.play()
+	_current_bgm = track_id
+
+func stop_bgm() -> void:
+	_bgm_player.stop()
+	_current_bgm = ""
+
+func fade_bgm(duration: float = 0.5) -> void:
+	if not _bgm_player.playing:
+		return
+	var tween: Tween = create_tween()
+	tween.tween_property(_bgm_player, "volume_db", -40.0, duration)
+	tween.tween_callback(stop_bgm)
 
 func play(sound_id: String, volume_db: float = 0.0) -> void:
 	if not _sounds.has(sound_id):

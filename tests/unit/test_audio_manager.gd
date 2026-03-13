@@ -36,3 +36,15 @@ func test_tower_sound_ids_registered():
 	AudioManager.play("tower_place")
 	AudioManager.play("tower_remove")
 	assert_true(true, "tower_place 和 tower_remove 调用不应崩溃")
+
+func test_play_bgm_unknown_track_no_crash():
+	AudioManager.play_bgm("nonexistent")
+	assert_true(true, "未知 BGM track 不应崩溃")
+
+func test_stop_bgm_no_crash():
+	AudioManager.stop_bgm()
+	assert_true(true, "stop_bgm 无播放时不应崩溃")
+
+func test_fade_bgm_no_crash():
+	AudioManager.fade_bgm(0.5)
+	assert_true(true, "fade_bgm 无播放时不应崩溃")
