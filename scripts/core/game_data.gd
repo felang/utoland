@@ -28,6 +28,11 @@ var pending_heal: int = 0
 var owned_weapons: Dictionary = {}
 var owned_towers: Dictionary = {}
 
+## 经验值/等级系统
+var current_level: int = 1
+var current_xp: int = 0
+var pending_upgrades: int = 0
+
 ## 里程碑效果保留字段（初期不使用，后续 milestones 写入）
 var pierce_count: int = 0
 var multishot_active: bool = false
@@ -52,6 +57,9 @@ const _DEFAULTS: Dictionary = {
 	"pending_heal": 0,
 	"owned_weapons": {},
 	"owned_towers": {},
+	"current_level": 1,
+	"current_xp": 0,
+	"pending_upgrades": 0,
 	"pierce_count": 0,
 	"multishot_active": false,
 	"multishot_damage_mult": 1.0,
@@ -144,3 +152,15 @@ func record_damage_taken(amount: float) -> void:
 
 func record_coins_earned(amount: int) -> void:
 	total_coins_earned += amount
+
+func get_xp_to_next_level() -> int:
+	return 20 + (current_level - 1) * 15
+
+func add_xp(amount: int) -> void:
+	current_xp += amount
+	while current_xp >= get_xp_to_next_level():
+		current_xp -= get_xp_to_next_level()
+		current_level += 1
+		pending_upgrades += 1
+		EventBus.player_leveled_up.emit(current_level)
+	EventBus.xp_changed.emit(current_xp, get_xp_to_next_level())
