@@ -19,16 +19,6 @@ func initialize(main: Node2D, range_indicator: RangeIndicator) -> void:
 	_create_tower_cards()
 	_update_buttons()
 	_main.coins_changed.connect(_update_buttons)
-	EventBus.tower_purchased.connect(_on_tower_purchased)
-	EventBus.tower_upgraded.connect(_on_tower_upgraded)
-
-func _on_tower_purchased(_tower_type: String) -> void:
-	_create_tower_cards()
-	_update_buttons()
-
-func _on_tower_upgraded(_tower_type: String) -> void:
-	_create_tower_cards()
-	_update_buttons()
 
 func _create_tower_cards() -> void:
 	var tower_list: VBoxContainer = get_parent().get_node("PlacementScroll/TowerList")

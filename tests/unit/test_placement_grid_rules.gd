@@ -103,16 +103,3 @@ func test_remove_tower_at_empty_does_nothing():
 	placement._placement_panel._remove_tower_at(Vector2(500, 500))
 	assert_eq(GameData.coins, 60, "空位置不应改变金币")
 
-func test_first_wave_hides_shop_tab():
-	GameData.current_wave = 0
-	var p = load("res://scenes/levels/placement.tscn").instantiate()
-	add_child_autofree(p)
-	var shop_tab: Button = p.get_node("UI/SidePanel/TabBar/ShopTab")
-	assert_false(shop_tab.visible, "首波应隐藏商店 Tab")
-
-func test_non_first_wave_shows_shop_tab():
-	GameData.current_wave = 1
-	var p = load("res://scenes/levels/placement.tscn").instantiate()
-	add_child_autofree(p)
-	var shop_tab: Button = p.get_node("UI/SidePanel/TabBar/ShopTab")
-	assert_true(shop_tab.visible, "非首波应显示商店 Tab")

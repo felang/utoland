@@ -11,9 +11,6 @@ const SIDEBAR_WIDTH = 120.0
 signal coins_changed
 
 @onready var _placement_content: VBoxContainer = $UI/SidePanel/PlacementContent
-@onready var _shop_content: VBoxContainer = $UI/SidePanel/ShopContent
-@onready var _placement_tab: Button = $UI/SidePanel/TabBar/PlacementTab
-@onready var _shop_tab: Button = $UI/SidePanel/TabBar/ShopTab
 @onready var _coins_label: Label = $UI/SidePanel/CoinsLabel
 @onready var _start_button: Button = $UI/SidePanel/StartBattleButton
 @onready var background_sprite: Sprite2D = $Background/BackgroundSprite
@@ -22,7 +19,6 @@ var _placement_camera: Camera2D = null
 var _grid_overlay: Node2D = null
 var _range_indicator: RangeIndicator = null
 var _placement_panel: Node = null
-var _shop_panel: Node = null
 
 func _ready() -> void:
 	_load_map_background()
@@ -51,23 +47,6 @@ func _ready() -> void:
 	_placement_panel = preload("res://scripts/ui/placement_panel.gd").new()
 	_placement_content.add_child(_placement_panel)
 	_placement_panel.initialize(self, _range_indicator)
-
-	# 初始化商店面板
-	_shop_panel = preload("res://scripts/ui/shop_panel.gd").new()
-	_shop_content.add_child(_shop_panel)
-	_shop_panel.initialize(self)
-
-	# Tab 切换
-	_placement_tab.pressed.connect(func() -> void: _switch_tab(true))
-	_shop_tab.pressed.connect(func() -> void: _switch_tab(false))
-
-	# 首波隐藏商店 Tab
-	if GameData.current_wave == 0:
-		_shop_tab.visible = false
-		_switch_tab(true)
-	else:
-		_shop_tab.visible = true
-		_switch_tab(false)  # 非首波默认商店 Tab
 
 	# 开始战斗按钮
 	_start_button.pressed.connect(_start_battle)
@@ -122,12 +101,6 @@ func _input(event: InputEvent) -> void:
 			get_tree().paused = not get_tree().paused
 		get_viewport().set_input_as_handled()
 		return
-
-func _switch_tab(is_placement: bool) -> void:
-	_placement_content.visible = is_placement
-	_shop_content.visible = not is_placement
-	_placement_tab.button_pressed = is_placement
-	_shop_tab.button_pressed = not is_placement
 
 func update_coins_display() -> void:
 	_coins_label.text = "金币: %d" % GameData.coins
