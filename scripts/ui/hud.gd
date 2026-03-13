@@ -10,6 +10,8 @@ const BUFF_PADDING_V: int = 2               # 增益标签垂直内边距
 @onready var hp_progress: ProgressBar = $TopBar/MarginContainer/HBoxContainer/HPBar/HPProgress
 @onready var hp_text: Label = $TopBar/MarginContainer/HBoxContainer/HPBar/HPText
 @onready var hp_icon: Label = $TopBar/MarginContainer/HBoxContainer/HPBar/HPIcon
+@onready var xp_progress: ProgressBar = $TopBar/MarginContainer/HBoxContainer/XPBar/XPProgress
+@onready var xp_icon: Label = $TopBar/MarginContainer/HBoxContainer/XPBar/XPIcon
 @onready var coin_icon: Label = $TopBar/MarginContainer/HBoxContainer/CoinDisplay/CoinIcon
 @onready var coin_text: Label = $TopBar/MarginContainer/HBoxContainer/CoinDisplay/CoinText
 @onready var wave_display: Label = $TopBar/MarginContainer/HBoxContainer/WaveDisplay
@@ -28,6 +30,8 @@ func _ready() -> void:
 		push_warning("HUD: Player node not found in 'player' group")
 	EventBus.wave_started.connect(_on_wave_started)
 	EventBus.wave_completed.connect(_on_wave_completed)
+	EventBus.xp_changed.connect(_on_xp_changed)
+	EventBus.player_leveled_up.connect(_on_player_leveled_up)
 	_style_ui()
 	_update_buffs()
 
@@ -105,6 +109,9 @@ func _style_ui() -> void:
 	coin_text.add_theme_color_override("font_color", UIConstants.COLOR_GOLD)
 	coin_icon.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_BODY)
 	coin_icon.add_theme_color_override("font_color", UIConstants.COLOR_GOLD)
+	xp_icon.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_SMALL)
+	xp_icon.add_theme_color_override("font_color", Color("#bb86fc"))
+	xp_icon.text = "Lv.%d" % GameData.current_level
 
 func _update_buffs() -> void:
 	for child in buff_container.get_children():
@@ -150,3 +157,37 @@ func _on_wave_started(_wave_number: int, wave_data: WaveData) -> void:
 
 func _on_wave_completed(_wave_number: int) -> void:
 	_is_wave_active = false
+
+func _on_xp_changed(current_xp: int, xp_to_next: int) -> void:
+	xp_progress.max_value = xp_to_next
+	xp_progress.value = current_xp
+
+func _on_player_leveled_up(level: int) -> void:
+	xp_icon.text = "Lv.%d" % level
+	# 经验条闪白
+	var tween: Tween = create_tween()
+	tween.tween_property(xp_progress, "modulate", Color.WHITE * 2, 0.15)
+	tween.tween_property(xp_progress, "modulate", Color.WHITE, 0.15)
+	# 浮动文字
+	if player and is_instance_valid(player):
+		_spawn_level_up_text(player.global_position + Vector2(0, -30))
+
+func _spawn_level_up_text(pos: Vector2) -> void:
+	var label := Label.new()
+	label.text = "Level Up!"
+	label.add_theme_font_size_override("font_size", 16)
+	label.add_theme_color_override("font_color", Color("#bb86fc"))
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.global_position = pos
+	label.z_index = 100
+	var tree: SceneTree = get_tree()
+	if tree and tree.current_scene:
+		tree.current_scene.add_child(label)
+	else:
+		add_child(label)
+	var tween: Tween = create_tween()
+	tween.set_parallel(true)
+	tween.tween_property(label, "global_position:y", pos.y - 30, 0.8).set_ease(Tween.EASE_OUT)
+	tween.tween_property(label, "modulate:a", 0.0, 0.4).set_delay(0.4)
+	tween.set_parallel(false)
+	tween.tween_callback(label.queue_free)
