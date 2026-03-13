@@ -43,6 +43,8 @@
 | `resources/characters/*.tres` (5 个) | 补充 default_tower，移除 affinity 字段 |
 | `scripts/core/game_config.gd` | 移除 `var items: Dictionary` 和 `_load_resources_from_dir("res://resources/items/", items)` |
 | `scripts/ui/result.gd` | 移除 purchased_item_list 和 GameConfig.items 引用，改为展示已拥有武器/塔 |
+| `scripts/ui/character_selection.gd` | 移除 _fill_affinity()、selected_weapon 引用 |
+| `scripts/entities/projectiles/bullet_projectile.gd` | 移除 lifesteal 逻辑 |
 | `tests/unit/test_game_data_stats.gd` | 移除 purchased_item_list 和 record_item_purchased 测试 |
 
 ### 新增的文件
@@ -578,9 +580,13 @@ git commit -m "feat: GameData 重构为武器/塔等级系统，EventBus 添加�
 - Delete: `tests/unit/test_shop_items_loaded.gd` (旧道具加载测试)
 - Delete: `tests/unit/test_shop_manager_logic.gd` (旧商店逻辑测试)
 - Delete: `scripts/systems/shop_manager.gd` (旧商店 UI)
+- Delete: `scripts/ui/shop_item_card.gd` + `scenes/ui/shop_item_card.tscn` (旧商品卡片)
+- Delete: `tests/unit/test_shop_item_data.gd` (旧道具数据测试)
 - Modify: `scripts/core/enums.gd` — 移除 ItemTag, ItemRarity, ItemEffect
 - Modify: `scripts/core/game_config.gd` — 移除 items 字典和加载
 - Modify: `scripts/ui/result.gd` — 移除道具引用，改为武器/塔展示
+- Modify: `scripts/ui/character_selection.gd` — 移除 _fill_affinity()、selected_weapon 引用
+- Modify: `scripts/entities/projectiles/bullet_projectile.gd` — 移除 lifesteal 逻辑
 - Modify: `tests/unit/test_game_data_stats.gd` — 移除 purchased_item_list 相关测试
 
 - [ ] **Step 1: 删除旧道具系统文件**
@@ -595,6 +601,9 @@ rm -rf resources/items/
 rm tests/unit/test_shop_panel.gd
 rm tests/unit/test_shop_items_loaded.gd
 rm tests/unit/test_shop_manager_logic.gd
+rm tests/unit/test_shop_item_data.gd
+rm scripts/ui/shop_item_card.gd
+rm scenes/ui/shop_item_card.tscn
 ```
 
 - [ ] **Step 2: 修改 enums.gd 移除道具相关枚举**
@@ -663,6 +672,22 @@ rm tests/unit/test_shop_manager_logic.gd
 - `test_reset_clears_stats()` — 移除 `GameData.record_item_purchased("test")` 和 `assert_eq(GameData.purchased_item_list.size(), 0)` 行
 
 同时在 `test_shop_items_loaded.gd` 已在 Step 1 删除，`test_dora_character_loaded` 中引用 `affinity_tags` 的断言也已随文件删除。
+
+- [ ] **Step 2e: 修改 character_selection.gd**
+
+`scripts/ui/character_selection.gd` 中：
+- 第 263 行 `GameData.selected_weapon = char_data.default_weapon` — 移除（GameData.reset() 已通过 owned_weapons 初始化）
+- 第 228-255 行 `_fill_affinity()` 方法 — 整个方法删除
+- 第 210 行 `_fill_affinity(char_data)` 调用 — 删除
+- 第 28 行 `@onready var _affinity_section` — 删除（若有对应 UI 节点引用也删除）
+
+> 角色选择页面不再显示亲和信息，可以改为显示"初始武器"和"初始塔"。
+
+- [ ] **Step 2f: 修改 bullet_projectile.gd 移除 lifesteal**
+
+`scripts/entities/projectiles/bullet_projectile.gd` 中：
+- 第 75-78 行 lifesteal 逻辑 — 移除（`GameData.lifesteal_ratio` 已删除）
+- 保留 split_count/split_damage_mult 引用（这些是 milestone 保留字段）
 
 - [ ] **Step 3: 移除 WeaponData/TowerData 旧平面字段**
 
