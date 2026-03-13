@@ -48,20 +48,24 @@ func test_place_slow_tower():
 	assert_true(tower.is_in_group(Enums.Group.TOWERS), "Tower should be in 'towers' group")
 
 func test_tower_cost_deduction():
-	# Test that tower cost is correctly calculated
+	# Test that tower cost is correctly calculated from per-level data
 	var shooter_cost = SceneFactory.get_tower_cost(Enums.TowerId.SHOOTER)
 	var wall_cost = SceneFactory.get_tower_cost(Enums.TowerId.WALL)
 	var slow_cost = SceneFactory.get_tower_cost(Enums.TowerId.SLOW)
 
-	assert_eq(shooter_cost, 40, "Shooter tower cost should be 40")
-	assert_eq(wall_cost, 40, "Wall tower cost should be 40")
-	assert_eq(slow_cost, 40, "Slow tower cost should be 40")
+	var shooter_td: TowerData = GameConfig.towers[Enums.TowerId.SHOOTER]
+	var wall_td: TowerData = GameConfig.towers[Enums.TowerId.WALL]
+	var slow_td: TowerData = GameConfig.towers[Enums.TowerId.SLOW]
+
+	assert_eq(shooter_cost, shooter_td.place_cost_per_level[0], "Shooter tower cost should match level 1 place_cost")
+	assert_eq(wall_cost, wall_td.place_cost_per_level[0], "Wall tower cost should match level 1 place_cost")
+	assert_eq(slow_cost, slow_td.place_cost_per_level[0], "Slow tower cost should match level 1 place_cost")
 
 	# Simulate cost deduction
 	var initial_coins = GameData.coins
 	GameData.coins -= shooter_cost
 
-	assert_eq(GameData.coins, initial_coins - 40, "Coins should be deducted by tower cost")
+	assert_eq(GameData.coins, initial_coins - shooter_cost, "Coins should be deducted by tower cost")
 
 func test_invalid_tower_placement():
 	# Test that invalid tower type returns null
@@ -130,11 +134,11 @@ func test_tower_hp_from_config():
 	var shooter = SceneFactory.create_tower(Enums.TowerId.SHOOTER)
 	test_scene.add_child(shooter)
 
-	var expected_hp = GameConfig.towers[Enums.TowerId.SHOOTER].hp
+	var expected_hp = GameConfig.towers[Enums.TowerId.SHOOTER].hp_per_level[0]
 	assert_eq(shooter.health.current_hp, expected_hp, "Shooter tower HP should match config")
 
 	var wall = SceneFactory.create_tower(Enums.TowerId.WALL)
 	test_scene.add_child(wall)
 
-	expected_hp = GameConfig.towers[Enums.TowerId.WALL].hp
+	expected_hp = GameConfig.towers[Enums.TowerId.WALL].hp_per_level[0]
 	assert_eq(wall.health.current_hp, expected_hp, "Wall tower HP should match config")

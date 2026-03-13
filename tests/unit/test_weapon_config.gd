@@ -17,7 +17,7 @@ func test_laser_has_projectile_type():
 func test_all_weapons_have_range():
 	for weapon_id in GameConfig.weapons:
 		var w: WeaponData = GameConfig.weapons[weapon_id]
-		assert_gt(w.weapon_range, 0.0, "武器 %s 应有正的射程" % weapon_id)
+		assert_gt(w.weapon_range_per_level[0], 0.0, "武器 %s 应有正的射程" % weapon_id)
 
 func test_boomerang_has_required_fields():
 	var w: WeaponData = GameConfig.weapons[Enums.WeaponId.BOOMERANG]

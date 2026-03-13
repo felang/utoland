@@ -57,19 +57,19 @@ func test_create_coin():
 	assert_not_null(coin, "Coin should be created")
 	coin.queue_free()
 
-# Tower cost test
+# Tower cost test — 费用现在按等级读取 place_cost_per_level
 func test_get_tower_cost():
-	# Test shooter tower cost (average of 35 and 45 = 40)
 	var shooter_cost = SceneFactory.get_tower_cost(Enums.TowerId.SHOOTER)
-	assert_eq(shooter_cost, 40, "Shooter tower cost should be 40 (average of 35 and 45)")
+	var shooter_td: TowerData = GameConfig.towers[Enums.TowerId.SHOOTER]
+	assert_eq(shooter_cost, shooter_td.place_cost_per_level[0], "Shooter tower cost should match level 1 place_cost")
 
-	# Test wall tower cost (average of 35 and 45 = 40)
 	var wall_cost = SceneFactory.get_tower_cost(Enums.TowerId.WALL)
-	assert_eq(wall_cost, 40, "Wall tower cost should be 40 (average of 35 and 45)")
+	var wall_td: TowerData = GameConfig.towers[Enums.TowerId.WALL]
+	assert_eq(wall_cost, wall_td.place_cost_per_level[0], "Wall tower cost should match level 1 place_cost")
 
-	# Test slow tower cost (average of 35 and 45 = 40)
 	var slow_cost = SceneFactory.get_tower_cost(Enums.TowerId.SLOW)
-	assert_eq(slow_cost, 40, "Slow tower cost should be 40 (average of 35 and 45)")
+	var slow_td: TowerData = GameConfig.towers[Enums.TowerId.SLOW]
+	assert_eq(slow_cost, slow_td.place_cost_per_level[0], "Slow tower cost should match level 1 place_cost")
 
 	# Test invalid tower type
 	var invalid_cost = SceneFactory.get_tower_cost("invalid_type")

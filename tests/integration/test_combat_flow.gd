@@ -135,7 +135,8 @@ func test_tower_damage_from_config():
 
 	await wait_frames(2)
 
-	var expected_damage = GameConfig.towers[Enums.TowerId.SHOOTER].damage * GameData.player_stats[Enums.Stat.TOWER_MULT]
+	var td: TowerData = GameConfig.towers[Enums.TowerId.SHOOTER]
+	var expected_damage = td.damage_per_level[0] * GameData.player_stats[Enums.Stat.TOWER_MULT]
 	assert_eq(tower.attack_damage, expected_damage, "Tower damage should match config")
 
 func test_enemy_drops_correct_coin_count():

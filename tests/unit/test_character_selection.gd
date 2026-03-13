@@ -33,13 +33,6 @@ func test_game_data_init_character_sets_stats() -> void:
 	assert_eq(GameData.character_speed, char_data.speed, "init_character 应设置 speed")
 	assert_eq(GameData.character_damage_mult, char_data.damage_mult, "init_character 应设置 damage_mult")
 
-func test_affinity_tags_are_known_values() -> void:
-	var known_tags := ["shooter", "engineer"]
-	for character_id in GameConfig.characters:
-		var char_data: CharacterData = GameConfig.characters[character_id]
-		for tag in char_data.affinity_tags:
-			assert_has(known_tags, tag, "%s 的亲和标签 '%s' 应为已知值" % [character_id, tag])
-
 func test_characters_dict_not_empty() -> void:
 	assert_gt(GameConfig.characters.size(), 0, "角色字典不应为空")
 

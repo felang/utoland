@@ -5,8 +5,11 @@ func test_weapon_tick_decrements_cooldown():
 	var w = Weapon.new()
 	add_child_autofree(w)
 	var data = WeaponData.new()
-	data.fire_rate = 1.0
-	data.damage = 10.0
+	data.id = "test_weapon_tick"
+	data.fire_rate_per_level = PackedFloat32Array([1.0])
+	data.damage_per_level = PackedFloat32Array([10.0])
+	data.weapon_range_per_level = PackedFloat32Array([300.0])
+	GameData.owned_weapons[data.id] = 1
 	w.initialize(data)
 	w._cooldown = 0.5
 
@@ -15,13 +18,17 @@ func test_weapon_tick_decrements_cooldown():
 	w.tick(0.1, target)
 
 	assert_almost_eq(w._cooldown, 0.4, 0.001)
+	GameData.owned_weapons.erase(data.id)
 
 func test_weapon_resets_cooldown_after_firing():
 	var w = Weapon.new()
 	add_child_autofree(w)
 	var data = WeaponData.new()
-	data.fire_rate = 0.5
-	data.damage = 10.0
+	data.id = "test_weapon_cd"
+	data.fire_rate_per_level = PackedFloat32Array([0.5])
+	data.damage_per_level = PackedFloat32Array([10.0])
+	data.weapon_range_per_level = PackedFloat32Array([300.0])
+	GameData.owned_weapons[data.id] = 1
 	w.initialize(data)
 	w._cooldown = 0.0
 
@@ -31,3 +38,4 @@ func test_weapon_resets_cooldown_after_firing():
 
 	# 冷却被重置为 fire_rate / attack_speed_mult
 	assert_almost_eq(w._cooldown, 0.5, 0.01)
+	GameData.owned_weapons.erase(data.id)

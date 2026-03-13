@@ -114,22 +114,8 @@ func _update_buffs() -> void:
 		buffs.append("穿甲x%d" % GameData.pierce_count)
 	if GameData.multishot_active:
 		buffs.append("弹幕")
-	if GameData.lifesteal_ratio > 0:
-		buffs.append("吸血%d%%" % int(GameData.lifesteal_ratio * 100))
 	if GameData.crit_chance > 0:
 		buffs.append("暴击%d%%" % int(GameData.crit_chance * 100))
-	if GameData.current_shield > 0:
-		buffs.append("护盾x%d" % GameData.current_shield)
-	if GameData.damage_reduction > 0:
-		buffs.append("减伤%d%%" % int(GameData.damage_reduction * 100))
-	if GameData.dodge_chance > 0:
-		buffs.append("闪避%d%%" % int(GameData.dodge_chance * 100))
-	if GameData.slow_aura_active:
-		buffs.append("减速光环")
-	if GameData.auto_dash_active:
-		buffs.append("冲刺")
-	if GameData.coin_magnet_mult > 1.0:
-		buffs.append("磁铁")
 	if GameData.split_count > 0:
 		buffs.append("分裂x%d" % GameData.split_count)
 	if GameData.bullet_speed_mult > 1.0:

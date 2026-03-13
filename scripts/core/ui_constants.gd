@@ -48,9 +48,9 @@ const BUTTON_PADDING_V := 8
 
 static func get_rarity_color(rarity: String) -> Color:
 	match rarity:
-		Enums.ItemRarity.RARE:
+		"rare":
 			return COLOR_RARITY_RARE
-		Enums.ItemRarity.EPIC:
+		"epic":
 			return COLOR_RARITY_EPIC
 		_:
 			return COLOR_RARITY_COMMON

@@ -15,9 +15,9 @@ func test_weapon_rifle_resource() -> void:
 	assert_eq(w.id, Enums.WeaponId.RIFLE)
 	assert_eq(w.display_name, "步枪")
 	assert_eq(w.projectile_type, Enums.ProjectileId.BULLET)
-	assert_eq(w.fire_rate, 0.1)
-	assert_eq(w.damage, 10.0)
-	assert_eq(w.weapon_range, 300.0)
+	assert_almost_eq(w.fire_rate_per_level[0], 0.1, 0.001)
+	assert_almost_eq(w.damage_per_level[0], 10.0, 0.001)
+	assert_almost_eq(w.weapon_range_per_level[0], 300.0, 0.001)
 	assert_eq(w.bullet_count, 1)
 	assert_eq(w.bullet_speed, 600.0)
 
@@ -25,8 +25,8 @@ func test_weapon_boomerang_resource() -> void:
 	assert_true(GameConfig.weapons.has(Enums.WeaponId.BOOMERANG), "应包含 boomerang")
 	var w: WeaponData = GameConfig.weapons[Enums.WeaponId.BOOMERANG]
 	assert_eq(w.projectile_type, Enums.ProjectileId.BOOMERANG)
-	assert_eq(w.fire_rate, 0.8)
-	assert_eq(w.damage, 15.0)
+	assert_almost_eq(w.fire_rate_per_level[0], 0.8, 0.001)
+	assert_almost_eq(w.damage_per_level[0], 15.0, 0.001)
 	assert_eq(w.boomerang_speed, 350.0)
 	assert_eq(w.outbound_distance, 200.0)
 	assert_eq(w.return_speed_mult, 1.3)
@@ -35,8 +35,8 @@ func test_weapon_laser_resource() -> void:
 	assert_true(GameConfig.weapons.has(Enums.WeaponId.LASER), "应包含 laser")
 	var w: WeaponData = GameConfig.weapons[Enums.WeaponId.LASER]
 	assert_eq(w.projectile_type, Enums.ProjectileId.LASER)
-	assert_eq(w.fire_rate, 0.15)
-	assert_eq(w.damage, 8.0)
+	assert_almost_eq(w.fire_rate_per_level[0], 0.15, 0.001)
+	assert_almost_eq(w.damage_per_level[0], 8.0, 0.001)
 	assert_eq(w.beam_range, 400.0)
 	assert_eq(w.beam_width, 2.0)
 	assert_eq(w.beam_duration, 0.08)
@@ -80,21 +80,21 @@ func test_towers_loaded_count() -> void:
 func test_tower_shooter_resource() -> void:
 	var t: TowerData = GameConfig.towers[Enums.TowerId.SHOOTER]
 	assert_eq(t.display_name, "射手塔")
-	assert_eq(t.hp, 80.0)
-	assert_eq(t.damage, 15.0)
-	assert_eq(t.fire_rate, 1.0)
-	assert_eq(t.attack_range, 300.0)
+	assert_almost_eq(t.hp_per_level[0], 80.0, 0.001)
+	assert_almost_eq(t.damage_per_level[0], 15.0, 0.001)
+	assert_almost_eq(t.fire_rate_per_level[0], 1.0, 0.001)
+	assert_almost_eq(t.attack_range_per_level[0], 300.0, 0.001)
 
 func test_tower_wall_resource() -> void:
 	var t: TowerData = GameConfig.towers[Enums.TowerId.WALL]
-	assert_eq(t.hp, 300.0)
-	assert_eq(t.damage, 0.0)
+	assert_almost_eq(t.hp_per_level[0], 300.0, 0.001)
+	assert_almost_eq(t.damage_per_level[0], 0.0, 0.001)
 
 func test_tower_slow_resource() -> void:
 	var t: TowerData = GameConfig.towers[Enums.TowerId.SLOW]
-	assert_eq(t.hp, 70.0)
-	assert_eq(t.slow_percent, 0.3)
-	assert_eq(t.attack_range, 200.0)
+	assert_almost_eq(t.hp_per_level[0], 70.0, 0.001)
+	assert_almost_eq(t.slow_ratio_per_level[0], 0.3, 0.001)
+	assert_almost_eq(t.attack_range_per_level[0], 200.0, 0.001)
 
 
 # ===== 波次资源加载 =====
