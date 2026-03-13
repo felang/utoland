@@ -18,3 +18,7 @@ tests/results.xml
 auto_*.tscn
 .worktrees/
 .superpowers/
+
+# Godot 生成文件
+*.uid
+export_presets.cfg

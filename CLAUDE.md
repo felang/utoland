@@ -6,6 +6,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 utoland 是一个基于 **Godot 4.6** 的 2D 塔防 + 射击混合类游戏。玩家选择角色，在波次战斗中击杀敌人获取金币。拾取金币同步获得经验值（1 金币 = 1 XP），升级后在波次结束时进入 N 轮 3 选 1 升级弹窗（武器+塔混合池，N = 本波升级次数），之后进入纯布置阶段放置已拥有的塔。武器和塔均有 1-5 级等级系统。
 
+**武器（10 种）**: 步枪(rifle)、回旋镖(boomerang)、激光(laser)、霰弹枪(shotgun)、加特林(minigun)、冰冻枪(ice_gun)、火箭炮(rocket)、闪电(lightning)、刀刃(blade)、喷火器(flamethrower)
+
+**植物塔（15 种）**: 射手塔(pea_shooter)、树桩(stump)、冰花(ice_flower)、仙人掌(cactus)、玫瑰(rose)、毒蘑菇(mushroom)、藤蔓(vine)、蒲公英(dandelion)、猪笼草(pitcher)、荆棘(thorn)、橡树(oak)、向日葵(sunflower)、薄荷(mint)、治愈花(heal_flower)、爆竹竹(bamboo)
+
 ## 运行与测试
 
 - **运行项目**: 通过 Godot 编辑器运行，或使用 gdai-mcp 插件的 `run_project` 工具
@@ -24,7 +28,7 @@ utoland 是一个基于 **Godot 4.6** 的 2D 塔防 + 射击混合类游戏。�
 - **SceneFactory** (`scripts/core/scene_factory.gd`) — 集中管理场景实例化，提供 `create_tower()`, `create_enemy()`, `create_bullet()`, `create_coin()` 等工厂方法。创建实体必须通过此工厂。
 - **EffectsManager** (`scripts/systems/effects_manager.gd`) — 特效管理：伤害数字、击中火花、死亡爆炸、闪白等视觉效果。
 - **AudioManager** (`scripts/systems/audio_manager.gd`) — 音效管理：AudioStreamPlayer 池化播放，通过 `play(sound_id)` 统一触发。音效文件放 `assets/sfx/`。
-- **EventBus** (`scripts/core/event_bus.gd`) — 全局事件总线，用于跨系统解耦通信（波次事件、等级事件 player_leveled_up/xp_changed 等）。
+- **EventBus** (`scripts/core/event_bus.gd`) — 全局事件总线，用于跨系统解耦通信（波次事件、等级事件 player_leveled_up/xp_changed、coins_generated 等）。
 - **SceneManager** (`scripts/core/scene_manager.gd`) — 集中管理场景切换，提供 `go_to(scene_name)` 方法。所有场景路径在此统一维护，禁止直接调用 `get_tree().change_scene_to_file()`。
 
 ### 游戏流程 (场景切换)
@@ -60,7 +64,7 @@ start_menu → character_selection → map_select → placement (纯塔布置)
 
 - **配置驱动**: 游戏数值通过 Resource 类定义 (`scripts/resources/`)，以 `.tres` 文件存储 (`resources/`)，由 `GameConfig` 在运行时加载。修改数值编辑对应 `.tres` 文件即可。
 - **工厂 + Resource 注入**: `SceneFactory` 创建实体时注入对应的 Resource 数据（`EnemyData`、`TowerData`），实体不再直接依赖 `GameConfig` 字典
-- **组件化实体**: 共享行为提取为可复用组件（`HealthComponent`、`SpriteAnimator`），专用行为提取为独立组件（`WeaponManager`、`KnockbackHandler`、`SlowHandler`），伤害通过 `Hitbox`/`Hurtbox` Area2D 体系处理，通过场景树子节点挂载
+- **组件化实体**: 共享行为提取为可复用组件（`HealthComponent`、`SpriteAnimator`），专用行为提取为独立组件（`WeaponManager`、`KnockbackHandler`、`SlowHandler`），伤害通过 `Hitbox`/`Hurtbox` Area2D 体系处理，通过场景树子节点挂载。`HealthComponent` 支持 `damage_reduction` 和带 `attacker` 参数的 `damaged` 信号。`SlowHandler` 为效果字典模式，支持多源减速叠加（取最大值）。塔支持 `apply_buff/remove_buff` 增益系统。敌人支持 `apply_root/remove_root` 定身系统
 - **事件总线**: 跨系统通信通过 `EventBus` 全局事件总线，避免系统间直接耦合
 - **信号通信**: 组件通过信号与宿主通信（如 `HealthComponent.died`）；跨系统事件通过 `EventBus`
 - **分组管理**: 实体通过 Godot 分组 (`towers`, `enemies`, `coins`) 进行批量操作

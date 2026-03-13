@@ -17,8 +17,8 @@ config/icon="res://icon.svg"
 
 [autoload]
 
-GameConfig="*res://scripts/core/game_config.gd"
 GameData="*res://scripts/core/game_data.gd"
+GameConfig="*res://scripts/core/game_config.gd"
 SceneFactory="*res://scripts/core/scene_factory.gd"
 EffectsManager="*res://scripts/systems/effects_manager.gd"
 EventBus="*res://scripts/core/event_bus.gd"
@@ -32,7 +32,6 @@ window/size/viewport_width=640
 window/size/viewport_height=360
 window/size/mode=2
 window/stretch/mode="viewport"
-window/stretch/aspect="keep"
 
 [editor_plugins]
 
@@ -106,8 +105,9 @@ debug_zoom_in={
 
 [rendering]
 
-2d/snap/snap_2d_transforms_to_pixel=true
 textures/canvas_textures/default_texture_filter=0
 rendering_device/driver.windows="d3d12"
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
+textures/vram_compression/import_etc2_astc=true
+2d/snap/snap_2d_transforms_to_pixel=true

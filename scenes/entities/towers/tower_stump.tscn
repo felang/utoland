@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3 uid="uid://b5760tlktfkgu"]
+[gd_scene format=3 uid="uid://b5760tlktfkgu"]
 
 [ext_resource type="Script" uid="uid://c787bqtynkfr0" path="res://scripts/entities/towers/tower.gd" id="1_yelwl"]
 [ext_resource type="Texture2D" path="res://assets/sprites/towers/tileset_towers.png" id="2_tileset"]
