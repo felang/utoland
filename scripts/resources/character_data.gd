@@ -5,7 +5,7 @@ extends Resource
 @export var display_name: String = ""
 @export var description: String = ""
 @export var max_hp: float = 100.0
-@export var speed: float = 200.0
+@export var speed: float = 100.0
 @export var damage_mult: float = 1.0
 @export var attack_speed_mult: float = 1.0
 @export var move_speed_mult: float = 1.0
@@ -21,4 +21,4 @@ extends Resource
 ## 头像 PNG 路径
 @export var portrait_path: String = ""
 ## 原始精灵像素尺寸，用于缩放计算
-@export var sprite_pixel_size: float = 32.0
+@export var sprite_pixel_size: float = 16.0

@@ -11,10 +11,14 @@ const DEBUG_MODE = true
 # 全局尺寸标准
 const BASE_VIEWPORT_WIDTH = 640
 const BASE_VIEWPORT_HEIGHT = 360
-const PPU = 32
-const GRID_SIZE = 32
+const PPU = 16
+const GRID_SIZE = 16
 
-# 地图尺寸（动态计算，_ready() 中赋值）
+# 地图网格数量（固定）
+const MAP_GRID_WIDTH = 40
+const MAP_GRID_HEIGHT = 25
+
+# 地图尺寸（由网格数量计算）
 var MAP_PIXEL_WIDTH: float = 0.0
 var MAP_PIXEL_HEIGHT: float = 0.0
 var MAP_HALF_WIDTH: float = 0.0
@@ -22,7 +26,7 @@ var MAP_HALF_HEIGHT: float = 0.0
 
 # 实体尺寸标准（像素）
 const ENTITY_SIZE_STANDARD = GRID_SIZE      # 30
-const ENTITY_SIZE_TANK = int(GRID_SIZE * 1.5)  # 45
+const ENTITY_SIZE_TANK = GRID_SIZE * 2          # 32
 const BULLET_SIZE = int(GRID_SIZE * 0.2)    # 6
 const COIN_RADIUS = int(GRID_SIZE * 0.2)    # 6
 
@@ -37,7 +41,7 @@ const UI_CARD_GAP = 20
 # ===== 玩家配置（保持 const 避免 Autoload 顺序问题） =====
 const PLAYER = {
 	"initial_hp": 100.0,
-	"initial_speed": 200.0,
+	"initial_speed": 100.0,
 	"initial_coins": 100,
 	"hp_regen_interval": 5.0,
 	"default_enemy_touch_damage": 10.0  # 敌人没有 touch_damage 属性时的默认伤害
@@ -61,8 +65,8 @@ const SPRITES = {
 			"fps": 10.0
 		},
 		"tank": {
-			"spritesheet": "res://assets/sprites/enemies/trex.png",
-			"frame_size": Vector2(16, 16),
+			"spritesheet": "res://assets/sprites/enemies/trex_large.png",
+			"frame_size": Vector2(32, 32),
 			"walk_frames": 4,
 			"walk_directions": 4,
 			"fps": 6.0
@@ -132,14 +136,8 @@ func _ready() -> void:
 
 
 func _compute_map_dimensions() -> void:
-	var fx: EffectConfigData = effects
-	if fx:
-		MAP_PIXEL_WIDTH = BASE_VIEWPORT_WIDTH / fx.camera_zoom * fx.map_size_ratio
-		MAP_PIXEL_HEIGHT = BASE_VIEWPORT_HEIGHT / fx.camera_zoom * fx.map_size_ratio
-	else:
-		# fallback：与旧尺寸接近
-		MAP_PIXEL_WIDTH = 1280.0
-		MAP_PIXEL_HEIGHT = 960.0
+	MAP_PIXEL_WIDTH = MAP_GRID_WIDTH * GRID_SIZE
+	MAP_PIXEL_HEIGHT = MAP_GRID_HEIGHT * GRID_SIZE
 	MAP_HALF_WIDTH = MAP_PIXEL_WIDTH / 2.0
 	MAP_HALF_HEIGHT = MAP_PIXEL_HEIGHT / 2.0
 
