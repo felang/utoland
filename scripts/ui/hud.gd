@@ -23,6 +23,7 @@ var player: Node2D = null
 var _wave_time_left: float = 0.0
 var _is_wave_active: bool = false
 var _wave_kills: int = 0
+var _last_coins: int = -1
 
 func _ready() -> void:
 	player = get_tree().get_first_node_in_group(Enums.Group.PLAYER)
@@ -62,7 +63,17 @@ func _update_hp() -> void:
 
 func _update_coins() -> void:
 	if player and is_instance_valid(player):
-		coin_text.text = str(player.coins)
+		var current_coins: int = player.coins
+		coin_text.text = str(current_coins)
+		if _last_coins >= 0 and current_coins != _last_coins:
+			_bounce_label(coin_text)
+		_last_coins = current_coins
+
+func _bounce_label(label: Control) -> void:
+	label.pivot_offset = label.size / 2
+	var tween: Tween = create_tween()
+	tween.tween_property(label, "scale", Vector2(1.3, 1.3), 0.1)
+	tween.tween_property(label, "scale", Vector2.ONE, 0.1)
 
 func _update_timer(delta: float) -> void:
 	if _is_wave_active:
