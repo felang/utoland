@@ -6,7 +6,6 @@
 [ext_resource type="PackedScene" uid="uid://cw1ribon6hcfu" path="res://scenes/ui/hud.tscn" id="4_tbgi4"]
 [ext_resource type="Script" uid="uid://spn074bn5fw7" path="res://scripts/systems/wave_manager.gd" id="6_tefeu"]
 [ext_resource type="PackedScene" uid="uid://5u5tndodgthf" path="res://scenes/shared/map_boundary.tscn" id="7_o6xl0"]
-[ext_resource type="Script" path="res://scripts/systems/item_effect_manager.gd" id="7_ubwgw"]
 
 [node name="Main" type="Node2D" unique_id=1198174103]
 script = ExtResource("1_main")
@@ -22,6 +21,3 @@ script = ExtResource("2_0wfyh")
 script = ExtResource("6_tefeu")
 
 [node name="MapBoundary" parent="." unique_id=1220843918 instance=ExtResource("7_o6xl0")]
-
-[node name="ItemEffectManager" type="Node" parent="." unique_id=1826561259]
-script = ExtResource("7_ubwgw")

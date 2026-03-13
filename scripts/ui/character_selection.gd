@@ -25,7 +25,6 @@ const STAT_BASELINES := {
 @onready var _damage_value: Label = %DamageValue
 @onready var _attack_speed_value: Label = %AttackSpeedValue
 @onready var _hp_regen_value: Label = %HPRegenValue
-@onready var _affinity_section: HBoxContainer = %AffinitySection
 @onready var _passive_desc: Label = %PassiveDesc
 @onready var _select_button: Button = %SelectButton
 @onready var _back_button: Button = %BackButton
@@ -206,9 +205,6 @@ func _fill_detail_panel(character_id: String) -> void:
 	_color_stat(_attack_speed_value, char_data.attack_speed_mult, STAT_BASELINES["attack_speed_mult"])
 	_color_stat(_hp_regen_value, char_data.hp_regen, STAT_BASELINES["hp_regen"])
 
-	# 亲和标签
-	_fill_affinity(char_data)
-
 	# 被动技能
 	if char_data.passive_description != "":
 		_passive_desc.text = char_data.passive_description
@@ -225,41 +221,10 @@ func _color_stat(label: Label, value: float, baseline: float) -> void:
 		label.add_theme_color_override("font_color", UIConstants.COLOR_TEXT_PRIMARY)
 
 
-func _fill_affinity(char_data: CharacterData) -> void:
-	# 清除旧内容
-	for child in _affinity_section.get_children():
-		child.queue_free()
-
-	if char_data.affinity_tags.size() == 0:
-		return
-
-	for tag in char_data.affinity_tags:
-		var tag_label := Label.new()
-		tag_label.text = tag
-		tag_label.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_TINY)
-		# 根据标签类型着色
-		match tag:
-			"shooter":
-				tag_label.add_theme_color_override("font_color", UIConstants.COLOR_AFFINITY_SHOOTER)
-			"engineer":
-				tag_label.add_theme_color_override("font_color", UIConstants.COLOR_AFFINITY_ENGINEER)
-			_:
-				tag_label.add_theme_color_override("font_color", UIConstants.COLOR_TEXT_SECONDARY)
-		_affinity_section.add_child(tag_label)
-
-	# 折扣标签
-	var discount_label := Label.new()
-	discount_label.text = "折扣%d%%" % int(char_data.affinity_discount * 100)
-	discount_label.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_TINY)
-	discount_label.add_theme_color_override("font_color", UIConstants.COLOR_GOLD)
-	_affinity_section.add_child(discount_label)
-
-
 func _on_select_pressed() -> void:
 	if _selected_id == "":
 		return
 	var char_data: CharacterData = GameConfig.characters[_selected_id]
 	GameData.current_character = _selected_id
-	GameData.selected_weapon = char_data.default_weapon
 	GameData.init_character(_selected_id)
 	SceneManager.go_to(Enums.Scene.MAP_SELECT)

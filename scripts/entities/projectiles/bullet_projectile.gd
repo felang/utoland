@@ -71,11 +71,6 @@ func _spawn_split_bullets() -> void:
 func _on_hitbox_area_entered(area: Area2D) -> void:
 	if area is Hurtbox:
 		EffectsManager.spawn_hit_sparks(global_position)
-		# 吸血：对敌人造成伤害后回复玩家HP
-		if GameData.lifesteal_ratio > 0.0:
-			var player_node: Node = get_tree().get_first_node_in_group(Enums.Group.PLAYER)
-			if player_node and player_node.has_method("heal_hp"):
-				player_node.heal_hp(hitbox.damage * GameData.lifesteal_ratio)
 		# 弹道分裂：命中后生成小弹（仅主弹分裂，防止无限递归）
 		if GameData.split_count > 0 and not get_meta("is_split", false):
 			_spawn_split_bullets()

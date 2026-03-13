@@ -14,14 +14,3 @@ extends Resource
 @export var shop_price_per_level: PackedInt32Array = []
 @export var place_cost_per_level: PackedInt32Array = []
 @export var milestones: Dictionary = {}
-
-# === 旧平面字段（暂保留，Task 5 移除）===
-@export var hp: float = 100.0
-@export var damage: float = 0.0
-@export var fire_rate: float = 0.0
-@export var attack_range: float = 0.0
-@export var shop_price_min: int = 35
-@export var shop_price_max: int = 45
-
-# 减速塔特有
-@export var slow_percent: float = 0.0

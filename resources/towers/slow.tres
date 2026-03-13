@@ -12,6 +12,3 @@ slow_ratio_per_level = PackedFloat32Array(0.3, 0.35, 0.4, 0.45, 0.5)
 attack_range_per_level = PackedFloat32Array(200, 220, 240, 260, 300)
 shop_price_per_level = PackedInt32Array(0, 20, 40, 65, 95)
 place_cost_per_level = PackedInt32Array(12, 17, 24, 33, 44)
-hp = 70.0
-attack_range = 200.0
-slow_percent = 0.3

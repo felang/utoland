@@ -12,11 +12,6 @@ extends Resource
 @export var weapon_range_per_level: PackedFloat32Array = []
 @export var milestones: Dictionary = {}
 
-# === 旧平面字段（暂保留，Task 5 移除）===
-@export var fire_rate: float = 0.1
-@export var damage: float = 10.0
-@export var weapon_range: float = 300.0
-
 # 子弹特有
 @export var bullet_count: int = 1
 @export var bullet_speed: float = 600.0

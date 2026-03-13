@@ -115,7 +115,6 @@ var maps: Dictionary = {}
 var effects: EffectConfigData = null
 var shop: ShopConfigData = null
 var spawn: SpawnConfigData = null
-var items: Dictionary = {}  # ShopItemData 注册表
 
 
 func _ready() -> void:
@@ -128,7 +127,6 @@ func _ready() -> void:
 	effects = load("res://resources/effects/default_effects.tres")
 	shop = load("res://resources/shop/default_shop.tres")
 	spawn = load("res://resources/spawn/default_spawn.tres")
-	_load_resources_from_dir("res://resources/items/", items)
 	# 动态计算地图尺寸
 	_compute_map_dimensions()
 
