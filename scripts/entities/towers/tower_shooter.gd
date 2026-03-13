@@ -9,7 +9,7 @@ extends Tower
 
 func _ready() -> void:
 	# 设置塔类型
-	tower_type = Enums.TowerId.SHOOTER
+	tower_type = Enums.TowerId.PEA_SHOOTER
 
 	super._ready()
 	shoot_timer.wait_time = attack_rate

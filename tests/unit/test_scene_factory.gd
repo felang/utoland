@@ -5,21 +5,21 @@ extends GutTest
 
 # Tower creation tests
 func test_create_tower_shooter():
-	var tower = SceneFactory.create_tower(Enums.TowerId.SHOOTER)
+	var tower = SceneFactory.create_tower(Enums.TowerId.PEA_SHOOTER)
 	assert_not_null(tower, "Shooter tower should be created")
-	assert_eq(tower.tower_type, Enums.TowerId.SHOOTER, "Tower type should be 'shooter'")
+	assert_eq(tower.tower_type, Enums.TowerId.PEA_SHOOTER, "Tower type should be 'shooter'")
 	tower.queue_free()
 
 func test_create_tower_wall():
-	var tower = SceneFactory.create_tower(Enums.TowerId.WALL)
+	var tower = SceneFactory.create_tower(Enums.TowerId.STUMP)
 	assert_not_null(tower, "Wall tower should be created")
-	assert_eq(tower.tower_type, Enums.TowerId.WALL, "Tower type should be 'wall'")
+	assert_eq(tower.tower_type, Enums.TowerId.STUMP, "Tower type should be 'wall'")
 	tower.queue_free()
 
 func test_create_tower_slow():
-	var tower = SceneFactory.create_tower(Enums.TowerId.SLOW)
+	var tower = SceneFactory.create_tower(Enums.TowerId.ICE_FLOWER)
 	assert_not_null(tower, "Slow tower should be created")
-	assert_eq(tower.tower_type, Enums.TowerId.SLOW, "Tower type should be 'slow'")
+	assert_eq(tower.tower_type, Enums.TowerId.ICE_FLOWER, "Tower type should be 'slow'")
 	tower.queue_free()
 
 func test_create_tower_invalid():
@@ -59,16 +59,16 @@ func test_create_coin():
 
 # Tower cost test — 费用现在按等级读取 place_cost_per_level
 func test_get_tower_cost():
-	var shooter_cost = SceneFactory.get_tower_cost(Enums.TowerId.SHOOTER)
-	var shooter_td: TowerData = GameConfig.towers[Enums.TowerId.SHOOTER]
+	var shooter_cost = SceneFactory.get_tower_cost(Enums.TowerId.PEA_SHOOTER)
+	var shooter_td: TowerData = GameConfig.towers[Enums.TowerId.PEA_SHOOTER]
 	assert_eq(shooter_cost, shooter_td.place_cost_per_level[0], "Shooter tower cost should match level 1 place_cost")
 
-	var wall_cost = SceneFactory.get_tower_cost(Enums.TowerId.WALL)
-	var wall_td: TowerData = GameConfig.towers[Enums.TowerId.WALL]
+	var wall_cost = SceneFactory.get_tower_cost(Enums.TowerId.STUMP)
+	var wall_td: TowerData = GameConfig.towers[Enums.TowerId.STUMP]
 	assert_eq(wall_cost, wall_td.place_cost_per_level[0], "Wall tower cost should match level 1 place_cost")
 
-	var slow_cost = SceneFactory.get_tower_cost(Enums.TowerId.SLOW)
-	var slow_td: TowerData = GameConfig.towers[Enums.TowerId.SLOW]
+	var slow_cost = SceneFactory.get_tower_cost(Enums.TowerId.ICE_FLOWER)
+	var slow_td: TowerData = GameConfig.towers[Enums.TowerId.ICE_FLOWER]
 	assert_eq(slow_cost, slow_td.place_cost_per_level[0], "Slow tower cost should match level 1 place_cost")
 
 	# Test invalid tower type

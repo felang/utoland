@@ -4,7 +4,7 @@
 
 [resource]
 script = ExtResource("1")
-id = "wall"
+id = "stump"
 display_name = "墙塔"
 max_level = 5
 hp_per_level = PackedFloat32Array(300, 400, 520, 660, 820)

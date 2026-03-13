@@ -11,7 +11,7 @@ func before_each():
 	_original_owned_towers = GameData.owned_towers.duplicate()
 
 	GameData.tower_inventory.clear()
-	GameData.owned_towers = {"shooter": 1, "wall": 1, "slow": 1}
+	GameData.owned_towers = {"pea_shooter": 1, "stump": 1, "ice_flower": 1}
 	GameData.coins = 100
 
 	var placement_scene = load("res://scenes/levels/placement.tscn")
@@ -44,7 +44,7 @@ func test_can_place_at_allows_position_on_map_boundary():
 	assert_true(placement.can_place_at(boundary_position))
 
 func test_find_tower_at_returns_closest_tower():
-	var tower = SceneFactory.create_tower(Enums.TowerId.SHOOTER)
+	var tower = SceneFactory.create_tower(Enums.TowerId.PEA_SHOOTER)
 	tower.global_position = Vector2(105, 105)
 	tower.add_to_group(Enums.Group.TOWERS)
 	placement.add_child(tower)
@@ -53,7 +53,7 @@ func test_find_tower_at_returns_closest_tower():
 	assert_eq(found, tower, "应找到最近的塔")
 
 func test_find_tower_at_returns_null_when_too_far():
-	var tower = SceneFactory.create_tower(Enums.TowerId.SHOOTER)
+	var tower = SceneFactory.create_tower(Enums.TowerId.PEA_SHOOTER)
 	tower.global_position = Vector2(105, 105)
 	tower.add_to_group(Enums.Group.TOWERS)
 	placement.add_child(tower)
@@ -62,7 +62,7 @@ func test_find_tower_at_returns_null_when_too_far():
 	assert_null(found, "距离太远应返回 null")
 
 func test_select_placed_tower_shows_range_for_shooter():
-	var tower = SceneFactory.create_tower(Enums.TowerId.SHOOTER)
+	var tower = SceneFactory.create_tower(Enums.TowerId.PEA_SHOOTER)
 	tower.global_position = Vector2(150, 150)
 	tower.add_to_group(Enums.Group.TOWERS)
 	placement.add_child(tower)
@@ -74,7 +74,7 @@ func test_select_placed_tower_shows_range_for_shooter():
 	assert_gt(placement._range_indicator.radius, 0.0, "范围圈半径应大于 0")
 
 func test_deselect_tower_hides_range():
-	var tower = SceneFactory.create_tower(Enums.TowerId.SHOOTER)
+	var tower = SceneFactory.create_tower(Enums.TowerId.PEA_SHOOTER)
 	tower.global_position = Vector2(150, 150)
 	tower.add_to_group(Enums.Group.TOWERS)
 	placement.add_child(tower)
@@ -88,12 +88,12 @@ func test_deselect_tower_hides_range():
 func test_remove_tower_refunds_coins():
 	GameData.coins = 60
 
-	var tower = SceneFactory.create_tower(Enums.TowerId.SHOOTER)
+	var tower = SceneFactory.create_tower(Enums.TowerId.PEA_SHOOTER)
 	tower.global_position = Vector2(105, 105)
 	tower.add_to_group(Enums.Group.TOWERS)
 	placement.add_child(tower)
 
-	var cost: int = SceneFactory.get_tower_cost(Enums.TowerId.SHOOTER)
+	var cost: int = SceneFactory.get_tower_cost(Enums.TowerId.PEA_SHOOTER)
 	placement._placement_panel._remove_tower_at(Vector2(110, 110))
 
 	assert_eq(GameData.coins, 60 + cost, "移除塔应退还金币")

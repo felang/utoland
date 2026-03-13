@@ -15,7 +15,7 @@ func after_each():
 
 func test_generates_mixed_options():
 	GameData.owned_weapons = {"rifle": 1}
-	GameData.owned_towers = {"shooter": 1}
+	GameData.owned_towers = {"pea_shooter": 1}
 	var options: Array[Dictionary] = _generator.generate_options()
 	assert_gt(options.size(), 0, "应生成至少 1 个选项")
 	assert_lte(options.size(), 3, "最多 3 个选项")
@@ -28,7 +28,7 @@ func test_generates_mixed_options():
 
 func test_new_item_has_level_1():
 	GameData.owned_weapons = {"rifle": 5, "boomerang": 5, "laser": 5}
-	GameData.owned_towers = {"shooter": 5, "wall": 5}
+	GameData.owned_towers = {"pea_shooter": 5, "stump": 5}
 	var options: Array[Dictionary] = _generator.generate_options()
 	for opt in options:
 		if opt["is_new"]:
@@ -37,25 +37,25 @@ func test_new_item_has_level_1():
 
 func test_upgrade_has_next_level():
 	GameData.owned_weapons = {"rifle": 2}
-	GameData.owned_towers = {"shooter": 3}
+	GameData.owned_towers = {"pea_shooter": 3}
 	var options: Array[Dictionary] = _generator.generate_options()
 	for opt in options:
 		if opt["id"] == "rifle":
 			assert_eq(opt["target_level"], 3)
 			assert_eq(opt["current_level"], 2)
-		if opt["id"] == "shooter":
+		if opt["id"] == "pea_shooter":
 			assert_eq(opt["target_level"], 4)
 			assert_eq(opt["current_level"], 3)
 
 func test_max_level_excluded():
 	GameData.owned_weapons = {"rifle": 5, "boomerang": 5, "laser": 5}
-	GameData.owned_towers = {"shooter": 5, "wall": 5, "slow": 5}
+	GameData.owned_towers = {"pea_shooter": 5, "stump": 5, "ice_flower": 5}
 	var options: Array[Dictionary] = _generator.generate_options()
 	assert_eq(options.size(), 0, "全部满级应返回空")
 
 func test_no_duplicate_options():
 	GameData.owned_weapons = {"rifle": 1}
-	GameData.owned_towers = {"shooter": 1}
+	GameData.owned_towers = {"pea_shooter": 1}
 	var options: Array[Dictionary] = _generator.generate_options()
 	var keys: Array[String] = []
 	for opt in options:
@@ -65,7 +65,7 @@ func test_no_duplicate_options():
 
 func test_exclude_filters_options():
 	GameData.owned_weapons = {"rifle": 1}
-	GameData.owned_towers = {"shooter": 1}
+	GameData.owned_towers = {"pea_shooter": 1}
 	var first: Array[Dictionary] = _generator.generate_options()
 	if first.size() > 0:
 		var second: Array[Dictionary] = _generator.generate_options(first)

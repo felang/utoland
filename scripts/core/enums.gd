@@ -43,9 +43,9 @@ class Enemy:
 
 # 塔类型
 class TowerId:
-	const SHOOTER = "shooter"
-	const WALL = "wall"
-	const SLOW = "slow"
+	const PEA_SHOOTER = "pea_shooter"
+	const STUMP = "stump"
+	const ICE_FLOWER = "ice_flower"
 
 # 投射物类型
 class ProjectileId:

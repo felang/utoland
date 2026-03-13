@@ -12,7 +12,7 @@ func before_each():
 
 func test_tower_shoots_at_enemy():
 	# Test that tower can shoot bullets
-	var tower = SceneFactory.create_tower(Enums.TowerId.SHOOTER)
+	var tower = SceneFactory.create_tower(Enums.TowerId.PEA_SHOOTER)
 	test_scene.add_child(tower)
 	tower.global_position = Vector2(200, 200)
 
@@ -130,12 +130,12 @@ func test_multiple_enemies_take_damage():
 
 func test_tower_damage_from_config():
 	# Test that tower damage is loaded from GameConfig
-	var tower = SceneFactory.create_tower(Enums.TowerId.SHOOTER)
+	var tower = SceneFactory.create_tower(Enums.TowerId.PEA_SHOOTER)
 	test_scene.add_child(tower)
 
 	await wait_frames(2)
 
-	var td: TowerData = GameConfig.towers[Enums.TowerId.SHOOTER]
+	var td: TowerData = GameConfig.towers[Enums.TowerId.PEA_SHOOTER]
 	var expected_damage = td.damage_per_level[0] * GameData.player_stats[Enums.Stat.TOWER_MULT]
 	assert_eq(tower.attack_damage, expected_damage, "Tower damage should match config")
 
@@ -162,7 +162,7 @@ func test_enemy_drops_correct_coin_count():
 
 func test_tower_takes_damage_from_enemy():
 	# Test that tower can take damage
-	var tower = SceneFactory.create_tower(Enums.TowerId.WALL)
+	var tower = SceneFactory.create_tower(Enums.TowerId.STUMP)
 	test_scene.add_child(tower)
 
 	var initial_hp = tower.health.current_hp
@@ -174,7 +174,7 @@ func test_tower_takes_damage_from_enemy():
 
 func test_tower_destroyed_at_zero_hp():
 	# Test that tower is destroyed when HP reaches zero
-	var tower = SceneFactory.create_tower(Enums.TowerId.WALL)
+	var tower = SceneFactory.create_tower(Enums.TowerId.STUMP)
 	test_scene.add_child(tower)
 
 	var initial_hp = tower.health.current_hp
@@ -190,7 +190,7 @@ func test_tower_destroyed_at_zero_hp():
 
 func test_combat_full_cycle():
 	# Test a complete combat cycle: tower shoots, enemy takes damage, dies, drops coins
-	var tower = SceneFactory.create_tower(Enums.TowerId.SHOOTER)
+	var tower = SceneFactory.create_tower(Enums.TowerId.PEA_SHOOTER)
 	test_scene.add_child(tower)
 	tower.global_position = Vector2(200, 200)
 

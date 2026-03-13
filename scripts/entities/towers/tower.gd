@@ -3,7 +3,7 @@ class_name Tower
 
 # 由 SceneFactory 注入的 Resource 数据
 var data: TowerData = null
-var tower_type: String = Enums.TowerId.WALL
+var tower_type: String = Enums.TowerId.STUMP
 
 @onready var health: HealthComponent = $HealthComponent
 

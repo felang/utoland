@@ -7,7 +7,7 @@ extends Tower
 
 func _ready() -> void:
 	# 设置塔类型
-	tower_type = Enums.TowerId.SLOW
+	tower_type = Enums.TowerId.ICE_FLOWER
 
 	super._ready()
 

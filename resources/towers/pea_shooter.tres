@@ -4,7 +4,7 @@
 
 [resource]
 script = ExtResource("1")
-id = "shooter"
+id = "pea_shooter"
 display_name = "射手塔"
 max_level = 5
 hp_per_level = PackedFloat32Array(80, 110, 150, 200, 260)

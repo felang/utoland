@@ -95,9 +95,9 @@ const SPRITES = {
 	},
 	"towers": {
 		"tileset": "res://assets/sprites/towers/tileset_towers.png",
-		"shooter": {"region": Rect2(32, 0, 16, 16)},
-		"wall": {"region": Rect2(64, 32, 16, 16)},
-		"slow": {"region": Rect2(320, 0, 16, 16)}
+		"pea_shooter": {"region": Rect2(32, 0, 16, 16)},
+		"stump": {"region": Rect2(64, 32, 16, 16)},
+		"ice_flower": {"region": Rect2(320, 0, 16, 16)}
 	},
 	"projectiles": {
 		"bullet": "res://assets/sprites/projectiles/kunai.png",

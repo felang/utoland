@@ -4,7 +4,7 @@
 
 [resource]
 script = ExtResource("1")
-id = "slow"
+id = "ice_flower"
 display_name = "减速塔"
 max_level = 5
 hp_per_level = PackedFloat32Array(70, 95, 125, 160, 200)
