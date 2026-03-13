@@ -91,7 +91,6 @@ func init_character(character_id: String) -> void:
 	character_attack_speed_mult = char_data.attack_speed_mult
 	character_move_speed_mult = char_data.move_speed_mult
 	character_hp_regen = char_data.hp_regen
-	print("角色初始化: ", char_data.display_name, " (", character_id, ")")
 
 func reset() -> void:
 	init_character(current_character)

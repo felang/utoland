@@ -104,7 +104,6 @@ func _apply_damage(raw_damage: float) -> void:
 	EventBus.camera_shake_requested.emit(fx.camera_shake_player_hit_intensity, fx.camera_shake_player_hit_duration)
 
 func _on_died() -> void:
-	print("Player died!")
 	GameData.reset_kill_streak()
 	EventBus.player_died.emit()
 	await get_tree().create_timer(DEATH_TRANSITION_DELAY).timeout

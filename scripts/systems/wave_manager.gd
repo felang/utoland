@@ -37,7 +37,6 @@ func start_next_wave() -> void:
 
 	if current_wave > total_waves:
 		EventBus.game_won.emit()
-		print("Victory! You completed all waves!")
 		await get_tree().create_timer(VICTORY_DELAY).timeout
 		SceneManager.go_to(Enums.Scene.RESULT)
 		return
@@ -51,7 +50,6 @@ func complete_wave() -> void:
 	is_wave_active = false
 	EventBus.wave_completed.emit(current_wave)
 	AudioManager.play("wave_complete")
-	print("Wave ", current_wave, " completed!")
 	if not is_inside_tree():
 		return
 	attract_all_coins()
@@ -84,7 +82,6 @@ func _start_wave_with_data(wave_num: int, wave_data: WaveData) -> void:
 	var fx: EffectConfigData = GameConfig.effects
 	if fx:
 		EventBus.camera_shake_requested.emit(fx.camera_shake_wave_start_intensity, fx.camera_shake_wave_start_duration)
-	print("Wave ", wave_num, " started!")
 
 func _on_enemy_killed(_enemy_type: String, _position: Vector2, _is_elite: bool) -> void:
 	if not is_wave_active:
