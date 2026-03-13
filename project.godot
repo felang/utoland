@@ -31,12 +31,16 @@ AudioManager="*res://scripts/systems/audio_manager.gd"
 window/size/viewport_width=640
 window/size/viewport_height=360
 window/size/mode=2
-window/stretch/mode="canvas_items"
-window/stretch/aspect="expand"
+window/stretch/mode="viewport"
+window/stretch/aspect="keep"
 
 [editor_plugins]
 
 enabled=PackedStringArray("res://addons/AsepriteWizard/plugin.cfg", "res://addons/gdai-mcp-plugin-godot/plugin.cfg", "res://addons/gut/plugin.cfg")
+
+[gui]
+
+theme/custom="res://assets/themes/default_theme.tres"
 
 [input]
 
@@ -102,6 +106,7 @@ debug_zoom_in={
 
 [rendering]
 
+2d/snap/snap_2d_transforms_to_pixel=true
 textures/canvas_textures/default_texture_filter=0
 rendering_device/driver.windows="d3d12"
 renderer/rendering_method="gl_compatibility"
