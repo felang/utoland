@@ -144,6 +144,7 @@ func remove_slow(source_id: String = "") -> void:
 func _on_hurtbox_hit(damage: float, knockback_dir: Vector2) -> void:
 	AudioManager.play("hit", -6.0)
 	health.take_damage(damage)
+	EffectsManager.sprite_shake(self, 2.0)
 	if knockback_dir.length() > 0:
 		_knockback.apply_knockback(knockback_dir.normalized())
 

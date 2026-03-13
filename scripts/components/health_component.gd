@@ -34,7 +34,7 @@ func take_damage(amount: float, attacker: Node2D = null) -> void:
 	# 闪白
 	var owner_node: Node2D = get_parent() as Node2D
 	if owner_node:
-		EffectsManager.flash_white(owner_node)
+		EffectsManager.flash_hit(owner_node)
 	# 伤害数字
 	var pos: Vector2 = _get_global_position() + damage_number_offset
 	EffectsManager.spawn_damage_number(pos, amount)

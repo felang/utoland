@@ -4,6 +4,7 @@ extends Node
 # 作为 Autoload 单例全局可用
 
 const FLASH_WHITE_COLOR := Color(2, 2, 2, 1)         # 闪白叠加颜色
+const FLASH_HIT_COLOR := Color(1, 0.3, 0.3, 1)      # 受击红色叠加颜色
 const HIT_SPARK_SIZE := Vector2(2, 2)                  # 击中火花粒子尺寸
 const DEATH_PARTICLE_SIZE := Vector2(3, 3)             # 死亡粒子尺寸
 const GRAVITY_FACTOR: float = 0.5                      # 重力位移公式的 1/2 系数
@@ -14,6 +15,30 @@ func flash_white(node: Node2D) -> Tween:
 	var tween: Tween = create_tween()
 	tween.tween_property(node, "modulate", original_modulate, GameConfig.effects.hit_flash_duration)
 	return tween
+
+func flash_hit(node: Node2D) -> Tween:
+	var original_modulate: Color = node.modulate
+	node.modulate = FLASH_HIT_COLOR
+	var tween: Tween = create_tween()
+	tween.tween_property(node, "modulate", original_modulate, GameConfig.effects.hit_flash_duration)
+	return tween
+
+func sprite_shake(node: Node2D, amount: float = 2.0) -> void:
+	if not is_instance_valid(node):
+		return
+	var sprite: Node2D = null
+	for child in node.get_children():
+		if child is Sprite2D or child is AnimatedSprite2D:
+			sprite = child
+			break
+	if not sprite:
+		return
+	var prop: String = "offset"
+	var base: Vector2 = sprite.get(prop)
+	var tween: Tween = node.create_tween()
+	tween.tween_property(sprite, prop, base + Vector2(amount, 0), 0.02)
+	tween.tween_property(sprite, prop, base + Vector2(-amount, 0), 0.02)
+	tween.tween_property(sprite, prop, base, 0.02)
 
 func spawn_damage_number(pos: Vector2, damage: float) -> void:
 	var fx: EffectConfigData = GameConfig.effects
