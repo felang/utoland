@@ -4,7 +4,8 @@ extends Node
 var _tower_scenes: Dictionary = {
 	Enums.TowerId.PEA_SHOOTER: preload("res://scenes/entities/towers/tower_pea_shooter.tscn"),
 	Enums.TowerId.STUMP: preload("res://scenes/entities/towers/tower_stump.tscn"),
-	Enums.TowerId.ICE_FLOWER: preload("res://scenes/entities/towers/tower_ice_flower.tscn")
+	Enums.TowerId.ICE_FLOWER: preload("res://scenes/entities/towers/tower_ice_flower.tscn"),
+	Enums.TowerId.CACTUS: preload("res://scenes/entities/towers/tower_cactus.tscn"),
 }
 
 var _enemy_scenes: Dictionary = {
