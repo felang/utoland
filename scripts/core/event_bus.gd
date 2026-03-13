@@ -20,6 +20,10 @@ signal player_died()
 signal coins_changed(amount: int, total: int)
 signal coin_collected(value: int, position: Vector2)
 
+# 等级系统
+signal player_leveled_up(level: int)
+signal xp_changed(current_xp: int, xp_to_next: int)
+
 # 视觉反馈
 signal camera_shake_requested(intensity: float, duration: float)
 
