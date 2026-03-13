@@ -10,4 +10,4 @@ projectile_type = "laser"
 max_level = 5
 damage_per_level = PackedFloat32Array(8, 12, 17, 23, 30)
 fire_rate_per_level = PackedFloat32Array(0.15, 0.13, 0.11, 0.09, 0.07)
-weapon_range_per_level = PackedFloat32Array(400, 430, 460, 500, 550)
+weapon_range_per_level = PackedFloat32Array(200, 215, 230, 250, 275)

@@ -9,6 +9,6 @@ display_name = "减速塔"
 max_level = 5
 hp_per_level = PackedFloat32Array(70, 95, 125, 160, 200)
 slow_ratio_per_level = PackedFloat32Array(0.3, 0.35, 0.4, 0.45, 0.5)
-attack_range_per_level = PackedFloat32Array(200, 220, 240, 260, 300)
+attack_range_per_level = PackedFloat32Array(100, 110, 120, 130, 150)
 shop_price_per_level = PackedInt32Array(0, 20, 40, 65, 95)
 place_cost_per_level = PackedInt32Array(12, 17, 24, 33, 44)

@@ -6,3 +6,4 @@
 script = ExtResource("1")
 id = "normal"
 display_name = "普通敌人"
+speed = 50.0
