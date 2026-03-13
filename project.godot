@@ -17,8 +17,8 @@ config/icon="res://icon.svg"
 
 [autoload]
 
-GameData="*res://scripts/core/game_data.gd"
 GameConfig="*res://scripts/core/game_config.gd"
+GameData="*res://scripts/core/game_data.gd"
 SceneFactory="*res://scripts/core/scene_factory.gd"
 EffectsManager="*res://scripts/systems/effects_manager.gd"
 EventBus="*res://scripts/core/event_bus.gd"
