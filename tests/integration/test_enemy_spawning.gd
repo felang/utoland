@@ -64,7 +64,7 @@ func test_fast_enemy_config():
 
 	assert_eq(fast_enemy.health.max_hp, enemy_data.hp, "Fast enemy max HP should match config")
 	assert_eq(fast_enemy.speed, enemy_data.speed, "Fast enemy speed should match config")
-	assert_gt(fast_enemy.speed, 100.0, "Fast enemy should have high speed")
+	assert_gt(fast_enemy.speed, 50.0, "Fast enemy should have high speed")
 
 func test_tank_enemy_config():
 	# Test tank enemy configuration

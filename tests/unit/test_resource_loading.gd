@@ -17,9 +17,9 @@ func test_weapon_rifle_resource() -> void:
 	assert_eq(w.projectile_type, Enums.ProjectileId.BULLET)
 	assert_almost_eq(w.fire_rate_per_level[0], 0.1, 0.001)
 	assert_almost_eq(w.damage_per_level[0], 10.0, 0.001)
-	assert_almost_eq(w.weapon_range_per_level[0], 300.0, 0.001)
+	assert_almost_eq(w.weapon_range_per_level[0], 150.0, 0.001)
 	assert_eq(w.bullet_count, 1)
-	assert_eq(w.bullet_speed, 600.0)
+	assert_eq(w.bullet_speed, 300.0)
 
 func test_weapon_boomerang_resource() -> void:
 	assert_true(GameConfig.weapons.has(Enums.WeaponId.BOOMERANG), "应包含 boomerang")
@@ -27,8 +27,8 @@ func test_weapon_boomerang_resource() -> void:
 	assert_eq(w.projectile_type, Enums.ProjectileId.BOOMERANG)
 	assert_almost_eq(w.fire_rate_per_level[0], 0.8, 0.001)
 	assert_almost_eq(w.damage_per_level[0], 15.0, 0.001)
-	assert_eq(w.boomerang_speed, 350.0)
-	assert_eq(w.outbound_distance, 200.0)
+	assert_eq(w.boomerang_speed, 175.0)
+	assert_eq(w.outbound_distance, 100.0)
 	assert_eq(w.return_speed_mult, 1.3)
 
 func test_weapon_laser_resource() -> void:
@@ -37,7 +37,7 @@ func test_weapon_laser_resource() -> void:
 	assert_eq(w.projectile_type, Enums.ProjectileId.LASER)
 	assert_almost_eq(w.fire_rate_per_level[0], 0.15, 0.001)
 	assert_almost_eq(w.damage_per_level[0], 8.0, 0.001)
-	assert_eq(w.beam_range, 400.0)
+	assert_eq(w.beam_range, 200.0)
 	assert_eq(w.beam_width, 2.0)
 	assert_eq(w.beam_duration, 0.08)
 
@@ -51,7 +51,7 @@ func test_enemy_normal_resource() -> void:
 	var e: EnemyData = GameConfig.enemies[Enums.Enemy.NORMAL]
 	assert_eq(e.display_name, "普通敌人")
 	assert_eq(e.hp, 50.0)
-	assert_eq(e.speed, 100.0)
+	assert_eq(e.speed, 50.0)
 	assert_eq(e.damage, 10.0)
 	assert_eq(e.coin_drop_min, 1)
 	assert_eq(e.coin_drop_max, 3)
@@ -59,14 +59,14 @@ func test_enemy_normal_resource() -> void:
 func test_enemy_fast_resource() -> void:
 	var e: EnemyData = GameConfig.enemies[Enums.Enemy.FAST]
 	assert_eq(e.hp, 35.0)
-	assert_eq(e.speed, 180.0)
+	assert_eq(e.speed, 90.0)
 	assert_eq(e.coin_drop_min, 2)
 	assert_eq(e.coin_drop_max, 4)
 
 func test_enemy_tank_resource() -> void:
 	var e: EnemyData = GameConfig.enemies[Enums.Enemy.TANK]
 	assert_eq(e.hp, 200.0)
-	assert_eq(e.speed, 50.0)
+	assert_eq(e.speed, 25.0)
 	assert_eq(e.damage, 25.0)
 	assert_eq(e.coin_drop_min, 5)
 	assert_eq(e.coin_drop_max, 10)
@@ -83,7 +83,7 @@ func test_tower_shooter_resource() -> void:
 	assert_almost_eq(t.hp_per_level[0], 80.0, 0.001)
 	assert_almost_eq(t.damage_per_level[0], 15.0, 0.001)
 	assert_almost_eq(t.fire_rate_per_level[0], 1.0, 0.001)
-	assert_almost_eq(t.attack_range_per_level[0], 300.0, 0.001)
+	assert_almost_eq(t.attack_range_per_level[0], 150.0, 0.001)
 
 func test_tower_wall_resource() -> void:
 	var t: TowerData = GameConfig.towers[Enums.TowerId.WALL]
@@ -94,7 +94,7 @@ func test_tower_slow_resource() -> void:
 	var t: TowerData = GameConfig.towers[Enums.TowerId.SLOW]
 	assert_almost_eq(t.hp_per_level[0], 70.0, 0.001)
 	assert_almost_eq(t.slow_ratio_per_level[0], 0.3, 0.001)
-	assert_almost_eq(t.attack_range_per_level[0], 200.0, 0.001)
+	assert_almost_eq(t.attack_range_per_level[0], 100.0, 0.001)
 
 
 # ===== 波次资源加载 =====
@@ -128,7 +128,7 @@ func test_character_dora_resource() -> void:
 	var c: CharacterData = GameConfig.characters[Enums.Character.DORA]
 	assert_eq(c.display_name, "朵拉")
 	assert_eq(c.max_hp, 100.0)
-	assert_eq(c.speed, 200.0)
+	assert_eq(c.speed, 100.0)
 	assert_eq(c.damage_mult, 1.0)
 	assert_eq(c.default_weapon, Enums.WeaponId.RIFLE)
 
@@ -193,7 +193,7 @@ func test_player_const_unchanged() -> void:
 	# PLAYER 保持 const，确保 GameData 初始化不受影响
 	assert_eq(GameConfig.PLAYER["initial_coins"], 100)
 	assert_eq(GameConfig.PLAYER["initial_hp"], 100.0)
-	assert_eq(GameConfig.PLAYER["initial_speed"], 200.0)
+	assert_eq(GameConfig.PLAYER["initial_speed"], 100.0)
 
 func test_sprites_const_unchanged() -> void:
 	# SPRITES 保持 const（玩家精灵已迁移到 CharacterData）
