@@ -26,8 +26,8 @@ func _on_tower_upgraded(upgraded_type: String) -> void:
 	if upgraded_type == data.id:
 		_apply_level_stats()
 
-func take_damage(amount: float) -> void:
-	health.take_damage(amount)
+func take_damage(amount: float, attacker: Node2D = null) -> void:
+	health.take_damage(amount, attacker)
 
 func _on_died() -> void:
 	EventBus.tower_upgraded.disconnect(_on_tower_upgraded)

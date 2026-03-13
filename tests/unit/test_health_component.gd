@@ -68,3 +68,47 @@ func test_default_ready_initializes_hp():
 	add_child_autofree(node2)
 	# _ready 会把 current_hp 设为 max_hp（如果 current_hp 为 0）
 	assert_eq(health2.current_hp, 75.0, "_ready 应自动初始化 current_hp")
+
+func test_damage_reduction_reduces_damage():
+	var hc := HealthComponent.new()
+	add_child(hc)
+	hc.initialize(100.0)
+	hc.damage_reduction = 0.25
+	hc.take_damage(40.0)
+	# 40 * (1 - 0.25) = 30 actual damage → 70 HP remaining
+	assert_almost_eq(hc.current_hp, 70.0, 0.01, "减伤 25% 后应为 70 HP")
+	hc.queue_free()
+
+func test_damage_reduction_clamp():
+	var hc := HealthComponent.new()
+	add_child(hc)
+	hc.initialize(100.0)
+	hc.damage_reduction = 0.9  # over limit
+	hc.take_damage(100.0)
+	# clamped to 0.75: 100 * (1 - 0.75) = 25 → 75 HP
+	assert_almost_eq(hc.current_hp, 75.0, 0.01, "减伤上限应为 75%")
+	hc.queue_free()
+
+func test_damaged_signal_includes_attacker():
+	var hc := HealthComponent.new()
+	add_child(hc)
+	hc.initialize(100.0)
+	watch_signals(hc)
+	var mock_attacker := Node2D.new()
+	add_child(mock_attacker)
+	hc.take_damage(10.0, mock_attacker)
+	var signal_params = get_signal_parameters(hc, "damaged")
+	assert_eq(signal_params[2], mock_attacker, "应收到 attacker 引用")
+	mock_attacker.queue_free()
+	hc.queue_free()
+
+func test_damaged_signal_null_attacker():
+	var hc := HealthComponent.new()
+	add_child(hc)
+	hc.initialize(100.0)
+	watch_signals(hc)
+	hc.take_damage(10.0)
+	assert_signal_emitted(hc, "damaged", "应触发 damaged 信号")
+	var signal_params = get_signal_parameters(hc, "damaged")
+	assert_null(signal_params[2], "attacker 应为 null 时传 null")
+	hc.queue_free()

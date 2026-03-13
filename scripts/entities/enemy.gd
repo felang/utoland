@@ -81,7 +81,7 @@ func _attack_tower(_delta: float) -> void:
 		return
 
 	if attack_timer <= 0:
-		target_tower.take_damage(tower_attack_damage)
+		target_tower.take_damage(tower_attack_damage, self)
 		attack_timer = tower_attack_rate
 
 func take_damage(amount: float) -> void:
