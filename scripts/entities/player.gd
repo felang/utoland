@@ -113,6 +113,7 @@ func _on_died() -> void:
 func add_coins(amount: int) -> void:
 	coins += amount
 	GameData.coins = coins  # 同步到 GameData
+	GameData.add_xp(amount)
 
 ## 吸血回复：供投射物命中敌人后调用
 func heal_hp(amount: float) -> void:
