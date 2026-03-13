@@ -3,7 +3,7 @@ extends GutTest
 # 验证 GameConfig.weapons 包含正确的武器配置
 
 func test_weapons_count():
-	assert_eq(GameConfig.weapons.size(), 4, "应有 4 把武器")
+	assert_eq(GameConfig.weapons.size(), 5, "应有 5 把武器")
 
 func test_rifle_has_projectile_type():
 	assert_eq(GameConfig.weapons[Enums.WeaponId.RIFLE].projectile_type, Enums.ProjectileId.BULLET, "步枪弹道类型应为 bullet")
@@ -42,3 +42,9 @@ func test_shotgun_resource_loaded():
 	assert_eq(w.weapon_type, "shotgun")
 	assert_eq(w.projectile_type, Enums.ProjectileId.BULLET)
 	assert_gt(w.bullet_count, 1, "霰弹枪应发射多颗子弹")
+
+func test_minigun_resource_loaded():
+	assert_true(GameConfig.weapons.has(Enums.WeaponId.MINIGUN))
+	var w: WeaponData = GameConfig.weapons[Enums.WeaponId.MINIGUN]
+	assert_eq(w.weapon_type, "minigun")
+	assert_lt(w.fire_rate_per_level[0], 0.1, "加特林射速应极快")
