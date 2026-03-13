@@ -77,7 +77,7 @@ func test_enemy_tank_resource() -> void:
 func test_towers_loaded_count() -> void:
 	assert_eq(GameConfig.towers.size(), 3, "应加载 3 种塔")
 
-func test_tower_shooter_resource() -> void:
+func test_tower_pea_shooter_resource() -> void:
 	var t: TowerData = GameConfig.towers[Enums.TowerId.PEA_SHOOTER]
 	assert_eq(t.display_name, "射手塔")
 	assert_almost_eq(t.hp_per_level[0], 80.0, 0.001)
@@ -85,12 +85,12 @@ func test_tower_shooter_resource() -> void:
 	assert_almost_eq(t.fire_rate_per_level[0], 1.0, 0.001)
 	assert_almost_eq(t.attack_range_per_level[0], 150.0, 0.001)
 
-func test_tower_wall_resource() -> void:
+func test_tower_stump_resource() -> void:
 	var t: TowerData = GameConfig.towers[Enums.TowerId.STUMP]
 	assert_almost_eq(t.hp_per_level[0], 300.0, 0.001)
 	assert_almost_eq(t.damage_per_level[0], 0.0, 0.001)
 
-func test_tower_slow_resource() -> void:
+func test_tower_ice_flower_resource() -> void:
 	var t: TowerData = GameConfig.towers[Enums.TowerId.ICE_FLOWER]
 	assert_almost_eq(t.hp_per_level[0], 70.0, 0.001)
 	assert_almost_eq(t.slow_ratio_per_level[0], 0.3, 0.001)

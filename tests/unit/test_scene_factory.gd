@@ -6,20 +6,20 @@ extends GutTest
 # Tower creation tests
 func test_create_tower_shooter():
 	var tower = SceneFactory.create_tower(Enums.TowerId.PEA_SHOOTER)
-	assert_not_null(tower, "Shooter tower should be created")
-	assert_eq(tower.tower_type, Enums.TowerId.PEA_SHOOTER, "Tower type should be 'shooter'")
+	assert_not_null(tower, "Pea shooter tower should be created")
+	assert_eq(tower.tower_type, Enums.TowerId.PEA_SHOOTER, "Tower type should be 'pea_shooter'")
 	tower.queue_free()
 
 func test_create_tower_wall():
 	var tower = SceneFactory.create_tower(Enums.TowerId.STUMP)
-	assert_not_null(tower, "Wall tower should be created")
-	assert_eq(tower.tower_type, Enums.TowerId.STUMP, "Tower type should be 'wall'")
+	assert_not_null(tower, "Stump tower should be created")
+	assert_eq(tower.tower_type, Enums.TowerId.STUMP, "Tower type should be 'stump'")
 	tower.queue_free()
 
 func test_create_tower_slow():
 	var tower = SceneFactory.create_tower(Enums.TowerId.ICE_FLOWER)
-	assert_not_null(tower, "Slow tower should be created")
-	assert_eq(tower.tower_type, Enums.TowerId.ICE_FLOWER, "Tower type should be 'slow'")
+	assert_not_null(tower, "Ice flower tower should be created")
+	assert_eq(tower.tower_type, Enums.TowerId.ICE_FLOWER, "Tower type should be 'ice_flower'")
 	tower.queue_free()
 
 func test_create_tower_invalid():

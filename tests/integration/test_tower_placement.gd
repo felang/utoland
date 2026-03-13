@@ -21,7 +21,7 @@ func test_place_shooter_tower():
 	test_scene.add_child(tower)
 	tower.global_position = Vector2(100, 100)
 
-	assert_eq(tower.tower_type, Enums.TowerId.PEA_SHOOTER, "Tower type should be 'shooter'")
+	assert_eq(tower.tower_type, Enums.TowerId.PEA_SHOOTER, "Tower type should be 'pea_shooter'")
 	assert_true(tower.is_in_group(Enums.Group.TOWERS), "Tower should be in 'towers' group")
 	assert_gt(tower.health.current_hp, 0, "Tower should have positive HP")
 
