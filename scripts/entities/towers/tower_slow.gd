@@ -23,8 +23,8 @@ func _apply_level_stats() -> void:
 
 func _on_enemy_entered(body: Node2D) -> void:
 	if body.is_in_group(Enums.Group.ENEMIES) and body.has_method("apply_slow"):
-		body.apply_slow(slow_percent)
+		body.apply_slow(slow_percent, str(get_instance_id()))
 
 func _on_enemy_exited(body: Node2D) -> void:
 	if body.is_in_group(Enums.Group.ENEMIES) and body.has_method("remove_slow"):
-		body.remove_slow(slow_percent)
+		body.remove_slow(str(get_instance_id()))

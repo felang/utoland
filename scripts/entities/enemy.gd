@@ -129,17 +129,17 @@ func apply_knockback(dir: Vector2) -> void:
 func _flash_white() -> void:
 	EffectsManager.flash_white(self)
 
-func apply_slow(slow_percent: float) -> void:
-	slow_handler.apply_slow(slow_percent)
+func apply_slow(slow_percent: float, source_id: String = "") -> void:
+	slow_handler.apply_slow(slow_percent, source_id)
+
+func remove_slow(source_id: String = "") -> void:
+	slow_handler.remove_slow(source_id)
 
 func _on_hurtbox_hit(damage: float, knockback_dir: Vector2) -> void:
 	AudioManager.play("hit", -6.0)
 	health.take_damage(damage)
 	if knockback_dir.length() > 0:
 		_knockback.apply_knockback(knockback_dir.normalized())
-
-func remove_slow(slow_percent: float) -> void:
-	slow_handler.remove_slow(slow_percent)
 
 func _on_speed_changed(new_speed: float) -> void:
 	speed = new_speed
