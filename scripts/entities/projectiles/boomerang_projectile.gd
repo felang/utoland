@@ -6,7 +6,7 @@ extends Projectile
 var speed: float = 350.0
 var outbound_distance: float = 200.0
 var return_speed_mult: float = 1.3
-var max_lifetime: float = 5.0  # TODO: 待 WeaponData 扩展 boomerang_max_lifetime 字段后改为配置驱动
+var max_lifetime: float = 5.0  # 默认值，_on_setup 中从配置覆盖
 
 var _state: Enums.BoomerangState = Enums.BoomerangState.OUTBOUND
 var _traveled: float = 0.0
@@ -31,6 +31,7 @@ func _on_setup(direction: Vector2) -> void:
 	speed = w.boomerang_speed
 	outbound_distance = w.outbound_distance
 	return_speed_mult = w.return_speed_mult
+	max_lifetime = w.boomerang_max_lifetime
 	# 特效配置缓存
 	var fx: EffectConfigData = GameConfig.effects
 	_trail_max_points = fx.boomerang_trail_points

@@ -36,3 +36,10 @@ func test_boomerang_returns_toward_player():
 	var start_x: float = b.global_position.x
 	b._physics_process(0.1)
 	assert_true(b.global_position.x < start_x, "should move toward player")
+
+func test_max_lifetime_from_config():
+	var b = _make_boomerang()
+	await get_tree().process_frame
+	b.setup(10.0, 50.0, Vector2.ZERO, Vector2.RIGHT)
+	var w: WeaponData = GameConfig.weapons[Enums.WeaponId.BOOMERANG]
+	assert_eq(b.max_lifetime, w.boomerang_max_lifetime, "max_lifetime should match WeaponData config")

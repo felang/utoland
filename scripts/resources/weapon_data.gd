@@ -20,6 +20,7 @@ extends Resource
 @export var boomerang_speed: float = 350.0
 @export var outbound_distance: float = 200.0
 @export var return_speed_mult: float = 1.3
+@export var boomerang_max_lifetime: float = 5.0
 
 # 通用
 @export var knockback_force: float = 80.0
