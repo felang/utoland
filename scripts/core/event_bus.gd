@@ -25,3 +25,5 @@ signal camera_shake_requested(intensity: float, duration: float)
 # 塔防事件
 signal tower_placed(tower_type: String, position: Vector2)
 signal tower_destroyed(tower_type: String, position: Vector2)
+signal tower_upgraded(tower_type: String)
+signal tower_purchased(tower_type: String)
