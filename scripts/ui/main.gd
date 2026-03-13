@@ -1,6 +1,6 @@
 extends Node2D
 
-var _weapon_popup_scene: PackedScene = preload("res://scenes/ui/weapon_select_popup.tscn")
+var _upgrade_popup_scene: PackedScene = preload("res://scenes/ui/upgrade_popup.tscn")
 
 func _ready() -> void:
 	_load_map()
@@ -11,7 +11,7 @@ func _ready() -> void:
 	# 调试面板
 	var debug_panel = load("res://scripts/ui/debug_panel.gd").new()
 	add_child(debug_panel)
-	# 波次结束后武器选择
+	# 波次结束后升级弹窗
 	EventBus.wave_transition_ready.connect(_on_wave_transition_ready)
 
 func _load_map() -> void:
@@ -38,17 +38,21 @@ func _restore_towers() -> void:
 
 func _on_wave_transition_ready() -> void:
 	await get_tree().process_frame
-	_show_weapon_select()
+	_show_upgrade_popup()
 
-func _show_weapon_select() -> void:
-	var popup: CanvasLayer = _weapon_popup_scene.instantiate()
+func _show_upgrade_popup() -> void:
+	var count: int = GameData.pending_upgrades
+	if count <= 0:
+		SceneManager.go_to(Enums.Scene.PLACEMENT)
+		return
+	var popup: CanvasLayer = _upgrade_popup_scene.instantiate()
 	add_child(popup)
-	popup.weapon_selected.connect(_on_weapon_selected)
-	popup.skipped.connect(_on_weapon_skipped)
-	popup.show_options()
+	popup.all_upgrades_completed.connect(_on_upgrades_completed)
+	popup.skipped.connect(_on_upgrades_skipped)
+	popup.show_upgrades(count)
 
-func _on_weapon_selected(_weapon_id: String) -> void:
+func _on_upgrades_completed() -> void:
 	SceneManager.go_to(Enums.Scene.PLACEMENT)
 
-func _on_weapon_skipped() -> void:
+func _on_upgrades_skipped() -> void:
 	SceneManager.go_to(Enums.Scene.PLACEMENT)
