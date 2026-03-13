@@ -1,5 +1,5 @@
-extends Tower
 class_name TowerGenerator
+extends Tower
 
 # 向日葵 — 定时产出金币（通过 EventBus 通知主场景）
 
@@ -25,4 +25,4 @@ func _apply_level_stats() -> void:
 			_generate_timer.start()
 
 func _on_generate_timer_timeout() -> void:
-	EventBus.emit_signal("coins_generated", generate_amount, global_position)
+	EventBus.coins_generated.emit(generate_amount, global_position)

@@ -1,5 +1,5 @@
-extends Tower
 class_name TowerAura
+extends Tower
 
 # 橡树 — 超肉 + 范围内友方塔减伤光环
 
@@ -29,7 +29,8 @@ func _on_tower_entered(body: Node2D) -> void:
 
 func _on_tower_exited(body: Node2D) -> void:
 	if body is Tower and body in _buffed_towers:
-		body.health.damage_reduction = maxf(body.health.damage_reduction - aura_reduction, 0.0)
+		if is_instance_valid(body):
+			body.health.damage_reduction = maxf(body.health.damage_reduction - aura_reduction, 0.0)
 		_buffed_towers.erase(body)
 
 func _update_buffed_towers(old_val: float, new_val: float) -> void:

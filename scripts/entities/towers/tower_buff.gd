@@ -1,5 +1,5 @@
-extends Tower
 class_name TowerBuff
+extends Tower
 
 # 薄荷 — 范围内友方塔攻击/速度增益光环
 
@@ -22,6 +22,10 @@ func _apply_level_stats() -> void:
 		buff_damage_mult = data.buff_damage_mult_per_level[idx]
 	if data.buff_speed_mult_per_level.size() > idx:
 		buff_speed_mult = data.buff_speed_mult_per_level[idx]
+	# Re-apply updated buffs to already-buffed towers
+	for t in _buffed_towers:
+		if is_instance_valid(t):
+			t.apply_buff(buff_damage_mult, buff_speed_mult, str(get_instance_id()))
 
 func _on_tower_entered(body: Node2D) -> void:
 	if body is Tower and body != self:
@@ -30,7 +34,8 @@ func _on_tower_entered(body: Node2D) -> void:
 
 func _on_tower_exited(body: Node2D) -> void:
 	if body is Tower and body in _buffed_towers:
-		body.remove_buff(str(get_instance_id()))
+		if is_instance_valid(body):
+			body.remove_buff(str(get_instance_id()))
 		_buffed_towers.erase(body)
 
 func _on_died() -> void:

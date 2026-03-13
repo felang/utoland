@@ -1,5 +1,5 @@
-extends Tower
 class_name TowerHeal
+extends Tower
 
 # 治愈花 — 定时治疗范围内血量最低的友方塔
 

@@ -1,5 +1,5 @@
-extends Tower
 class_name TowerThorn
+extends Tower
 
 # 荆棘 — 敌人攻击自身时反弹伤害
 
