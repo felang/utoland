@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="WeaponData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/weapon_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "shotgun"
+display_name = "霰弹枪"
+weapon_type = "shotgun"
+projectile_type = "bullet"
+max_level = 5
+bullet_count = 4
+bullet_speed = 250.0
+knockback_force = 60.0
+damage_per_level = PackedFloat32Array(6, 9, 13, 18, 24)
+fire_rate_per_level = PackedFloat32Array(0.6, 0.55, 0.5, 0.45, 0.4)
+weapon_range_per_level = PackedFloat32Array(180, 195, 210, 230, 250)
