@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="TowerData" load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/resources/tower_data.gd" id="1"]
+[resource]
+script = ExtResource("1")
+id = "vine"
+display_name = "藤蔓"
+max_level = 5
+trap_cooldown = 8.0
+hp_per_level = PackedFloat32Array(100, 135, 175, 230, 295)
+damage_per_level = PackedFloat32Array(0, 0, 0, 0, 0)
+attack_range_per_level = PackedFloat32Array(120, 135, 150, 165, 185)
+trap_duration_per_level = PackedFloat32Array(2.5, 2.8, 3.1, 3.5, 4.0)
+shop_price_per_level = PackedInt32Array(0, 28, 48, 72, 102)
+place_cost_per_level = PackedInt32Array(18, 24, 32, 42, 54)

@@ -46,6 +46,14 @@ func test_create_tower_mushroom():
 	assert_not_null(tower.data, "应注入 TowerData")
 	tower.queue_free()
 
+func test_create_tower_vine():
+	var tower = SceneFactory.create_tower(Enums.TowerId.VINE)
+	assert_not_null(tower, "应能创建藤蔓塔")
+	assert_eq(tower.tower_type, Enums.TowerId.VINE)
+	add_child(tower)
+	assert_not_null(tower.data, "应注入 TowerData")
+	tower.queue_free()
+
 func test_create_tower_invalid():
 	var tower = SceneFactory.create_tower("invalid_type")
 	assert_null(tower, "Invalid tower type should return null")

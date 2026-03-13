@@ -8,6 +8,7 @@ var _tower_scenes: Dictionary = {
 	Enums.TowerId.CACTUS: preload("res://scenes/entities/towers/tower_cactus.tscn"),
 	Enums.TowerId.ROSE: preload("res://scenes/entities/towers/tower_rose.tscn"),
 	Enums.TowerId.MUSHROOM: preload("res://scenes/entities/towers/tower_mushroom.tscn"),
+	Enums.TowerId.VINE: preload("res://scenes/entities/towers/tower_vine.tscn"),
 }
 
 var _enemy_scenes: Dictionary = {

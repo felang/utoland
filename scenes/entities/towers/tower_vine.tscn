@@ -1,0 +1,36 @@
+[gd_scene load_steps=6 format=3 uid="uid://tower_vine"]
+
+[ext_resource type="Script" path="res://scripts/entities/towers/tower_trap.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://assets/sprites/towers/tileset_towers.png" id="2_tileset"]
+[ext_resource type="Script" path="res://scripts/components/health_component.gd" id="3_health"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_body"]
+size = Vector2(16, 16)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_trap"]
+radius = 120.0
+
+[node name="TowerVine" type="StaticBody2D"]
+collision_layer = 8
+collision_mask = 2
+script = ExtResource("1_script")
+
+[node name="Visual" type="Sprite2D" parent="."]
+texture = ExtResource("2_tileset")
+region_enabled = true
+region_rect = Rect2(0, 0, 16, 16)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_body")
+
+[node name="TrapArea" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="TrapArea"]
+shape = SubResource("CircleShape2D_trap")
+
+[node name="HealthComponent" type="Node" parent="."]
+script = ExtResource("3_health")
+
+[connection signal="body_entered" from="TrapArea" to="." method="_on_enemy_entered"]
