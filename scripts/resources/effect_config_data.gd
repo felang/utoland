@@ -93,3 +93,7 @@ extends Resource
 @export var muzzle_flash_color: Color = Color(1, 1, 0.8, 0.9)
 @export var muzzle_flash_z_index: int = 10
 @export var muzzle_flash_duration: float = 0.05
+
+## Hitstop（击杀慢动作）
+@export var hitstop_time_scale: float = 0.05
+@export var hitstop_duration: float = 0.1  # 实际时间（不受 time_scale 影响）

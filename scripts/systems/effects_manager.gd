@@ -103,3 +103,9 @@ func spawn_death_effect(pos: Vector2, entity_color: Color) -> void:
 		tween.tween_property(particle, "modulate:a", 0.0, fx.death_particle_lifetime * 0.5).set_delay(fx.death_particle_lifetime * 0.5)
 		tween.set_parallel(false)
 		tween.tween_callback(particle.queue_free)
+
+func hitstop(time_scale: float = 0.05, duration: float = 0.1) -> void:
+	Engine.time_scale = time_scale
+	# ignore_time_scale=true (4th param) 确保计时器按真实时间走
+	await get_tree().create_timer(duration, true, false, true).timeout
+	Engine.time_scale = 1.0
