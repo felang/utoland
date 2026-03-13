@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## 项目概述
 
-utoland 是一个基于 **Godot 4.6** 的 2D 塔防 + 射击混合类游戏。玩家选择角色和武器，在波次战斗中击杀敌人获取金币，通过商店购买塔和属性升级来生存。
+utoland 是一个基于 **Godot 4.6** 的 2D 塔防 + 射击混合类游戏。玩家选择角色，在波次战斗中击杀敌人获取金币。两条成长线：武器（波次结束 3 选 1 免费升级，类似吸血鬼幸存者）和塔（布置阶段金币商店 3 格 + 刷新，类似 Brotato）。武器和塔均有 1-5 级等级系统。
 
 ## 运行与测试
 
@@ -19,8 +19,8 @@ utoland 是一个基于 **Godot 4.6** 的 2D 塔防 + 射击混合类游戏。�
 
 ### Autoload 单例 (全局可用，加载顺序有依赖)
 
-- **GameConfig** (`scripts/core/game_config.gd`) — 资源注册表，运行时从 `resources/` 目录加载 `.tres` 配置文件（武器、敌人、塔、波次、角色、商店物品、地图、特效、精灵等）。必须最先加载（GameData 依赖它）。
-- **GameData** (`scripts/core/game_data.gd`) — 运行时游戏状态，存储当前角色属性、金币、波次、已购买物品效果状态（pierce_count、multishot_active、lifesteal_ratio 等）、塔属性倍率等。跨场景传递数据。
+- **GameConfig** (`scripts/core/game_config.gd`) — 资源注册表，运行时从 `resources/` 目录加载 `.tres` 配置文件（武器、敌人、塔、波次、角色、地图、特效、精灵等）。必须最先加载（GameData 依赖它）。
+- **GameData** (`scripts/core/game_data.gd`) — 运行时游戏状态，存储当前角色属性、金币、波次、owned_weapons/owned_towers（{id: level} 字典）。`reset()` 从 CharacterData 初始化默认武器/塔。`upgrade_weapon()`/`upgrade_tower()` 管理等级升级。跨场景传递数据。
 - **SceneFactory** (`scripts/core/scene_factory.gd`) — 集中管理场景实例化，提供 `create_tower()`, `create_enemy()`, `create_bullet()`, `create_coin()` 等工厂方法。创建实体必须通过此工厂。
 - **EffectsManager** (`scripts/systems/effects_manager.gd`) — 特效管理：伤害数字、击中火花、死亡爆炸、闪白等视觉效果。
 - **AudioManager** (`scripts/systems/audio_manager.gd`) — 音效管理：AudioStreamPlayer 池化播放，通过 `play(sound_id)` 统一触发。音效文件放 `assets/sfx/`。
@@ -32,24 +32,25 @@ utoland 是一个基于 **Godot 4.6** 的 2D 塔防 + 射击混合类游戏。�
 ```
 start_menu → character_selection → map_select → placement (布置，仅布置Tab)
     ↓ (开始战斗)
-  main (战斗)
-    ↓ (波次结束)
-  placement (布置Tab + 商店Tab) → main (下一波战斗)
+  main (战斗) → 波次结束 → weapon_select_popup (3选1武器升级弹窗，暂停)
+    ↓ (选择后)
+  placement (布置Tab + 塔商店Tab) → main (下一波战斗)
     ↓ (全部波次完成或玩家死亡)
   result (结算)
 ```
 
-> **布置阶段**: 每波战斗前进入 placement 场景，左侧 120px 侧栏（Tab 切换布置/商店），右侧地图网格。首波仅布置 Tab（`current_wave == 0`），后续波次商店 Tab 可见。塔在波间全回满 HP。
+> **波次结束流程**: 战斗波次结束后，先弹出武器选择弹窗（3 选 1，免费升级/获取新武器），选择后进入布置阶段。
+> **布置阶段**: 左侧 120px 侧栏（Tab 切换布置/塔商店），右侧地图网格。首波仅布置 Tab（`current_wave == 0`），后续波次塔商店 Tab 可见（3 格 + 刷新，金币购买新塔或升级塔）。塔在波间全回满 HP。
 
 ### 代码组织
 
 - `scripts/core/` — 核心系统 (GameConfig, GameData, SceneFactory, EventBus, SpriteLoader)
 - `scripts/components/` — 可复用组件 (HealthComponent, SpriteAnimator, Hitbox, Hurtbox, KnockbackHandler, SlowHandler)
-- `scripts/resources/` — 自定义 Resource 类定义 (WeaponData, EnemyData, TowerData, WaveData, CharacterData, ShopItemData 等)
+- `scripts/resources/` — 自定义 Resource 类定义 (WeaponData, EnemyData, TowerData, WaveData, CharacterData 等)
 - `scripts/entities/` — 游戏实体 (player, enemy, boss_base, boss_brute, coin, towers/, weapons/, projectiles/)
-- `scripts/systems/` — 游戏系统 (wave_manager, enemy_spawner, shop_item_generator, shop_effect_applier, effects_manager, audio_manager, item_effect_manager)
-- `scripts/ui/` — UI 脚本 (hud, start_menu, result, 各选择界面, main 场景控制, placement 布置场景控制, placement_panel 塔布置侧栏, shop_panel 商店侧栏)
-- `resources/` — `.tres` 配置数据文件 (weapons/, enemies/, towers/, waves/<map_id>/, characters/, maps/, shop/, effects/, spawn/, items/)
+- `scripts/systems/` — 游戏系统 (wave_manager, enemy_spawner, weapon_upgrade_generator, tower_shop_generator, effects_manager, audio_manager)
+- `scripts/ui/` — UI 脚本 (hud, start_menu, result, 各选择界面, main 场景控制, placement 布置场景控制, placement_panel 塔布置侧栏, shop_panel 塔商店侧栏, weapon_select_popup 武器选择弹窗)
+- `resources/` — `.tres` 配置数据文件 (weapons/, enemies/, towers/, waves/<map_id>/, characters/, maps/, shop/, effects/, spawn/)
 - `scenes/entities/` — 实体场景 (player, coin, enemies/, towers/, projectiles/)
 - `scenes/levels/` — 关卡场景 (main, placement)
 - `scenes/ui/` — UI 场景 (start_menu, hud, result, character_selection, map_select)
