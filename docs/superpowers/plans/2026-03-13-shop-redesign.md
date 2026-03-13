@@ -606,6 +606,12 @@ rm scripts/ui/shop_item_card.gd
 rm scenes/ui/shop_item_card.tscn
 ```
 
+- [ ] **Step 1b: 从 main.tscn 移除 ItemEffectManager 节点**
+
+`scenes/levels/main.tscn` 中有 `ItemEffectManager` 节点引用了被删除的 `scripts/systems/item_effect_manager.gd`。必须移除该节点及其 `ext_resource` 引用，否则战斗场景无法加载。
+
+具体操作：编辑 `scenes/levels/main.tscn`，删除 `ItemEffectManager` 相关的 `ext_resource` 行和 `[node name="ItemEffectManager" ...]` 行，更新 `load_steps` 计数。
+
 - [ ] **Step 2: 修改 enums.gd 移除道具相关枚举**
 
 从 `scripts/core/enums.gd` 中移除以下类（约第 89-128 行）：
