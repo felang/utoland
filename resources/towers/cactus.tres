@@ -4,6 +4,9 @@
 script = ExtResource("1")
 id = "cactus"
 display_name = "仙人掌"
+description = "瞄准血量最高的敌人精准狙击。沙漠猎手，一针见血。"
+icon_path = ""
+rarity = 1
 max_level = 5
 hp_per_level = PackedFloat32Array(60, 80, 105, 135, 170)
 damage_per_level = PackedFloat32Array(35, 48, 63, 82, 110)

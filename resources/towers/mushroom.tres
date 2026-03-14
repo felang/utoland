@@ -4,6 +4,9 @@
 script = ExtResource("1")
 id = "mushroom"
 display_name = "毒蘑菇"
+description = "释放毒雾持续伤害范围内敌人。闻起来不太对劲。"
+icon_path = ""
+rarity = 1
 max_level = 5
 hp_per_level = PackedFloat32Array(90, 120, 160, 210, 270)
 damage_per_level = PackedFloat32Array(5, 7, 10, 14, 19)

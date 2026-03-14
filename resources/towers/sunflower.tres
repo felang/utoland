@@ -4,6 +4,9 @@
 script = ExtResource("1")
 id = "sunflower"
 display_name = "向日葵"
+description = "定时产出金币。它追逐的不是阳光，而是闪闪发光的一切。"
+icon_path = ""
+rarity = 0
 max_level = 5
 hp_per_level = PackedFloat32Array(50, 70, 90, 110, 120)
 generate_amount_per_level = PackedInt32Array(5, 6, 8, 10, 12)

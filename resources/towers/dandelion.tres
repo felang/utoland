@@ -4,6 +4,9 @@
 script = ExtResource("1")
 id = "dandelion"
 display_name = "蒲公英"
+description = "周期性击退范围内敌人。一口气吹散所有烦恼。"
+icon_path = ""
+rarity = 0
 max_level = 5
 knockback_interval = 5.0
 hp_per_level = PackedFloat32Array(80, 108, 142, 188, 245)

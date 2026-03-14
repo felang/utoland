@@ -4,6 +4,9 @@
 script = ExtResource("1")
 id = "pitcher"
 display_name = "猪笼草"
+description = "抓取敌人缓慢消化。Boss 太大塞不进去。"
+icon_path = ""
+rarity = 2
 max_level = 5
 hp_per_level = PackedFloat32Array(120, 160, 210, 275, 355)
 damage_per_level = PackedFloat32Array(0, 0, 0, 0, 0)

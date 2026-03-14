@@ -4,6 +4,9 @@
 script = ExtResource("1")
 id = "rose"
 display_name = "玫瑰"
+description = "三连发爆射，火力凶猛。美丽的东西往往带刺。"
+icon_path = ""
+rarity = 1
 max_level = 5
 burst_count = 3
 burst_interval = 0.15

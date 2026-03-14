@@ -6,6 +6,9 @@
 script = ExtResource("1")
 id = "pea_shooter"
 display_name = "射手塔"
+description = "稳定射击最近的敌人。虽然平凡，但从不缺席。"
+icon_path = ""
+rarity = 0
 max_level = 5
 hp_per_level = PackedFloat32Array(80, 110, 150, 200, 260)
 damage_per_level = PackedFloat32Array(15, 22, 30, 40, 55)

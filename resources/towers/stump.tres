@@ -6,6 +6,9 @@
 script = ExtResource("1")
 id = "stump"
 display_name = "墙塔"
+description = "坚实的血肉屏障，不攻击但极难击倒。年轮是它唯一的武器。"
+icon_path = ""
+rarity = 0
 max_level = 5
 hp_per_level = PackedFloat32Array(300, 400, 520, 660, 820)
 damage_per_level = PackedFloat32Array(0, 0, 0, 0, 0)

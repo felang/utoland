@@ -4,6 +4,9 @@
 script = ExtResource("1")
 id = "bamboo"
 display_name = "爆竹竹"
+description = "充能后自爆造成大范围伤害。生命虽短，但要轰轰烈烈。"
+icon_path = ""
+rarity = 2
 max_level = 5
 hp_per_level = PackedFloat32Array(100, 130, 160, 190, 220)
 explosion_damage_per_level = PackedFloat32Array(150.0, 200.0, 250.0, 300.0, 350.0)

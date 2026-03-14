@@ -6,6 +6,9 @@
 script = ExtResource("1")
 id = "ice_flower"
 display_name = "减速塔"
+description = "散发寒气减速周围敌人。冬天的花朵，盛开在最不该温暖的地方。"
+icon_path = ""
+rarity = 0
 max_level = 5
 hp_per_level = PackedFloat32Array(70, 95, 125, 160, 200)
 slow_ratio_per_level = PackedFloat32Array(0.3, 0.35, 0.4, 0.45, 0.5)

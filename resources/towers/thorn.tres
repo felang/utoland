@@ -4,6 +4,9 @@
 script = ExtResource("1")
 id = "thorn"
 display_name = "荆棘"
+description = "受击时将伤害反弹给攻击者。以牙还牙，以刺还刺。"
+icon_path = ""
+rarity = 0
 max_level = 5
 hp_per_level = PackedFloat32Array(150, 200, 250, 300, 340)
 reflect_ratio_per_level = PackedFloat32Array(0.25, 0.28, 0.32, 0.38, 0.45)
