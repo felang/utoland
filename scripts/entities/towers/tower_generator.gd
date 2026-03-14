@@ -15,7 +15,7 @@ func _ready() -> void:
 
 func _apply_level_stats() -> void:
 	super._apply_level_stats()
-	var idx: int = get_current_level() - 1
+	var idx: int = current_level - 1
 	if data.generate_amount_per_level.size() > idx:
 		generate_amount = data.generate_amount_per_level[idx]
 	if data.generate_interval_per_level.size() > idx:

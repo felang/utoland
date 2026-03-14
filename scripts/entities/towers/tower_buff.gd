@@ -17,7 +17,7 @@ func _ready() -> void:
 
 func _apply_level_stats() -> void:
 	super._apply_level_stats()
-	var idx: int = get_current_level() - 1
+	var idx: int = current_level - 1
 	if data.buff_damage_mult_per_level.size() > idx:
 		buff_damage_mult = data.buff_damage_mult_per_level[idx]
 	if data.buff_speed_mult_per_level.size() > idx:

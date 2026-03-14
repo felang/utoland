@@ -19,7 +19,7 @@ func _apply_level_stats() -> void:
 	super._apply_level_stats()
 	if not data:
 		return
-	var idx: int = get_current_level() - 1
+	var idx: int = current_level - 1
 	attack_damage = data.damage_per_level[idx] * GameData.player_stats.get(Enums.Stat.TOWER_MULT, 1.0) * damage_mult
 	attack_rate = data.fire_rate_per_level[idx] / maxf(speed_mult, 0.1)
 	attack_range = data.attack_range_per_level[idx]

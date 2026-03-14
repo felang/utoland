@@ -16,7 +16,7 @@ func _ready() -> void:
 
 func _apply_level_stats() -> void:
 	super._apply_level_stats()
-	var idx: int = get_current_level() - 1
+	var idx: int = current_level - 1
 	if data.aura_reduction_per_level.size() > idx:
 		var old_reduction: float = aura_reduction
 		aura_reduction = data.aura_reduction_per_level[idx]

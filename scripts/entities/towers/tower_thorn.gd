@@ -12,7 +12,7 @@ func _ready() -> void:
 
 func _apply_level_stats() -> void:
 	super._apply_level_stats()
-	var idx: int = get_current_level() - 1
+	var idx: int = current_level - 1
 	if data.reflect_ratio_per_level.size() > idx:
 		reflect_ratio = data.reflect_ratio_per_level[idx]
 

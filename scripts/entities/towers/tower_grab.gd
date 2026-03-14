@@ -25,7 +25,7 @@ func _apply_level_stats() -> void:
 	super._apply_level_stats()
 	if not data:
 		return
-	var idx: int = get_current_level() - 1
+	var idx: int = current_level - 1
 	if data.grab_dps_per_level.size() > idx:
 		grab_dps = data.grab_dps_per_level[idx] * GameData.player_stats.get(Enums.Stat.TOWER_MULT, 1.0) * damage_mult
 	if data.digest_duration_per_level.size() > idx:

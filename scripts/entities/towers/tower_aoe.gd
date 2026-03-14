@@ -17,7 +17,7 @@ func _apply_level_stats() -> void:
 	super._apply_level_stats()
 	if not data:
 		return
-	var idx: int = get_current_level() - 1
+	var idx: int = current_level - 1
 	tick_damage = data.damage_per_level[idx] * GameData.player_stats.get(Enums.Stat.TOWER_MULT, 1.0) * damage_mult
 	if _spore_area and _spore_area.get_node_or_null("CollisionShape2D"):
 		_spore_area.get_node("CollisionShape2D").shape.radius = data.attack_range_per_level[idx]

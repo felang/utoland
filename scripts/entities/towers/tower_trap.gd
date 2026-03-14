@@ -20,7 +20,7 @@ func _apply_level_stats() -> void:
 	super._apply_level_stats()
 	if not data:
 		return
-	var idx: int = get_current_level() - 1
+	var idx: int = current_level - 1
 	if data.trap_duration_per_level.size() > idx:
 		trap_duration = data.trap_duration_per_level[idx]
 	trap_range = data.attack_range_per_level[idx]
