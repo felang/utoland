@@ -11,8 +11,10 @@ func refresh_shop(is_first: bool = false) -> void:
 	GameData.shop_slots = []
 	var guaranteed_ids: Array[String] = []
 	if is_first:
-		guaranteed_ids.append(GameData._recommended_weapon)
-		guaranteed_ids.append(GameData._recommended_tower)
+		if GameData._recommended_weapon != "" and _has_item(GameData._recommended_weapon):
+			guaranteed_ids.append(GameData._recommended_weapon)
+		if GameData._recommended_tower != "" and _has_item(GameData._recommended_tower):
+			guaranteed_ids.append(GameData._recommended_tower)
 	for i in config.slot_count:
 		if i < guaranteed_ids.size():
 			var item_id: String = guaranteed_ids[i]
@@ -93,10 +95,16 @@ func _get_pool_by_rarity(rarity: int) -> Array[String]:
 			pool.append(id)
 	return pool
 
+func _has_item(item_id: String) -> bool:
+	return GameConfig.weapons.has(item_id) or GameConfig.towers.has(item_id)
+
 func _get_item_data(item_id: String) -> Resource:
 	if GameConfig.weapons.has(item_id):
 		return GameConfig.weapons[item_id]
-	return GameConfig.towers[item_id]
+	if GameConfig.towers.has(item_id):
+		return GameConfig.towers[item_id]
+	push_error("未知物品 ID: " + item_id)
+	return null
 
 func _get_item_type(item_id: String) -> String:
 	if GameConfig.weapons.has(item_id):
