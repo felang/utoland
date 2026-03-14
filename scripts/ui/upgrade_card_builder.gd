@@ -62,16 +62,16 @@ static func create_card(opt: Dictionary, on_selected: Callable) -> PanelContaine
 	vbox.add_child(name_lbl)
 
 	# 描述文字
-	var _desc_text: String = ""
+	var desc_text: String = ""
 	if is_weapon:
 		var wd_for_desc: WeaponData = GameConfig.weapons[opt["id"]]
-		_desc_text = wd_for_desc.description
+		desc_text = wd_for_desc.description
 	else:
 		var td_for_desc: TowerData = GameConfig.towers[opt["id"]]
-		_desc_text = td_for_desc.description
-	if _desc_text != "":
+		desc_text = td_for_desc.description
+	if desc_text != "":
 		var desc_lbl := Label.new()
-		desc_lbl.text = _desc_text
+		desc_lbl.text = desc_text
 		desc_lbl.add_theme_font_size_override("font_size", 10)
 		desc_lbl.add_theme_color_override("font_color", Color(0.5, 0.5, 0.5))
 		desc_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
