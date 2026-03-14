@@ -31,9 +31,39 @@ func _apply_level_stats() -> void:
 func _on_charge_timer_timeout() -> void:
 	_explode()
 
-func _explode() -> void:
+func _explode(is_chain: bool = false) -> void:
+	var damage: float = explosion_damage
+	# 连环引爆：爆炸伤害 +50%
+	if GameData.active_pair_synergies.has("chain_detonation"):
+		damage *= 1.5
 	for body in _explosion_area.get_overlapping_bodies():
 		if body.is_in_group(Enums.Group.ENEMIES):
 			if body.has_node("HealthComponent"):
-				body.health.take_damage(explosion_damage)
+				body.health.take_damage(damage)
+	# Blast 3: 殉爆 — 15% 概率二次爆炸（二次不再触发）
+	if not is_chain:
+		_try_chain_blast(damage)
 	health.take_damage(health.max_hp)  # triggers _on_died() naturally
+
+
+## Blast 3: 殉爆检查
+func _try_chain_blast(base_damage: float) -> void:
+	if not is_inside_tree():
+		return
+	var processors: Array[Node] = get_tree().get_nodes_in_group("synergy_processor")
+	if processors.is_empty():
+		return
+	var processor: SynergyEffectProcessor = processors[0] as SynergyEffectProcessor
+	if not processor:
+		return
+	var params: Dictionary = processor.get_chain_blast_params()
+	if params.is_empty():
+		return
+	if randf() < params.chance:
+		var chain_damage: float = base_damage * params.damage_mult
+		for body in _explosion_area.get_overlapping_bodies():
+			if body.is_in_group(Enums.Group.ENEMIES):
+				if body.has_node("HealthComponent"):
+					body.health.take_damage(chain_damage)
+		EffectsManager.spawn_hit_sparks(global_position)
+		EventBus.synergy_effect_triggered.emit(Enums.Tag.BLAST, "chain_blast")

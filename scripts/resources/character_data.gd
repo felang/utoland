@@ -14,12 +14,20 @@ extends Resource
 @export var recommended_weapon: String = ""
 ## 角色推荐塔 ID（商店首次访问保证出现）
 @export var recommended_tower: String = ""
-## 被动技能类型（使用 Enums.PassiveType 常量）
+## 协同标签（使用 Enums.Tag 常量）
+@export var tag: String = ""
+## 旧被动技能类型（已弃用，保留兼容 .tres 文件）
 @export var passive_type: String = ""
 ## 被动技能数值
 @export var passive_value: float = 0.0
 ## 角色特色被动描述（展示用）
 @export var passive_description: String = ""
+## 新被动技能 ID（羁绊系统使用）
+@export var new_passive_id: String = ""
+## 新被动技能数值 1
+@export var new_passive_value: float = 0.0
+## 新被动技能数值 2
+@export var new_passive_value_2: float = 0.0
 ## 精灵 SpriteFrames 资源路径（Aseprite Wizard 导出的 .res）
 @export var sprite_frames_path: String = ""
 ## 头像 PNG 路径

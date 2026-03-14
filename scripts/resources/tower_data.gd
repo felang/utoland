@@ -7,6 +7,7 @@ extends Resource
 @export var description: String = ""
 @export var icon_path: String = ""
 @export var rarity: int = 0
+@export var tag: String = ""
 
 @export_group("等级系统")
 @export var max_level: int = 3

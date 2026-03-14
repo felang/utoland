@@ -5,6 +5,7 @@ extends Node
 
 signal damaged(amount: float, current_hp: float, attacker: Node2D)
 signal died()
+signal died_with_overkill(overkill_damage: float, death_position: Vector2)
 
 @export var max_hp: float = 100.0
 var current_hp: float = 0.0
@@ -42,7 +43,10 @@ func take_damage(amount: float, attacker: Node2D = null) -> void:
 	EffectsManager.spawn_hit_sparks(_get_global_position())
 	damaged.emit(amount, current_hp, attacker)
 	if current_hp <= 0:
+		# 计算溢杀伤害（current_hp 此时为负值）
+		var overkill: float = absf(current_hp)
 		die()
+		died_with_overkill.emit(overkill, _get_global_position())
 
 func take_damage_no_sparks(amount: float, attacker: Node2D = null) -> void:
 	# 用于 Player — 不需要击中火花，需要自定义闪白后续（无敌帧）

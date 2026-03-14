@@ -41,9 +41,12 @@ func _ready() -> void:
 	var sprite_frames: SpriteFrames = load(char_data.sprite_frames_path)
 	_sprite_animator.setup_from_sprite_frames(sprite_frames, char_data.sprite_pixel_size, GameConfig.ENTITY_SIZE_STANDARD)
 
-	# 被动技能初始化
-	if GameData.character_passive_type == Enums.PassiveType.KILL_HEAL:
-		EventBus.enemy_killed.connect(_on_enemy_killed_passive)
+	# 新被动技能初始化
+	_init_passives()
+
+	# 嗜血狂战：击杀敌人回复 5% 最大 HP
+	if GameData.active_pair_synergies.has("bloodthirst"):
+		EventBus.enemy_killed.connect(_on_bloodthirst_kill)
 
 func _process(delta: float) -> void:
 	if invincible_timer > 0:
@@ -51,6 +54,9 @@ func _process(delta: float) -> void:
 
 	# 武器系统更新
 	_weapon_manager.tick(delta)
+
+	# 被动技能更新
+	_process_passives(delta)
 
 func _physics_process(_delta: float) -> void:
 	var input_vector: Vector2 = Vector2.ZERO
@@ -122,5 +128,69 @@ func _start_invincible_blink() -> void:
 		_blink_tween.tween_property(self, "modulate:a", fx.invincible_blink_alpha_high, fx.invincible_blink_interval)
 	_blink_tween.tween_property(self, "modulate:a", 1.0, BLINK_RESET_DURATION)
 
-func _on_enemy_killed_passive(_enemy_type: String, _position: Vector2, _is_elite: bool) -> void:
-	health.heal(GameData.character_passive_value)
+# ===== 新被动系统 =====
+
+## 疾风连击（Kaze）— 连续攻击同一目标叠加伤害
+var _combo_target: Node2D = null
+var _combo_stacks: int = 0
+const _COMBO_MAX_STACKS: int = 6  # max_mult = value_2 / value = 0.3/0.05 = 6
+
+## 坚壁回馈（Dora）— 每 5 秒回复 2% 最大 HP
+var _fortify_regen_timer: float = 0.0
+const _FORTIFY_REGEN_INTERVAL: float = 5.0
+
+func _init_passives() -> void:
+	match GameData.new_passive_id:
+		"swift_combo":
+			_combo_target = null
+			_combo_stacks = 0
+		"fortify_regen":
+			_fortify_regen_timer = 0.0
+
+func _process_passives(delta: float) -> void:
+	if GameData.new_passive_id == "fortify_regen":
+		_fortify_regen_timer += delta
+		if _fortify_regen_timer >= _FORTIFY_REGEN_INTERVAL:
+			_fortify_regen_timer -= _FORTIFY_REGEN_INTERVAL
+			var heal_pct: float = GameData.new_passive_value  # 0.02
+			# 坚壁回馈：≥3 个 fortify 标签单位存活时治疗翻倍
+			var fortify_count: int = _count_fortify_units()
+			if fortify_count >= int(GameData.new_passive_value_2):
+				heal_pct *= 2.0
+			health.heal(health.max_hp * heal_pct)
+
+## 获取连击伤害倍率（供武器查询）
+func get_combo_damage_mult() -> float:
+	if GameData.new_passive_id != "swift_combo":
+		return 1.0
+	return 1.0 + (_combo_stacks * GameData.new_passive_value)
+
+## 更新连击目标（武器命中时调用）
+func update_combo_target(target: Node2D) -> void:
+	if GameData.new_passive_id != "swift_combo":
+		return
+	if target == _combo_target:
+		_combo_stacks = mini(_combo_stacks + 1, _COMBO_MAX_STACKS)
+	else:
+		_combo_target = target
+		_combo_stacks = 0
+
+## 统计 fortify 标签的上场单位数
+func _count_fortify_units() -> int:
+	var count: int = 0
+	for tower in get_tree().get_nodes_in_group(Enums.Group.TOWERS):
+		if tower is Tower and tower.data and tower.data.tag == Enums.Tag.FORTIFY:
+			count += 1
+	return count
+
+## 嗜血狂战：击杀回复 5% 最大 HP
+func _on_bloodthirst_kill(_enemy_type: String, _position: Vector2, _is_elite: bool) -> void:
+	health.heal(health.max_hp * 0.05)
+
+## 获取血怒伤害倍率（Gorg）— 供武器/塔查询 AOE 伤害加成
+func get_blood_rage_mult() -> float:
+	if GameData.new_passive_id != "blood_rage":
+		return 1.0
+	var hp_pct: float = health.current_hp / health.max_hp
+	var lost_pct: float = 1.0 - hp_pct
+	return 1.0 + minf(lost_pct / 0.1 * GameData.new_passive_value, GameData.new_passive_value_2)

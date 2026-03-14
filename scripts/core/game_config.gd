@@ -132,6 +132,7 @@ var effects: EffectConfigData = null
 var shop: ShopConfigData = null
 var shop_config: ShopConfig = null
 var spawn: SpawnConfigData = null
+var synergies: Dictionary = {}
 
 
 func _ready() -> void:
@@ -145,6 +146,7 @@ func _ready() -> void:
 	shop = load("res://resources/shop/default_shop.tres")
 	shop_config = load("res://resources/shop/shop_config.tres")
 	spawn = load("res://resources/spawn/default_spawn.tres")
+	_load_synergies()
 	# 动态计算地图尺寸
 	_compute_map_dimensions()
 
@@ -207,6 +209,22 @@ func _load_wave_files(path: String, target: Array) -> void:
 				target.append(res)
 		file_name = dir.get_next()
 	target.sort_custom(func(a: WaveData, b: WaveData) -> bool: return a.wave_number < b.wave_number)
+
+func _load_synergies() -> void:
+	var path := "res://resources/synergies/"
+	var dir := DirAccess.open(path)
+	if not dir:
+		push_error("无法打开羁绊资源目录: " + path)
+		return
+	dir.list_dir_begin()
+	var file_name := dir.get_next()
+	while file_name != "":
+		if file_name.ends_with(".tres"):
+			var res: Resource = load(path + file_name)
+			if res and res is SynergyData:
+				synergies[res.tag] = res
+		file_name = dir.get_next()
+
 
 func get_waves_for_map(map_id: String) -> Array:
 	if waves_by_map.has(map_id):

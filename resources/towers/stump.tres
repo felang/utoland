@@ -15,3 +15,4 @@ damage_per_level = PackedFloat32Array(0, 0, 0)
 fire_rate_per_level = PackedFloat32Array(0, 0, 0)
 attack_range_per_level = PackedFloat32Array(0, 0, 0)
 sell_price_per_level = PackedInt32Array(3, 7, 21)
+tag = "fortify"

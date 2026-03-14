@@ -9,8 +9,8 @@ func before_each():
 	# Setup test scene
 	test_scene = Node2D.new()
 	add_child_autofree(test_scene)
-	# 重置金币倍率，防止其他测试设置角色被动影响
-	GameData.coin_drop_mult = 1.0
+	# 重置被动系统
+	GameData.new_passive_id = ""
 
 func test_tower_shoots_at_enemy():
 	# Test that tower can shoot bullets

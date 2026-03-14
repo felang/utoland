@@ -38,6 +38,26 @@ func _on_enemy_entered(body: Node2D) -> void:
 	if _on_cooldown:
 		return
 	if body.is_in_group(Enums.Group.ENEMIES) and body.has_method("apply_root"):
-		body.apply_root(trap_duration)
+		body.apply_root(trap_duration, "vine")
 		_on_cooldown = true
 		_cooldown_timer = trap_cooldown
+		# 极寒囚笼：藤蔓定身结束后，若敌人被冰冻枪减速则追加 2 秒冰冻定身
+		if GameData.active_pair_synergies.has("frozen_cage"):
+			_schedule_frozen_cage(body, trap_duration)
+
+## 极寒囚笼：定身到期后检查是否被冰冻枪减速，追加 2 秒冰冻
+func _schedule_frozen_cage(enemy: Node2D, delay: float) -> void:
+	if not is_inside_tree():
+		return
+	var timer: SceneTreeTimer = get_tree().create_timer(delay)
+	timer.timeout.connect(_apply_frozen_cage.bind(enemy))
+
+func _apply_frozen_cage(enemy: Node2D) -> void:
+	if not is_instance_valid(enemy):
+		return
+	if not enemy.has_node("SlowHandler"):
+		return
+	var sh: SlowHandler = enemy.get_node("SlowHandler") as SlowHandler
+	if sh and not sh._active_slows.is_empty():
+		# 敌人有减速效果生效中，施加 2 秒冰冻定身
+		enemy.apply_root(2.0, "frozen_cage")

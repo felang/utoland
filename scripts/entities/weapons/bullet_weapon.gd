@@ -2,6 +2,12 @@
 class_name BulletWeapon
 extends Weapon
 
+## 弹幕时刻：minigun 射击计数
+var _bullet_time_shot_count: int = 0
+const _BULLET_TIME_THRESHOLD: int = 50
+const _BULLET_TIME_SLOW_PERCENT: float = 0.8
+const _BULLET_TIME_SLOW_DURATION: float = 0.5
+
 func fire(target: Node2D) -> void:
 	if not owner_node:
 		return
@@ -17,6 +23,23 @@ func fire(target: Node2D) -> void:
 
 	_spawn_muzzle_flash(owner_node)
 	AudioManager.play("shoot")
+
+	# 弹幕时刻：minigun 每 50 发全场减速
+	if weapon_data and weapon_data.weapon_type == "minigun" and GameData.active_pair_synergies.has("bullet_time"):
+		_bullet_time_shot_count += 1
+		if _bullet_time_shot_count >= _BULLET_TIME_THRESHOLD:
+			_bullet_time_shot_count = 0
+			_trigger_bullet_time()
+
+## 弹幕时刻：对全场敌人施加 0.5 秒 80% 减速
+func _trigger_bullet_time() -> void:
+	if not is_inside_tree():
+		return
+	for enemy in get_tree().get_nodes_in_group(Enums.Group.ENEMIES):
+		if enemy.has_node("SlowHandler"):
+			var sh: SlowHandler = enemy.get_node("SlowHandler") as SlowHandler
+			if sh:
+				sh.apply_timed_slow(_BULLET_TIME_SLOW_PERCENT, _BULLET_TIME_SLOW_DURATION, "bullet_time")
 
 func _spawn_bullet(scene_parent: Node, direction: Vector2, damage: float) -> void:
 	var bullet: BulletProjectile = SceneFactory.create_bullet_projectile()

@@ -13,3 +13,4 @@ max_level = 3
 hp_per_level = PackedFloat32Array(150, 250, 340)
 reflect_ratio_per_level = PackedFloat32Array(0.25, 0.32, 0.45)
 sell_price_per_level = PackedInt32Array(5, 12, 36)
+tag = "boost"

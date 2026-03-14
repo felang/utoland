@@ -41,21 +41,16 @@ func test_portrait_load_fallback_for_invalid_path() -> void:
 	var invalid_path := "res://nonexistent/portrait.png"
 	assert_false(ResourceLoader.exists(invalid_path), "无效路径应不存在")
 
-const VALID_PASSIVE_TYPES: Array[String] = [
-	Enums.PassiveType.NONE,
-	Enums.PassiveType.KILL_HEAL,
-	Enums.PassiveType.TOWER_ATTACK_SPEED_BONUS,
-	Enums.PassiveType.TOWER_HP_BONUS,
-	Enums.PassiveType.COIN_BONUS,
-	Enums.PassiveType.DAMAGE_ON_LOW_HP,
+const VALID_NEW_PASSIVE_IDS: Array[String] = [
+	"", "swift_combo", "field_master", "blood_rage", "fortify_regen", "amplify_field",
 ]
 
-func test_character_has_valid_passive_type() -> void:
+func test_character_has_valid_new_passive_id() -> void:
 	for character_id in GameConfig.characters:
 		var char_data: CharacterData = GameConfig.characters[character_id]
 		assert_true(
-			char_data.passive_type in VALID_PASSIVE_TYPES,
-			"%s passive_type '%s' 不是有效的 PassiveType 常量" % [character_id, char_data.passive_type]
+			char_data.new_passive_id in VALID_NEW_PASSIVE_IDS,
+			"%s new_passive_id '%s' 不是有效的被动 ID" % [character_id, char_data.new_passive_id]
 		)
 
 func test_character_has_starting_gold() -> void:
