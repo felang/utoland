@@ -5,11 +5,8 @@
 [resource]
 script = ExtResource("1")
 wave_number = 18
-total_enemies = 20
-time_limit = 150.0
-spawn_interval = 0.5
-enemy_weights = { "fast": 50, "tank": 50 }
-elite_chance = 0.15
-is_boss_wave = true
-boss_id = "boss_guardian"
-boss_escort_count = 20
+total_enemies = 75
+time_limit = 60.0
+spawn_interval = 0.35
+enemy_weights = { "normal": 15, "fast": 40, "tank": 45 }
+elite_chance = 0.18

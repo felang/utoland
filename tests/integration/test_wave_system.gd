@@ -2,7 +2,7 @@ extends GutTest
 
 func test_forest_wave_count():
 	var waves: Array = GameConfig.get_waves_for_map("forest")
-	assert_eq(waves.size(), 18, "Forest 地图应有 18 波")
+	assert_eq(waves.size(), 20, "Forest 地图应有 20 波")
 
 func test_waves_sorted_by_number():
 	var waves: Array = GameConfig.get_waves_for_map("forest")
@@ -15,17 +15,16 @@ func test_boss_waves_count():
 	for w: WaveData in waves:
 		if w.is_boss_wave:
 			boss_waves.append(w.wave_number)
-	assert_eq(boss_waves.size(), 3, "应有 3 个 Boss 波")
+	assert_eq(boss_waves.size(), 2, "应有 2 个 Boss 波")
 
-func test_boss_waves_are_8_15_18():
+func test_boss_waves_are_10_20():
 	var waves: Array = GameConfig.get_waves_for_map("forest")
 	var boss_wave_numbers := []
 	for w: WaveData in waves:
 		if w.is_boss_wave:
 			boss_wave_numbers.append(w.wave_number)
-	assert_has(boss_wave_numbers, 8, "第 8 波应为 Boss 波")
-	assert_has(boss_wave_numbers, 15, "第 15 波应为 Boss 波")
-	assert_has(boss_wave_numbers, 18, "第 18 波应为 Boss 波")
+	assert_has(boss_wave_numbers, 10, "第 10 波应为 Boss 波")
+	assert_has(boss_wave_numbers, 20, "第 20 波应为 Boss 波")
 
 func test_all_enemy_weights_reference_valid_types():
 	var waves: Array = GameConfig.get_waves_for_map("forest")
@@ -42,12 +41,17 @@ func test_boss_ids_reference_valid_enemies():
 
 func test_difficulty_curve_total_enemies_increasing():
 	var waves: Array = GameConfig.get_waves_for_map("forest")
-	# 非 Boss 波的 total_enemies 应大致递增
-	var prev_total := 0
-	for w: WaveData in waves:
+	# 整体趋势：后期波次 total_enemies 应多于前期（允许喘息波下降）
+	var first_half_max := 0
+	var second_half_max := 0
+	for i in range(waves.size()):
+		var w: WaveData = waves[i]
 		if not w.is_boss_wave:
-			assert_gte(w.total_enemies, prev_total, "普通波 %d 的 total_enemies 应 >= 前一波" % w.wave_number)
-			prev_total = w.total_enemies
+			if i < waves.size() / 2:
+				first_half_max = max(first_half_max, w.total_enemies)
+			else:
+				second_half_max = max(second_half_max, w.total_enemies)
+	assert_gt(second_half_max, first_half_max, "后半段最大敌人数应大于前半段")
 
 func test_difficulty_curve_spawn_interval_decreasing():
 	var waves: Array = GameConfig.get_waves_for_map("forest")

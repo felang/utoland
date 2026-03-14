@@ -100,7 +100,7 @@ func test_tower_ice_flower_resource() -> void:
 # ===== 波次资源加载 =====
 
 func test_waves_loaded_count() -> void:
-	assert_eq(GameConfig.waves.size(), 18, "应加载 18 个波次")
+	assert_eq(GameConfig.waves.size(), 20, "应加载 20 个波次")
 
 func test_waves_sorted_by_number() -> void:
 	for i in range(GameConfig.waves.size()):
@@ -108,14 +108,14 @@ func test_waves_sorted_by_number() -> void:
 
 func test_wave_1_defaults() -> void:
 	var w: WaveData = GameConfig.waves[0]
-	assert_eq(w.time_limit, 45.0, "波次1的time_limit应为45.0")
-	assert_eq(w.spawn_interval, 2.0, "波次1的spawn_interval应为2.0")
+	assert_eq(w.time_limit, 60.0, "波次1的time_limit应为60.0")
+	assert_eq(w.spawn_interval, 1.5, "波次1的spawn_interval应为1.5")
 	assert_true(w.enemy_weights.has("normal"), "波次1应包含normal敌人权重")
 
 func test_wave_6_values() -> void:
 	var w: WaveData = GameConfig.waves[5]
-	assert_eq(w.time_limit, 55.0, "波次6的time_limit应为55.0")
-	assert_eq(w.spawn_interval, 1.2, "波次6的spawn_interval应为1.2")
+	assert_eq(w.time_limit, 70.0, "波次6的time_limit应为70.0")
+	assert_eq(w.spawn_interval, 0.9, "波次6的spawn_interval应为0.9")
 	assert_true(w.enemy_weights.has("tank"), "波次6应包含tank敌人权重")
 
 

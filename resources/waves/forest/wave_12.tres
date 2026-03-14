@@ -5,7 +5,8 @@
 [resource]
 script = ExtResource("1")
 wave_number = 12
-total_enemies = 35
-spawn_interval = 1.0
+total_enemies = 60
+time_limit = 70.0
+spawn_interval = 0.6
 enemy_weights = { "normal": 30, "fast": 40, "tank": 30 }
-elite_chance = 0.15
+elite_chance = 0.1
