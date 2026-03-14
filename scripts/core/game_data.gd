@@ -247,6 +247,61 @@ func _apply_sell(item: Dictionary) -> int:
 	EventBus.coins_changed.emit(refund, coins)
 	return refund
 
+# ===== 合成系统 =====
+
+func _check_merge(item_id: String, item_level: int) -> void:
+	if item_level >= 3:
+		return
+	var all_items: Array[Dictionary] = _collect_items_by_id_level(item_id, item_level)
+	if all_items.size() < 3:
+		return
+	# 回收 3 个物品（优先从 bag 取，再从 deployed 取）
+	var consumed: int = 0
+	var item_type: String = ""
+	# 从 bag 回收
+	var i: int = bag.size() - 1
+	while i >= 0 and consumed < 3:
+		if bag[i].id == item_id and bag[i].level == item_level:
+			item_type = bag[i].type
+			bag.remove_at(i)
+			consumed += 1
+		i -= 1
+	# 从 deployed_weapons 回收
+	i = deployed_weapons.size() - 1
+	while i >= 0 and consumed < 3:
+		if deployed_weapons[i].id == item_id and deployed_weapons[i].level == item_level:
+			item_type = "weapon"
+			deployed_weapons.remove_at(i)
+			consumed += 1
+		i -= 1
+	# 从 deployed_towers 回收
+	i = deployed_towers.size() - 1
+	while i >= 0 and consumed < 3:
+		if deployed_towers[i].id == item_id and deployed_towers[i].level == item_level:
+			item_type = "tower"
+			deployed_towers.remove_at(i)
+			consumed += 1
+		i -= 1
+	# 生成合成品
+	var new_level: int = item_level + 1
+	bag.append({id = item_id, type = item_type, level = new_level})
+	EventBus.item_merged.emit(item_id, new_level)
+	# 递归检查
+	_check_merge(item_id, new_level)
+
+func _collect_items_by_id_level(item_id: String, item_level: int) -> Array[Dictionary]:
+	var result: Array[Dictionary] = []
+	for item in bag:
+		if item.id == item_id and item.level == item_level:
+			result.append(item)
+	for item in deployed_weapons:
+		if item.id == item_id and item.level == item_level:
+			result.append(item)
+	for item in deployed_towers:
+		if item.id == item_id and item.level == item_level:
+			result.append(item)
+	return result
+
 # ===== 统计 =====
 
 func record_kill() -> void:
