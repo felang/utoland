@@ -27,8 +27,8 @@ func _ready() -> void:
 	var stats_grid: GridContainer = vbox.get_node("StatsPanel/StatsGrid")
 	_add_stat_row(stats_grid, "击杀总数", str(GameData.total_kills))
 	_add_stat_row(stats_grid, "获取金币", str(GameData.total_coins_earned))
-	_add_stat_row(stats_grid, "拥有武器", str(GameData.owned_weapons.size()))
-	_add_stat_row(stats_grid, "拥有塔", str(GameData.owned_towers.size()))
+	_add_stat_row(stats_grid, "拥有武器", str(GameData.deployed_weapons.size()))
+	_add_stat_row(stats_grid, "拥有塔", str(GameData.deployed_towers.size()))
 	_add_stat_row(stats_grid, "受到伤害", str(int(GameData.total_damage_taken)))
 	_add_stat_row(stats_grid, "最高连杀", str(GameData.max_kill_streak))
 
@@ -37,18 +37,26 @@ func _ready() -> void:
 	items_panel.add_theme_stylebox_override("panel", UIConstants.create_panel_stylebox())
 	var items_flow: HFlowContainer = vbox.get_node("ItemsPanel/ItemsFlow")
 	var has_items := false
-	for weapon_id in GameData.owned_weapons:
+	# 显示背包 + 已上阵武器
+	var all_items: Array[Dictionary] = []
+	for item in GameData.bag:
+		all_items.append(item)
+	for item in GameData.deployed_weapons:
+		all_items.append({id = item.id, type = "weapon", level = item.level})
+	for item in GameData.deployed_towers:
+		all_items.append({id = item.id, type = "tower", level = item.level})
+	for item in all_items:
 		has_items = true
-		var level: int = GameData.owned_weapons[weapon_id]
-		var wdata: WeaponData = GameConfig.weapons.get(weapon_id)
-		var text: String = (wdata.display_name if wdata else weapon_id) + " Lv%d" % level
-		_add_pill(items_flow, text)
-	for tower_id in GameData.owned_towers:
-		has_items = true
-		var level: int = GameData.owned_towers[tower_id]
-		var tdata: TowerData = GameConfig.towers.get(tower_id)
-		var text: String = (tdata.display_name if tdata else tower_id) + " Lv%d" % level
-		_add_pill(items_flow, text)
+		var item_id: String = item.id
+		var level: int = item.level
+		if item.type == "weapon":
+			var wdata: WeaponData = GameConfig.weapons.get(item_id)
+			var text: String = (wdata.display_name if wdata else item_id) + " Lv%d" % level
+			_add_pill(items_flow, text)
+		else:
+			var tdata: TowerData = GameConfig.towers.get(item_id)
+			var text: String = (tdata.display_name if tdata else item_id) + " Lv%d" % level
+			_add_pill(items_flow, text)
 	if not has_items:
 		var label := Label.new()
 		label.text = "无"

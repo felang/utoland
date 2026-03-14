@@ -183,24 +183,14 @@ func test_create_coin():
 	assert_not_null(coin, "Coin should be created")
 	coin.queue_free()
 
-# Tower cost test — 费用现在按等级读取 place_cost_per_level
-func test_get_tower_cost():
-	var shooter_cost = SceneFactory.get_tower_cost(Enums.TowerId.PEA_SHOOTER)
-	var shooter_td: TowerData = GameConfig.towers[Enums.TowerId.PEA_SHOOTER]
-	assert_eq(shooter_cost, shooter_td.place_cost_per_level[0], "Shooter tower cost should match level 1 place_cost")
-
-	var wall_cost = SceneFactory.get_tower_cost(Enums.TowerId.STUMP)
-	var wall_td: TowerData = GameConfig.towers[Enums.TowerId.STUMP]
-	assert_eq(wall_cost, wall_td.place_cost_per_level[0], "Wall tower cost should match level 1 place_cost")
-
-	var slow_cost = SceneFactory.get_tower_cost(Enums.TowerId.ICE_FLOWER)
-	var slow_td: TowerData = GameConfig.towers[Enums.TowerId.ICE_FLOWER]
-	assert_eq(slow_cost, slow_td.place_cost_per_level[0], "Slow tower cost should match level 1 place_cost")
-
-	# Test invalid tower type
-	var invalid_cost = SceneFactory.get_tower_cost("invalid_type")
-	assert_eq(invalid_cost, 0, "Invalid tower type should return 0")
-	assert_push_error("Unknown tower type")
+# Tower level injection test
+func test_create_tower_with_level():
+	var tower = SceneFactory.create_tower(Enums.TowerId.PEA_SHOOTER, 2)
+	assert_not_null(tower, "Shooter tower should be created")
+	var td: TowerData = GameConfig.towers[Enums.TowerId.PEA_SHOOTER]
+	assert_almost_eq(tower.health.max_hp, td.hp_per_level[1], 0.01,
+		"Lv2 tower HP should match hp_per_level[1]")
+	tower.queue_free()
 
 # 新投射物工厂方法测试
 func test_create_bullet_projectile():
