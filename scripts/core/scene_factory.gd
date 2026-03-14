@@ -24,6 +24,8 @@ var _enemy_scenes: Dictionary = {
 	Enums.Enemy.FAST: preload("res://scenes/entities/enemies/enemy_fast.tscn"),
 	Enums.Enemy.TANK: preload("res://scenes/entities/enemies/enemy_tank.tscn"),
 	Enums.Enemy.BOSS_BRUTE: preload("res://scenes/entities/enemies/boss_brute.tscn"),
+	Enums.Enemy.BOSS_SUMMONER: preload("res://scenes/entities/enemies/boss_summoner.tscn"),
+	Enums.Enemy.BOSS_GUARDIAN: preload("res://scenes/entities/enemies/boss_guardian.tscn"),
 }
 
 var _bullet_projectile_scene: PackedScene = preload("res://scenes/entities/projectiles/bullet_projectile.tscn")

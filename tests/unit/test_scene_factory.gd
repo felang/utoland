@@ -142,6 +142,36 @@ func test_create_enemy_tank():
 	assert_eq(enemy.enemy_type, Enums.Enemy.TANK, "Enemy type should be 'tank'")
 	enemy.queue_free()
 
+func test_create_enemy_boss_brute():
+	var enemy = SceneFactory.create_enemy(Enums.Enemy.BOSS_BRUTE)
+	assert_not_null(enemy, "Boss brute should be created")
+	assert_eq(enemy.enemy_type, Enums.Enemy.BOSS_BRUTE)
+	enemy.queue_free()
+
+func test_create_enemy_boss_summoner():
+	var enemy = SceneFactory.create_enemy(Enums.Enemy.BOSS_SUMMONER)
+	assert_not_null(enemy, "Boss summoner should be created")
+	assert_eq(enemy.enemy_type, Enums.Enemy.BOSS_SUMMONER)
+	enemy.queue_free()
+
+func test_create_enemy_boss_guardian():
+	var enemy = SceneFactory.create_enemy(Enums.Enemy.BOSS_GUARDIAN)
+	assert_not_null(enemy, "Boss guardian should be created")
+	assert_eq(enemy.enemy_type, Enums.Enemy.BOSS_GUARDIAN)
+	enemy.queue_free()
+
+func test_all_enemies_can_be_created():
+	var all_ids: Array[String] = [
+		Enums.Enemy.NORMAL, Enums.Enemy.FAST, Enums.Enemy.TANK,
+		Enums.Enemy.BOSS_BRUTE, Enums.Enemy.BOSS_SUMMONER, Enums.Enemy.BOSS_GUARDIAN,
+	]
+	for id in all_ids:
+		var enemy = SceneFactory.create_enemy(id)
+		assert_not_null(enemy, "应能创建敌人: " + id)
+		assert_eq(enemy.enemy_type, id)
+		assert_not_null(enemy.data, id + " 应注入 EnemyData")
+		enemy.queue_free()
+
 func test_create_enemy_invalid():
 	var enemy = SceneFactory.create_enemy("invalid_type")
 	assert_null(enemy, "Invalid enemy type should return null")

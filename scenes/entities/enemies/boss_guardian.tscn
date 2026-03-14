@@ -1,0 +1,62 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/entities/boss_base.gd" id="1_script"]
+[ext_resource type="Script" path="res://scripts/components/health_component.gd" id="2_health"]
+[ext_resource type="Script" path="res://scripts/components/knockback_handler.gd" id="3_knockback"]
+[ext_resource type="Script" path="res://scripts/components/slow_handler.gd" id="4_slow"]
+[ext_resource type="Script" path="res://scripts/components/sprite_animator.gd" id="5_sprite"]
+[ext_resource type="Script" path="res://scripts/components/hitbox.gd" id="6_hitbox"]
+[ext_resource type="Script" path="res://scripts/components/hurtbox.gd" id="7_hurtbox"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_body"]
+size = Vector2(24, 24)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_hitbox"]
+radius = 10.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_hurtbox"]
+radius = 10.0
+
+[node name="BossGuardian" type="CharacterBody2D"]
+scale = Vector2(2.5, 2.5)
+collision_layer = 2
+collision_mask = 8
+script = ExtResource("1_script")
+
+[node name="Visual" type="ColorRect" parent="."]
+offset_left = -12.0
+offset_top = -12.0
+offset_right = 12.0
+offset_bottom = 12.0
+color = Color(0.2, 0.6, 0.1, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_body")
+
+[node name="HealthComponent" type="Node" parent="."]
+script = ExtResource("2_health")
+
+[node name="KnockbackHandler" type="Node" parent="."]
+script = ExtResource("3_knockback")
+
+[node name="SlowHandler" type="Node" parent="."]
+script = ExtResource("4_slow")
+
+[node name="SpriteAnimator" type="Node" parent="."]
+script = ExtResource("5_sprite")
+
+[node name="Hitbox" type="Area2D" parent="."]
+collision_layer = 32
+collision_mask = 64
+script = ExtResource("6_hitbox")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
+shape = SubResource("CircleShape2D_hitbox")
+
+[node name="Hurtbox" type="Area2D" parent="."]
+collision_layer = 128
+collision_mask = 4
+script = ExtResource("7_hurtbox")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox"]
+shape = SubResource("CircleShape2D_hurtbox")

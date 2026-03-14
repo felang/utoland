@@ -26,6 +26,7 @@ func test_bullet_projectile_creates_trail():
 func test_boomerang_projectile_rotates():
 	var boomerang: BoomerangProjectile = SceneFactory.create_boomerang_projectile()
 	add_child_autoqfree(boomerang)
+	boomerang.weapon_data = GameConfig.weapons[Enums.WeaponId.BOOMERANG]
 	boomerang.setup(10.0, 0.0, Vector2.ZERO, Vector2.RIGHT)
 	var initial_rotation: float = boomerang.rotation
 	await get_tree().create_timer(0.1).timeout
