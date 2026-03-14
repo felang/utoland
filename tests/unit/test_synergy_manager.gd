@@ -11,6 +11,14 @@ func before_each() -> void:
 	manager = SynergyManager.new()
 
 
+func after_each() -> void:
+	# 清理羁绊状态避免污染其他测试文件
+	GameData.synergy_active_tiers = {}
+	GameData.synergy_tag_counts = {}
+	GameData.deployed_weapons = []
+	GameData.deployed_towers = []
+
+
 # ===== count_tags =====
 
 func test_count_tags_empty() -> void:
@@ -125,3 +133,84 @@ func test_is_tier3_active_false() -> void:
 	GameData.deployed_towers = []
 	manager.recalculate()
 	assert_false(manager.is_tier3_active("assault"))
+
+
+# ===== 2 档效果查询 =====
+
+func test_tier2_damage_mult_bonus() -> void:
+	# kaze(assault) + rifle(assault) = 2 个 assault → 2 档激活
+	GameData.current_character = "kaze"
+	GameData.deployed_weapons = [{id = "rifle", level = 1}]
+	manager.recalculate()
+	var bonus: float = manager.get_damage_mult_bonus("rifle")
+	assert_almost_eq(bonus, 0.15, 0.001)
+
+
+func test_tier2_no_bonus_below_threshold() -> void:
+	# kaze(assault) 仅 1 个 assault → 不足 2 档
+	GameData.current_character = "kaze"
+	GameData.deployed_weapons = []
+	GameData.deployed_towers = []
+	manager.recalculate()
+	var bonus: float = manager.get_damage_mult_bonus("rifle")
+	assert_almost_eq(bonus, 0.0, 0.001)
+
+
+func test_tier2_damage_mult_non_assault_unit() -> void:
+	# 非 assault 标签单位不享受 assault 伤害加成
+	GameData.current_character = "kaze"
+	GameData.deployed_weapons = [{id = "rifle", level = 1}]
+	manager.recalculate()
+	var bonus: float = manager.get_damage_mult_bonus("ice_gun")
+	assert_almost_eq(bonus, 0.0, 0.001)
+
+
+func test_tier2_control_duration_bonus() -> void:
+	# nemo(control) + ice_gun(control) = 2 个 control → 2 档激活
+	GameData.current_character = "nemo"
+	GameData.deployed_weapons = [{id = "ice_gun", level = 1}]
+	manager.recalculate()
+	assert_almost_eq(manager.get_control_duration_bonus(), 0.25, 0.001)
+
+
+func test_tier2_control_duration_no_bonus() -> void:
+	# 仅 1 个 control → 不足 2 档
+	GameData.current_character = "nemo"
+	GameData.deployed_weapons = []
+	GameData.deployed_towers = []
+	manager.recalculate()
+	assert_almost_eq(manager.get_control_duration_bonus(), 0.0, 0.001)
+
+
+func test_tier2_aoe_range_bonus() -> void:
+	# gorg(blast) + rocket(blast) = 2 个 blast → 2 档激活
+	GameData.current_character = "gorg"
+	GameData.deployed_weapons = [{id = "rocket", level = 1}]
+	manager.recalculate()
+	assert_almost_eq(manager.get_aoe_range_bonus(), 0.2, 0.001)
+
+
+func test_tier2_boost_strength_bonus() -> void:
+	# merlin(boost) + sunflower(boost) = 2 个 boost → 2 档激活
+	GameData.current_character = "merlin"
+	GameData.deployed_towers = [{id = "sunflower", level = 1, grid_pos = Vector2i(0, 0)}]
+	manager.recalculate()
+	assert_almost_eq(manager.get_boost_strength_bonus(), 0.25, 0.001)
+
+
+func test_tier2_boost_fallback_damage() -> void:
+	# boost 2 档激活，pea_shooter 无内在 boost 机制 → 回退为伤害加成
+	GameData.current_character = "merlin"
+	GameData.deployed_towers = [{id = "pea_shooter", level = 1, grid_pos = Vector2i(0, 0)}]
+	manager.recalculate()
+	var bonus: float = manager.get_damage_mult_bonus("pea_shooter")
+	assert_almost_eq(bonus, 0.25, 0.001)
+
+
+func test_tier2_boost_no_fallback_for_buff_tower() -> void:
+	# boost 2 档激活，mint 有内在 boost 机制 → 不回退为伤害加成
+	GameData.current_character = "merlin"
+	GameData.deployed_towers = [{id = "mint", level = 1, grid_pos = Vector2i(0, 0)}]
+	manager.recalculate()
+	var bonus: float = manager.get_damage_mult_bonus("mint")
+	assert_almost_eq(bonus, 0.0, 0.001)

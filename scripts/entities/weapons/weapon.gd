@@ -26,6 +26,10 @@ func get_damage() -> float:
 			var hp: HealthComponent = owner_node.get_node("HealthComponent")
 			if hp.current_hp / hp.max_hp < 0.3:
 				base *= (1.0 + GameData.character_passive_value)
+	# 羁绊 2 档：伤害倍率加成（assault / boost 回退）
+	if GameData._synergy_manager:
+		var synergy_bonus: float = GameData._synergy_manager.get_damage_mult_bonus(weapon_data.id)
+		base *= (1.0 + synergy_bonus)
 	return base
 
 func get_fire_rate() -> float:

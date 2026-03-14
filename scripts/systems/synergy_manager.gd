@@ -91,3 +91,55 @@ func recalculate() -> void:
 ## 检查指定标签是否达到 3 档
 func is_tier3_active(tag: String) -> bool:
 	return GameData.synergy_active_tiers.get(tag, 0) >= 3
+
+
+# ===== 2 档效果查询 =====
+
+## 无内在 boost 机制的单位列表（boost 标签激活时回退为伤害加成）
+const _BOOST_FALLBACK_UNITS: PackedStringArray = ["pea_shooter", "thorn", "laser"]
+
+
+## 获取单位的伤害倍率加成（assault 2 档 / boost 回退）
+func get_damage_mult_bonus(unit_id: String) -> float:
+	var tag: String = get_tag(unit_id)
+	if tag == "":
+		return 0.0
+	# assault 标签：2 档 damage_mult 加成
+	if tag == Enums.Tag.ASSAULT and GameData.synergy_active_tiers.get(tag, 0) >= 2:
+		var synergy: SynergyData = GameConfig.synergies.get(tag)
+		if synergy and synergy.tier2_stat == "damage_mult":
+			return synergy.tier2_value
+	# boost 标签：无内在 boost 机制的单位回退为伤害加成
+	if tag == Enums.Tag.BOOST and GameData.synergy_active_tiers.get(tag, 0) >= 2:
+		if unit_id in _BOOST_FALLBACK_UNITS:
+			var synergy: SynergyData = GameConfig.synergies.get(tag)
+			if synergy:
+				return synergy.tier2_value
+	return 0.0
+
+
+## 获取控制持续时间加成（control 2 档）
+func get_control_duration_bonus() -> float:
+	if GameData.synergy_active_tiers.get(Enums.Tag.CONTROL, 0) >= 2:
+		var synergy: SynergyData = GameConfig.synergies.get(Enums.Tag.CONTROL)
+		if synergy:
+			return synergy.tier2_value
+	return 0.0
+
+
+## 获取范围伤害范围加成（blast 2 档）
+func get_aoe_range_bonus() -> float:
+	if GameData.synergy_active_tiers.get(Enums.Tag.BLAST, 0) >= 2:
+		var synergy: SynergyData = GameConfig.synergies.get(Enums.Tag.BLAST)
+		if synergy:
+			return synergy.tier2_value
+	return 0.0
+
+
+## 获取增益效果强度加成（boost 2 档）
+func get_boost_strength_bonus() -> float:
+	if GameData.synergy_active_tiers.get(Enums.Tag.BOOST, 0) >= 2:
+		var synergy: SynergyData = GameConfig.synergies.get(Enums.Tag.BOOST)
+		if synergy:
+			return synergy.tier2_value
+	return 0.0

@@ -1,5 +1,12 @@
 extends GutTest
 
+
+func before_each() -> void:
+	# 清理羁绊状态避免其他测试文件污染
+	GameData.synergy_active_tiers = {}
+	GameData.synergy_tag_counts = {}
+
+
 func test_tower_default_mult():
 	var tower = SceneFactory.create_tower(Enums.TowerId.PEA_SHOOTER)
 	add_child(tower)
