@@ -90,3 +90,31 @@ func test_refresh_cost_formula():
 	assert_eq(_generator.get_refresh_cost(1), 5, "第二次刷新 5 金币")
 	assert_eq(_generator.get_refresh_cost(2), 10, "第三次刷新 10 金币")
 	assert_eq(_generator.get_refresh_cost(3), 15, "第四次刷新 15 金币")
+
+func test_rarity_weights_level_1():
+	var weights = UpgradeGenerator.get_rarity_weights(1)
+	assert_almost_eq(weights[0], 1.0, 0.001)
+	assert_almost_eq(weights[1], 0.3, 0.001)
+	assert_almost_eq(weights[2], 0.0, 0.001)
+
+func test_rarity_weights_level_3():
+	var weights = UpgradeGenerator.get_rarity_weights(3)
+	assert_almost_eq(weights[0], 1.0, 0.001)
+	assert_almost_eq(weights[1], 0.6, 0.001)
+	assert_almost_eq(weights[2], 0.15, 0.001)
+
+func test_rarity_weights_level_6():
+	var weights = UpgradeGenerator.get_rarity_weights(6)
+	assert_almost_eq(weights[0], 1.0, 0.001)
+	assert_almost_eq(weights[1], 0.8, 0.001)
+	assert_almost_eq(weights[2], 0.3, 0.001)
+
+func test_rarity_weights_level_10():
+	var weights = UpgradeGenerator.get_rarity_weights(10)
+	assert_almost_eq(weights[0], 1.0, 0.001)
+	assert_almost_eq(weights[1], 1.0, 0.001)
+	assert_almost_eq(weights[2], 0.5, 0.001)
+
+func test_epic_blocked_at_low_level():
+	var weights = UpgradeGenerator.get_rarity_weights(2)
+	assert_eq(weights[2], 0.0, "等级 2 时 Epic 权重应为 0")

@@ -14,19 +14,20 @@ func test_all_weapons_have_description() -> void:
 		assert_ne(wd.description, "", "%s 缺少 description" % weapon_id)
 
 func test_rarity_weight_mapping() -> void:
-	# 验证 RARITY_WEIGHTS 常量包含所有稀有度等级
-	assert_true(UpgradeGenerator.RARITY_WEIGHTS.has(Enums.WeaponRarity.COMMON), "缺少 COMMON 权重")
-	assert_true(UpgradeGenerator.RARITY_WEIGHTS.has(Enums.WeaponRarity.RARE), "缺少 RARE 权重")
-	assert_true(UpgradeGenerator.RARITY_WEIGHTS.has(Enums.WeaponRarity.EPIC), "缺少 EPIC 权重")
-	# 验证权重递减
+	# 验证 get_rarity_weights 在中等等级时返回所有稀有度等级（使用整数键）
+	var weights: Dictionary = UpgradeGenerator.get_rarity_weights(5)
+	assert_true(weights.has(Enums.WeaponRarity.COMMON), "缺少 COMMON 权重")
+	assert_true(weights.has(Enums.WeaponRarity.RARE), "缺少 RARE 权重")
+	assert_true(weights.has(Enums.WeaponRarity.EPIC), "缺少 EPIC 权重")
+	# 验证权重递减（等级 5 时 1.0 > 0.8 > 0.3）
 	assert_gt(
-		UpgradeGenerator.RARITY_WEIGHTS[Enums.WeaponRarity.COMMON],
-		UpgradeGenerator.RARITY_WEIGHTS[Enums.WeaponRarity.RARE],
+		weights[Enums.WeaponRarity.COMMON],
+		weights[Enums.WeaponRarity.RARE],
 		"COMMON 权重应大于 RARE"
 	)
 	assert_gt(
-		UpgradeGenerator.RARITY_WEIGHTS[Enums.WeaponRarity.RARE],
-		UpgradeGenerator.RARITY_WEIGHTS[Enums.WeaponRarity.EPIC],
+		weights[Enums.WeaponRarity.RARE],
+		weights[Enums.WeaponRarity.EPIC],
 		"RARE 权重应大于 EPIC"
 	)
 

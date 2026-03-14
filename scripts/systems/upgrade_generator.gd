@@ -1,17 +1,16 @@
 class_name UpgradeGenerator
 extends RefCounted
 
-const RARITY_WEIGHTS: Dictionary = {
-	Enums.WeaponRarity.COMMON: 1.0,
-	Enums.WeaponRarity.RARE: 0.6,
-	Enums.WeaponRarity.EPIC: 0.3,
-}
-
-const TOWER_RARITY_WEIGHTS: Dictionary = {
-	Enums.TowerRarity.COMMON: 1.0,
-	Enums.TowerRarity.RARE: 0.6,
-	Enums.TowerRarity.EPIC: 0.3,
-}
+## 按玩家等级返回稀有度权重，替换静态 RARITY_WEIGHTS/TOWER_RARITY_WEIGHTS
+static func get_rarity_weights(player_level: int) -> Dictionary:
+	if player_level <= 2:
+		return {0: 1.0, 1: 0.3, 2: 0.0}
+	elif player_level <= 4:
+		return {0: 1.0, 1: 0.6, 2: 0.15}
+	elif player_level <= 6:
+		return {0: 1.0, 1: 0.8, 2: 0.3}
+	else:
+		return {0: 1.0, 1: 1.0, 2: 0.5}
 
 ## 合并的武器+塔升级选项生成器
 ## 从武器和塔的池子中加权随机抽取 3 个选项
@@ -61,13 +60,13 @@ func _build_pool(exclude: Array[Dictionary]) -> Array[Dictionary]:
 			pool.append({
 				"type": "weapon", "id": weapon_id,
 				"target_level": 1, "is_new": true, "current_level": 0,
-				"_weight": RARITY_WEIGHTS.get(wd.rarity, 1.0)
+				"_weight": get_rarity_weights(GameData.current_level).get(wd.rarity, 1.0)
 			})
 		elif current_level < wd.max_level:
 			pool.append({
 				"type": "weapon", "id": weapon_id,
 				"target_level": current_level + 1, "is_new": false,
-				"current_level": current_level, "_weight": RARITY_WEIGHTS.get(wd.rarity, 1.0)
+				"current_level": current_level, "_weight": get_rarity_weights(GameData.current_level).get(wd.rarity, 1.0)
 			})
 	# 塔池
 	for tower_id: String in GameConfig.towers:
@@ -79,13 +78,13 @@ func _build_pool(exclude: Array[Dictionary]) -> Array[Dictionary]:
 			pool.append({
 				"type": "tower", "id": tower_id,
 				"target_level": 1, "is_new": true, "current_level": 0,
-				"_weight": TOWER_RARITY_WEIGHTS.get(td.rarity, 1.0)
+				"_weight": get_rarity_weights(GameData.current_level).get(td.rarity, 1.0)
 			})
 		elif current_level < td.max_level:
 			pool.append({
 				"type": "tower", "id": tower_id,
 				"target_level": current_level + 1, "is_new": false,
-				"current_level": current_level, "_weight": TOWER_RARITY_WEIGHTS.get(td.rarity, 1.0)
+				"current_level": current_level, "_weight": get_rarity_weights(GameData.current_level).get(td.rarity, 1.0)
 			})
 	return pool
 
