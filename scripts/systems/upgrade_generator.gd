@@ -1,6 +1,12 @@
 class_name UpgradeGenerator
 extends RefCounted
 
+const RARITY_WEIGHTS: Dictionary = {
+	Enums.WeaponRarity.COMMON: 1.0,
+	Enums.WeaponRarity.RARE: 0.6,
+	Enums.WeaponRarity.EPIC: 0.3,
+}
+
 ## 合并的武器+塔升级选项生成器
 ## 从武器和塔的池子中加权随机抽取 3 个选项
 
@@ -49,13 +55,13 @@ func _build_pool(exclude: Array[Dictionary]) -> Array[Dictionary]:
 			pool.append({
 				"type": "weapon", "id": weapon_id,
 				"target_level": 1, "is_new": true, "current_level": 0,
-				"_weight": 1.0
+				"_weight": RARITY_WEIGHTS.get(wd.rarity, 1.0)
 			})
 		elif current_level < wd.max_level:
 			pool.append({
 				"type": "weapon", "id": weapon_id,
 				"target_level": current_level + 1, "is_new": false,
-				"current_level": current_level, "_weight": 1.0
+				"current_level": current_level, "_weight": RARITY_WEIGHTS.get(wd.rarity, 1.0)
 			})
 	# 塔池
 	for tower_id: String in GameConfig.towers:
