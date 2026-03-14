@@ -3,6 +3,8 @@
 class_name BoomerangProjectile
 extends Projectile
 
+var weapon_data: WeaponData = null
+
 var speed: float = 175.0
 var outbound_distance: float = 100.0
 var return_speed_mult: float = 1.3
@@ -25,13 +27,12 @@ func _on_setup(direction: Vector2) -> void:
 	_state = Enums.BoomerangState.OUTBOUND
 	_traveled = 0.0
 	_elapsed = 0.0
-	assert(GameConfig.weapons.has(Enums.WeaponId.BOOMERANG), "缺少 boomerang 武器配置，请检查 resources/weapons/")
-	# 从 WeaponData 读取回旋镖配置
-	var w: WeaponData = GameConfig.weapons[Enums.WeaponId.BOOMERANG]
-	speed = w.boomerang_speed
-	outbound_distance = w.outbound_distance
-	return_speed_mult = w.return_speed_mult
-	max_lifetime = w.boomerang_max_lifetime
+	assert(weapon_data != null, "BoomerangProjectile: weapon_data 未注入，请在 setup() 前设置")
+	# 从注入的 WeaponData 读取回旋镖配置
+	speed = weapon_data.boomerang_speed
+	outbound_distance = weapon_data.outbound_distance
+	return_speed_mult = weapon_data.return_speed_mult
+	max_lifetime = weapon_data.boomerang_max_lifetime
 	# 特效配置缓存
 	var fx: EffectConfigData = GameConfig.effects
 	_trail_max_points = fx.boomerang_trail_points

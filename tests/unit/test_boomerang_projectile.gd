@@ -6,6 +6,7 @@ func _make_boomerang() -> BoomerangProjectile:
 	var hitbox = Hitbox.new()
 	hitbox.name = "Hitbox"
 	b.add_child(hitbox)
+	b.weapon_data = GameConfig.weapons[Enums.WeaponId.BOOMERANG]
 	add_child_autofree(b)
 	return b
 
