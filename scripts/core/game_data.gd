@@ -155,7 +155,7 @@ func record_coins_earned(amount: int) -> void:
 	total_coins_earned += amount
 
 func get_xp_to_next_level() -> int:
-	return 20 + (current_level - 1) * 15
+	return ceili(15.0 * pow(1.4, current_level - 1))
 
 func add_xp(amount: int) -> void:
 	current_xp += amount
