@@ -9,6 +9,7 @@ extends Resource
 @export var rarity: int = 0
 @export var weapon_type: String = ""
 @export var projectile_type: String = "bullet"
+@export var tag: String = ""
 
 @export_group("等级系统")
 @export var max_level: int = 3

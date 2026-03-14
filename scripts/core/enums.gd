@@ -89,6 +89,15 @@ class Stat:
 	const ATTACK_SPEED_MULT = "attack_speed_mult"
 	const TOWER_MULT = "tower_mult"
 
+# 协同标签
+class Tag:
+	const ASSAULT = "assault"
+	const CONTROL = "control"
+	const BLAST = "blast"
+	const FORTIFY = "fortify"
+	const BOOST = "boost"
+	const ALL = [ASSAULT, CONTROL, BLAST, FORTIFY, BOOST]
+
 # 角色被动技能类型
 class PassiveType:
 	const NONE = ""

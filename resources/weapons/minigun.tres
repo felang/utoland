@@ -19,3 +19,4 @@ damage_per_level = PackedFloat32Array(4, 8, 15)
 fire_rate_per_level = PackedFloat32Array(0.05, 0.04, 0.03)
 weapon_range_per_level = PackedFloat32Array(250, 280, 320)
 sell_price_per_level = PackedInt32Array(5, 12, 36)
+tag = "assault"

@@ -15,3 +15,4 @@ heal_amount_per_level = PackedFloat32Array(20.0, 30.0, 45.0)
 heal_interval_per_level = PackedFloat32Array(3.0, 2.5, 2.0)
 attack_range_per_level = PackedFloat32Array(200, 240, 300)
 sell_price_per_level = PackedInt32Array(8, 19, 57)
+tag = "fortify"

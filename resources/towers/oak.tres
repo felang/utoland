@@ -14,3 +14,4 @@ hp_per_level = PackedFloat32Array(400, 600, 820)
 aura_reduction_per_level = PackedFloat32Array(0.15, 0.19, 0.25)
 attack_range_per_level = PackedFloat32Array(150, 190, 250)
 sell_price_per_level = PackedInt32Array(5, 12, 36)
+tag = "fortify"

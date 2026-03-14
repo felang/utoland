@@ -14,3 +14,4 @@ hp_per_level = PackedFloat32Array(90, 160, 270)
 damage_per_level = PackedFloat32Array(5, 10, 19)
 attack_range_per_level = PackedFloat32Array(180, 220, 275)
 sell_price_per_level = PackedInt32Array(5, 12, 36)
+tag = "blast"
