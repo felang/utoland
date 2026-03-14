@@ -50,6 +50,9 @@ var _recommended_tower: String = ""
 ## 是否首次访问商店
 var is_first_shop_visit: bool = true
 
+## 塔部署 ID 计数器（从 1 开始，0 表示失败）
+var _next_deploy_id: int = 1
+
 ## 羁绊管理器
 var _synergy_manager: SynergyManager
 ## 配对协同管理器
@@ -147,6 +150,7 @@ func reset() -> void:
 	active_pair_synergies = []
 	_synergy_manager = SynergyManager.new()
 	_pair_synergy_manager = PairSynergyManager.new()
+	_next_deploy_id = 1
 
 # ===== 种群系统 =====
 
@@ -209,30 +213,58 @@ func undeploy_weapon(deploy_index: int) -> void:
 	_synergy_manager.recalculate()
 	_pair_synergy_manager.recalculate()
 
-func deploy_tower(bag_index: int, grid_pos: Vector2i) -> bool:
+func deploy_tower(bag_index: int, grid_pos: Vector2i) -> int:
 	if not can_deploy():
-		return false
+		return 0
 	if bag_index < 0 or bag_index >= bag.size():
-		return false
+		return 0
 	var item: Dictionary = bag[bag_index]
 	if item.type != "tower":
-		return false
+		return 0
+	var deploy_id: int = _next_deploy_id
+	_next_deploy_id += 1
 	bag.remove_at(bag_index)
-	deployed_towers.append({id = item.id, level = item.level, grid_pos = grid_pos})
+	deployed_towers.append({id = item.id, level = item.level, grid_pos = grid_pos, deploy_id = deploy_id})
 	EventBus.item_deployed.emit(item)
 	_synergy_manager.recalculate()
 	_pair_synergy_manager.recalculate()
-	return true
+	return deploy_id
 
-func undeploy_tower(deploy_index: int) -> void:
-	if deploy_index < 0 or deploy_index >= deployed_towers.size():
-		return
-	var item: Dictionary = deployed_towers[deploy_index]
-	deployed_towers.remove_at(deploy_index)
+func undeploy_tower(deploy_id: int) -> bool:
+	var tower_index := -1
+	for i in range(deployed_towers.size()):
+		if deployed_towers[i].deploy_id == deploy_id:
+			tower_index = i
+			break
+	if tower_index == -1:
+		return false
+	var item: Dictionary = deployed_towers[tower_index]
+	deployed_towers.remove_at(tower_index)
 	bag.append({id = item.id, type = "tower", level = item.level})
 	EventBus.item_undeployed.emit(item)
 	_synergy_manager.recalculate()
 	_pair_synergy_manager.recalculate()
+	return true
+
+func move_tower(deploy_id: int, new_grid_pos: Vector2i) -> bool:
+	if new_grid_pos.x < 0 or new_grid_pos.x >= GameConfig.MAP_GRID_WIDTH:
+		return false
+	if new_grid_pos.y < 0 or new_grid_pos.y >= GameConfig.MAP_GRID_HEIGHT:
+		return false
+	var tower_index := -1
+	for i in range(deployed_towers.size()):
+		if deployed_towers[i].deploy_id == deploy_id:
+			tower_index = i
+			break
+	if tower_index == -1:
+		return false
+	for i in range(deployed_towers.size()):
+		if i != tower_index and deployed_towers[i].grid_pos == new_grid_pos:
+			return false
+	var old_pos: Vector2i = deployed_towers[tower_index].grid_pos
+	deployed_towers[tower_index].grid_pos = new_grid_pos
+	EventBus.tower_moved.emit(deploy_id, old_pos, new_grid_pos)
+	return true
 
 # ===== 出售 =====
 
@@ -251,11 +283,16 @@ func sell_from_deployed_weapon(deploy_index: int) -> int:
 	var item := {id = entry.id, type = "weapon", level = entry.level}
 	return _apply_sell(item)
 
-func sell_from_deployed_tower(deploy_index: int) -> int:
-	if deploy_index < 0 or deploy_index >= deployed_towers.size():
+func sell_from_deployed_tower(deploy_id: int) -> int:
+	var tower_index := -1
+	for i in range(deployed_towers.size()):
+		if deployed_towers[i].deploy_id == deploy_id:
+			tower_index = i
+			break
+	if tower_index == -1:
 		return 0
-	var entry: Dictionary = deployed_towers[deploy_index]
-	deployed_towers.remove_at(deploy_index)
+	var entry: Dictionary = deployed_towers[tower_index]
+	deployed_towers.remove_at(tower_index)
 	var item := {id = entry.id, type = "tower", level = entry.level}
 	return _apply_sell(item)
 
