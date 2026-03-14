@@ -15,7 +15,14 @@ func get_current_level() -> int:
 	return GameData.owned_weapons.get(weapon_data.id, 1)
 
 func get_damage() -> float:
-	return weapon_data.damage_per_level[get_current_level() - 1]
+	var base: float = weapon_data.damage_per_level[get_current_level() - 1]
+	# 角色被动：低血量伤害加成（仅影响武器伤害，不影响塔伤害）
+	if GameData.character_passive_type == Enums.PassiveType.DAMAGE_ON_LOW_HP:
+		if owner_node and owner_node.has_node("HealthComponent"):
+			var hp: HealthComponent = owner_node.get_node("HealthComponent")
+			if hp.current_hp / hp.max_hp < 0.3:
+				base *= (1.0 + GameData.character_passive_value)
+	return base
 
 func get_fire_rate() -> float:
 	return weapon_data.fire_rate_per_level[get_current_level() - 1]
