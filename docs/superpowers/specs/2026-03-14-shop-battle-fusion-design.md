@@ -142,7 +142,7 @@ ShopManager（RefCounted）保持不变，继续作为商店逻辑的核心被 s
 
 **GameData：**
 - 新增 `_next_deploy_id: int` 自增计数器，`deploy_tower()` 时为新条目分配 `deploy_id`
-- 修改 `deploy_tower()` 返回值：从 `bool` 改为 `int`，成功时返回新条目的 `deploy_id`，失败时返回 `-1`
+- 修改 `deploy_tower()` 返回值：从 `bool` 改为 `int`，成功时返回新条目的 `deploy_id`（从 1 开始），失败时返回 `0`（GDScript 中 0 为 falsy，这样现有 `if deploy_tower(...)` 模式仍然正确）
 - `reset()` 时重置 `_next_deploy_id = 0`
 - 新增 `move_tower(deploy_id: int, new_grid_pos: Vector2i) -> bool`：通过 `deploy_id` 查找条目，更新 `grid_pos`，不触发羁绊重算
 - 修改 `undeploy_tower()` 接口：改为接受 `deploy_id: int` 而非数组索引，内部通过 `deploy_id` 查找条目
