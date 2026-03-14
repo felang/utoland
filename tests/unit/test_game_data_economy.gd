@@ -1,0 +1,267 @@
+extends GutTest
+## GameData 经济系统单元测试
+## 覆盖：初始状态、种群上限、部署/撤回、出售逻辑、buy_level_up
+
+func before_each() -> void:
+	GameData.reset()
+	# 清空背包和部署状态，确保每个测试从干净状态开始
+	GameData.bag = []
+	GameData.deployed_weapons = []
+	GameData.deployed_towers = []
+	GameData.player_level = 1
+	GameData.coins = GameConfig.PLAYER["initial_coins"]
+
+# ===== 初始状态 =====
+
+func test_initial_state_after_reset() -> void:
+	assert_eq(GameData.player_level, 1)
+	assert_eq(GameData.bag.size(), 0)
+	assert_eq(GameData.deployed_weapons.size(), 0)
+	assert_eq(GameData.deployed_towers.size(), 0)
+	assert_eq(GameData.shop_slots.size(), 0)
+	assert_true(GameData.is_first_shop_visit)
+
+# ===== 种群上限 =====
+
+func test_get_population_cap_level1() -> void:
+	GameData.player_level = 1
+	var cap: int = GameData.get_population_cap()
+	# ShopConfig.population_per_level[0] = 2
+	assert_eq(cap, 2)
+
+func test_get_population_cap_level2() -> void:
+	GameData.player_level = 2
+	var cap: int = GameData.get_population_cap()
+	# ShopConfig.population_per_level[1] = 3
+	assert_eq(cap, 3)
+
+func test_get_population_cap_level3() -> void:
+	GameData.player_level = 3
+	var cap: int = GameData.get_population_cap()
+	# ShopConfig.population_per_level[2] = 4
+	assert_eq(cap, 4)
+
+# ===== 种群已用 =====
+
+func test_get_population_used_empty() -> void:
+	assert_eq(GameData.get_population_used(), 0)
+
+func test_get_population_used_with_deployed() -> void:
+	GameData.deployed_weapons.append({id = "rifle", level = 1})
+	GameData.deployed_towers.append({id = "pea_shooter", level = 1, grid_pos = Vector2i(0, 0)})
+	assert_eq(GameData.get_population_used(), 2)
+
+# ===== can_deploy =====
+
+func test_can_deploy_when_under_cap() -> void:
+	GameData.player_level = 1
+	# cap=2, used=0
+	assert_true(GameData.can_deploy())
+
+func test_can_deploy_when_at_cap() -> void:
+	GameData.player_level = 1
+	# cap=2, fill with 2 deployed
+	GameData.deployed_weapons.append({id = "rifle", level = 1})
+	GameData.deployed_towers.append({id = "pea_shooter", level = 1, grid_pos = Vector2i(0, 0)})
+	assert_false(GameData.can_deploy())
+
+# ===== can_buy =====
+
+func test_can_buy_when_bag_empty() -> void:
+	assert_true(GameData.can_buy())
+
+func test_can_buy_when_bag_full() -> void:
+	var config: ShopConfig = GameConfig.shop_config
+	for idx in range(config.bag_capacity):
+		GameData.bag.append({id = "rifle", type = "weapon", level = 1})
+	assert_false(GameData.can_buy())
+
+# ===== buy_level_up =====
+
+func test_buy_level_up_success() -> void:
+	GameData.player_level = 1
+	var config: ShopConfig = GameConfig.shop_config
+	var cost: int = config.level_up_costs[0]
+	GameData.coins = cost + 10
+	var result: bool = GameData.buy_level_up()
+	assert_true(result)
+	assert_eq(GameData.player_level, 2)
+	assert_eq(GameData.coins, 10)
+
+func test_buy_level_up_insufficient_coins() -> void:
+	GameData.player_level = 1
+	GameData.coins = 0
+	var result: bool = GameData.buy_level_up()
+	assert_false(result)
+	assert_eq(GameData.player_level, 1)
+
+func test_buy_level_up_at_max_level() -> void:
+	var config: ShopConfig = GameConfig.shop_config
+	# 设为最高等级（population_per_level 最后一项索引）
+	GameData.player_level = config.population_per_level.size()
+	GameData.coins = 9999
+	var result: bool = GameData.buy_level_up()
+	assert_false(result)
+
+func test_buy_level_up_emits_signal() -> void:
+	var config: ShopConfig = GameConfig.shop_config
+	var cost: int = config.level_up_costs[0]
+	GameData.coins = cost + 100
+	GameData.player_level = 1
+	var level_changes: Array[int] = []
+	EventBus.player_level_changed.connect(func(lvl: int): level_changes.append(lvl))
+	GameData.buy_level_up()
+	assert_eq(level_changes, [2])
+	for conn in EventBus.player_level_changed.get_connections():
+		EventBus.player_level_changed.disconnect(conn["callable"])
+
+# ===== deploy_weapon =====
+
+func test_deploy_weapon_success() -> void:
+	GameData.player_level = 1
+	GameData.bag.append({id = "rifle", type = "weapon", level = 1})
+	var result: bool = GameData.deploy_weapon(0)
+	assert_true(result)
+	assert_eq(GameData.bag.size(), 0)
+	assert_eq(GameData.deployed_weapons.size(), 1)
+	assert_eq(GameData.deployed_weapons[0].id, "rifle")
+	assert_eq(GameData.deployed_weapons[0].level, 1)
+
+func test_deploy_weapon_fails_when_population_full() -> void:
+	GameData.player_level = 1
+	# 填满种群上限（cap=2）
+	GameData.deployed_weapons.append({id = "laser", level = 1})
+	GameData.deployed_towers.append({id = "pea_shooter", level = 1, grid_pos = Vector2i(0, 0)})
+	GameData.bag.append({id = "rifle", type = "weapon", level = 1})
+	var result: bool = GameData.deploy_weapon(0)
+	assert_false(result)
+	assert_eq(GameData.bag.size(), 1)
+	assert_eq(GameData.deployed_weapons.size(), 1)
+
+func test_deploy_weapon_fails_wrong_type() -> void:
+	GameData.player_level = 2
+	GameData.bag.append({id = "pea_shooter", type = "tower", level = 1})
+	var result: bool = GameData.deploy_weapon(0)
+	assert_false(result)
+	assert_eq(GameData.bag.size(), 1)
+
+func test_deploy_weapon_fails_invalid_index() -> void:
+	var result: bool = GameData.deploy_weapon(99)
+	assert_false(result)
+
+# ===== undeploy_weapon =====
+
+func test_undeploy_weapon_success() -> void:
+	GameData.deployed_weapons.append({id = "rifle", level = 2})
+	GameData.undeploy_weapon(0)
+	assert_eq(GameData.deployed_weapons.size(), 0)
+	assert_eq(GameData.bag.size(), 1)
+	assert_eq(GameData.bag[0].id, "rifle")
+	assert_eq(GameData.bag[0].type, "weapon")
+	assert_eq(GameData.bag[0].level, 2)
+
+func test_undeploy_weapon_invalid_index() -> void:
+	GameData.undeploy_weapon(99)
+	assert_eq(GameData.deployed_weapons.size(), 0)
+
+# ===== deploy_tower =====
+
+func test_deploy_tower_success() -> void:
+	GameData.player_level = 2
+	GameData.bag.append({id = "pea_shooter", type = "tower", level = 1})
+	var pos := Vector2i(5, 3)
+	var result: bool = GameData.deploy_tower(0, pos)
+	assert_true(result)
+	assert_eq(GameData.bag.size(), 0)
+	assert_eq(GameData.deployed_towers.size(), 1)
+	assert_eq(GameData.deployed_towers[0].id, "pea_shooter")
+	assert_eq(GameData.deployed_towers[0].grid_pos, pos)
+
+func test_deploy_tower_fails_wrong_type() -> void:
+	GameData.player_level = 2
+	GameData.bag.append({id = "rifle", type = "weapon", level = 1})
+	var result: bool = GameData.deploy_tower(0, Vector2i(0, 0))
+	assert_false(result)
+	assert_eq(GameData.bag.size(), 1)
+
+# ===== undeploy_tower =====
+
+func test_undeploy_tower_success() -> void:
+	GameData.deployed_towers.append({id = "pea_shooter", level = 1, grid_pos = Vector2i(2, 2)})
+	GameData.undeploy_tower(0)
+	assert_eq(GameData.deployed_towers.size(), 0)
+	assert_eq(GameData.bag.size(), 1)
+	assert_eq(GameData.bag[0].id, "pea_shooter")
+	assert_eq(GameData.bag[0].type, "tower")
+
+func test_undeploy_tower_invalid_index() -> void:
+	GameData.undeploy_tower(5)
+	assert_eq(GameData.deployed_towers.size(), 0)
+
+# ===== sell_from_bag =====
+
+func test_sell_from_bag_lv1_weapon() -> void:
+	# rifle lv1 sell_price = 3
+	GameData.bag.append({id = "rifle", type = "weapon", level = 1})
+	var initial_coins: int = GameData.coins
+	var refund: int = GameData.sell_from_bag(0)
+	assert_eq(refund, 3)
+	assert_eq(GameData.coins, initial_coins + 3)
+	assert_eq(GameData.bag.size(), 0)
+
+func test_sell_from_bag_lv2_weapon() -> void:
+	# rifle lv2 sell_price = 7
+	GameData.bag.append({id = "rifle", type = "weapon", level = 2})
+	var initial_coins: int = GameData.coins
+	var refund: int = GameData.sell_from_bag(0)
+	assert_eq(refund, 7)
+	assert_eq(GameData.coins, initial_coins + 7)
+
+func test_sell_from_bag_lv1_tower() -> void:
+	# pea_shooter lv1 sell_price = 3
+	GameData.bag.append({id = "pea_shooter", type = "tower", level = 1})
+	var initial_coins: int = GameData.coins
+	var refund: int = GameData.sell_from_bag(0)
+	assert_eq(refund, 3)
+	assert_eq(GameData.coins, initial_coins + 3)
+	assert_eq(GameData.bag.size(), 0)
+
+func test_sell_from_bag_invalid_index() -> void:
+	var initial_coins: int = GameData.coins
+	var refund: int = GameData.sell_from_bag(0)
+	assert_eq(refund, 0)
+	assert_eq(GameData.coins, initial_coins)
+
+# ===== sell_from_deployed_weapon =====
+
+func test_sell_from_deployed_weapon() -> void:
+	# rifle lv1 sell_price = 3
+	GameData.deployed_weapons.append({id = "rifle", level = 1})
+	var initial_coins: int = GameData.coins
+	var refund: int = GameData.sell_from_deployed_weapon(0)
+	assert_eq(refund, 3)
+	assert_eq(GameData.coins, initial_coins + 3)
+	assert_eq(GameData.deployed_weapons.size(), 0)
+
+func test_sell_from_deployed_weapon_invalid_index() -> void:
+	var initial_coins: int = GameData.coins
+	var refund: int = GameData.sell_from_deployed_weapon(0)
+	assert_eq(refund, 0)
+	assert_eq(GameData.coins, initial_coins)
+
+# ===== sell_from_deployed_tower =====
+
+func test_sell_from_deployed_tower() -> void:
+	# pea_shooter lv1 sell_price = 3
+	GameData.deployed_towers.append({id = "pea_shooter", level = 1, grid_pos = Vector2i(0, 0)})
+	var initial_coins: int = GameData.coins
+	var refund: int = GameData.sell_from_deployed_tower(0)
+	assert_eq(refund, 3)
+	assert_eq(GameData.coins, initial_coins + 3)
+	assert_eq(GameData.deployed_towers.size(), 0)
+
+func test_sell_from_deployed_tower_invalid_index() -> void:
+	var initial_coins: int = GameData.coins
+	var refund: int = GameData.sell_from_deployed_tower(0)
+	assert_eq(refund, 0)
+	assert_eq(GameData.coins, initial_coins)

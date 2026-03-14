@@ -20,17 +20,29 @@ var player_stats: Dictionary = {
 }
 var coins: int = GameConfig.PLAYER["initial_coins"]
 var current_wave: int = 0
-var tower_inventory: Array = []  # 已布置的塔 {type, position}
 var pending_heal: int = 0
 
-## 武器/塔 拥有状态 {id: level}
-var owned_weapons: Dictionary = {}
-var owned_towers: Dictionary = {}
+## 种群等级（商店升级购买）
+var player_level: int = 1
 
-## 经验值/等级系统
-var current_level: int = 1
-var current_xp: int = 0
-var pending_upgrades: int = 0
+## 背包 [{id, type, level}]，最多 bag_capacity 个
+var bag: Array[Dictionary] = []
+
+## 已上阵武器 [{id, level}]
+var deployed_weapons: Array[Dictionary] = []
+
+## 已布置塔 [{id, level, grid_pos}]
+var deployed_towers: Array[Dictionary] = []
+
+## 商店栏位 [{id, type, rarity, cost}] x4
+var shop_slots: Array[Dictionary] = []
+
+## 推荐武器/塔 ID（商店首次访问保证出现）
+var _recommended_weapon: String = ""
+var _recommended_tower: String = ""
+
+## 是否首次访问商店
+var is_first_shop_visit: bool = true
 
 ## 里程碑效果保留字段（初期不使用，后续 milestones 写入）
 var pierce_count: int = 0
@@ -52,13 +64,13 @@ var current_kill_streak: int = 0
 
 const _DEFAULTS: Dictionary = {
 	"current_wave": 0,
-	"tower_inventory": [],
 	"pending_heal": 0,
-	"owned_weapons": {},
-	"owned_towers": {},
-	"current_level": 1,
-	"current_xp": 0,
-	"pending_upgrades": 0,
+	"player_level": 1,
+	"bag": [],
+	"deployed_weapons": [],
+	"deployed_towers": [],
+	"shop_slots": [],
+	"is_first_shop_visit": true,
 	"pierce_count": 0,
 	"multishot_active": false,
 	"multishot_damage_mult": 1.0,
@@ -108,6 +120,7 @@ func reset() -> void:
 		Enums.Stat.TOWER_MULT: 1.0
 	}
 	coins = GameConfig.PLAYER["initial_coins"] + char_data.starting_gold
+	assert(coins >= 6, "初始金币必须 >= 6")
 	# 批量重置
 	for key: String in _DEFAULTS:
 		var val: Variant = _DEFAULTS[key]
@@ -115,29 +128,126 @@ func reset() -> void:
 			set(key, val.duplicate())
 		else:
 			set(key, val)
-	# 从角色配置初始化拥有的武器和塔
-	owned_weapons = {char_data.recommended_weapon: 1}
-	owned_towers = {char_data.recommended_tower: 1}
+	# 从角色配置初始化推荐武器/塔
+	_recommended_weapon = char_data.recommended_weapon
+	_recommended_tower = char_data.recommended_tower
 
-func upgrade_weapon(weapon_id: String) -> void:
-	var current_level: int = owned_weapons.get(weapon_id, 0)
-	if current_level == 0:
-		owned_weapons[weapon_id] = 1
-	else:
-		var wd: WeaponData = GameConfig.weapons[weapon_id]
-		if current_level < wd.max_level:
-			owned_weapons[weapon_id] = current_level + 1
+# ===== 种群系统 =====
 
-func upgrade_tower(tower_id: String) -> void:
-	var current_level: int = owned_towers.get(tower_id, 0)
-	if current_level == 0:
-		owned_towers[tower_id] = 1
-		EventBus.tower_purchased.emit(tower_id)
+func get_population_cap() -> int:
+	var config: ShopConfig = GameConfig.shop_config
+	return config.population_per_level[player_level - 1]
+
+func get_population_used() -> int:
+	return deployed_weapons.size() + deployed_towers.size()
+
+func get_bag_count() -> int:
+	return bag.size()
+
+func can_deploy() -> bool:
+	return get_population_used() < get_population_cap()
+
+func can_buy() -> bool:
+	var config: ShopConfig = GameConfig.shop_config
+	return bag.size() < config.bag_capacity
+
+# ===== 等级升级 =====
+
+func buy_level_up() -> bool:
+	var config: ShopConfig = GameConfig.shop_config
+	if player_level >= config.population_per_level.size():
+		return false
+	var cost: int = config.level_up_costs[player_level - 1]
+	if coins < cost:
+		return false
+	coins -= cost
+	player_level += 1
+	EventBus.player_level_changed.emit(player_level)
+	EventBus.coins_changed.emit(-cost, coins)
+	return true
+
+# ===== 部署/撤回 =====
+
+func deploy_weapon(bag_index: int) -> bool:
+	if not can_deploy():
+		return false
+	if bag_index < 0 or bag_index >= bag.size():
+		return false
+	var item: Dictionary = bag[bag_index]
+	if item.type != "weapon":
+		return false
+	bag.remove_at(bag_index)
+	deployed_weapons.append({id = item.id, level = item.level})
+	EventBus.item_deployed.emit(item)
+	return true
+
+func undeploy_weapon(deploy_index: int) -> void:
+	if deploy_index < 0 or deploy_index >= deployed_weapons.size():
+		return
+	var item: Dictionary = deployed_weapons[deploy_index]
+	deployed_weapons.remove_at(deploy_index)
+	bag.append({id = item.id, type = "weapon", level = item.level})
+	EventBus.item_undeployed.emit(item)
+
+func deploy_tower(bag_index: int, grid_pos: Vector2i) -> bool:
+	if not can_deploy():
+		return false
+	if bag_index < 0 or bag_index >= bag.size():
+		return false
+	var item: Dictionary = bag[bag_index]
+	if item.type != "tower":
+		return false
+	bag.remove_at(bag_index)
+	deployed_towers.append({id = item.id, level = item.level, grid_pos = grid_pos})
+	EventBus.item_deployed.emit(item)
+	return true
+
+func undeploy_tower(deploy_index: int) -> void:
+	if deploy_index < 0 or deploy_index >= deployed_towers.size():
+		return
+	var item: Dictionary = deployed_towers[deploy_index]
+	deployed_towers.remove_at(deploy_index)
+	bag.append({id = item.id, type = "tower", level = item.level})
+	EventBus.item_undeployed.emit(item)
+
+# ===== 出售 =====
+
+func sell_from_bag(bag_index: int) -> int:
+	if bag_index < 0 or bag_index >= bag.size():
+		return 0
+	var item: Dictionary = bag[bag_index]
+	bag.remove_at(bag_index)
+	return _apply_sell(item)
+
+func sell_from_deployed_weapon(deploy_index: int) -> int:
+	if deploy_index < 0 or deploy_index >= deployed_weapons.size():
+		return 0
+	var entry: Dictionary = deployed_weapons[deploy_index]
+	deployed_weapons.remove_at(deploy_index)
+	var item := {id = entry.id, type = "weapon", level = entry.level}
+	return _apply_sell(item)
+
+func sell_from_deployed_tower(deploy_index: int) -> int:
+	if deploy_index < 0 or deploy_index >= deployed_towers.size():
+		return 0
+	var entry: Dictionary = deployed_towers[deploy_index]
+	deployed_towers.remove_at(deploy_index)
+	var item := {id = entry.id, type = "tower", level = entry.level}
+	return _apply_sell(item)
+
+func _apply_sell(item: Dictionary) -> int:
+	var data: Resource
+	if item.type == "weapon":
+		data = GameConfig.weapons[item.id]
 	else:
-		var td: TowerData = GameConfig.towers[tower_id]
-		if current_level < td.max_level:
-			owned_towers[tower_id] = current_level + 1
-			EventBus.tower_upgraded.emit(tower_id)
+		data = GameConfig.towers[item.id]
+	var refund: int = data.sell_price_per_level[item.level - 1]
+	coins += refund
+	EventBus.item_sold.emit(item, refund)
+	EventBus.coins_changed.emit(refund, coins)
+	return refund
+
+# ===== 统计 =====
 
 func record_kill() -> void:
 	total_kills += 1
@@ -153,15 +263,3 @@ func record_damage_taken(amount: float) -> void:
 
 func record_coins_earned(amount: int) -> void:
 	total_coins_earned += amount
-
-func get_xp_to_next_level() -> int:
-	return ceili(15.0 * pow(1.4, current_level - 1))
-
-func add_xp(amount: int) -> void:
-	current_xp += amount
-	while current_xp >= get_xp_to_next_level():
-		current_xp -= get_xp_to_next_level()
-		current_level += 1
-		pending_upgrades += 1
-		EventBus.player_leveled_up.emit(current_level)
-	EventBus.xp_changed.emit(current_xp, get_xp_to_next_level())
