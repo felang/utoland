@@ -6,6 +6,9 @@
 script = ExtResource("1")
 id = "rocket"
 display_name = "火箭筒"
+description = "发射火箭弹，造成范围爆炸伤害"
+icon_path = ""
+rarity = 1
 weapon_type = "rocket"
 projectile_type = "rocket"
 max_level = 5

@@ -6,6 +6,9 @@
 script = ExtResource("1")
 id = "lightning"
 display_name = "闪电链"
+description = "闪电链式弹跳，可打击多个敌人"
+icon_path = ""
+rarity = 2
 weapon_type = "lightning"
 projectile_type = "chain"
 max_level = 5

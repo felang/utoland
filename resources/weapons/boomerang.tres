@@ -6,6 +6,9 @@
 script = ExtResource("1")
 id = "boomerang"
 display_name = "回旋镖"
+description = "投掷后自动返回，可二次命中"
+icon_path = ""
+rarity = 0
 weapon_type = "boomerang"
 projectile_type = "boomerang"
 max_level = 5

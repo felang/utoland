@@ -6,6 +6,9 @@
 script = ExtResource("1")
 id = "laser"
 display_name = "激光枪"
+description = "持续光束，快速射击"
+icon_path = ""
+rarity = 1
 weapon_type = "laser"
 projectile_type = "laser"
 max_level = 5

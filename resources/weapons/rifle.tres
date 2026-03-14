@@ -6,6 +6,9 @@
 script = ExtResource("1")
 id = "rifle"
 display_name = "步枪"
+description = "基础连射武器，稳定可靠"
+icon_path = ""
+rarity = 0
 weapon_type = "bullet"
 max_level = 5
 damage_per_level = PackedFloat32Array(10, 15, 22, 30, 40)

@@ -6,6 +6,9 @@
 script = ExtResource("1")
 id = "flamethrower"
 display_name = "火焰喷射"
+description = "持续锥形火焰，灼烧区域敌人"
+icon_path = ""
+rarity = 2
 weapon_type = "flamethrower"
 projectile_type = "flame"
 max_level = 5

@@ -6,6 +6,9 @@
 script = ExtResource("1")
 id = "blade"
 display_name = "旋刃"
+description = "近距离环形斩击"
+icon_path = ""
+rarity = 1
 weapon_type = "blade"
 projectile_type = "melee"
 max_level = 5

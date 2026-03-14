@@ -6,6 +6,9 @@
 script = ExtResource("1")
 id = "ice_gun"
 display_name = "冰冻枪"
+description = "命中敌人施加减速效果"
+icon_path = ""
+rarity = 1
 weapon_type = "ice_gun"
 projectile_type = "bullet"
 max_level = 5

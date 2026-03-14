@@ -6,6 +6,9 @@
 script = ExtResource("1")
 id = "shotgun"
 display_name = "霰弹枪"
+description = "近距离散射，一次发射多枚弹丸"
+icon_path = ""
+rarity = 0
 weapon_type = "shotgun"
 projectile_type = "bullet"
 max_level = 5
