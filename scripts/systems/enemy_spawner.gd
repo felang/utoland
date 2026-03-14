@@ -1,6 +1,11 @@
 extends Node
+class_name EnemySpawner
 
 enum BossPhase { NONE, ESCORT, BOSS, DONE }
+
+const SCALING_START_WAVE := 11
+const HP_SCALING_PER_WAVE := 1.06
+const DAMAGE_SCALING_PER_WAVE := 1.04
 
 var spawn_timer: float = 0.0
 var enemies_spawned: int = 0
@@ -51,6 +56,16 @@ func _should_spawn() -> bool:
 		return false
 	return enemies_spawned < _current_wave_data.total_enemies
 
+## 返回指定波次的缩放倍率，第 11 波开始缩放
+static func get_wave_scaling(wave_number: int) -> Dictionary:
+	if wave_number < SCALING_START_WAVE:
+		return {"hp_mult": 1.0, "damage_mult": 1.0}
+	var waves_past: int = wave_number - SCALING_START_WAVE + 1
+	return {
+		"hp_mult": pow(HP_SCALING_PER_WAVE, waves_past),
+		"damage_mult": pow(DAMAGE_SCALING_PER_WAVE, waves_past)
+	}
+
 func pick_weighted_enemy(weights: Dictionary) -> String:
 	var total_weight: int = 0
 	for w: int in weights.values():
@@ -80,6 +95,14 @@ func spawn_enemy() -> void:
 			_current_wave_data.elite_coin_mult,
 			_current_wave_data.elite_scale
 		)
+	# 波次缩放（仅非 Boss 敌人，在精英化之后叠加）
+	if not enemy.data.is_boss:
+		var scaling = get_wave_scaling(_current_wave_data.wave_number)
+		if scaling.hp_mult > 1.0:
+			enemy.health.max_hp *= scaling.hp_mult
+			enemy.health.current_hp = enemy.health.max_hp
+			enemy._hitbox.damage *= scaling.damage_mult
+			enemy.tower_attack_damage *= scaling.damage_mult
 
 func get_random_spawn_position() -> Vector2:
 	var spawn_pos = Vector2.ZERO
