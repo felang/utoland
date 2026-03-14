@@ -31,10 +31,12 @@ class TowerRarity:
 
 文件：`scripts/resources/tower_data.gd`
 
-**新增字段：**
-- `description: String` — 功能+风味结合的描述文本
-- `icon_path: String` — 图标路径（预留）
-- `rarity: int` — 稀有度，对应 TowerRarity 枚举值
+**新增字段（含默认值，与 WeaponData 一致）：**
+- `description: String = ""` — 功能+风味结合的描述文本
+- `icon_path: String = ""` — 图标路径（预留）
+- `rarity: int = 0` — 稀有度，对应 TowerRarity 枚举值
+
+**注意：** 毒蘑菇(mushroom)和仙人掌(cactus)仅使用基础等级字段（damage/fire_rate/attack_range），无专有字段，因此不需要专有 `@export_group`。
 
 **分组结构（@export_group）：**
 
@@ -124,9 +126,18 @@ const TOWER_RARITY_WEIGHTS: Dictionary = {
 
 文件：`scripts/ui/upgrade_card_builder.gd`
 
-- 塔边框颜色改为按稀有度着色，复用 `RARITY_COLORS`（蓝/紫/橙）
+- 塔边框颜色改为按稀有度着色，复用 `RARITY_COLORS`（蓝/紫/橙）。`RARITY_COLORS` 以整数 0/1/2 为 key，`WeaponRarity` 和 `TowerRarity` 共享相同整数值，因此可直接复用
 - 背景色保持绿色系（`#1a2a1a`）以区分武器
-- 塔卡片新增 description 显示（与武器逻辑一致）
+- 塔卡片新增 description 显示逻辑：
+
+```gdscript
+else:
+    var td: TowerData = GameConfig.towers[opt["id"]]
+    if td.description != "":
+        # 创建 desc_lbl（与武器逻辑一致）
+```
+
+- 顺带清理武器描述分支中 `if not opt.has("_wd")` 的无用判断（opt 字典中从不包含 `_wd` key）
 
 ### 7. 测试
 
@@ -137,6 +148,20 @@ const TOWER_RARITY_WEIGHTS: Dictionary = {
 - 所有塔有非空 description
 - 稀有度分布：COMMON 6 / RARE 5 / EPIC 4
 - TowerRarity 枚举值正确
+- `TOWER_RARITY_WEIGHTS` 映射包含所有三个稀有度等级且权重递减
+
+## 修改文件清单
+
+| 文件 | 操作 |
+|---|---|
+| `scripts/core/enums.gd` | 新增 TowerRarity 类 |
+| `scripts/resources/tower_data.gd` | @export_group + 新增字段 |
+| `resources/towers/*.tres` (15 个) | 添加 description/icon_path/rarity |
+| `scripts/systems/upgrade_generator.gd` | 新增 TOWER_RARITY_WEIGHTS，塔池使用权重 |
+| `scripts/ui/upgrade_card_builder.gd` | 塔稀有度着色 + 描述显示 + 清理 _wd 判断 |
+| `tests/unit/test_tower_data.gd` (新建) | 稀有度/描述/权重测试 |
+
+**注意：** `_apply_weights()` 方法（武器/塔数量平衡的 1.5x 权重）不需要修改，它与稀有度权重独立。
 
 ## 不在本次范围
 
