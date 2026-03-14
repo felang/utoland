@@ -98,6 +98,12 @@ class PassiveType:
 	const COIN_BONUS = "coin_bonus"
 	const DAMAGE_ON_LOW_HP = "damage_on_low_hp"
 
+# 武器稀有度
+class WeaponRarity:
+	const COMMON = 0
+	const RARE = 1
+	const EPIC = 2
+
 # 回旋镖状态
 enum BoomerangState { OUTBOUND, RETURNING }
 
