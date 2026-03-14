@@ -23,7 +23,6 @@ func _ready() -> void:
 	total_waves = GameConfig.waves.size()
 	if GameData.current_wave > 0:
 		current_wave = GameData.current_wave
-	start_next_wave()
 
 func _process(delta: float) -> void:
 	if is_wave_active:

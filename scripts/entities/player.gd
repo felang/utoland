@@ -6,6 +6,7 @@ const BLINK_RESET_DURATION: float = 0.01      # 闪烁结束后恢复透明度�
 var speed: float = 0.0  # 从 GameData 初始化
 @export var invincible_duration: float = 0.5
 var coins: int = 0
+var _input_enabled: bool = true
 var invincible_timer: float = 0.0
 var _blink_tween: Tween = null
 
@@ -58,7 +59,14 @@ func _process(delta: float) -> void:
 	# 被动技能更新
 	_process_passives(delta)
 
+func set_input_enabled(enabled: bool) -> void:
+	_input_enabled = enabled
+
 func _physics_process(_delta: float) -> void:
+	if not _input_enabled:
+		velocity = Vector2.ZERO
+		move_and_slide()
+		return
 	var input_vector: Vector2 = Vector2.ZERO
 	input_vector.x = Input.get_axis("move_left", "move_right")
 	input_vector.y = Input.get_axis("move_up", "move_down")

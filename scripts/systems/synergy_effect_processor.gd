@@ -34,6 +34,7 @@ var _tactical_bomb_count: int = 3
 # 标记：由 SlowHandler 在减速到期时触发
 # 由 _on_timed_slow_expired 中检查
 
+var _is_active: bool = false
 
 func _ready() -> void:
 	add_to_group("synergy_processor")
@@ -42,7 +43,15 @@ func _ready() -> void:
 	EventBus.tower_destroyed.connect(_on_tower_destroyed)
 
 
+func activate() -> void:
+	_is_active = true
+
+func deactivate() -> void:
+	_is_active = false
+
 func _process(delta: float) -> void:
+	if not _is_active:
+		return
 	# 狂热计时
 	if _frenzy_active:
 		_frenzy_timer -= delta

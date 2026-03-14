@@ -5,7 +5,6 @@ const SCENES: Dictionary = {
 	"character_selection": "res://scenes/ui/character_selection.tscn",
 	"map_select":          "res://scenes/ui/map_select.tscn",
 	"result":              "res://scenes/ui/result.tscn",
-	"shop":                "res://scenes/ui/shop.tscn",
 	"main":                "res://scenes/levels/main.tscn",
 }
 
@@ -15,7 +14,6 @@ const SCENE_BGM: Dictionary = {
 	"start_menu": "menu",
 	"character_selection": "menu",
 	"map_select": "menu",
-	"shop": "placement",
 	"main": "battle",
 	"result": "result",
 }
