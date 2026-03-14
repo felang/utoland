@@ -21,6 +21,7 @@ const BUFF_PADDING_V: int = 2               # 增益标签垂直内边距
 var player: Node2D = null
 var _wave_time_left: float = 0.0
 var _is_wave_active: bool = false
+var _is_battle_phase: bool = false
 var _wave_kills: int = 0
 var _last_coins: int = -1
 
@@ -73,7 +74,17 @@ func _bounce_label(label: Control) -> void:
 	tween.tween_property(label, "scale", Vector2(1.3, 1.3), 0.1)
 	tween.tween_property(label, "scale", Vector2.ONE, 0.1)
 
+func set_battle_phase(is_battle: bool) -> void:
+	_is_battle_phase = is_battle
+	if not is_battle:
+		timer_display.text = "准备中"
+		kill_display.visible = false
+	else:
+		kill_display.visible = true
+
 func _update_timer(delta: float) -> void:
+	if not _is_battle_phase:
+		return
 	if _is_wave_active:
 		_wave_time_left -= delta
 		if _wave_time_left < 0:
