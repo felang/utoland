@@ -2,12 +2,12 @@ extends GutTest
 
 func test_init_character_sets_passive_fields() -> void:
 	GameData.init_character(Enums.Character.DORA)
-	assert_eq(GameData.character_passive_type, "", "默认角色应无被动")
-	assert_eq(GameData.character_passive_value, 0.0, "默认角色被动值应为 0")
+	assert_eq(GameData.character_passive_type, "coin_bonus", "Dora 被动类型应为 coin_bonus")
+	assert_almost_eq(GameData.character_passive_value, 0.2, 0.001, "Dora 被动值应为 0.2")
 
 func test_coin_drop_mult_default() -> void:
 	GameData.init_character(Enums.Character.DORA)
-	assert_eq(GameData.coin_drop_mult, 1.0, "无 coin_bonus 被动时倍率应为 1.0")
+	assert_almost_eq(GameData.coin_drop_mult, 1.2, 0.001, "Dora coin_bonus 被动应使倍率为 1.2")
 
 func test_reset_applies_starting_gold() -> void:
 	GameData.current_character = Enums.Character.DORA

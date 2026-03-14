@@ -15,8 +15,8 @@ func test_weapon_rifle_resource() -> void:
 	assert_eq(w.id, Enums.WeaponId.RIFLE)
 	assert_eq(w.display_name, "步枪")
 	assert_eq(w.projectile_type, Enums.ProjectileId.BULLET)
-	assert_almost_eq(w.fire_rate_per_level[0], 0.1, 0.001)
-	assert_almost_eq(w.damage_per_level[0], 10.0, 0.001)
+	assert_almost_eq(w.fire_rate_per_level[0], 0.12, 0.001)
+	assert_almost_eq(w.damage_per_level[0], 8.0, 0.001)
 	assert_almost_eq(w.weapon_range_per_level[0], 150.0, 0.001)
 	assert_eq(w.bullet_count, 1)
 	assert_eq(w.bullet_speed, 300.0)
@@ -36,7 +36,7 @@ func test_weapon_laser_resource() -> void:
 	var w: WeaponData = GameConfig.weapons[Enums.WeaponId.LASER]
 	assert_eq(w.projectile_type, Enums.ProjectileId.LASER)
 	assert_almost_eq(w.fire_rate_per_level[0], 0.15, 0.001)
-	assert_almost_eq(w.damage_per_level[0], 8.0, 0.001)
+	assert_almost_eq(w.damage_per_level[0], 12.0, 0.001)
 	assert_eq(w.beam_range, 200.0)
 	assert_eq(w.beam_width, 2.0)
 	assert_eq(w.beam_duration, 0.08)
@@ -135,22 +135,22 @@ func test_character_dora_resource() -> void:
 func test_character_gorg_resource() -> void:
 	var c: CharacterData = GameConfig.characters[Enums.Character.GORG]
 	assert_eq(c.display_name, "格格")
-	assert_eq(c.default_weapon, Enums.WeaponId.RIFLE)
+	assert_eq(c.default_weapon, Enums.WeaponId.BLADE)
 
 func test_character_kaze_resource() -> void:
 	var c: CharacterData = GameConfig.characters[Enums.Character.KAZE]
 	assert_eq(c.display_name, "风")
-	assert_eq(c.default_weapon, Enums.WeaponId.RIFLE)
+	assert_eq(c.default_weapon, Enums.WeaponId.MINIGUN)
 
 func test_character_merlin_resource() -> void:
 	var c: CharacterData = GameConfig.characters[Enums.Character.MERLIN]
 	assert_eq(c.display_name, "梅林")
-	assert_eq(c.default_weapon, Enums.WeaponId.RIFLE)
+	assert_eq(c.default_weapon, Enums.WeaponId.LASER)
 
 func test_character_nemo_resource() -> void:
 	var c: CharacterData = GameConfig.characters[Enums.Character.NEMO]
 	assert_eq(c.display_name, "尼莫")
-	assert_eq(c.default_weapon, Enums.WeaponId.RIFLE)
+	assert_eq(c.default_weapon, Enums.WeaponId.ICE_GUN)
 
 func test_character_has_sprite_frames_path() -> void:
 	var c: CharacterData = GameConfig.characters[Enums.Character.DORA]
