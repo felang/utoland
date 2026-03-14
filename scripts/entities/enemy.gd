@@ -25,6 +25,7 @@ var player: Node2D = null
 # Root（定身）系统
 var is_rooted: bool = false
 var _pre_root_speed: float = 0.0
+var _root_source: String = ""  # 定身来源标记
 
 @onready var health: HealthComponent = $HealthComponent
 @onready var _knockback: KnockbackHandler = $KnockbackHandler
@@ -45,6 +46,7 @@ func _ready() -> void:
 
 	# 连接组件信号
 	health.died.connect(_on_died)
+	health.died_with_overkill.connect(_on_died_with_overkill)
 	slow_handler.speed_changed.connect(_on_speed_changed)
 	$Hurtbox.hit_taken.connect(_on_hurtbox_hit)
 
@@ -91,6 +93,8 @@ func _attack_tower(_delta: float) -> void:
 		attack_timer = tower_attack_rate
 
 func take_damage(amount: float) -> void:
+	# Control 3: 脆弱标记 — 被控制的敌人受到额外伤害
+	amount = _apply_vulnerable_mult(amount)
 	health.take_damage(amount)
 
 func die() -> void:
@@ -149,8 +153,9 @@ func _on_hurtbox_hit(damage: float, knockback_dir: Vector2) -> void:
 	if knockback_dir.length() > 0:
 		_knockback.apply_knockback(knockback_dir.normalized())
 
-func apply_root(duration: float) -> void:
+func apply_root(duration: float, source: String = "") -> void:
 	is_rooted = true
+	_root_source = source
 	_pre_root_speed = speed
 	speed = 0.0
 	velocity = Vector2.ZERO
@@ -160,11 +165,52 @@ func apply_root(duration: float) -> void:
 func remove_root() -> void:
 	if not is_rooted:
 		return
+	var was_chain_freeze: bool = (_root_source == "chain_freeze")
 	is_rooted = false
+	_root_source = ""
 	speed = _pre_root_speed
+	# Control 5: 定身到期时也可触发连锁控制（但连锁控制产生的定身不再触发）
+	if not was_chain_freeze:
+		_try_chain_freeze_from_root()
 
 func _on_speed_changed(new_speed: float) -> void:
 	if is_rooted:
 		_pre_root_speed = new_speed  # 保存速度但不覆盖实际速度
 		return
 	speed = new_speed
+
+
+## Control 5: 从定身到期触发连锁控制
+func _try_chain_freeze_from_root() -> void:
+	var processor: SynergyEffectProcessor = _get_synergy_processor()
+	if processor and processor.should_chain_freeze():
+		apply_root(1.0, "chain_freeze")
+
+
+## Assault 5: 溢杀 — 转发给处理器
+func _on_died_with_overkill(overkill_damage: float, death_position: Vector2) -> void:
+	var processor: SynergyEffectProcessor = _get_synergy_processor()
+	if processor:
+		processor.handle_overkill(overkill_damage, death_position)
+
+
+## Control 3: 脆弱标记伤害加成
+func _apply_vulnerable_mult(amount: float) -> float:
+	var processor: SynergyEffectProcessor = _get_synergy_processor()
+	if processor:
+		return amount * processor.get_vulnerable_mult(self)
+	return amount
+
+
+## 获取羁绊效果处理器
+func _get_synergy_processor() -> SynergyEffectProcessor:
+	if not is_inside_tree():
+		return null
+	var processors: Array[Node] = get_tree().get_nodes_in_group("synergy_processor")
+	if processors.size() > 0:
+		return processors[0] as SynergyEffectProcessor
+	# 回退：从场景树查找
+	var root: Node = get_tree().current_scene
+	if root:
+		return root.get_node_or_null("SynergyEffectProcessor") as SynergyEffectProcessor
+	return null

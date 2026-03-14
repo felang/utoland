@@ -3,6 +3,7 @@ extends Node2D
 const GRID_SIZE: int = GameConfig.GRID_SIZE
 
 var _tower_container: Node2D = null
+var _synergy_processor: SynergyEffectProcessor = null
 
 func _ready() -> void:
 	_tower_container = Node2D.new()
@@ -10,6 +11,10 @@ func _ready() -> void:
 	add_child(_tower_container)
 	_load_map()
 	_restore_towers()
+	# 羁绊效果处理器
+	_synergy_processor = SynergyEffectProcessor.new()
+	_synergy_processor.name = "SynergyEffectProcessor"
+	add_child(_synergy_processor)
 	# 暂停覆盖层
 	var pause_overlay = load("res://scripts/ui/pause_overlay.gd").new()
 	add_child(pause_overlay)

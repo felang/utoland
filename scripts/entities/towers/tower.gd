@@ -76,4 +76,5 @@ func _recalc_buffs() -> void:
 		speed_mult *= data_entry["spd"]
 
 func _on_died() -> void:
+	EventBus.tower_destroyed.emit(tower_type, global_position)
 	queue_free()

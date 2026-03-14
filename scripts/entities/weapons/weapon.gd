@@ -43,7 +43,22 @@ func tick(delta: float, target: Node2D) -> void:
 	if _cooldown <= 0.0 and target:
 		fire(target)
 		var speed_mult: float = GameData.player_stats.get(Enums.Stat.ATTACK_SPEED_MULT, 1.0)
+		# Assault 3: 狂热 — 攻速翻倍（冷却减半）
+		if _is_frenzy_active():
+			speed_mult *= 2.0
 		_cooldown = get_fire_rate() / speed_mult
 
 func fire(_target: Node2D) -> void:
 	pass  # 子类实现
+
+
+## 查询狂热是否激活
+func _is_frenzy_active() -> bool:
+	if not is_inside_tree():
+		return false
+	var processors: Array[Node] = get_tree().get_nodes_in_group("synergy_processor")
+	if processors.size() > 0:
+		var processor: SynergyEffectProcessor = processors[0] as SynergyEffectProcessor
+		if processor:
+			return processor.is_frenzy_active()
+	return false
