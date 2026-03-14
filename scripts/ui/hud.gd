@@ -10,7 +10,6 @@ const BUFF_PADDING_V: int = 2               # 增益标签垂直内边距
 @onready var hp_progress: ProgressBar = $TopBar/MarginContainer/HBoxContainer/HPBar/HPProgress
 @onready var hp_text: Label = $TopBar/MarginContainer/HBoxContainer/HPBar/HPText
 @onready var hp_icon: Label = $TopBar/MarginContainer/HBoxContainer/HPBar/HPIcon
-@onready var xp_progress: ProgressBar = $TopBar/MarginContainer/HBoxContainer/XPBar/XPProgress
 @onready var xp_icon: Label = $TopBar/MarginContainer/HBoxContainer/XPBar/XPIcon
 @onready var coin_icon: Label = $TopBar/MarginContainer/HBoxContainer/CoinDisplay/CoinIcon
 @onready var coin_text: Label = $TopBar/MarginContainer/HBoxContainer/CoinDisplay/CoinText
