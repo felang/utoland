@@ -104,6 +104,13 @@ class WeaponRarity:
 	const RARE = 1
 	const EPIC = 2
 
+
+# 塔稀有度
+class TowerRarity:
+	const COMMON = 0
+	const RARE = 1
+	const EPIC = 2
+
 # 回旋镖状态
 enum BoomerangState { OUTBOUND, RETURNING }
 
