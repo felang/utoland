@@ -21,15 +21,17 @@ signal coins_changed(amount: int, total: int)
 signal coin_collected(value: int, position: Vector2)
 signal coins_generated(amount: int, position: Vector2)
 
-# 等级系统
-signal player_leveled_up(level: int)
-signal xp_changed(current_xp: int, xp_to_next: int)
-
 # 视觉反馈
 signal camera_shake_requested(intensity: float, duration: float)
 
 # 塔防事件
 signal tower_placed(tower_type: String, position: Vector2)
 signal tower_destroyed(tower_type: String, position: Vector2)
-signal tower_upgraded(tower_type: String)
-signal tower_purchased(tower_type: String)
+
+# 商店系统
+signal item_purchased(item: Dictionary)
+signal item_sold(item: Dictionary, refund: int)
+signal item_merged(item_id: String, new_level: int)
+signal item_deployed(item: Dictionary)
+signal item_undeployed(item: Dictionary)
+signal player_level_changed(new_level: int)
