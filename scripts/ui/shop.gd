@@ -43,10 +43,10 @@ func _ready() -> void:
 
 func _update_ui() -> void:
 	# 顶栏
-	_coins_label.text = "💰 %d" % GameData.coins
+	_coins_label.text = "💰%d" % GameData.coins
 	_level_label.text = "Lv%d" % GameData.player_level
-	_pop_label.text = "人口 %d/%d" % [GameData.get_population_used(), GameData.get_population_cap()]
-	_wave_label.text = "第 %d 波" % (GameData.current_wave + 1)
+	_pop_label.text = "%d/%d" % [GameData.get_population_used(), GameData.get_population_cap()]
+	_wave_label.text = "波%d" % (GameData.current_wave + 1)
 	_update_level_up_button()
 	_update_shop_slots()
 	_update_bag()
@@ -60,7 +60,7 @@ func _update_level_up_button() -> void:
 		_level_up_button.disabled = true
 	else:
 		var cost: int = config.level_up_costs[GameData.player_level - 1]
-		_level_up_button.text = "升本 %d💰 → Lv%d" % [cost, GameData.player_level + 1]
+		_level_up_button.text = "升本%d💰" % cost
 		_level_up_button.disabled = GameData.coins < cost
 
 func _update_shop_slots() -> void:
@@ -84,7 +84,7 @@ func _update_bag() -> void:
 	var config: ShopConfig = GameConfig.shop_config
 	for i in config.bag_capacity:
 		var btn: Button = Button.new()
-		btn.custom_minimum_size = Vector2(72, 72)
+		btn.custom_minimum_size = Vector2(50, 50)
 		if i < GameData.bag.size():
 			var item: Dictionary = GameData.bag[i]
 			var data: Resource = _get_item_data(item.id)
