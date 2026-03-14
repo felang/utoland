@@ -49,7 +49,8 @@ start_menu → character_selection → map_select → shop（首次，用初始�
 ### 规则
 
 - 武器和塔各占 **1 人口**，不区分类型
-- 纯人口限制，无独立武器栏上限，玩家可自由搭配武器/塔比例
+- 纯人口限制，无独立武器栏上限，玩家可自由搭配武器/塔比例（理论上可全武器 0 塔，或全塔 0 武器）
+- 背包中的物品**不占人口**，只有已装备（deployed）的才占人口
 - 合成释放人口：3 个占 3 人口 → 合成后 1 个占 1 人口（净释放 2）
 - 角色不自带默认武器/塔，初始 2 人口，第一波前在商店用初始金币购买
 
@@ -90,7 +91,8 @@ start_menu → character_selection → map_select → shop（首次，用初始�
 ### 卖出规则
 
 - **Lv1**：原价返还（全额）
-- **Lv2+**：按投入成本的 **80%** 返还
+- **Lv2+**：按投入成本的 **80%** 返还，向下取整（floor）
+- 卖出价由 `sell_price_per_level` 字段定义（硬编码在各物品 Resource 中，而非运行时计算）
 
 | 稀有度 | 买入价 | Lv1 卖出 | Lv2 投入 | Lv2 卖出 | Lv3 投入 | Lv3 卖出 |
 |--------|-------|---------|---------|---------|---------|---------|
@@ -120,6 +122,17 @@ start_menu → character_selection → map_select → shop（首次，用初始�
 
 - 购买物品进入背包时
 - 只要 bag + deployed 中存在 ≥3 个同 id 同 level 的物品即触发
+
+### 已部署物品被合成时的处理
+
+合成只在商店阶段触发（战斗中不购买），状态变更如下：
+
+1. **已装备武器被合成**：武器从角色装备栏移除（undeploy），人口释放
+2. **已布置塔被合成**：塔从地图上移除，网格位置释放，人口释放
+3. **合成品**：始终放入背包，不自动部署
+4. **人口变化**：立即重算（3 个占用 → 1 个在背包不占用，净释放 3 人口）
+
+> 注意：背包中的物品不占人口，只有 deployed（装备/布置）才占人口。
 
 ## 5. 商店场景 UI 布局
 
@@ -163,8 +176,10 @@ start_menu → character_selection → map_select → shop（首次，用初始�
 # ... 其他 per_level 字段同理
 
 # 新增
-@export var shop_cost: int  # 购买价格（由 rarity 决定：3/5/8）
-@export var sell_price_per_level: PackedInt32Array  # 各级卖出价
+@export var sell_price_per_level: PackedInt32Array  # 各级卖出价，硬编码
+
+# 删除
+# shop_price_per_level — 由 ShopConfig.cost_by_rarity 统一管理
 ```
 
 ### TowerData 变更
@@ -178,10 +193,10 @@ start_menu → character_selection → map_select → shop（首次，用初始�
 
 # 删除
 # place_cost_per_level — 免费放置，不再需要
+# shop_price_per_level — 由 ShopConfig.cost_by_rarity 统一管理
 
 # 新增
-@export var shop_cost: int  # 购买价格
-@export var sell_price_per_level: PackedInt32Array  # 各级卖出价
+@export var sell_price_per_level: PackedInt32Array  # 各级卖出价，硬编码
 ```
 
 ### per_level 数值映射策略
@@ -203,11 +218,10 @@ extends Resource
 @export var slot_count: int = 4
 @export var refresh_cost: int = 2
 @export var bag_capacity: int = 10
-@export var cost_by_rarity: Dictionary = {0: 3, 1: 5, 2: 8}
+@export var cost_by_rarity: PackedInt32Array = [3, 5, 8]  # index = rarity
 @export var level_up_costs: PackedInt32Array = [4, 8, 12, 20, 28, 36]
 @export var population_per_level: PackedInt32Array = [2, 3, 4, 5, 6, 7, 8]
-@export var rarity_weights: Dictionary  # {level: {rarity: weight}}
-@export var sell_ratio_lv2_plus: float = 0.8
+@export var rarity_weights: Array[PackedFloat32Array]  # index = level-1, 内部 [普通%, 稀有%, 史诗%]
 ```
 
 ### CharacterData 变更
@@ -262,7 +276,9 @@ func _collect_all_items() -> Array[Dictionary]
 
 - `var owned_weapons / owned_towers`
 - `var current_xp / current_level / pending_upgrades`
+- `var tower_inventory` — 已布置塔列表（由 `deployed_towers` 取代）
 - `func add_xp() / upgrade_weapon() / upgrade_tower()`
+- 里程碑相关字段（`pierce_count`, `multishot_active`, `split_count`, `bullet_speed_mult`, `weapon_range_mult`, `crit_chance`, `crit_damage_mult` 等）暂时保留，后续评估是否需要通过其他机制（如装备词条）替代
 
 ## 8. 战斗系统对接
 
@@ -307,8 +323,10 @@ func _collect_all_items() -> Array[Dictionary]
 
 **保留：**
 - `coins_changed`
+- `coin_collected`（金币拾取动画）
 - `coins_generated`（向日葵产金）
 - `wave_transition_ready`（触发跳转 shop 场景）
+- `wave_completed`、`enemy_killed`、`boss_killed` 等战斗信号
 
 ### SceneManager 路由变更
 
@@ -324,4 +342,8 @@ func _collect_all_items() -> Array[Dictionary]
 - 所有塔子类战斗逻辑（tower.gd 及子类）
 - EffectsManager — 特效系统不变
 - AudioManager — 音效系统不变
-- SceneFactory — 工厂方法保留，调整塔创建参数
+- SceneFactory — 工厂方法保留，`create_tower(tower_id, level)` 签名调整为接受 level 参数（不再从 owned_towers 读取），`get_tower_cost()` 删除
+
+### 初始金币约束
+
+角色的 `starting_gold` + `GameConfig.PLAYER.initial_coins` 必须 >= 6（至少能购买 2 个普通物品：1 武器 + 1 塔）。实现时在 GameData.reset() 中 assert 校验。
