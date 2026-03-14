@@ -1,5 +1,7 @@
 [gd_resource type="Resource" script_class="TowerData" load_steps=2 format=3]
+
 [ext_resource type="Script" path="res://scripts/resources/tower_data.gd" id="1"]
+
 [resource]
 script = ExtResource("1")
 id = "bamboo"
@@ -7,10 +9,9 @@ display_name = "爆竹竹"
 description = "充能后自爆造成大范围伤害。生命虽短，但要轰轰烈烈。"
 icon_path = ""
 rarity = 2
-max_level = 5
-hp_per_level = PackedFloat32Array(100, 130, 160, 190, 220)
-explosion_damage_per_level = PackedFloat32Array(150.0, 200.0, 250.0, 300.0, 350.0)
-explosion_range_per_level = PackedFloat32Array(250.0, 280.0, 310.0, 360.0, 400.0)
+max_level = 3
+hp_per_level = PackedFloat32Array(100, 160, 220)
+explosion_damage_per_level = PackedFloat32Array(150.0, 250.0, 350.0)
+explosion_range_per_level = PackedFloat32Array(250.0, 310.0, 400.0)
 charge_time = 12.0
-shop_price_per_level = PackedInt32Array(60, 80, 100, 120, 150)
-place_cost_per_level = PackedInt32Array(20, 26, 34, 44, 56)
+sell_price_per_level = PackedInt32Array(8, 19, 57)

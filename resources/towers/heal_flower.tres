@@ -1,5 +1,7 @@
 [gd_resource type="Resource" script_class="TowerData" load_steps=2 format=3]
+
 [ext_resource type="Script" path="res://scripts/resources/tower_data.gd" id="1"]
+
 [resource]
 script = ExtResource("1")
 id = "heal_flower"
@@ -7,10 +9,9 @@ display_name = "治愈花"
 description = "治疗血量最低的友方塔。温柔的力量，无声的守护。"
 icon_path = ""
 rarity = 1
-max_level = 5
-hp_per_level = PackedFloat32Array(60, 80, 100, 120, 140)
-heal_amount_per_level = PackedFloat32Array(20.0, 25.0, 30.0, 37.0, 45.0)
-heal_interval_per_level = PackedFloat32Array(3.0, 2.8, 2.5, 2.2, 2.0)
-attack_range_per_level = PackedFloat32Array(200, 220, 240, 270, 300)
-shop_price_per_level = PackedInt32Array(90, 110, 140, 170, 200)
-place_cost_per_level = PackedInt32Array(16, 22, 30, 40, 52)
+max_level = 3
+hp_per_level = PackedFloat32Array(60, 100, 140)
+heal_amount_per_level = PackedFloat32Array(20.0, 30.0, 45.0)
+heal_interval_per_level = PackedFloat32Array(3.0, 2.5, 2.0)
+attack_range_per_level = PackedFloat32Array(200, 240, 300)
+sell_price_per_level = PackedInt32Array(8, 19, 57)

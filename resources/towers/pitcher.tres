@@ -1,5 +1,7 @@
 [gd_resource type="Resource" script_class="TowerData" load_steps=2 format=3]
+
 [ext_resource type="Script" path="res://scripts/resources/tower_data.gd" id="1"]
+
 [resource]
 script = ExtResource("1")
 id = "pitcher"
@@ -7,11 +9,10 @@ display_name = "猪笼草"
 description = "抓取敌人缓慢消化。Boss 太大塞不进去。"
 icon_path = ""
 rarity = 2
-max_level = 5
-hp_per_level = PackedFloat32Array(120, 160, 210, 275, 355)
-damage_per_level = PackedFloat32Array(0, 0, 0, 0, 0)
-attack_range_per_level = PackedFloat32Array(100, 112, 125, 140, 160)
-grab_dps_per_level = PackedFloat32Array(8, 11, 15, 20, 27)
-digest_duration_per_level = PackedFloat32Array(3.0, 3.5, 4.0, 4.5, 5.0)
-shop_price_per_level = PackedInt32Array(0, 30, 52, 78, 110)
-place_cost_per_level = PackedInt32Array(20, 27, 36, 47, 60)
+max_level = 3
+hp_per_level = PackedFloat32Array(120, 210, 355)
+damage_per_level = PackedFloat32Array(0, 0, 0)
+attack_range_per_level = PackedFloat32Array(100, 125, 160)
+grab_dps_per_level = PackedFloat32Array(8, 15, 27)
+digest_duration_per_level = PackedFloat32Array(3.0, 4.0, 5.0)
+sell_price_per_level = PackedInt32Array(8, 19, 57)

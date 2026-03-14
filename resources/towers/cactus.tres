@@ -1,5 +1,7 @@
 [gd_resource type="Resource" script_class="TowerData" load_steps=2 format=3]
+
 [ext_resource type="Script" path="res://scripts/resources/tower_data.gd" id="1"]
+
 [resource]
 script = ExtResource("1")
 id = "cactus"
@@ -7,10 +9,9 @@ display_name = "仙人掌"
 description = "瞄准血量最高的敌人精准狙击。沙漠猎手，一针见血。"
 icon_path = ""
 rarity = 1
-max_level = 5
-hp_per_level = PackedFloat32Array(60, 80, 105, 135, 170)
-damage_per_level = PackedFloat32Array(35, 48, 63, 82, 110)
-fire_rate_per_level = PackedFloat32Array(2.5, 2.3, 2.1, 1.9, 1.7)
-attack_range_per_level = PackedFloat32Array(450, 475, 500, 530, 570)
-shop_price_per_level = PackedInt32Array(0, 30, 50, 75, 105)
-place_cost_per_level = PackedInt32Array(20, 26, 34, 44, 56)
+max_level = 3
+hp_per_level = PackedFloat32Array(60, 105, 170)
+damage_per_level = PackedFloat32Array(35, 63, 110)
+fire_rate_per_level = PackedFloat32Array(2.5, 2.1, 1.7)
+attack_range_per_level = PackedFloat32Array(450, 500, 570)
+sell_price_per_level = PackedInt32Array(5, 12, 36)

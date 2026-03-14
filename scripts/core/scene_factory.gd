@@ -50,14 +50,9 @@ func create_tower(type: String) -> Node2D:
 		tower.data = GameConfig.towers[type]
 	return tower
 
-func get_tower_cost(type: String) -> int:
-	if not GameConfig.towers.has(type):
-		push_error("Unknown tower type: " + type)
-		return 0
-
-	var td: TowerData = GameConfig.towers[type]
-	var level: int = GameData.owned_towers.get(type, 1)
-	return td.place_cost_per_level[level - 1]
+func get_tower_cost(_type: String) -> int:
+	# 布置免费，place_cost 已移除
+	return 0
 
 # Enemy creation — 注入 EnemyData Resource
 func create_enemy(type: String) -> CharacterBody2D:
