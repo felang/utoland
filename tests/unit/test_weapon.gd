@@ -21,6 +21,9 @@ func test_weapon_tick_decrements_cooldown():
 	GameData.owned_weapons.erase(data.id)
 
 func test_weapon_resets_cooldown_after_firing():
+	# 重置 player_stats 确保 attack_speed_mult = 1.0，隔离跨测试状态
+	GameData.current_character = Enums.Character.DORA
+	GameData.reset()
 	var w = Weapon.new()
 	add_child_autofree(w)
 	var data = WeaponData.new()
