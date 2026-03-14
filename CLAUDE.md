@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## 项目概述
 
-utoland 是一个基于 **Godot 4.6** 的 2D 塔防 + 射击混合类游戏。玩家选择角色，在波次战斗中击杀敌人获取金币。拾取金币同步获得经验值（1 金币 = 1 XP），升级后在波次结束时进入 N 轮 3 选 1 升级弹窗（武器+塔混合池，N = 本波升级次数），之后进入纯布置阶段放置已拥有的塔。武器和塔均有 1-5 级等级系统。
+utoland 是一个基于 **Godot 4.6** 的 2D 塔防 + 射击混合类游戏（自走棋经济模式）。玩家选择角色，在波次战斗中击杀敌人获取金币。波次结束后进入商店，花金币购买武器/塔（进入背包），购买经验升本提高人口上限，从背包装备武器到角色或布置塔到地图。3 个同类同级物品自动合成升级（最高 3 级）。武器和塔共用人口上限（2-8）。
 
 **武器（10 种）**: 步枪(rifle)、回旋镖(boomerang)、激光(laser)、霰弹枪(shotgun)、加特林(minigun)、冰冻枪(ice_gun)、火箭炮(rocket)、闪电(lightning)、刀刃(blade)、喷火器(flamethrower)
 
@@ -24,27 +24,24 @@ utoland 是一个基于 **Godot 4.6** 的 2D 塔防 + 射击混合类游戏。�
 ### Autoload 单例 (全局可用，加载顺序有依赖)
 
 - **GameConfig** (`scripts/core/game_config.gd`) — 资源注册表，运行时从 `resources/` 目录加载 `.tres` 配置文件（武器、敌人、塔、波次、角色、地图、特效、精灵等）。必须最先加载（GameData 依赖它）。
-- **GameData** (`scripts/core/game_data.gd`) — 运行时游戏状态，存储当前角色属性、金币、波次、owned_weapons/owned_towers（{id: level} 字典）、经验值/等级（current_level/current_xp/pending_upgrades）。`reset()` 从 CharacterData 初始化默认武器/塔并重置等级。`upgrade_weapon()`/`upgrade_tower()` 管理等级升级。`add_xp()` 累积经验值并触发升级。跨场景传递数据。
+- **GameData** (`scripts/core/game_data.gd`) — 运行时游戏状态，存储角色属性、金币、波次、背包（`bag: Array[Dictionary]`）、已装备武器（`deployed_weapons`）、已布置塔（`deployed_towers`）、商店栏位（`shop_slots`）、人口等级（`player_level` 1-7）。`reset()` 初始化新游戏状态。提供 `deploy/undeploy_weapon/tower()`、`sell_from_bag/deployed_weapon/deployed_tower()`、`buy_level_up()`、`_check_merge()` 等方法。跨场景传递数据。
 - **SceneFactory** (`scripts/core/scene_factory.gd`) — 集中管理场景实例化，提供 `create_tower()`, `create_enemy()`, `create_bullet()`, `create_coin()` 等工厂方法。创建实体必须通过此工厂。
 - **EffectsManager** (`scripts/systems/effects_manager.gd`) — 特效管理：伤害数字、击中火花、死亡爆炸、红闪（flash_hit）、击中抖动（sprite_shake）、增强死亡特效（spawn_enhanced_death）、Boss 击杀慢动作（hitstop）等视觉效果。
 - **AudioManager** (`scripts/systems/audio_manager.gd`) — 音效管理：SFX 通过 AudioStreamPlayer 池化播放 `play(sound_id)`，BGM 通过独立 AudioStreamPlayer 播放 `play_bgm(track_id)` / `stop_bgm()` / `fade_bgm(duration)`。SFX 放 `assets/sfx/`，BGM 放 `assets/bgm/`。
-- **EventBus** (`scripts/core/event_bus.gd`) — 全局事件总线，用于跨系统解耦通信（波次事件、等级事件 player_leveled_up/xp_changed、coins_generated 等）。
+- **EventBus** (`scripts/core/event_bus.gd`) — 全局事件总线，用于跨系统解耦通信。商店信号：`item_purchased/item_sold/item_merged/item_deployed/item_undeployed/player_level_changed`。战斗信号：`wave_started/wave_completed/wave_transition_ready/enemy_killed/boss_killed/coins_changed/coins_generated`。
 - **SceneManager** (`scripts/core/scene_manager.gd`) — 集中管理场景切换，提供 `go_to(scene_name)` 方法（带淡入淡出过渡动画，async）。自动根据 SCENE_BGM 映射切换 BGM。所有场景路径在此统一维护，禁止直接调用 `get_tree().change_scene_to_file()`。
 
 ### 游戏流程 (场景切换)
 
 ```
-start_menu → character_selection → map_select → placement (纯塔布置)
-    ↓ (开始战斗)
-  main (战斗，拾取金币获取XP) → 波次结束 → upgrade_popup (N轮3选1武器+塔混合升级弹窗)
-    ↓ (选择后)
-  placement (纯塔布置) → main (下一波战斗)
-    ↓ (全部波次完成或玩家死亡)
-  result (结算)
+start_menu → character_selection → map_select → shop（首次，用初始金币购买）
+    ↓ (点击"开始战斗")
+  main (战斗，拾取金币积累) → 波次结束 → shop（自动刷新商店）
+    ↓ (点击"开始战斗")
+  main (下一波战斗) → ... → result (结算)
 ```
 
-> **波次结束流程**: 战斗中拾取金币同步获取 XP，可能升多级。波次结束后，若 pending_upgrades > 0 则弹出升级弹窗（N 轮 3 选 1，武器+塔混合池，由 UpgradeGenerator 生成），否则直接进布置。
-> **布置阶段**: 左侧 120px 侧栏（已拥有塔列表），右侧地图网格。纯塔布置，无商店。塔在波间全回满 HP。
+> **商店阶段**: 统一界面包含商店栏（4 个物品 + 刷新）、背包（10 格）、角色装备栏、地图布置区。购买物品进背包，从背包装备武器或布置塔到地图。花金币升本提高人口上限和解锁高稀有度物品。3 个同类同级自动合成。
 
 ### 代码组织
 
@@ -52,12 +49,12 @@ start_menu → character_selection → map_select → placement (纯塔布置)
 - `scripts/components/` — 可复用组件 (HealthComponent, SpriteAnimator, Hitbox, Hurtbox, KnockbackHandler, SlowHandler)
 - `scripts/resources/` — 自定义 Resource 类定义 (WeaponData, EnemyData, TowerData, WaveData, CharacterData 等)
 - `scripts/entities/` — 游戏实体 (player, enemy, boss_base, boss_brute, coin, towers/, weapons/, projectiles/)
-- `scripts/systems/` — 游戏系统 (wave_manager, enemy_spawner, upgrade_generator, effects_manager, audio_manager)
-- `scripts/ui/` — UI 脚本 (hud, start_menu, result, 各选择界面, main 场景控制, placement 布置场景控制, placement_panel 塔布置侧栏, upgrade_popup 升级弹窗)
+- `scripts/systems/` — 游戏系统 (wave_manager, enemy_spawner, shop_manager, effects_manager, audio_manager)
+- `scripts/ui/` — UI 脚本 (hud, start_menu, result, 各选择界面, main 场景控制, shop 商店场景控制)
 - `resources/` — `.tres` 配置数据文件 (weapons/, enemies/, towers/, waves/<map_id>/, characters/, maps/, shop/, effects/, spawn/)
 - `scenes/entities/` — 实体场景 (player, coin, enemies/, towers/, projectiles/)
-- `scenes/levels/` — 关卡场景 (main, placement)
-- `scenes/ui/` — UI 场景 (start_menu, hud, result, character_selection, map_select)
+- `scenes/levels/` — 关卡场景 (main)
+- `scenes/ui/` — UI 场景 (start_menu, hud, result, character_selection, map_select, shop)
 - `scenes/shared/` — 共用场景 (map_boundary)
 
 ### 关键模式
