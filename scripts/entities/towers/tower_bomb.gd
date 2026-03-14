@@ -33,6 +33,9 @@ func _on_charge_timer_timeout() -> void:
 
 func _explode(is_chain: bool = false) -> void:
 	var damage: float = explosion_damage
+	# 连环引爆：爆炸伤害 +50%
+	if GameData.active_pair_synergies.has("chain_detonation"):
+		damage *= 1.5
 	for body in _explosion_area.get_overlapping_bodies():
 		if body.is_in_group(Enums.Group.ENEMIES):
 			if body.has_node("HealthComponent"):
