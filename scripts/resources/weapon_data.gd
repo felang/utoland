@@ -11,11 +11,11 @@ extends Resource
 @export var projectile_type: String = "bullet"
 
 @export_group("等级系统")
-@export var max_level: int = 5
+@export var max_level: int = 3
 @export var damage_per_level: PackedFloat32Array = []
 @export var fire_rate_per_level: PackedFloat32Array = []
 @export var weapon_range_per_level: PackedFloat32Array = []
-@export var milestones: Dictionary = {}
+@export var sell_price_per_level: PackedInt32Array = PackedInt32Array([])
 
 @export_group("通用属性")
 @export var knockback_force: float = 40.0
