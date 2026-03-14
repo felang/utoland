@@ -12,7 +12,7 @@ const STAT_BASELINES := {
 	"speed": 200.0,
 	"damage_mult": 1.0,
 	"attack_speed_mult": 1.0,
-	"hp_regen": 0.0,
+	"starting_gold": 0,
 }
 
 # 节点引用
@@ -24,7 +24,7 @@ const STAT_BASELINES := {
 @onready var _speed_value: Label = %SpeedValue
 @onready var _damage_value: Label = %DamageValue
 @onready var _attack_speed_value: Label = %AttackSpeedValue
-@onready var _hp_regen_value: Label = %HPRegenValue
+@onready var _starting_gold_value: Label = %StartingGoldValue
 @onready var _passive_desc: Label = %PassiveDesc
 @onready var _select_button: Button = %SelectButton
 @onready var _back_button: Button = %BackButton
@@ -95,7 +95,7 @@ func _apply_styles() -> void:
 		title_label.add_theme_color_override("font_color", UIConstants.COLOR_TEXT_SECONDARY)
 
 	# 属性值标签
-	for value_label in [_hp_value, _speed_value, _damage_value, _attack_speed_value, _hp_regen_value]:
+	for value_label in [_hp_value, _speed_value, _damage_value, _attack_speed_value, _starting_gold_value]:
 		value_label.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_SMALL)
 
 	# 被动技能
@@ -198,14 +198,14 @@ func _fill_detail_panel(character_id: String) -> void:
 	_speed_value.text = "%d" % int(char_data.speed)
 	_damage_value.text = "x%.1f" % char_data.damage_mult
 	_attack_speed_value.text = "x%.1f" % char_data.attack_speed_mult
-	_hp_regen_value.text = "%.1f/s" % char_data.hp_regen
+	_starting_gold_value.text = "%d" % char_data.starting_gold
 
 	# 属性颜色
 	_color_stat(_hp_value, char_data.max_hp, STAT_BASELINES["max_hp"])
 	_color_stat(_speed_value, char_data.speed, STAT_BASELINES["speed"])
 	_color_stat(_damage_value, char_data.damage_mult, STAT_BASELINES["damage_mult"])
 	_color_stat(_attack_speed_value, char_data.attack_speed_mult, STAT_BASELINES["attack_speed_mult"])
-	_color_stat(_hp_regen_value, char_data.hp_regen, STAT_BASELINES["hp_regen"])
+	_color_stat(_starting_gold_value, float(char_data.starting_gold), float(STAT_BASELINES["starting_gold"]))
 
 	# 被动技能
 	if char_data.passive_description != "":

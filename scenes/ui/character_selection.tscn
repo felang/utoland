@@ -139,11 +139,11 @@ text = "攻速倍率"
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="HPRegenTitle" type="Label" parent="MainVBox/HSplitContent/RightPanel/DetailScroll/DetailMargin/DetailVBox/StatsSection/StatsGrid"]
+[node name="StartingGoldTitle" type="Label" parent="MainVBox/HSplitContent/RightPanel/DetailScroll/DetailMargin/DetailVBox/StatsSection/StatsGrid"]
 layout_mode = 2
-text = "生命回复"
+text = "初始资金"
 
-[node name="HPRegenValue" type="Label" parent="MainVBox/HSplitContent/RightPanel/DetailScroll/DetailMargin/DetailVBox/StatsSection/StatsGrid"]
+[node name="StartingGoldValue" type="Label" parent="MainVBox/HSplitContent/RightPanel/DetailScroll/DetailMargin/DetailVBox/StatsSection/StatsGrid"]
 unique_name_in_owner = true
 layout_mode = 2
 
