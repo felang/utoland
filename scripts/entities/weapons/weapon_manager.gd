@@ -5,21 +5,24 @@ extends Node
 
 var _weapons: Array[Weapon] = []
 
-func initialize(weapon_ids: Array[String]) -> void:
-	for id in weapon_ids:
-		if not GameConfig.weapons.has(id):
-			push_error("WeaponManager: 未知武器 id: " + id)
+func initialize(weapon_entries: Array[Dictionary]) -> void:
+	for entry in weapon_entries:
+		if not GameConfig.weapons.has(entry.id):
+			push_error("WeaponManager: 未知武器 id: " + entry.id)
 			continue
-		_add_weapon(GameConfig.weapons[id])
+		var weapon: Weapon = _add_weapon(GameConfig.weapons[entry.id])
+		if weapon:
+			weapon.set_level(entry.level)
 
-func _add_weapon(data: WeaponData) -> void:
+func _add_weapon(data: WeaponData) -> Weapon:
 	var weapon: Weapon = _create_weapon(data.weapon_type)
 	if not weapon:
-		return
+		return null
 	weapon.initialize(data)
 	weapon.owner_node = get_parent() as Node2D
 	add_child(weapon)
 	_weapons.append(weapon)
+	return weapon
 
 func tick(delta: float) -> void:
 	# 取所有武器中最大的射程作为搜索范围

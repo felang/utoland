@@ -4,6 +4,8 @@ class_name Tower
 # 由 SceneFactory 注入的 Resource 数据
 var data: TowerData = null
 var tower_type: String = Enums.TowerId.STUMP
+# 由 SceneFactory 在实例化后注入的等级
+var current_level: int = 1
 
 # Buff 系统
 var damage_mult: float = 1.0
@@ -18,19 +20,10 @@ func _ready() -> void:
 	health.death_color = Color.GREEN
 	health.died.connect(_on_died)
 	add_to_group(Enums.Group.TOWERS)
-	EventBus.tower_upgraded.connect(_on_tower_upgraded)
-
-func get_current_level() -> int:
-	return GameData.owned_towers.get(data.id, 1)
 
 func _apply_level_stats() -> void:
-	var level: int = get_current_level()
-	var idx: int = level - 1
+	var idx: int = current_level - 1
 	health.initialize(data.hp_per_level[idx])
-
-func _on_tower_upgraded(upgraded_type: String) -> void:
-	if upgraded_type == data.id:
-		_apply_level_stats()
 
 func _apply_character_passive() -> void:
 	var passive: String = GameData.character_passive_type
@@ -61,5 +54,4 @@ func _recalc_buffs() -> void:
 		speed_mult *= data_entry["spd"]
 
 func _on_died() -> void:
-	EventBus.tower_upgraded.disconnect(_on_tower_upgraded)
 	queue_free()

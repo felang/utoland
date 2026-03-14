@@ -26,11 +26,8 @@ func _ready() -> void:
 		health.heal(GameData.pending_heal)
 		GameData.pending_heal = 0
 
-	# 初始化武器系统（从 owned_weapons 读取所有已拥有武器）
-	var weapon_ids: Array[String] = []
-	for id: String in GameData.owned_weapons:
-		weapon_ids.append(id)
-	_weapon_manager.initialize(weapon_ids)
+	# 初始化武器系统（从 deployed_weapons 注入等级）
+	_weapon_manager.initialize(GameData.deployed_weapons)
 
 	# 同步金币
 	coins = GameData.coins
@@ -104,7 +101,6 @@ func _on_died() -> void:
 func add_coins(amount: int) -> void:
 	coins += amount
 	GameData.coins = coins  # 同步到 GameData
-	GameData.add_xp(amount)
 
 ## 吸血回复：供投射物命中敌人后调用
 func heal_hp(amount: float) -> void:

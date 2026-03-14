@@ -37,22 +37,19 @@ var _melee_projectile_scene: PackedScene = preload("res://scenes/entities/projec
 var _flame_projectile_scene: PackedScene = preload("res://scenes/entities/projectiles/flame_projectile.tscn")
 var _coin_scene: PackedScene = preload("res://scenes/entities/coin.tscn")
 
-# Tower creation — 注入 TowerData Resource
-func create_tower(type: String) -> Node2D:
+# Tower creation — 注入 TowerData Resource，level 直接注入
+func create_tower(type: String, level: int = 1) -> Node2D:
 	if not _tower_scenes.has(type):
 		push_error("Unknown tower type: " + type)
 		return null
 
 	var tower = _tower_scenes[type].instantiate()
 	tower.tower_type = type
+	tower.current_level = level
 	# 注入 Resource 数据
 	if GameConfig.towers.has(type):
 		tower.data = GameConfig.towers[type]
 	return tower
-
-func get_tower_cost(_type: String) -> int:
-	# 布置免费，place_cost 已移除
-	return 0
 
 # Enemy creation — 注入 EnemyData Resource
 func create_enemy(type: String) -> CharacterBody2D:

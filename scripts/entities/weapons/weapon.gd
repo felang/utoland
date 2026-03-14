@@ -6,13 +6,17 @@ extends Node
 var weapon_data: WeaponData = null
 var owner_node: Node2D = null
 var _cooldown: float = 0.0
+var _level: int = 1
 
 func initialize(data: WeaponData) -> void:
 	weapon_data = data
 	_cooldown = 0.0
 
+func set_level(level: int) -> void:
+	_level = level
+
 func get_current_level() -> int:
-	return GameData.owned_weapons.get(weapon_data.id, 1)
+	return _level
 
 func get_damage() -> float:
 	var base: float = weapon_data.damage_per_level[get_current_level() - 1]
