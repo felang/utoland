@@ -187,10 +187,10 @@ func test_create_coin():
 func test_create_tower_with_level():
 	var tower = SceneFactory.create_tower(Enums.TowerId.PEA_SHOOTER, 2)
 	assert_not_null(tower, "Shooter tower should be created")
+	add_child_autofree(tower)
 	var td: TowerData = GameConfig.towers[Enums.TowerId.PEA_SHOOTER]
 	assert_almost_eq(tower.health.max_hp, td.hp_per_level[1], 0.01,
 		"Lv2 tower HP should match hp_per_level[1]")
-	tower.queue_free()
 
 # 新投射物工厂方法测试
 func test_create_bullet_projectile():

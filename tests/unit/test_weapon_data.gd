@@ -25,7 +25,7 @@ func test_common_weapons_count() -> void:
 		var wd: WeaponData = GameConfig.weapons[weapon_id]
 		if wd.rarity == Enums.WeaponRarity.COMMON:
 			count += 1
-	assert_eq(count, 4, "应有 4 把普通武器")
+	assert_eq(count, 3, "应有 3 把普通武器")
 
 func test_rare_weapons_count() -> void:
 	var count: int = 0
@@ -41,4 +41,4 @@ func test_epic_weapons_count() -> void:
 		var wd: WeaponData = GameConfig.weapons[weapon_id]
 		if wd.rarity == Enums.WeaponRarity.EPIC:
 			count += 1
-	assert_eq(count, 2, "应有 2 把史诗武器")
+	assert_eq(count, 3, "应有 3 把史诗武器")

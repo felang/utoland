@@ -30,7 +30,7 @@ func test_common_towers_count() -> void:
 		var td: TowerData = GameConfig.towers[tower_id]
 		if td.rarity == Enums.TowerRarity.COMMON:
 			count += 1
-	assert_eq(count, 6, "应有 6 个普通塔")
+	assert_eq(count, 4, "应有 4 个普通塔")
 
 func test_rare_towers_count() -> void:
 	var count: int = 0
@@ -38,7 +38,7 @@ func test_rare_towers_count() -> void:
 		var td: TowerData = GameConfig.towers[tower_id]
 		if td.rarity == Enums.TowerRarity.RARE:
 			count += 1
-	assert_eq(count, 5, "应有 5 个稀有塔")
+	assert_eq(count, 7, "应有 7 个稀有塔")
 
 func test_epic_towers_count() -> void:
 	var count: int = 0

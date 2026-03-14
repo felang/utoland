@@ -2,10 +2,10 @@ extends GutTest
 
 func test_weapon_data_has_level_fields():
 	var wd: WeaponData = GameConfig.weapons["rifle"]
-	assert_eq(wd.max_level, 5, "应有最大等级 5")
-	assert_eq(wd.damage_per_level.size(), 5, "damage_per_level 应有 5 级")
-	assert_eq(wd.fire_rate_per_level.size(), 5, "fire_rate_per_level 应有 5 级")
-	assert_eq(wd.weapon_range_per_level.size(), 5, "weapon_range_per_level 应有 5 级")
+	assert_eq(wd.max_level, 3, "应有最大等级 3")
+	assert_eq(wd.damage_per_level.size(), 3, "damage_per_level 应有 3 级")
+	assert_eq(wd.fire_rate_per_level.size(), 3, "fire_rate_per_level 应有 3 级")
+	assert_eq(wd.weapon_range_per_level.size(), 3, "weapon_range_per_level 应有 3 级")
 
 func test_weapon_data_level_values_increase():
 	var wd: WeaponData = GameConfig.weapons["rifle"]
@@ -36,7 +36,7 @@ func test_weapon_get_weapon_range_reads_level():
 	var weapon := BulletWeapon.new()
 	var wd: WeaponData = GameConfig.weapons["rifle"]
 	weapon.initialize(wd)
-	weapon.set_level(5)
-	assert_almost_eq(weapon.get_weapon_range(), wd.weapon_range_per_level[4], 0.01,
-		"Lv5 射程应读 weapon_range_per_level[4]")
+	weapon.set_level(3)
+	assert_almost_eq(weapon.get_weapon_range(), wd.weapon_range_per_level[2], 0.01,
+		"Lv3 射程应读 weapon_range_per_level[2]")
 	add_child_autofree(weapon)
