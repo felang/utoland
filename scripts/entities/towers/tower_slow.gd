@@ -19,6 +19,9 @@ func _apply_level_stats() -> void:
 	super._apply_level_stats()
 	var idx: int = current_level - 1
 	slow_radius = data.attack_range_per_level[idx]
+	# 控场大师（Nemo）— 控制效果范围 +30%
+	if GameData.new_passive_id == "field_master" and data.tag == Enums.Tag.CONTROL:
+		slow_radius *= (1.0 + GameData.new_passive_value)
 	slow_percent = data.slow_ratio_per_level[idx]
 
 func _on_enemy_entered(body: Node2D) -> void:

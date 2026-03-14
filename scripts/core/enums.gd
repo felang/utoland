@@ -98,15 +98,6 @@ class Tag:
 	const BOOST = "boost"
 	const ALL = [ASSAULT, CONTROL, BLAST, FORTIFY, BOOST]
 
-# 角色被动技能类型
-class PassiveType:
-	const NONE = ""
-	const KILL_HEAL = "kill_heal"
-	const TOWER_ATTACK_SPEED_BONUS = "tower_attack_speed_bonus"
-	const TOWER_HP_BONUS = "tower_hp_bonus"
-	const COIN_BONUS = "coin_bonus"
-	const DAMAGE_ON_LOW_HP = "damage_on_low_hp"
-
 # 武器稀有度
 class WeaponRarity:
 	const COMMON = 0

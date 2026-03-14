@@ -20,16 +20,16 @@ func get_current_level() -> int:
 
 func get_damage() -> float:
 	var base: float = weapon_data.damage_per_level[get_current_level() - 1]
-	# 角色被动：低血量伤害加成（仅影响武器伤害，不影响塔伤害）
-	if GameData.character_passive_type == Enums.PassiveType.DAMAGE_ON_LOW_HP:
-		if owner_node and owner_node.has_node("HealthComponent"):
-			var hp: HealthComponent = owner_node.get_node("HealthComponent")
-			if hp.current_hp / hp.max_hp < 0.3:
-				base *= (1.0 + GameData.character_passive_value)
 	# 羁绊 2 档：伤害倍率加成（assault / boost 回退）
 	if GameData._synergy_manager:
 		var synergy_bonus: float = GameData._synergy_manager.get_damage_mult_bonus(weapon_data.id)
 		base *= (1.0 + synergy_bonus)
+	# 新被动：疾风连击（Kaze）— 连击伤害加成
+	if GameData.new_passive_id == "swift_combo" and owner_node and owner_node.has_method("get_combo_damage_mult"):
+		base *= owner_node.get_combo_damage_mult()
+	# 新被动：血怒（Gorg）— 失血伤害加成
+	if GameData.new_passive_id == "blood_rage" and owner_node and owner_node.has_method("get_blood_rage_mult"):
+		base *= owner_node.get_blood_rage_mult()
 	return base
 
 func get_fire_rate() -> float:

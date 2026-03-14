@@ -6,9 +6,10 @@ var character_max_hp: float = 0.0
 var character_speed: float = 0.0
 var character_damage_mult: float = 1.0
 var character_attack_speed_mult: float = 1.0
-var character_passive_type: String = ""
-var character_passive_value: float = 0.0
-var coin_drop_mult: float = 1.0
+## 新被动系统
+var new_passive_id: String = ""
+var new_passive_value: float = 0.0
+var new_passive_value_2: float = 0.0
 
 var selected_map: String = Enums.Map.FOREST
 var player_stats: Dictionary = {
@@ -51,6 +52,8 @@ var is_first_shop_visit: bool = true
 
 ## 羁绊管理器
 var _synergy_manager: SynergyManager
+## 配对协同管理器
+var _pair_synergy_manager: PairSynergyManager
 
 ## 里程碑效果保留字段（初期不使用，后续 milestones 写入）
 var pierce_count: int = 0
@@ -97,6 +100,7 @@ const _DEFAULTS: Dictionary = {
 
 func _ready() -> void:
 	_synergy_manager = SynergyManager.new()
+	_pair_synergy_manager = PairSynergyManager.new()
 	init_character(current_character)
 
 func init_character(character_id: String) -> void:
@@ -109,13 +113,10 @@ func init_character(character_id: String) -> void:
 	character_speed = char_data.speed
 	character_damage_mult = char_data.damage_mult
 	character_attack_speed_mult = char_data.attack_speed_mult
-	character_passive_type = char_data.passive_type
-	character_passive_value = char_data.passive_value
-	# 金币掉落倍率（coin_bonus 被动）
-	if character_passive_type == Enums.PassiveType.COIN_BONUS:
-		coin_drop_mult = 1.0 + character_passive_value
-	else:
-		coin_drop_mult = 1.0
+	# 新被动系统
+	new_passive_id = char_data.new_passive_id
+	new_passive_value = char_data.new_passive_value
+	new_passive_value_2 = char_data.new_passive_value_2
 
 func reset() -> void:
 	init_character(current_character)
@@ -145,6 +146,7 @@ func reset() -> void:
 	synergy_active_tiers = {}
 	active_pair_synergies = []
 	_synergy_manager = SynergyManager.new()
+	_pair_synergy_manager = PairSynergyManager.new()
 
 # ===== 种群系统 =====
 
@@ -194,6 +196,7 @@ func deploy_weapon(bag_index: int) -> bool:
 	deployed_weapons.append({id = item.id, level = item.level})
 	EventBus.item_deployed.emit(item)
 	_synergy_manager.recalculate()
+	_pair_synergy_manager.recalculate()
 	return true
 
 func undeploy_weapon(deploy_index: int) -> void:
@@ -204,6 +207,7 @@ func undeploy_weapon(deploy_index: int) -> void:
 	bag.append({id = item.id, type = "weapon", level = item.level})
 	EventBus.item_undeployed.emit(item)
 	_synergy_manager.recalculate()
+	_pair_synergy_manager.recalculate()
 
 func deploy_tower(bag_index: int, grid_pos: Vector2i) -> bool:
 	if not can_deploy():
@@ -217,6 +221,7 @@ func deploy_tower(bag_index: int, grid_pos: Vector2i) -> bool:
 	deployed_towers.append({id = item.id, level = item.level, grid_pos = grid_pos})
 	EventBus.item_deployed.emit(item)
 	_synergy_manager.recalculate()
+	_pair_synergy_manager.recalculate()
 	return true
 
 func undeploy_tower(deploy_index: int) -> void:
@@ -227,6 +232,7 @@ func undeploy_tower(deploy_index: int) -> void:
 	bag.append({id = item.id, type = "tower", level = item.level})
 	EventBus.item_undeployed.emit(item)
 	_synergy_manager.recalculate()
+	_pair_synergy_manager.recalculate()
 
 # ===== 出售 =====
 
@@ -264,6 +270,7 @@ func _apply_sell(item: Dictionary) -> int:
 	EventBus.item_sold.emit(item, refund)
 	EventBus.coins_changed.emit(refund, coins)
 	_synergy_manager.recalculate()
+	_pair_synergy_manager.recalculate()
 	return refund
 
 # ===== 合成系统 =====
@@ -306,6 +313,7 @@ func _check_merge(item_id: String, item_level: int) -> void:
 	bag.append({id = item_id, type = item_type, level = new_level})
 	EventBus.item_merged.emit(item_id, new_level)
 	_synergy_manager.recalculate()
+	_pair_synergy_manager.recalculate()
 	# 递归检查
 	_check_merge(item_id, new_level)
 

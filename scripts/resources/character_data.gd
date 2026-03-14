@@ -16,7 +16,7 @@ extends Resource
 @export var recommended_tower: String = ""
 ## 协同标签（使用 Enums.Tag 常量）
 @export var tag: String = ""
-## 被动技能类型（使用 Enums.PassiveType 常量）
+## 旧被动技能类型（已弃用，保留兼容 .tres 文件）
 @export var passive_type: String = ""
 ## 被动技能数值
 @export var passive_value: float = 0.0

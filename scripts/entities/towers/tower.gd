@@ -16,7 +16,6 @@ var _buff_sources: Dictionary = {}  # {source_id: {dmg: float, spd: float}}
 
 func _ready() -> void:
 	_apply_level_stats()
-	_apply_character_passive()
 	_apply_synergy_bonus()
 	health.death_color = Color.GREEN
 	health.died.connect(_on_died)
@@ -25,16 +24,6 @@ func _ready() -> void:
 func _apply_level_stats() -> void:
 	var idx: int = current_level - 1
 	health.initialize(data.hp_per_level[idx])
-
-func _apply_character_passive() -> void:
-	var passive: String = GameData.character_passive_type
-	var value: float = GameData.character_passive_value
-	if passive == Enums.PassiveType.TOWER_ATTACK_SPEED_BONUS:
-		apply_buff(1.0, 1.0 + value, "character_passive")
-	elif passive == Enums.PassiveType.TOWER_HP_BONUS:
-		var bonus_hp: float = health.max_hp * value
-		health.max_hp += bonus_hp
-		health.current_hp += bonus_hp
 
 ## 应用羁绊 2 档加成（assault/fortify/boost 回退的伤害/血量加成）
 func _apply_synergy_bonus() -> void:

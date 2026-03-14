@@ -95,6 +95,9 @@ func _attack_tower(_delta: float) -> void:
 func take_damage(amount: float) -> void:
 	# Control 3: 脆弱标记 — 被控制的敌人受到额外伤害
 	amount = _apply_vulnerable_mult(amount)
+	# 极寒囚笼：frozen_cage 定身中受到 +30% 伤害
+	if _root_source == "frozen_cage" and GameData.active_pair_synergies.has("frozen_cage"):
+		amount *= 1.3
 	health.take_damage(amount)
 
 func die() -> void:
@@ -118,7 +121,7 @@ func _drop_coins() -> void:
 		return
 
 	var coin_count: int = randi_range(data.coin_drop_min, data.coin_drop_max)
-	coin_count = int(coin_count * _elite_coin_mult * GameData.coin_drop_mult)
+	coin_count = int(coin_count * _elite_coin_mult)
 	for i in coin_count:
 		var coin = SceneFactory.create_coin()
 		coin.global_position = global_position + Vector2(randf_range(-COIN_SCATTER_RANGE, COIN_SCATTER_RANGE), randf_range(-COIN_SCATTER_RANGE, COIN_SCATTER_RANGE))
