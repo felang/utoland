@@ -6,17 +6,16 @@ var character_max_hp: float = 0.0
 var character_speed: float = 0.0
 var character_damage_mult: float = 1.0
 var character_attack_speed_mult: float = 1.0
-var character_move_speed_mult: float = 1.0
-var character_hp_regen: float = 0.0
+var character_passive_type: String = ""
+var character_passive_value: float = 0.0
+var coin_drop_mult: float = 1.0
 
 var selected_map: String = Enums.Map.FOREST
 var player_stats: Dictionary = {
 	Enums.Stat.MAX_HP: 100.0,
 	Enums.Stat.HP_MULT: 1.0,
-	Enums.Stat.HP_REGEN: 0.0,
 	Enums.Stat.DAMAGE_MULT: 1.0,
 	Enums.Stat.ATTACK_SPEED_MULT: 1.0,
-	Enums.Stat.MOVE_SPEED_MULT: 1.0,
 	Enums.Stat.TOWER_MULT: 1.0
 }
 var coins: int = GameConfig.PLAYER["initial_coins"]
@@ -89,8 +88,13 @@ func init_character(character_id: String) -> void:
 	character_speed = char_data.speed
 	character_damage_mult = char_data.damage_mult
 	character_attack_speed_mult = char_data.attack_speed_mult
-	character_move_speed_mult = char_data.move_speed_mult
-	character_hp_regen = char_data.hp_regen
+	character_passive_type = char_data.passive_type
+	character_passive_value = char_data.passive_value
+	# 金币掉落倍率（coin_bonus 被动）
+	if character_passive_type == Enums.PassiveType.COIN_BONUS:
+		coin_drop_mult = 1.0 + character_passive_value
+	else:
+		coin_drop_mult = 1.0
 
 func reset() -> void:
 	init_character(current_character)
@@ -99,13 +103,11 @@ func reset() -> void:
 	player_stats = {
 		Enums.Stat.MAX_HP: character_max_hp,
 		Enums.Stat.HP_MULT: 1.0,
-		Enums.Stat.HP_REGEN: character_hp_regen,
 		Enums.Stat.DAMAGE_MULT: character_damage_mult,
 		Enums.Stat.ATTACK_SPEED_MULT: character_attack_speed_mult,
-		Enums.Stat.MOVE_SPEED_MULT: character_move_speed_mult,
 		Enums.Stat.TOWER_MULT: 1.0
 	}
-	coins = GameConfig.PLAYER["initial_coins"]
+	coins = GameConfig.PLAYER["initial_coins"] + char_data.starting_gold
 	# 批量重置
 	for key: String in _DEFAULTS:
 		var val: Variant = _DEFAULTS[key]

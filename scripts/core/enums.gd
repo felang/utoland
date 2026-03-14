@@ -85,11 +85,18 @@ class Map:
 class Stat:
 	const MAX_HP = "max_hp"
 	const HP_MULT = "hp_mult"
-	const HP_REGEN = "hp_regen"
 	const DAMAGE_MULT = "damage_mult"
 	const ATTACK_SPEED_MULT = "attack_speed_mult"
-	const MOVE_SPEED_MULT = "move_speed_mult"
 	const TOWER_MULT = "tower_mult"
+
+# 角色被动技能类型
+class PassiveType:
+	const NONE = ""
+	const KILL_HEAL = "kill_heal"
+	const TOWER_ATTACK_SPEED_BONUS = "tower_attack_speed_bonus"
+	const TOWER_HP_BONUS = "tower_hp_bonus"
+	const COIN_BONUS = "coin_bonus"
+	const DAMAGE_ON_LOW_HP = "damage_on_low_hp"
 
 # 回旋镖状态
 enum BoomerangState { OUTBOUND, RETURNING }

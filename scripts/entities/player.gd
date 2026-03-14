@@ -7,7 +7,6 @@ var speed: float = 0.0  # 从 GameData 初始化
 @export var invincible_duration: float = 0.5
 var coins: int = 0
 var invincible_timer: float = 0.0
-var hp_regen_timer: float = 0.0
 var _blink_tween: Tween = null
 
 @onready var health: HealthComponent = $HealthComponent
@@ -17,13 +16,10 @@ var _blink_tween: Tween = null
 func _ready() -> void:
 	add_to_group(Enums.Group.PLAYER)
 
-	# 重置生命回复计时器（修复已知问题 #2）
-	hp_regen_timer = 0.0
-
 	# 应用被动属性
 	var max_hp: float = GameData.player_stats[Enums.Stat.MAX_HP] * GameData.player_stats[Enums.Stat.HP_MULT]
 	health.initialize(max_hp)
-	speed = GameData.character_speed * GameData.player_stats[Enums.Stat.MOVE_SPEED_MULT]
+	speed = GameData.character_speed
 
 	# 应用待处理的治疗
 	if GameData.pending_heal > 0:
@@ -48,20 +44,16 @@ func _ready() -> void:
 	var sprite_frames: SpriteFrames = load(char_data.sprite_frames_path)
 	_sprite_animator.setup_from_sprite_frames(sprite_frames, char_data.sprite_pixel_size, GameConfig.ENTITY_SIZE_STANDARD)
 
+	# 被动技能初始化
+	if GameData.character_passive_type == Enums.PassiveType.KILL_HEAL:
+		EventBus.enemy_killed.connect(_on_enemy_killed_passive)
+
 func _process(delta: float) -> void:
 	if invincible_timer > 0:
 		invincible_timer -= delta
 
 	# 武器系统更新
 	_weapon_manager.tick(delta)
-
-	# 生命回复机制
-	hp_regen_timer += delta
-	if hp_regen_timer >= GameConfig.PLAYER["hp_regen_interval"]:
-		hp_regen_timer = 0.0
-		var regen_amount: float = GameData.character_hp_regen + GameData.player_stats[Enums.Stat.HP_REGEN]
-		if regen_amount > 0:
-			health.heal(regen_amount)
 
 func _physics_process(_delta: float) -> void:
 	var input_vector: Vector2 = Vector2.ZERO
@@ -133,3 +125,6 @@ func _start_invincible_blink() -> void:
 		_blink_tween.tween_property(self, "modulate:a", fx.invincible_blink_alpha_low, fx.invincible_blink_interval)
 		_blink_tween.tween_property(self, "modulate:a", fx.invincible_blink_alpha_high, fx.invincible_blink_interval)
 	_blink_tween.tween_property(self, "modulate:a", 1.0, BLINK_RESET_DURATION)
+
+func _on_enemy_killed_passive(_enemy_type: String, _position: Vector2, _is_elite: bool) -> void:
+	health.heal(GameData.character_passive_value)

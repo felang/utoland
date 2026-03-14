@@ -8,12 +8,16 @@ extends Resource
 @export var speed: float = 100.0
 @export var damage_mult: float = 1.0
 @export var attack_speed_mult: float = 1.0
-@export var move_speed_mult: float = 1.0
-@export var hp_regen: float = 0.0
+## 初始资金（与 GameConfig.PLAYER["initial_coins"] 叠加）
+@export var starting_gold: int = 0
 ## 角色默认武器 ID
 @export var default_weapon: String = ""
 ## 角色默认塔 ID
 @export var default_tower: String = ""
+## 被动技能类型（使用 Enums.PassiveType 常量）
+@export var passive_type: String = ""
+## 被动技能数值
+@export var passive_value: float = 0.0
 ## 角色特色被动描述（展示用）
 @export var passive_description: String = ""
 ## 精灵 SpriteFrames 资源路径（Aseprite Wizard 导出的 .res）
