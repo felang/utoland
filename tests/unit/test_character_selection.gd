@@ -41,6 +41,28 @@ func test_portrait_load_fallback_for_invalid_path() -> void:
 	var invalid_path := "res://nonexistent/portrait.png"
 	assert_false(ResourceLoader.exists(invalid_path), "无效路径应不存在")
 
+const VALID_PASSIVE_TYPES: Array[String] = [
+	Enums.PassiveType.NONE,
+	Enums.PassiveType.KILL_HEAL,
+	Enums.PassiveType.TOWER_ATTACK_SPEED_BONUS,
+	Enums.PassiveType.TOWER_HP_BONUS,
+	Enums.PassiveType.COIN_BONUS,
+	Enums.PassiveType.DAMAGE_ON_LOW_HP,
+]
+
+func test_character_has_valid_passive_type() -> void:
+	for character_id in GameConfig.characters:
+		var char_data: CharacterData = GameConfig.characters[character_id]
+		assert_true(
+			char_data.passive_type in VALID_PASSIVE_TYPES,
+			"%s passive_type '%s' 不是有效的 PassiveType 常量" % [character_id, char_data.passive_type]
+		)
+
+func test_character_has_starting_gold() -> void:
+	for character_id in GameConfig.characters:
+		var char_data: CharacterData = GameConfig.characters[character_id]
+		assert_true(char_data.starting_gold >= 0, "%s starting_gold 不应为负数" % character_id)
+
 func test_scene_file_exists() -> void:
 	assert_true(ResourceLoader.exists("res://scenes/ui/character_selection.tscn"),
 		"角色选择场景文件应存在")
