@@ -130,27 +130,27 @@ func test_character_dora_resource() -> void:
 	assert_eq(c.max_hp, 100.0)
 	assert_eq(c.speed, 100.0)
 	assert_eq(c.damage_mult, 1.0)
-	assert_eq(c.default_weapon, Enums.WeaponId.RIFLE)
+	assert_eq(c.recommended_weapon, Enums.WeaponId.RIFLE)
 
 func test_character_gorg_resource() -> void:
 	var c: CharacterData = GameConfig.characters[Enums.Character.GORG]
 	assert_eq(c.display_name, "格格")
-	assert_eq(c.default_weapon, Enums.WeaponId.BLADE)
+	assert_eq(c.recommended_weapon, Enums.WeaponId.BLADE)
 
 func test_character_kaze_resource() -> void:
 	var c: CharacterData = GameConfig.characters[Enums.Character.KAZE]
 	assert_eq(c.display_name, "风")
-	assert_eq(c.default_weapon, Enums.WeaponId.MINIGUN)
+	assert_eq(c.recommended_weapon, Enums.WeaponId.MINIGUN)
 
 func test_character_merlin_resource() -> void:
 	var c: CharacterData = GameConfig.characters[Enums.Character.MERLIN]
 	assert_eq(c.display_name, "梅林")
-	assert_eq(c.default_weapon, Enums.WeaponId.LASER)
+	assert_eq(c.recommended_weapon, Enums.WeaponId.LASER)
 
 func test_character_nemo_resource() -> void:
 	var c: CharacterData = GameConfig.characters[Enums.Character.NEMO]
 	assert_eq(c.display_name, "尼莫")
-	assert_eq(c.default_weapon, Enums.WeaponId.ICE_GUN)
+	assert_eq(c.recommended_weapon, Enums.WeaponId.ICE_GUN)
 
 func test_character_has_sprite_frames_path() -> void:
 	var c: CharacterData = GameConfig.characters[Enums.Character.DORA]

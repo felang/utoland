@@ -10,10 +10,10 @@ extends Resource
 @export var attack_speed_mult: float = 1.0
 ## 初始资金（与 GameConfig.PLAYER["initial_coins"] 叠加）
 @export var starting_gold: int = 0
-## 角色默认武器 ID
-@export var default_weapon: String = ""
-## 角色默认塔 ID
-@export var default_tower: String = ""
+## 角色推荐武器 ID（商店首次访问保证出现）
+@export var recommended_weapon: String = ""
+## 角色推荐塔 ID（商店首次访问保证出现）
+@export var recommended_tower: String = ""
 ## 被动技能类型（使用 Enums.PassiveType 常量）
 @export var passive_type: String = ""
 ## 被动技能数值

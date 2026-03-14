@@ -180,7 +180,7 @@ func _update_portrait_borders() -> void:
 
 func _fill_detail_panel(character_id: String) -> void:
 	var char_data: CharacterData = GameConfig.characters[character_id]
-	var weapon_data: WeaponData = GameConfig.weapons[char_data.default_weapon]
+	var weapon_data: WeaponData = GameConfig.weapons[char_data.recommended_weapon]
 
 	# 头像
 	var portrait: Texture2D = _load_portrait(char_data.portrait_path)
@@ -191,7 +191,7 @@ func _fill_detail_panel(character_id: String) -> void:
 
 	# 名称与武器
 	_character_name.text = char_data.display_name
-	_weapon_label.text = "默认武器: %s" % weapon_data.display_name
+	_weapon_label.text = "推荐武器: %s" % weapon_data.display_name
 
 	# 属性
 	_hp_value.text = "%d" % int(char_data.max_hp)

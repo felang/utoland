@@ -13,9 +13,9 @@ func test_dora_starting_gold() -> void:
 	var cd: CharacterData = GameConfig.characters[Enums.Character.DORA]
 	assert_eq(cd.starting_gold, 30, "Dora starting_gold 应为 30")
 
-func test_dora_default_weapon() -> void:
+func test_dora_recommended_weapon() -> void:
 	var cd: CharacterData = GameConfig.characters[Enums.Character.DORA]
-	assert_eq(cd.default_weapon, "rifle", "Dora default_weapon 应为 rifle")
+	assert_eq(cd.recommended_weapon, "rifle", "Dora recommended_weapon 应为 rifle")
 
 func test_dora_passive_type() -> void:
 	var cd: CharacterData = GameConfig.characters[Enums.Character.DORA]
@@ -46,9 +46,9 @@ func test_gorg_starting_gold() -> void:
 	var cd: CharacterData = GameConfig.characters[Enums.Character.GORG]
 	assert_eq(cd.starting_gold, 20, "Gorg starting_gold 应为 20")
 
-func test_gorg_default_weapon() -> void:
+func test_gorg_recommended_weapon() -> void:
 	var cd: CharacterData = GameConfig.characters[Enums.Character.GORG]
-	assert_eq(cd.default_weapon, "blade", "Gorg default_weapon 应为 blade")
+	assert_eq(cd.recommended_weapon, "blade", "Gorg recommended_weapon 应为 blade")
 
 func test_gorg_passive_type() -> void:
 	var cd: CharacterData = GameConfig.characters[Enums.Character.GORG]
@@ -75,9 +75,9 @@ func test_kaze_starting_gold() -> void:
 	var cd: CharacterData = GameConfig.characters[Enums.Character.KAZE]
 	assert_eq(cd.starting_gold, 25, "Kaze starting_gold 应为 25")
 
-func test_kaze_default_weapon() -> void:
+func test_kaze_recommended_weapon() -> void:
 	var cd: CharacterData = GameConfig.characters[Enums.Character.KAZE]
-	assert_eq(cd.default_weapon, "minigun", "Kaze default_weapon 应为 minigun")
+	assert_eq(cd.recommended_weapon, "minigun", "Kaze recommended_weapon 应为 minigun")
 
 func test_kaze_passive_type() -> void:
 	var cd: CharacterData = GameConfig.characters[Enums.Character.KAZE]
@@ -104,13 +104,13 @@ func test_merlin_starting_gold() -> void:
 	var cd: CharacterData = GameConfig.characters[Enums.Character.MERLIN]
 	assert_eq(cd.starting_gold, 40, "Merlin starting_gold 应为 40")
 
-func test_merlin_default_weapon() -> void:
+func test_merlin_recommended_weapon() -> void:
 	var cd: CharacterData = GameConfig.characters[Enums.Character.MERLIN]
-	assert_eq(cd.default_weapon, "laser", "Merlin default_weapon 应为 laser")
+	assert_eq(cd.recommended_weapon, "laser", "Merlin recommended_weapon 应为 laser")
 
-func test_merlin_default_tower() -> void:
+func test_merlin_recommended_tower() -> void:
 	var cd: CharacterData = GameConfig.characters[Enums.Character.MERLIN]
-	assert_eq(cd.default_tower, "mushroom", "Merlin default_tower 应为 mushroom")
+	assert_eq(cd.recommended_tower, "mushroom", "Merlin recommended_tower 应为 mushroom")
 
 func test_merlin_passive_type() -> void:
 	var cd: CharacterData = GameConfig.characters[Enums.Character.MERLIN]
@@ -137,13 +137,13 @@ func test_nemo_starting_gold() -> void:
 	var cd: CharacterData = GameConfig.characters[Enums.Character.NEMO]
 	assert_eq(cd.starting_gold, 35, "Nemo starting_gold 应为 35")
 
-func test_nemo_default_weapon() -> void:
+func test_nemo_recommended_weapon() -> void:
 	var cd: CharacterData = GameConfig.characters[Enums.Character.NEMO]
-	assert_eq(cd.default_weapon, "ice_gun", "Nemo default_weapon 应为 ice_gun")
+	assert_eq(cd.recommended_weapon, "ice_gun", "Nemo recommended_weapon 应为 ice_gun")
 
-func test_nemo_default_tower() -> void:
+func test_nemo_recommended_tower() -> void:
 	var cd: CharacterData = GameConfig.characters[Enums.Character.NEMO]
-	assert_eq(cd.default_tower, "sunflower", "Nemo default_tower 应为 sunflower")
+	assert_eq(cd.recommended_tower, "sunflower", "Nemo recommended_tower 应为 sunflower")
 
 func test_nemo_passive_type() -> void:
 	var cd: CharacterData = GameConfig.characters[Enums.Character.NEMO]

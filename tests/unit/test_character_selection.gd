@@ -7,11 +7,11 @@ func test_all_characters_have_portrait_path() -> void:
 		var char_data: CharacterData = GameConfig.characters[character_id]
 		assert_ne(char_data.portrait_path, "", "%s 应有 portrait_path" % character_id)
 
-func test_all_characters_have_valid_default_weapon() -> void:
+func test_all_characters_have_valid_recommended_weapon() -> void:
 	for character_id in GameConfig.characters:
 		var char_data: CharacterData = GameConfig.characters[character_id]
-		assert_true(GameConfig.weapons.has(char_data.default_weapon),
-			"%s 的 default_weapon '%s' 应存在于 GameConfig.weapons" % [character_id, char_data.default_weapon])
+		assert_true(GameConfig.weapons.has(char_data.recommended_weapon),
+			"%s 的 recommended_weapon '%s' 应存在于 GameConfig.weapons" % [character_id, char_data.recommended_weapon])
 
 func test_all_characters_have_display_name() -> void:
 	for character_id in GameConfig.characters:

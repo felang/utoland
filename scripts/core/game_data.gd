@@ -116,8 +116,8 @@ func reset() -> void:
 		else:
 			set(key, val)
 	# 从角色配置初始化拥有的武器和塔
-	owned_weapons = {char_data.default_weapon: 1}
-	owned_towers = {char_data.default_tower: 1}
+	owned_weapons = {char_data.recommended_weapon: 1}
+	owned_towers = {char_data.recommended_tower: 1}
 
 func upgrade_weapon(weapon_id: String) -> void:
 	var current_level: int = owned_weapons.get(weapon_id, 0)
