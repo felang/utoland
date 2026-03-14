@@ -35,6 +35,7 @@ signal item_merged(item_id: String, new_level: int)
 signal item_deployed(item: Dictionary)
 signal item_undeployed(item: Dictionary)
 signal player_level_changed(new_level: int)
+signal tower_moved(deploy_id: int, old_pos: Vector2i, new_pos: Vector2i)
 
 # 羁绊信号
 signal synergy_changed(tag: String, old_tier: int, new_tier: int)
