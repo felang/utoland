@@ -114,7 +114,7 @@ func _drop_coins() -> void:
 		return
 
 	var coin_count: int = randi_range(data.coin_drop_min, data.coin_drop_max)
-	coin_count = int(coin_count * _elite_coin_mult)
+	coin_count = int(coin_count * _elite_coin_mult * GameData.coin_drop_mult)
 	for i in coin_count:
 		var coin = SceneFactory.create_coin()
 		coin.global_position = global_position + Vector2(randf_range(-COIN_SCATTER_RANGE, COIN_SCATTER_RANGE), randf_range(-COIN_SCATTER_RANGE, COIN_SCATTER_RANGE))
