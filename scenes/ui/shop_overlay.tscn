@@ -1,0 +1,84 @@
+[gd_scene load_steps=2 format=3 uid="uid://dkqv7xm2w3a8p"]
+
+[ext_resource type="Script" path="res://scripts/ui/shop_overlay.gd" id="1_shop"]
+
+[node name="ShopOverlay" type="CanvasLayer"]
+layer = 10
+script = ExtResource("1_shop")
+
+[node name="ShopPanel" type="PanelContainer" parent="."]
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -140.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ShopPanel"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="TopRow" type="HBoxContainer" parent="ShopPanel/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="CoinsLabel" type="Label" parent="ShopPanel/VBoxContainer/TopRow"]
+layout_mode = 2
+text = "$0"
+
+[node name="LevelLabel" type="Label" parent="ShopPanel/VBoxContainer/TopRow"]
+layout_mode = 2
+text = "Lv.1"
+
+[node name="PopLabel" type="Label" parent="ShopPanel/VBoxContainer/TopRow"]
+layout_mode = 2
+text = "人口 0/2"
+
+[node name="WaveLabel" type="Label" parent="ShopPanel/VBoxContainer/TopRow"]
+layout_mode = 2
+text = "Wave 0"
+
+[node name="Spacer" type="Control" parent="ShopPanel/VBoxContainer/TopRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="LevelUpButton" type="Button" parent="ShopPanel/VBoxContainer/TopRow"]
+layout_mode = 2
+text = "Lv↑"
+
+[node name="RefreshButton" type="Button" parent="ShopPanel/VBoxContainer/TopRow"]
+layout_mode = 2
+text = "刷新 $2"
+
+[node name="StartButton" type="Button" parent="ShopPanel/VBoxContainer/TopRow"]
+layout_mode = 2
+text = "开战"
+
+[node name="ShopRow" type="HBoxContainer" parent="ShopPanel/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="ShopSlot0" type="Button" parent="ShopPanel/VBoxContainer/ShopRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "空"
+
+[node name="ShopSlot1" type="Button" parent="ShopPanel/VBoxContainer/ShopRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "空"
+
+[node name="ShopSlot2" type="Button" parent="ShopPanel/VBoxContainer/ShopRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "空"
+
+[node name="ShopSlot3" type="Button" parent="ShopPanel/VBoxContainer/ShopRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "空"
+
+[node name="BagRow" type="HBoxContainer" parent="ShopPanel/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 2
