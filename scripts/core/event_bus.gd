@@ -35,3 +35,11 @@ signal item_merged(item_id: String, new_level: int)
 signal item_deployed(item: Dictionary)
 signal item_undeployed(item: Dictionary)
 signal player_level_changed(new_level: int)
+
+# 羁绊信号
+signal synergy_changed(tag: String, old_tier: int, new_tier: int)
+signal synergy_effect_triggered(tag: String, effect_id: String)
+
+# 配对协同信号
+signal pair_synergy_activated(synergy_id: String)
+signal pair_synergy_deactivated(synergy_id: String)

@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="SynergyData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/synergy_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "blast"
+tag = "blast"
+display_name = "爆破"
+tier_thresholds = PackedInt32Array(2, 3, 5)
+tier2_stat = "aoe_range"
+tier2_value = 0.2
+tier3_id = "chain_blast"
+tier3_value = 0.15
+tier3_value_2 = 0.5
+tier5_id = "tactical_bomb"
+tier5_value = 15.0
+tier5_value_2 = 3.0

@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="SynergyData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/synergy_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "assault"
+tag = "assault"
+display_name = "猛攻"
+tier_thresholds = PackedInt32Array(2, 3, 5)
+tier2_stat = "damage_mult"
+tier2_value = 0.15
+tier3_id = "frenzy"
+tier3_value = 2.0
+tier3_duration = 3.0
+tier5_id = "overkill"
+tier5_value = 0.3

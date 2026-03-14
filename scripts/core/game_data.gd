@@ -37,12 +37,20 @@ var deployed_towers: Array[Dictionary] = []
 ## 商店栏位 [{id, type, rarity, cost}] x4
 var shop_slots: Array[Dictionary] = []
 
+## 羁绊状态
+var synergy_tag_counts: Dictionary = {}
+var synergy_active_tiers: Dictionary = {}
+var active_pair_synergies: Array[String] = []
+
 ## 推荐武器/塔 ID（商店首次访问保证出现）
 var _recommended_weapon: String = ""
 var _recommended_tower: String = ""
 
 ## 是否首次访问商店
 var is_first_shop_visit: bool = true
+
+## 羁绊管理器
+var _synergy_manager: SynergyManager
 
 ## 里程碑效果保留字段（初期不使用，后续 milestones 写入）
 var pierce_count: int = 0
@@ -88,6 +96,7 @@ const _DEFAULTS: Dictionary = {
 }
 
 func _ready() -> void:
+	_synergy_manager = SynergyManager.new()
 	init_character(current_character)
 
 func init_character(character_id: String) -> void:
@@ -131,6 +140,11 @@ func reset() -> void:
 	# 从角色配置初始化推荐武器/塔
 	_recommended_weapon = char_data.recommended_weapon
 	_recommended_tower = char_data.recommended_tower
+	# 羁绊状态重置
+	synergy_tag_counts = {}
+	synergy_active_tiers = {}
+	active_pair_synergies = []
+	_synergy_manager = SynergyManager.new()
 
 # ===== 种群系统 =====
 
@@ -179,6 +193,7 @@ func deploy_weapon(bag_index: int) -> bool:
 	bag.remove_at(bag_index)
 	deployed_weapons.append({id = item.id, level = item.level})
 	EventBus.item_deployed.emit(item)
+	_synergy_manager.recalculate()
 	return true
 
 func undeploy_weapon(deploy_index: int) -> void:
@@ -188,6 +203,7 @@ func undeploy_weapon(deploy_index: int) -> void:
 	deployed_weapons.remove_at(deploy_index)
 	bag.append({id = item.id, type = "weapon", level = item.level})
 	EventBus.item_undeployed.emit(item)
+	_synergy_manager.recalculate()
 
 func deploy_tower(bag_index: int, grid_pos: Vector2i) -> bool:
 	if not can_deploy():
@@ -200,6 +216,7 @@ func deploy_tower(bag_index: int, grid_pos: Vector2i) -> bool:
 	bag.remove_at(bag_index)
 	deployed_towers.append({id = item.id, level = item.level, grid_pos = grid_pos})
 	EventBus.item_deployed.emit(item)
+	_synergy_manager.recalculate()
 	return true
 
 func undeploy_tower(deploy_index: int) -> void:
@@ -209,6 +226,7 @@ func undeploy_tower(deploy_index: int) -> void:
 	deployed_towers.remove_at(deploy_index)
 	bag.append({id = item.id, type = "tower", level = item.level})
 	EventBus.item_undeployed.emit(item)
+	_synergy_manager.recalculate()
 
 # ===== 出售 =====
 
@@ -245,6 +263,7 @@ func _apply_sell(item: Dictionary) -> int:
 	coins += refund
 	EventBus.item_sold.emit(item, refund)
 	EventBus.coins_changed.emit(refund, coins)
+	_synergy_manager.recalculate()
 	return refund
 
 # ===== 合成系统 =====
@@ -286,6 +305,7 @@ func _check_merge(item_id: String, item_level: int) -> void:
 	var new_level: int = item_level + 1
 	bag.append({id = item_id, type = item_type, level = new_level})
 	EventBus.item_merged.emit(item_id, new_level)
+	_synergy_manager.recalculate()
 	# 递归检查
 	_check_merge(item_id, new_level)
 

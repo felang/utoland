@@ -265,3 +265,27 @@ func test_sell_from_deployed_tower_invalid_index() -> void:
 	var refund: int = GameData.sell_from_deployed_tower(0)
 	assert_eq(refund, 0)
 	assert_eq(GameData.coins, initial_coins)
+
+# ===== 羁绊联动 =====
+
+func test_deploy_weapon_triggers_synergy_recalculate() -> void:
+	GameData.reset()
+	GameData.current_character = "kaze"
+	GameData.coins = 100
+	GameData.bag.append({id = "rifle", type = "weapon", level = 1})
+	GameData.bag.append({id = "minigun", type = "weapon", level = 1})
+	GameData.deploy_weapon(0)
+	GameData.deploy_weapon(0)
+	assert_eq(GameData.synergy_active_tiers.get("assault", 0), 3)
+
+func test_undeploy_weapon_triggers_synergy_recalculate() -> void:
+	GameData.reset()
+	GameData.current_character = "kaze"
+	GameData.coins = 100
+	GameData.bag.append({id = "rifle", type = "weapon", level = 1})
+	GameData.bag.append({id = "minigun", type = "weapon", level = 1})
+	GameData.deploy_weapon(0)
+	GameData.deploy_weapon(0)
+	assert_eq(GameData.synergy_active_tiers.get("assault", 0), 3)
+	GameData.undeploy_weapon(0)
+	assert_eq(GameData.synergy_active_tiers.get("assault", 0), 2)

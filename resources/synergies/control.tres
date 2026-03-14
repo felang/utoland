@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="SynergyData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/synergy_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "control"
+tag = "control"
+display_name = "控制"
+tier_thresholds = PackedInt32Array(2, 3, 5)
+tier2_stat = "control_duration"
+tier2_value = 0.25
+tier3_id = "vulnerable"
+tier3_value = 0.2
+tier5_id = "chain_freeze"
+tier5_value = 1.0
