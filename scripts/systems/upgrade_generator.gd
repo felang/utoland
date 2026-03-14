@@ -7,6 +7,12 @@ const RARITY_WEIGHTS: Dictionary = {
 	Enums.WeaponRarity.EPIC: 0.3,
 }
 
+const TOWER_RARITY_WEIGHTS: Dictionary = {
+	Enums.TowerRarity.COMMON: 1.0,
+	Enums.TowerRarity.RARE: 0.6,
+	Enums.TowerRarity.EPIC: 0.3,
+}
+
 ## 合并的武器+塔升级选项生成器
 ## 从武器和塔的池子中加权随机抽取 3 个选项
 
@@ -73,13 +79,13 @@ func _build_pool(exclude: Array[Dictionary]) -> Array[Dictionary]:
 			pool.append({
 				"type": "tower", "id": tower_id,
 				"target_level": 1, "is_new": true, "current_level": 0,
-				"_weight": 1.0
+				"_weight": TOWER_RARITY_WEIGHTS.get(td.rarity, 1.0)
 			})
 		elif current_level < td.max_level:
 			pool.append({
 				"type": "tower", "id": tower_id,
 				"target_level": current_level + 1, "is_new": false,
-				"current_level": current_level, "_weight": 1.0
+				"current_level": current_level, "_weight": TOWER_RARITY_WEIGHTS.get(td.rarity, 1.0)
 			})
 	return pool
 
