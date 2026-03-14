@@ -4,10 +4,20 @@ extends RefCounted
 
 const CARD_WIDTH: int = 180
 const CARD_HEIGHT: int = 200
+const RARITY_COLORS: Dictionary = {
+	Enums.WeaponRarity.COMMON: Color("#4fc3f7"),
+	Enums.WeaponRarity.RARE: Color("#ab47bc"),
+	Enums.WeaponRarity.EPIC: Color("#ffa726"),
+}
 
 static func create_card(opt: Dictionary, on_selected: Callable) -> PanelContainer:
 	var is_weapon: bool = opt["type"] == "weapon"
-	var border_color: Color = Color("#4fc3f7") if is_weapon else Color("#66bb6a")
+	var border_color: Color
+	if is_weapon:
+		var wd: WeaponData = GameConfig.weapons[opt["id"]]
+		border_color = RARITY_COLORS.get(wd.rarity, Color("#4fc3f7"))
+	else:
+		border_color = Color("#66bb6a")
 	var bg_color: Color = Color("#1a1a3a") if is_weapon else Color("#1a2a1a")
 
 	var panel := PanelContainer.new()
@@ -49,6 +59,19 @@ static func create_card(opt: Dictionary, on_selected: Callable) -> PanelContaine
 	name_lbl.add_theme_color_override("font_color", Color.WHITE)
 	name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	vbox.add_child(name_lbl)
+
+	# 描述文字（仅武器且 description 非空时显示）
+	if is_weapon:
+		if not opt.has("_wd"):
+			var wd_for_desc: WeaponData = GameConfig.weapons[opt["id"]]
+			if wd_for_desc.description != "":
+				var desc_lbl := Label.new()
+				desc_lbl.text = wd_for_desc.description
+				desc_lbl.add_theme_font_size_override("font_size", 10)
+				desc_lbl.add_theme_color_override("font_color", Color(0.5, 0.5, 0.5))
+				desc_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+				desc_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+				vbox.add_child(desc_lbl)
 
 	# 等级信息
 	var level_lbl := Label.new()
