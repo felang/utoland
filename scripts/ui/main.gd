@@ -1,8 +1,13 @@
 extends Node2D
 
-var _upgrade_popup_scene: PackedScene = preload("res://scenes/ui/upgrade_popup.tscn")
+const GRID_SIZE: int = GameConfig.GRID_SIZE
+
+var _tower_container: Node2D = null
 
 func _ready() -> void:
+	_tower_container = Node2D.new()
+	_tower_container.name = "TowerContainer"
+	add_child(_tower_container)
 	_load_map()
 	_restore_towers()
 	# 暂停覆盖层
@@ -11,7 +16,7 @@ func _ready() -> void:
 	# 调试面板
 	var debug_panel = load("res://scripts/ui/debug_panel.gd").new()
 	add_child(debug_panel)
-	# 波次结束后升级弹窗
+	# 波次结束跳转商店
 	EventBus.wave_transition_ready.connect(_on_wave_transition_ready)
 	# 监听 sunflower 产金事件
 	EventBus.coins_generated.connect(_on_coins_generated)
@@ -29,35 +34,18 @@ func _load_map() -> void:
 	move_child(map_instance, 0)  # 确保地图在最底层
 
 func _restore_towers() -> void:
-	for tower_entry in GameData.tower_inventory:
-		var tower_type: String = tower_entry["type"]
-		var tower_pos: Vector2 = tower_entry["position"]
-		var tower: Node2D = SceneFactory.create_tower(tower_type)
+	for tower_entry in GameData.deployed_towers:
+		var tower: Node2D = SceneFactory.create_tower(tower_entry.id, tower_entry.level)
 		if tower:
-			tower.global_position = tower_pos
-			tower.add_to_group(Enums.Group.TOWERS)
-			add_child(tower)
+			tower.global_position = _grid_to_world(tower_entry.grid_pos)
+			_tower_container.add_child(tower)
+
+func _grid_to_world(grid_pos: Vector2i) -> Vector2:
+	return Vector2(grid_pos.x * GRID_SIZE + GRID_SIZE / 2.0,
+				   grid_pos.y * GRID_SIZE + GRID_SIZE / 2.0)
 
 func _on_wave_transition_ready() -> void:
-	await get_tree().process_frame
-	_show_upgrade_popup()
-
-func _show_upgrade_popup() -> void:
-	var count: int = GameData.pending_upgrades
-	if count <= 0:
-		SceneManager.go_to(Enums.Scene.PLACEMENT)
-		return
-	var popup: CanvasLayer = _upgrade_popup_scene.instantiate()
-	add_child(popup)
-	popup.all_upgrades_completed.connect(_on_upgrades_completed)
-	popup.skipped.connect(_on_upgrades_skipped)
-	popup.show_upgrades(count)
-
-func _on_upgrades_completed() -> void:
-	SceneManager.go_to(Enums.Scene.PLACEMENT)
-
-func _on_upgrades_skipped() -> void:
-	SceneManager.go_to(Enums.Scene.PLACEMENT)
+	SceneManager.go_to("shop")
 
 func _on_coins_generated(amount: int, _pos: Vector2) -> void:
 	var player: Node2D = get_tree().get_first_node_in_group(Enums.Group.PLAYER)
@@ -65,4 +53,3 @@ func _on_coins_generated(amount: int, _pos: Vector2) -> void:
 		player.add_coins(amount)
 	else:
 		GameData.coins += amount
-		GameData.add_xp(amount)
