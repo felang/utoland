@@ -85,11 +85,6 @@ func _setup_buttons() -> void:
 		btn.add_theme_font_size_override("font_size", 18)
 		UIUtils.setup_button_hover(btn)
 
-	# 主按钮亮金色，次要按钮偏暗
-	_start_button.self_modulate = Color(1.3, 1.1, 0.8)
-	_settings_button.self_modulate = Color(0.8, 0.75, 0.7)
-	_quit_button.self_modulate = Color(0.8, 0.75, 0.7)
-
 	_start_button.pressed.connect(_on_start_pressed)
 	_settings_button.pressed.connect(_on_settings_pressed)
 	_quit_button.pressed.connect(func() -> void: get_tree().quit())
