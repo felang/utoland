@@ -62,7 +62,7 @@ func _setup_background() -> void:
 # --- 标题样式 ---
 
 func _setup_title_style() -> void:
-	_title_label.add_theme_font_size_override("font_size", 36)
+	_title_label.add_theme_font_size_override("font_size", 48)
 	_title_label.add_theme_color_override("font_color", Color("#f0e0c0"))
 	_title_label.add_theme_color_override("font_outline_color", Color("#4a2800"))
 	_title_label.add_theme_constant_override("outline_size", 6)
@@ -152,6 +152,21 @@ func _play_entrance_animation() -> void:
 
 func _setup_settings_panel() -> void:
 	_settings_panel.visible = false
+
+	# 给 PanelContainer 应用 theme_1 的面板样式
+	var panel_tex: Texture2D = load("res://assets/themes/theme_1/nine_path_panel.png")
+	if panel_tex:
+		var style := StyleBoxTexture.new()
+		style.texture = panel_tex
+		style.texture_margin_left = 6.0
+		style.texture_margin_top = 6.0
+		style.texture_margin_right = 6.0
+		style.texture_margin_bottom = 6.0
+		style.content_margin_left = 2.0
+		style.content_margin_top = 2.0
+		style.content_margin_right = 2.0
+		style.content_margin_bottom = 2.0
+		_panel_container.add_theme_stylebox_override("panel", style)
 
 	_overlay.gui_input.connect(_on_overlay_input)
 	_close_x_button.pressed.connect(_close_settings)
