@@ -52,6 +52,19 @@ start_menu → character_selection → map_select → main（SHOP 阶段，首�
 - `scripts/systems/` — 游戏系统 (wave_manager, enemy_spawner, shop_manager, effects_manager, audio_manager, synergy_manager, pair_synergy_manager, synergy_effect_processor, drag_manager)
 - `scripts/ui/` — UI 脚本 (hud, start_menu, result, 各选择界面, main 场景控制, shop_overlay 底部商店面板)
 - `resources/` — `.tres` 配置数据文件 (weapons/, enemies/, towers/, waves/<map_id>/, characters/, maps/, shop/, effects/, spawn/)
+- `assets/characters/<name>/` — 角色素材 (portrait.png, sprite.png, sprite.res)
+- `assets/enemies/<name>/` — 敌人精灵 (sprite.png)
+- `assets/towers/` — 塔素材 (tileset_towers.png 共享图集 + 各塔子目录)
+- `assets/weapons/<name>/` — 武器素材
+- `assets/projectiles/` — 弹道精灵
+- `assets/items/` — 物品精灵 (gold_coin.png)
+- `assets/effects/` — 特效动画 (explosions/, hit_sparks/, skill_effects/)
+- `assets/ui/` — UI 素材 (icons/, panels/, buttons/, fonts/)
+- `assets/maps/` — 地图背景
+- `assets/tilesets/` — Tileset 图片
+- `assets/sfx/` — 音效
+- `assets/bgm/` — 背景音乐
+- `assets_source/` — Aseprite 等源文件（镜像 assets/ 的实体目录结构）
 - `scenes/entities/` — 实体场景 (player, coin, enemies/, towers/, projectiles/)
 - `scenes/levels/` — 关卡场景 (main)
 - `scenes/ui/` — UI 场景 (start_menu, hud, result, character_selection, map_select, shop_overlay)
