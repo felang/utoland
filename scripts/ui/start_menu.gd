@@ -82,6 +82,7 @@ func _setup_version_style() -> void:
 func _setup_buttons() -> void:
 	for btn_name in ["StartButton", "SettingsButton", "QuitButton"]:
 		var btn: Button = $CenterContainer/VBoxContainer.get_node(btn_name)
+		btn.add_theme_font_size_override("font_size", 18)
 		UIUtils.setup_button_hover(btn)
 
 	_start_button.pressed.connect(_on_start_pressed)
