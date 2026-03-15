@@ -1,0 +1,113 @@
+[gd_scene format=3 uid="uid://b14baqesovtsj"]
+
+[ext_resource type="Script" path="res://scripts/ui/shop.gd" id="1_ahsc1"]
+
+[node name="Shop" type="Control" unique_id=249085510]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_ahsc1")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=930704503]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 4.0
+offset_top = 2.0
+offset_right = -4.0
+offset_bottom = -2.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TopBar" type="HBoxContainer" parent="VBoxContainer" unique_id=1008534311]
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+
+[node name="CoinsLabel" type="Label" parent="VBoxContainer/TopBar" unique_id=661088988]
+unique_name_in_owner = true
+layout_mode = 2
+text = "💰0"
+
+[node name="LevelLabel" type="Label" parent="VBoxContainer/TopBar" unique_id=2119261048]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Lv1"
+
+[node name="PopLabel" type="Label" parent="VBoxContainer/TopBar" unique_id=1934420447]
+unique_name_in_owner = true
+layout_mode = 2
+text = "0/2"
+
+[node name="WaveLabel" type="Label" parent="VBoxContainer/TopBar" unique_id=69353633]
+unique_name_in_owner = true
+layout_mode = 2
+text = "波1"
+
+[node name="Spacer" type="Control" parent="VBoxContainer/TopBar" unique_id=975425430]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="LevelUpButton" type="Button" parent="VBoxContainer/TopBar" unique_id=1907763179]
+unique_name_in_owner = true
+layout_mode = 2
+text = "升本"
+
+[node name="RefreshButton" type="Button" parent="VBoxContainer/TopBar" unique_id=2124862795]
+unique_name_in_owner = true
+layout_mode = 2
+text = "刷新2💰"
+
+[node name="StartButton" type="Button" parent="VBoxContainer/TopBar" unique_id=1583650173]
+unique_name_in_owner = true
+layout_mode = 2
+text = "开战▶"
+
+[node name="ShopBar" type="HBoxContainer" parent="VBoxContainer" unique_id=1217992233]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+
+[node name="ShopSlot0" type="Button" parent="VBoxContainer/ShopBar" unique_id=1676328275]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ShopSlot1" type="Button" parent="VBoxContainer/ShopBar" unique_id=19449105]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ShopSlot2" type="Button" parent="VBoxContainer/ShopBar" unique_id=1143540180]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ShopSlot3" type="Button" parent="VBoxContainer/ShopBar" unique_id=57023835]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="MainArea" type="HBoxContainer" parent="VBoxContainer" unique_id=2030194993]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="EquipPanel" type="VBoxContainer" parent="VBoxContainer/MainArea" unique_id=103607692]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="MapArea" type="Control" parent="VBoxContainer/MainArea" unique_id=856489809]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="BagBar" type="HBoxContainer" parent="VBoxContainer" unique_id=2095034695]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2

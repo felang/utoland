@@ -32,5 +32,5 @@ func test_entity_and_ui_size_tokens_are_grid_aligned():
 	assert_eq(GameConfig.UI_BUTTON_SIZE, Vector2(160, 36))
 
 func test_map_grid_constants():
-	assert_eq(GameConfig.MAP_GRID_WIDTH, 40)
-	assert_eq(GameConfig.MAP_GRID_HEIGHT, 25)
+	assert_eq(GameConfig.MAP_GRID_WIDTH, 34)
+	assert_eq(GameConfig.MAP_GRID_HEIGHT, 26)

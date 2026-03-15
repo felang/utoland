@@ -39,7 +39,7 @@ enabled=PackedStringArray("res://addons/AsepriteWizard/plugin.cfg", "res://addon
 
 [gui]
 
-theme/custom="res://assets/themes/default_theme.tres"
+theme/custom="res://assets/themes/theme_1/theme_1.tres"
 
 [input]
 

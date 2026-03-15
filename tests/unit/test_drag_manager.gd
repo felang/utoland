@@ -28,10 +28,10 @@ func test_world_to_grid_conversion() -> void:
 
 func test_is_valid_grid_pos() -> void:
 	assert_true(_drag_manager._is_valid_grid_pos(Vector2i(0, 0)))
-	assert_true(_drag_manager._is_valid_grid_pos(Vector2i(39, 24)))
+	assert_true(_drag_manager._is_valid_grid_pos(Vector2i(33, 25)))
 	assert_false(_drag_manager._is_valid_grid_pos(Vector2i(-1, 0)))
-	assert_false(_drag_manager._is_valid_grid_pos(Vector2i(40, 0)))
-	assert_false(_drag_manager._is_valid_grid_pos(Vector2i(0, 25)))
+	assert_false(_drag_manager._is_valid_grid_pos(Vector2i(34, 0)))
+	assert_false(_drag_manager._is_valid_grid_pos(Vector2i(0, 26)))
 
 func test_is_grid_available_empty() -> void:
 	assert_true(_drag_manager._is_grid_available(Vector2i(5, 5)))

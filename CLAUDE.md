@@ -60,6 +60,7 @@ start_menu → character_selection → map_select → main（SHOP 阶段，首�
 - `assets/items/` — 物品精灵 (gold_coin.png)
 - `assets/effects/` — 特效动画 (explosions/, hit_sparks/, skill_effects/)
 - `assets/ui/` — UI 素材 (icons/, panels/, buttons/, fonts/)
+- `assets/themes/` — UI 主题 (default_theme.tres 默认主题, theme_1/ 木质像素风主题)
 - `assets/maps/` — 地图背景
 - `assets/tilesets/` — Tileset 图片
 - `assets/sfx/` — 音效
