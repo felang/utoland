@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://byi2def2d0m7n"
+path="res://.godot/imported/Hit7.wav-67d43a1487bf517bdb87d410c824bcb2.sample"
+
+[deps]
+
+source_file="res://assets/sfx/Sounds/Hit & Impact/Hit7.wav"
+dest_files=["res://.godot/imported/Hit7.wav-67d43a1487bf517bdb87d410c824bcb2.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=2

@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://d21kn5sw8nyvq"
+path="res://.godot/imported/Bounce4.wav-283c6e084187b88d803742859a7bcf15.sample"
+
+[deps]
+
+source_file="res://assets/sfx/Sounds/Jump & Bounce/Bounce4.wav"
+dest_files=["res://.godot/imported/Bounce4.wav-283c6e084187b88d803742859a7bcf15.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=2

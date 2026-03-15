@@ -1,0 +1,19 @@
+[remap]
+
+importer="oggvorbisstr"
+type="AudioStreamOggVorbis"
+uid="uid://dau2ll2ug6l7q"
+path="res://.godot/imported/35 - Adventure.ogg-87eb9a762e776ebac1d6177c3dd4fe6b.oggvorbisstr"
+
+[deps]
+
+source_file="res://assets/bgm/35 - Adventure.ogg"
+dest_files=["res://.godot/imported/35 - Adventure.ogg-87eb9a762e776ebac1d6177c3dd4fe6b.oggvorbisstr"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4
