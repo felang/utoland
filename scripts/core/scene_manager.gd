@@ -32,6 +32,20 @@ func _ready() -> void:
 	_fade_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	canvas.add_child(_fade_rect)
 
+	# 启动时播放初始场景的 BGM
+	_play_initial_bgm.call_deferred()
+
+
+func _play_initial_bgm() -> void:
+	var current_scene: Node = get_tree().current_scene
+	if not current_scene:
+		return
+	var scene_path: String = current_scene.scene_file_path
+	for scene_name: String in SCENES:
+		if SCENES[scene_name] == scene_path and SCENE_BGM.has(scene_name):
+			AudioManager.play_bgm(SCENE_BGM[scene_name])
+			return
+
 func go_to(scene_name: String) -> void:
 	assert(SCENES.has(scene_name), "未知场景: " + scene_name)
 	if _is_transitioning:

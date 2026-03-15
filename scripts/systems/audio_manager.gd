@@ -72,7 +72,10 @@ func _register_bgm() -> void:
 	for id: String in bgm_map:
 		var path: String = bgm_dir + bgm_map[id]
 		if ResourceLoader.exists(path):
-			_bgm_tracks[id] = load(path)
+			var stream: AudioStream = load(path)
+			if stream is AudioStreamOggVorbis:
+				stream.loop = true
+			_bgm_tracks[id] = stream
 
 ## 设置 SFX 音量（0~100，0 时静音总线）
 func set_sfx_volume(value: float) -> void:
