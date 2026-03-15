@@ -43,14 +43,13 @@ func _ready() -> void:
 
 func _setup_background() -> void:
 	var gradient := Gradient.new()
-	while gradient.get_point_count() > 0:
-		gradient.remove_point(0)
-	gradient.add_point(0.0, Color("#0a0a2e"))
+	# 默认 Gradient 有 2 个点（0 和 1），直接设置首尾颜色，中间用 add_point
+	gradient.set_color(0, Color("#0a0a2e"))
+	gradient.set_color(1, Color("#c06030"))
 	gradient.add_point(0.25, Color("#1a1040"))
 	gradient.add_point(0.45, Color("#2d1b4e"))
 	gradient.add_point(0.65, Color("#4a2040"))
 	gradient.add_point(0.85, Color("#8b4020"))
-	gradient.add_point(1.0, Color("#c06030"))
 	var tex := GradientTexture2D.new()
 	tex.gradient = gradient
 	tex.fill_from = Vector2(0.5, 0.0)
