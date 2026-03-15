@@ -135,18 +135,18 @@ func _play_entrance_animation() -> void:
 	var tw: Tween = create_tween()
 
 	# 标题和星星淡入
-	tw.tween_interval(0.2)
-	tw.tween_property(_title_label, "modulate:a", 1.0, 0.4)
-	tw.parallel().tween_property(_stars, "modulate:a", 1.0, 0.4)
+	tw.tween_interval(0.1)
+	tw.tween_property(_title_label, "modulate:a", 1.0, 0.2)
+	tw.parallel().tween_property(_stars, "modulate:a", 1.0, 0.2)
 
 	# 按钮依次淡入
 	for btn in buttons:
-		tw.tween_interval(0.1)
-		tw.tween_property(btn, "modulate:a", 1.0, 0.3)
+		tw.tween_interval(0.05)
+		tw.tween_property(btn, "modulate:a", 1.0, 0.15)
 
 	# 版本号渐现
-	tw.tween_interval(0.1)
-	tw.tween_property(_version_label, "modulate:a", 1.0, 0.3)
+	tw.tween_interval(0.05)
+	tw.tween_property(_version_label, "modulate:a", 1.0, 0.15)
 
 
 # --- 设置面板 ---
