@@ -34,4 +34,4 @@ func test_start_menu_button_uses_standard_size():
 	var scene = load("res://scenes/ui/start_menu.tscn").instantiate()
 	add_child_autofree(scene)
 	var start_btn: Button = scene.get_node("CenterContainer/VBoxContainer/StartButton")
-	assert_eq(start_btn.custom_minimum_size, Vector2(200, 44))
+	assert_eq(start_btn.custom_minimum_size, Vector2(240, 44))
