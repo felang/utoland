@@ -15,8 +15,8 @@ const PPU = 16
 const GRID_SIZE = 16
 
 # 地图网格数量（固定）
-const MAP_GRID_WIDTH = 40
-const MAP_GRID_HEIGHT = 25
+const MAP_GRID_WIDTH = 30
+const MAP_GRID_HEIGHT = 26
 
 # 地图尺寸（由网格数量计算）
 var MAP_PIXEL_WIDTH: float = 0.0
@@ -51,42 +51,42 @@ const PLAYER = {
 const SPRITES = {
 	"enemies": {
 		"normal": {
-			"spritesheet": "res://assets/sprites/enemies/slime.png",
+			"spritesheet": "res://assets/enemies/slime/sprite.png",
 			"frame_size": Vector2(16, 16),
 			"walk_frames": 4,
 			"walk_directions": 4,
 			"fps": 8.0
 		},
 		"fast": {
-			"spritesheet": "res://assets/sprites/enemies/bluebat.png",
+			"spritesheet": "res://assets/enemies/bluebat/sprite.png",
 			"frame_size": Vector2(16, 16),
 			"walk_frames": 4,
 			"walk_directions": 4,
 			"fps": 10.0
 		},
 		"tank": {
-			"spritesheet": "res://assets/sprites/enemies/trex_large.png",
+			"spritesheet": "res://assets/enemies/trex/sprite_large.png",
 			"frame_size": Vector2(32, 32),
 			"walk_frames": 4,
 			"walk_directions": 4,
 			"fps": 6.0
 		},
 		"boss_brute": {
-			"spritesheet": "res://assets/sprites/enemies/trex.png",
+			"spritesheet": "res://assets/enemies/trex/sprite.png",
 			"frame_size": Vector2(16, 16),
 			"walk_frames": 4,
 			"walk_directions": 4,
 			"fps": 5.0
 		},
 		"boss_summoner": {
-			"spritesheet": "res://assets/sprites/enemies/bluebat.png",
+			"spritesheet": "res://assets/enemies/bluebat/sprite.png",
 			"frame_size": Vector2(16, 16),
 			"walk_frames": 4,
 			"walk_directions": 4,
 			"fps": 5.0
 		},
 		"boss_guardian": {
-			"spritesheet": "res://assets/sprites/enemies/trex.png",
+			"spritesheet": "res://assets/enemies/trex/sprite.png",
 			"frame_size": Vector2(16, 16),
 			"walk_frames": 4,
 			"walk_directions": 4,
@@ -94,7 +94,7 @@ const SPRITES = {
 		}
 	},
 	"towers": {
-		"tileset": "res://assets/sprites/towers/tileset_towers.png",
+		"tileset": "res://assets/towers/tileset_towers.png",
 		"pea_shooter": {"region": Rect2(32, 0, 16, 16)},
 		"stump": {"region": Rect2(64, 32, 16, 16)},
 		"ice_flower": {"region": Rect2(320, 0, 16, 16)},
@@ -112,11 +112,11 @@ const SPRITES = {
 		"bamboo": {"region": Rect2(192, 0, 16, 16)}
 	},
 	"projectiles": {
-		"bullet": "res://assets/sprites/projectiles/kunai.png",
-		"boomerang": "res://assets/sprites/projectiles/shuriken.png"
+		"bullet": "res://assets/projectiles/kunai.png",
+		"boomerang": "res://assets/projectiles/shuriken.png"
 	},
 	"items": {
-		"coin": "res://assets/sprites/items/gold_coin.png"
+		"coin": "res://assets/items/gold_coin.png"
 	}
 }
 

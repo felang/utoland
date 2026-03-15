@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://5uhjfg5l2l8i"]
 
 [ext_resource type="Script" uid="uid://ckwxfmslcyshb" path="res://scripts/entities/towers/tower_shooter.gd" id="1_15q5k"]
-[ext_resource type="Texture2D" path="res://assets/sprites/towers/tileset_towers.png" id="2_tileset"]
+[ext_resource type="Texture2D" path="res://assets/towers/tileset_towers.png" id="2_tileset"]
 [ext_resource type="Script" path="res://scripts/components/health_component.gd" id="3_health"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_dgv38"]

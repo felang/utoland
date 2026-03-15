@@ -1,7 +1,7 @@
 [gd_scene load_steps=6 format=3 uid="uid://tower_vine"]
 
 [ext_resource type="Script" path="res://scripts/entities/towers/tower_trap.gd" id="1_script"]
-[ext_resource type="Texture2D" path="res://assets/sprites/towers/tileset_towers.png" id="2_tileset"]
+[ext_resource type="Texture2D" path="res://assets/towers/tileset_towers.png" id="2_tileset"]
 [ext_resource type="Script" path="res://scripts/components/health_component.gd" id="3_health"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_body"]
