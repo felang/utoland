@@ -64,10 +64,10 @@ func _create_bgm_player() -> void:
 func _register_bgm() -> void:
 	var bgm_dir := "res://assets/bgm/"
 	var bgm_map: Dictionary = {
-		"menu": "menu.ogg",
-		"placement": "placement.ogg",
-		"battle": "battle.ogg",
-		"result": "result.ogg",
+		"menu": "1 - Adventure Begin.ogg",
+		"placement": "5 - Peaceful.ogg",
+		"battle": "17 - Fight.ogg",
+		"result": "15 - Credit Theme.ogg",
 	}
 	for id: String in bgm_map:
 		var path: String = bgm_dir + bgm_map[id]
