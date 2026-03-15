@@ -45,10 +45,10 @@ func _register_sounds() -> void:
 		"boss_appear": "boss_appear.wav",
 		"tower_place": "tower_place.wav",
 		"tower_remove": "tower_remove.wav",
-		"ui_hover": "ui_hover.wav",
-		"ui_click": "ui_click.wav",
-		"ui_panel_open": "ui_panel_open.wav",
-		"ui_panel_close": "ui_panel_close.wav",
+		"ui_hover": "Sounds/Menu/Move3.wav",
+		"ui_click": "Sounds/Menu/Accept3.wav",
+		"ui_panel_open": "Sounds/Menu/Menu8.wav",
+		"ui_panel_close": "Sounds/Menu/Cancel.wav",
 	}
 	for id: String in sound_map:
 		var path: String = sfx_dir + sound_map[id]
