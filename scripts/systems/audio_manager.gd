@@ -14,6 +14,10 @@ var _bgm_player: AudioStreamPlayer
 var _bgm_tracks: Dictionary = {}
 var _current_bgm: String = ""
 
+## 音量（0~100 线性值，100 为全音量）
+var _sfx_volume: float = 100.0
+var _bgm_volume: float = 100.0
+
 func _ready() -> void:
 	_create_pool()
 	_register_sounds()
@@ -23,7 +27,7 @@ func _ready() -> void:
 func _create_pool() -> void:
 	for i in POOL_SIZE:
 		var player := AudioStreamPlayer.new()
-		player.bus = "Master"
+		player.bus = "SFX"
 		add_child(player)
 		_pool.append(player)
 
@@ -41,6 +45,10 @@ func _register_sounds() -> void:
 		"boss_appear": "boss_appear.wav",
 		"tower_place": "tower_place.wav",
 		"tower_remove": "tower_remove.wav",
+		"ui_hover": "ui_hover.wav",
+		"ui_click": "ui_click.wav",
+		"ui_panel_open": "ui_panel_open.wav",
+		"ui_panel_close": "ui_panel_close.wav",
 	}
 	for id: String in sound_map:
 		var path: String = sfx_dir + sound_map[id]
@@ -49,7 +57,7 @@ func _register_sounds() -> void:
 
 func _create_bgm_player() -> void:
 	_bgm_player = AudioStreamPlayer.new()
-	_bgm_player.bus = "Master"
+	_bgm_player.bus = "BGM"
 	_bgm_player.volume_db = -6.0
 	add_child(_bgm_player)
 
@@ -65,6 +73,38 @@ func _register_bgm() -> void:
 		var path: String = bgm_dir + bgm_map[id]
 		if ResourceLoader.exists(path):
 			_bgm_tracks[id] = load(path)
+
+## 设置 SFX 音量（0~100，0 时静音总线）
+func set_sfx_volume(value: float) -> void:
+	_sfx_volume = clampf(value, 0.0, 100.0)
+	var bus_idx: int = AudioServer.get_bus_index("SFX")
+	if bus_idx < 0:
+		return
+	if _sfx_volume == 0.0:
+		AudioServer.set_bus_mute(bus_idx, true)
+	else:
+		AudioServer.set_bus_mute(bus_idx, false)
+		AudioServer.set_bus_volume_db(bus_idx, linear_to_db(_sfx_volume / 100.0))
+
+## 获取当前 SFX 音量（0~100）
+func get_sfx_volume() -> float:
+	return _sfx_volume
+
+## 设置 BGM 音量（0~100，0 时静音总线）
+func set_bgm_volume(value: float) -> void:
+	_bgm_volume = clampf(value, 0.0, 100.0)
+	var bus_idx: int = AudioServer.get_bus_index("BGM")
+	if bus_idx < 0:
+		return
+	if _bgm_volume == 0.0:
+		AudioServer.set_bus_mute(bus_idx, true)
+	else:
+		AudioServer.set_bus_mute(bus_idx, false)
+		AudioServer.set_bus_volume_db(bus_idx, linear_to_db(_bgm_volume / 100.0))
+
+## 获取当前 BGM 音量（0~100）
+func get_bgm_volume() -> float:
+	return _bgm_volume
 
 func play_bgm(track_id: String) -> void:
 	if track_id == _current_bgm and _bgm_player.playing:
