@@ -1,5 +1,6 @@
 [gd_scene format=3 uid="uid://24phowe362yu"]
 
+[ext_resource type="Theme" uid="uid://dx4r0mviklhsx" path="res://assets/themes/theme_1/theme_1.tres" id="1_0kjv3"]
 [ext_resource type="Script" uid="uid://crqwnrcfh4ggx" path="res://scripts/ui/start_menu.gd" id="1_irhji"]
 
 [node name="StartMenu" type="Control" unique_id=126935014]
@@ -9,9 +10,23 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme = ExtResource("1_0kjv3")
 script = ExtResource("1_irhji")
 
-[node name="Background" type="ColorRect" parent="."]
+[node name="Background" type="TextureRect" parent="." unique_id=149637177]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+stretch_mode = 6
+
+[node name="Stars" type="Node2D" parent="." unique_id=1815747518]
+z_index = 1
+
+[node name="CenterContainer" type="CenterContainer" parent="." unique_id=957303621]
+z_index = 2
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -19,49 +34,37 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="CenterContainer" type="CenterContainer" parent="."]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer" unique_id=205388409]
 layout_mode = 2
-alignment = 1
 theme_override_constants/separation = 20
+alignment = 1
 
-[node name="TitleLabel" type="Label" parent="CenterContainer/VBoxContainer"]
+[node name="TitleLabel" type="Label" parent="CenterContainer/VBoxContainer" unique_id=938269537]
 layout_mode = 2
-text = "Survivor Tower Defense"
+text = "UTOLAND"
 horizontal_alignment = 1
 
-[node name="SubtitleLabel" type="Label" parent="CenterContainer/VBoxContainer"]
-layout_mode = 2
-text = "类幸存者塔防射击"
-horizontal_alignment = 1
-
-[node name="Spacer" type="Control" parent="CenterContainer/VBoxContainer"]
-custom_minimum_size = Vector2(0, 30)
+[node name="Spacer" type="Control" parent="CenterContainer/VBoxContainer" unique_id=80216985]
+custom_minimum_size = Vector2(0, 60)
 layout_mode = 2
 
-[node name="StartButton" type="Button" parent="CenterContainer/VBoxContainer"]
-custom_minimum_size = Vector2(200, 44)
+[node name="StartButton" type="Button" parent="CenterContainer/VBoxContainer" unique_id=482910740]
+custom_minimum_size = Vector2(240, 44)
 layout_mode = 2
 text = "开始游戏"
 
-[node name="SettingsButton" type="Button" parent="CenterContainer/VBoxContainer"]
-custom_minimum_size = Vector2(200, 44)
+[node name="SettingsButton" type="Button" parent="CenterContainer/VBoxContainer" unique_id=1173039120]
+custom_minimum_size = Vector2(240, 44)
 layout_mode = 2
 text = "设置"
 
-[node name="QuitButton" type="Button" parent="CenterContainer/VBoxContainer"]
-custom_minimum_size = Vector2(200, 44)
+[node name="QuitButton" type="Button" parent="CenterContainer/VBoxContainer" unique_id=1042043999]
+custom_minimum_size = Vector2(240, 44)
 layout_mode = 2
 text = "退出"
 
-[node name="VersionLabel" type="Label" parent="."]
+[node name="VersionLabel" type="Label" parent="." unique_id=1024002635]
+z_index = 2
 layout_mode = 1
 anchors_preset = 3
 anchor_left = 1.0
@@ -74,3 +77,116 @@ grow_horizontal = 0
 grow_vertical = 0
 text = "v0.1.0"
 horizontal_alignment = 2
+
+[node name="SettingsPanel" type="Control" parent="." unique_id=142631248]
+visible = false
+z_index = 10
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Overlay" type="ColorRect" parent="SettingsPanel" unique_id=1155978734]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.5)
+
+[node name="CenterContainer" type="CenterContainer" parent="SettingsPanel" unique_id=1743308540]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="SettingsPanel/CenterContainer" unique_id=953787508]
+custom_minimum_size = Vector2(320, 0)
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="SettingsPanel/CenterContainer/PanelContainer" unique_id=1966991732]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="VBoxContainer" type="VBoxContainer" parent="SettingsPanel/CenterContainer/PanelContainer/MarginContainer" unique_id=2111433304]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="TitleBar" type="HBoxContainer" parent="SettingsPanel/CenterContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=1009140542]
+layout_mode = 2
+
+[node name="SettingsTitleLabel" type="Label" parent="SettingsPanel/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/TitleBar" unique_id=1448501742]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "设置"
+
+[node name="CloseXButton" type="Button" parent="SettingsPanel/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/TitleBar" unique_id=1011312749]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+text = "✕"
+
+[node name="SFXSection" type="VBoxContainer" parent="SettingsPanel/CenterContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=1952652629]
+layout_mode = 2
+
+[node name="SFXHeader" type="HBoxContainer" parent="SettingsPanel/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/SFXSection" unique_id=2015211010]
+layout_mode = 2
+
+[node name="SFXLabel" type="Label" parent="SettingsPanel/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/SFXSection/SFXHeader" unique_id=1243556416]
+layout_mode = 2
+text = "音效音量"
+
+[node name="SFXValueLabel" type="Label" parent="SettingsPanel/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/SFXSection/SFXHeader" unique_id=532942499]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "100%"
+horizontal_alignment = 2
+
+[node name="SFXSlider" type="HSlider" parent="SettingsPanel/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/SFXSection" unique_id=1020540940]
+layout_mode = 2
+value = 100.0
+
+[node name="BGMSection" type="VBoxContainer" parent="SettingsPanel/CenterContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=1560860846]
+layout_mode = 2
+
+[node name="BGMHeader" type="HBoxContainer" parent="SettingsPanel/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/BGMSection" unique_id=1249523676]
+layout_mode = 2
+
+[node name="BGMLabel" type="Label" parent="SettingsPanel/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/BGMSection/BGMHeader" unique_id=1270527009]
+layout_mode = 2
+text = "音乐音量"
+
+[node name="BGMValueLabel" type="Label" parent="SettingsPanel/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/BGMSection/BGMHeader" unique_id=301567716]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "100%"
+horizontal_alignment = 2
+
+[node name="BGMSlider" type="HSlider" parent="SettingsPanel/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/BGMSection" unique_id=239712953]
+layout_mode = 2
+value = 100.0
+
+[node name="HSeparator" type="HSeparator" parent="SettingsPanel/CenterContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=2106856847]
+layout_mode = 2
+
+[node name="FullscreenRow" type="HBoxContainer" parent="SettingsPanel/CenterContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=352559136]
+layout_mode = 2
+
+[node name="FullscreenLabel" type="Label" parent="SettingsPanel/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/FullscreenRow" unique_id=765605185]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "全屏模式"
+
+[node name="FullscreenCheck" type="CheckButton" parent="SettingsPanel/CenterContainer/PanelContainer/MarginContainer/VBoxContainer/FullscreenRow" unique_id=221786279]
+layout_mode = 2
+
+[node name="CloseButton" type="Button" parent="SettingsPanel/CenterContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=920337591]
+layout_mode = 2
+text = "关闭"
