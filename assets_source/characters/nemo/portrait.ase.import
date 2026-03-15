@@ -1,0 +1,14 @@
+[remap]
+
+importer="aseprite_wizard.plugin.noop"
+type="PackedDataContainer"
+uid="uid://b0xg13kwbjhet"
+path="res://.godot/imported/portrait.ase-bc598d724e7378e9c7b02858dd981400.res"
+
+[deps]
+
+source_file="res://assets_source/characters/nemo/portrait.ase"
+dest_files=["res://.godot/imported/portrait.ase-bc598d724e7378e9c7b02858dd981400.res"]
+
+[params]
+

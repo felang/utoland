@@ -1,0 +1,14 @@
+[remap]
+
+importer="aseprite_wizard.plugin.noop"
+type="PackedDataContainer"
+uid="uid://jh240c558dbx"
+path="res://.godot/imported/sprite.ase-790a346455a7bb94d9dd5f114f25cc74.res"
+
+[deps]
+
+source_file="res://assets_source/characters/nemo/sprite.ase"
+dest_files=["res://.godot/imported/sprite.ase-790a346455a7bb94d9dd5f114f25cc74.res"]
+
+[params]
+

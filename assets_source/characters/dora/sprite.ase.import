@@ -1,0 +1,14 @@
+[remap]
+
+importer="aseprite_wizard.plugin.noop"
+type="PackedDataContainer"
+uid="uid://eoe5v6t181in"
+path="res://.godot/imported/sprite.ase-803b6359b9c610d4a60600f43b7ea4dd.res"
+
+[deps]
+
+source_file="res://assets_source/characters/dora/sprite.ase"
+dest_files=["res://.godot/imported/sprite.ase-803b6359b9c610d4a60600f43b7ea4dd.res"]
+
+[params]
+

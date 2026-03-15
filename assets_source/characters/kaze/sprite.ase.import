@@ -1,0 +1,14 @@
+[remap]
+
+importer="aseprite_wizard.plugin.noop"
+type="PackedDataContainer"
+uid="uid://bcq31r2lbdhj5"
+path="res://.godot/imported/sprite.ase-84a481321fb4da224d3f1312c666f1a8.res"
+
+[deps]
+
+source_file="res://assets_source/characters/kaze/sprite.ase"
+dest_files=["res://.godot/imported/sprite.ase-84a481321fb4da224d3f1312c666f1a8.res"]
+
+[params]
+
