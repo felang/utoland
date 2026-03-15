@@ -24,24 +24,24 @@ utoland 是一个基于 **Godot 4.6** 的 2D 塔防 + 射击混合类游戏（�
 ### Autoload 单例 (全局可用，加载顺序有依赖)
 
 - **GameConfig** (`scripts/core/game_config.gd`) — 资源注册表，运行时从 `resources/` 目录加载 `.tres` 配置文件（武器、敌人、塔、波次、角色、地图、特效、精灵等）。必须最先加载（GameData 依赖它）。
-- **GameData** (`scripts/core/game_data.gd`) — 运行时游戏状态，存储角色属性、金币、波次、背包（`bag: Array[Dictionary]`）、已装备武器（`deployed_weapons`）、已布置塔（`deployed_towers`）、商店栏位（`shop_slots`）、人口等级（`player_level` 1-7）、羁绊标签数（`synergy_tag_counts`）、激活档位（`synergy_active_tiers`）。`reset()` 初始化新游戏状态。提供 `deploy/undeploy_weapon/tower()`、`sell_from_bag/deployed_weapon/deployed_tower()`、`buy_level_up()`、`_check_merge()` 等方法。持有 `_synergy_manager`（SynergyManager）和 `_pair_synergy_manager`（PairSynergyManager）内部实例，deploy/undeploy 后自动触发羁绊重算。跨场景传递数据。
+- **GameData** (`scripts/core/game_data.gd`) — 运行时游戏状态，存储角色属性、金币、波次、背包（`bag: Array[Dictionary]`）、已装备武器（`deployed_weapons`）、已布置塔（`deployed_towers`，含 `deploy_id` 稳定标识符）、商店栏位（`shop_slots`）、人口等级（`player_level` 1-7）、羁绊标签数（`synergy_tag_counts`）、激活档位（`synergy_active_tiers`）。`reset()` 初始化新游戏状态。提供 `deploy_tower(bag_index, grid_pos) -> int`（返回 deploy_id，0=失败）、`undeploy_tower(deploy_id) -> bool`、`move_tower(deploy_id, new_grid_pos) -> bool`、`deploy/undeploy_weapon()`、`sell_from_bag/deployed_weapon/deployed_tower(deploy_id)`、`buy_level_up()`、`_check_merge()` 等方法。持有 `_synergy_manager`（SynergyManager）和 `_pair_synergy_manager`（PairSynergyManager）内部实例，deploy/undeploy 后自动触发羁绊重算。跨场景传递数据。
 - **SceneFactory** (`scripts/core/scene_factory.gd`) — 集中管理场景实例化，提供 `create_tower()`, `create_enemy()`, `create_bullet()`, `create_coin()` 等工厂方法。创建实体必须通过此工厂。
 - **EffectsManager** (`scripts/systems/effects_manager.gd`) — 特效管理：伤害数字、击中火花、死亡爆炸、红闪（flash_hit）、击中抖动（sprite_shake）、增强死亡特效（spawn_enhanced_death）、Boss 击杀慢动作（hitstop）等视觉效果。
 - **AudioManager** (`scripts/systems/audio_manager.gd`) — 音效管理：SFX 通过 AudioStreamPlayer 池化播放 `play(sound_id)`，BGM 通过独立 AudioStreamPlayer 播放 `play_bgm(track_id)` / `stop_bgm()` / `fade_bgm(duration)`。SFX 放 `assets/sfx/`，BGM 放 `assets/bgm/`。
-- **EventBus** (`scripts/core/event_bus.gd`) — 全局事件总线，用于跨系统解耦通信。商店信号：`item_purchased/item_sold/item_merged/item_deployed/item_undeployed/player_level_changed`。战斗信号：`wave_started/wave_completed/wave_transition_ready/enemy_killed/boss_killed/coins_changed/coins_generated`。羁绊信号：`synergy_changed(tag, old_tier, new_tier)`、`pair_synergy_activated/deactivated(pair_id)`。
+- **EventBus** (`scripts/core/event_bus.gd`) — 全局事件总线，用于跨系统解耦通信。商店信号：`item_purchased/item_sold/item_merged/item_deployed/item_undeployed/player_level_changed/tower_moved`。战斗信号：`wave_started/wave_completed/wave_transition_ready/enemy_killed/boss_killed/coins_changed/coins_generated`。羁绊信号：`synergy_changed(tag, old_tier, new_tier)`、`pair_synergy_activated/deactivated(pair_id)`。
 - **SceneManager** (`scripts/core/scene_manager.gd`) — 集中管理场景切换，提供 `go_to(scene_name)` 方法（带淡入淡出过渡动画，async）。自动根据 SCENE_BGM 映射切换 BGM。所有场景路径在此统一维护，禁止直接调用 `get_tree().change_scene_to_file()`。
 
 ### 游戏流程 (场景切换)
 
 ```
-start_menu → character_selection → map_select → shop（首次，用初始金币购买）
-    ↓ (点击"开始战斗")
-  main (战斗，拾取金币积累) → 波次结束 → shop（自动刷新商店）
-    ↓ (点击"开始战斗")
-  main (下一波战斗) → ... → result (结算)
+start_menu → character_selection → map_select → main（SHOP 阶段，首次用初始金币购买）
+    ↓ (点击"开战")
+  main（BATTLE 阶段，战斗，拾取金币积累）→ 波次结束 → main（SHOP 阶段，自动刷新商店）
+    ↓ (点击"开战")
+  main（BATTLE 阶段，下一波战斗）→ ... → result (结算)
 ```
 
-> **商店阶段**: 统一界面包含商店栏（4 个物品 + 刷新）、背包（10 格）、角色装备栏、地图布置区。购买物品进背包，从背包装备武器或布置塔到地图。花金币升本提高人口上限和解锁高稀有度物品。3 个同类同级自动合成。
+> **商店与战斗融合**: 不再有独立的商店场景。main 场景通过 `Phase` 状态机（SHOP/BATTLE）管理两个阶段。SHOP 阶段底部面板（`ShopOverlay`，CanvasLayer layer=10）显示商店栏（4 个物品 + 刷新）、背包（10 格）。塔通过拖拽直接放置在真实地图上（`DragManager`），武器拖拽到玩家角色装备。开战后面板滑出隐藏，波次结束后滑回。
 
 ### 代码组织
 
@@ -49,12 +49,12 @@ start_menu → character_selection → map_select → shop（首次，用初始�
 - `scripts/components/` — 可复用组件 (HealthComponent, SpriteAnimator, Hitbox, Hurtbox, KnockbackHandler, SlowHandler)
 - `scripts/resources/` — 自定义 Resource 类定义 (WeaponData, EnemyData, TowerData, WaveData, CharacterData, SynergyData 等)
 - `scripts/entities/` — 游戏实体 (player, enemy, boss_base, boss_brute, coin, towers/, weapons/, projectiles/)
-- `scripts/systems/` — 游戏系统 (wave_manager, enemy_spawner, shop_manager, effects_manager, audio_manager, synergy_manager, pair_synergy_manager, synergy_effect_processor)
-- `scripts/ui/` — UI 脚本 (hud, start_menu, result, 各选择界面, main 场景控制, shop 商店场景控制)
+- `scripts/systems/` — 游戏系统 (wave_manager, enemy_spawner, shop_manager, effects_manager, audio_manager, synergy_manager, pair_synergy_manager, synergy_effect_processor, drag_manager)
+- `scripts/ui/` — UI 脚本 (hud, start_menu, result, 各选择界面, main 场景控制, shop_overlay 底部商店面板)
 - `resources/` — `.tres` 配置数据文件 (weapons/, enemies/, towers/, waves/<map_id>/, characters/, maps/, shop/, effects/, spawn/)
 - `scenes/entities/` — 实体场景 (player, coin, enemies/, towers/, projectiles/)
 - `scenes/levels/` — 关卡场景 (main)
-- `scenes/ui/` — UI 场景 (start_menu, hud, result, character_selection, map_select, shop)
+- `scenes/ui/` — UI 场景 (start_menu, hud, result, character_selection, map_select, shop_overlay)
 - `scenes/shared/` — 共用场景 (map_boundary)
 
 ### 关键模式
