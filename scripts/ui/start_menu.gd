@@ -37,6 +37,7 @@ func _ready() -> void:
 	_create_stars()
 	_setup_settings_panel()
 	_play_entrance_animation()
+	AudioManager.play_bgm("menu")
 
 
 # --- 背景 ---
