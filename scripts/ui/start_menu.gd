@@ -139,14 +139,12 @@ func _play_entrance_animation() -> void:
 	tw.tween_property(_title_label, "modulate:a", 1.0, 0.2)
 	tw.parallel().tween_property(_stars, "modulate:a", 1.0, 0.2)
 
-	# 按钮依次淡入
-	for btn in buttons:
-		tw.tween_interval(0.05)
-		tw.tween_property(btn, "modulate:a", 1.0, 0.15)
-
-	# 版本号渐现
+	# 按钮同时淡入
 	tw.tween_interval(0.05)
-	tw.tween_property(_version_label, "modulate:a", 1.0, 0.15)
+	tw.tween_property(_start_button, "modulate:a", 1.0, 0.15)
+	tw.parallel().tween_property(_settings_button, "modulate:a", 1.0, 0.15)
+	tw.parallel().tween_property(_quit_button, "modulate:a", 1.0, 0.15)
+	tw.parallel().tween_property(_version_label, "modulate:a", 1.0, 0.15)
 
 
 # --- 设置面板 ---
