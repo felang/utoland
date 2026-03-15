@@ -14,7 +14,6 @@ class Scene:
 	const START_MENU = "start_menu"
 	const CHARACTER_SELECTION = "character_selection"
 	const MAP_SELECT = "map_select"
-	const SHOP = "shop"
 	const MAIN = "main"
 	const RESULT = "result"
 
