@@ -77,6 +77,10 @@ func _register_bgm() -> void:
 				stream.loop = true
 			_bgm_tracks[id] = stream
 
+func get_current_bgm() -> String:
+	return _current_bgm
+
+
 ## 设置 SFX 音量（0~100，0 时静音总线）
 func set_sfx_volume(value: float) -> void:
 	_sfx_volume = clampf(value, 0.0, 100.0)

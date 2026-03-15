@@ -51,8 +51,12 @@ func go_to(scene_name: String) -> void:
 	if _is_transitioning:
 		return
 	_is_transitioning = true
-	# 淡出（同步淡出 BGM）
-	AudioManager.fade_bgm(FADE_DURATION)
+	# 判断是否需要切换 BGM
+	var new_bgm: String = SCENE_BGM.get(scene_name, "")
+	var bgm_changed: bool = new_bgm != AudioManager.get_current_bgm()
+	# 淡出（仅在 BGM 变化时淡出音乐）
+	if bgm_changed:
+		AudioManager.fade_bgm(FADE_DURATION)
 	var tween_out: Tween = create_tween()
 	tween_out.tween_property(_fade_rect, "color:a", 1.0, FADE_DURATION)
 	await tween_out.finished
@@ -60,9 +64,9 @@ func go_to(scene_name: String) -> void:
 	get_tree().change_scene_to_file(SCENES[scene_name])
 	# 等一帧让新场景初始化
 	await get_tree().process_frame
-	# 播放新场景 BGM
-	if SCENE_BGM.has(scene_name):
-		AudioManager.play_bgm(SCENE_BGM[scene_name])
+	# 仅在 BGM 变化时播放新 BGM
+	if bgm_changed and new_bgm != "":
+		AudioManager.play_bgm(new_bgm)
 	# 淡入
 	var tween_in: Tween = create_tween()
 	tween_in.tween_property(_fade_rect, "color:a", 0.0, FADE_DURATION)
