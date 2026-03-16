@@ -15,7 +15,7 @@ func test_weapon_bow_resource() -> void:
 	assert_eq(w.id, Enums.WeaponId.BOW)
 	assert_eq(w.display_name, "弓")
 	assert_eq(w.projectile_type, Enums.ProjectileId.BULLET)
-	assert_almost_eq(w.fire_rate_per_level[0], 0.12, 0.001)
+	assert_almost_eq(w.fire_rate_per_level[0], 0.5, 0.001)
 	assert_almost_eq(w.damage_per_level[0], 8.0, 0.001)
 	assert_almost_eq(w.weapon_range_per_level[0], 150.0, 0.001)
 	assert_eq(w.bullet_count, 1)
