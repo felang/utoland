@@ -47,7 +47,7 @@ func _shoot_nearest_enemy() -> void:
 				closest = enemy
 
 	if closest:
-		var bullet: BulletProjectile = SceneFactory.create_bullet_projectile()
+		var bullet: ProjectileBase = SceneFactory.create_bullet_projectile()
 		var direction: Vector2 = global_position.direction_to(closest.global_position)
 		# 弹道精灵（附加到 bullet，跟随方向旋转）+ 禁用拖尾
 		if data.projectile_sprite_path != "" and ResourceLoader.exists(data.projectile_sprite_path):
@@ -60,6 +60,6 @@ func _shoot_nearest_enemy() -> void:
 			bullet.slow_on_hit = slow_on_hit
 			bullet.slow_duration = slow_duration
 		get_parent().add_child(bullet)
-		bullet.setup(attack_damage, 0.0, global_position, direction)
+		bullet.setup_legacy(attack_damage, 0.0, global_position, direction)
 		# 攻击动画
 		play_attack_animation()

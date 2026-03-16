@@ -101,7 +101,7 @@ func test_create_tower_with_level():
 # 新投射物工厂方法测试
 func test_create_bullet_projectile():
 	var bullet = SceneFactory.create_bullet_projectile()
-	assert_not_null(bullet, "BulletProjectile should be created")
+	assert_not_null(bullet, "ProjectileBase should be created")
 	bullet.queue_free()
 
 func test_create_shuriken_projectile():

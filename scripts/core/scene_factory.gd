@@ -51,10 +51,18 @@ func create_enemy(type: String) -> CharacterBody2D:
 func create_coin() -> Area2D:
 	return _coin_scene.instantiate()
 
-# BulletProjectile creation — 新投射物系统
-func create_bullet_projectile() -> BulletProjectile:
+# 统一投射物创建 — 从 ProjectileData 实例化
+func create_projectile(p_data: ProjectileData, damage: float, from: Vector2, direction: Vector2, extra_pierce: int = 0) -> ProjectileBase:
+	assert(p_data != null, "SceneFactory.create_projectile: data 不能为 null")
+	assert(p_data.projectile_scene != null, "SceneFactory.create_projectile: projectile_scene 未配置")
+	var proj: ProjectileBase = p_data.projectile_scene.instantiate()
+	proj.setup(p_data, damage, from, direction, extra_pierce)
+	return proj
+
+# [过渡兼容] BulletProjectile 创建 — 后续 Task 16 删除
+func create_bullet_projectile() -> ProjectileBase:
 	return _bullet_projectile_scene.instantiate()
 
-# ShurikenProjectile creation — 新投射物系统
+# [过渡兼容] ShurikenProjectile 创建 — 后续 Task 16 删除
 func create_shuriken_projectile() -> ShurikenProjectile:
 	return _shuriken_projectile_scene.instantiate()

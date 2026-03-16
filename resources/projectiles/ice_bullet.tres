@@ -1,12 +1,14 @@
-[gd_resource type="Resource" script_class="ProjectileData" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="ProjectileData" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scripts/resources/projectile_data.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/entities/projectiles/bullet_projectile.tscn" id="2"]
 
 [resource]
 script = ExtResource("1")
 speed = 800.0
 lifetime = 5.0
 sprite_path = "res://assets/projectiles/ice_bullet.png"
+projectile_scene = ExtResource("2")
 trail_enabled = false
 knockback_force = 0.0
 slow_ratio = 0.3
