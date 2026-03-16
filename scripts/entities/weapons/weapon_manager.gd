@@ -5,6 +5,7 @@ class_name WeaponManager
 extends Node2D
 
 const ORBIT_RADIUS: float = 20.0
+const ORBIT_SPEED: float = TAU / 8.0  # 1 圈 / 8 秒
 const SPRITE_SIZE: int = 6
 
 const WEAPON_COLORS: Dictionary = {
@@ -24,6 +25,7 @@ const SPRITE_ROTATION_OFFSET: Dictionary = {
 var _weapons: Array[Weapon] = []
 var _weapon_sprites: Array[Sprite2D] = []
 var _sprite_rot_offsets: Array[float] = []
+var _orbit_angle: float = 0.0
 var _current_target: Node2D = null
 
 func initialize(weapon_entries: Array[Dictionary]) -> void:
@@ -69,9 +71,11 @@ func tick(delta: float) -> void:
 func _update_sprites(delta: float) -> void:
 	if _weapon_sprites.is_empty():
 		return
+	# 慢速环绕
+	_orbit_angle += ORBIT_SPEED * delta
 	var count: int = _weapon_sprites.size()
 	var angle_step: float = TAU / count
-	# 计算朝向角度（有目标朝目标，无目标各自朝轨道外侧）
+	# 计算朝向角度（有目标朝目标，无目标朝轨道外侧）
 	var has_target: bool = _current_target != null and is_instance_valid(_current_target)
 	var target_angle: float = 0.0
 	if has_target:
@@ -79,8 +83,8 @@ func _update_sprites(delta: float) -> void:
 		if owner_node:
 			target_angle = owner_node.global_position.direction_to(_current_target.global_position).angle()
 	for i in range(count):
-		# 固定位置：均匀分布在圆上
-		var slot_angle: float = angle_step * i
+		# 环绕位置：均匀分布 + 慢速旋转
+		var slot_angle: float = _orbit_angle + angle_step * i
 		_weapon_sprites[i].position = Vector2(cos(slot_angle), sin(slot_angle)) * ORBIT_RADIUS
 		# 精灵朝向：有目标朝目标，无目标朝轨道外侧
 		var face_angle: float
