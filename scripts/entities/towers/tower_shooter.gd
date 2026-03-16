@@ -4,13 +4,13 @@ extends Tower
 @export var attack_damage: float = 10.0
 @export var attack_rate: float = 1.0
 
+var slow_on_hit: float = 0.0
+var slow_duration: float = 0.0
+
 @onready var detect_area: Area2D = $DetectArea
 @onready var shoot_timer: Timer = $ShootTimer
 
 func _ready() -> void:
-	# 设置塔类型
-	tower_type = Enums.TowerId.PEA_SHOOTER
-
 	super._ready()
 	shoot_timer.wait_time = attack_rate
 	shoot_timer.timeout.connect(_on_shoot_timer_timeout)
@@ -25,6 +25,11 @@ func _apply_level_stats() -> void:
 	# 更新射击间隔
 	if is_instance_valid(shoot_timer):
 		shoot_timer.wait_time = attack_rate
+	# 减速弹道（仅冰花塔有这些字段）
+	if data.slow_ratio_per_level.size() > 0:
+		slow_on_hit = data.slow_ratio_per_level[idx]
+	if data.slow_duration_per_level.size() > 0:
+		slow_duration = data.slow_duration_per_level[idx]
 
 func _on_shoot_timer_timeout() -> void:
 	_shoot_nearest_enemy()
@@ -51,6 +56,9 @@ func _shoot_nearest_enemy() -> void:
 			proj_sprite.rotation = direction.angle()
 			bullet.add_child(proj_sprite)
 			bullet.show_trail = false
+		if slow_on_hit > 0.0:
+			bullet.slow_on_hit = slow_on_hit
+			bullet.slow_duration = slow_duration
 		get_parent().add_child(bullet)
 		bullet.setup(attack_damage, 0.0, global_position, direction)
 		# 攻击动画

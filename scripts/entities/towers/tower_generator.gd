@@ -9,7 +9,6 @@ var generate_interval: float = 10.0
 @onready var _generate_timer: Timer = $GenerateTimer
 
 func _ready() -> void:
-	tower_type = Enums.TowerId.SUNFLOWER
 	super._ready()
 	_generate_timer.timeout.connect(_on_generate_timer_timeout)
 
