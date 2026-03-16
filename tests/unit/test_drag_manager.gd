@@ -7,6 +7,8 @@ func before_each() -> void:
 	GameData.reset()
 	GameData.coins = 50
 	GameData.player_level = 5
+	GameData.deployed_weapons = []
+	GameData.deployed_towers = []
 	_tower_container = Node2D.new()
 	add_child(_tower_container)
 	_drag_manager = load("res://scripts/systems/drag_manager.gd").new()
@@ -37,31 +39,28 @@ func test_is_grid_available_empty() -> void:
 	assert_true(_drag_manager._is_grid_available(Vector2i(5, 5)))
 
 func test_is_grid_available_occupied() -> void:
-	GameData.bag.append({id = "pea_shooter", type = "tower", level = 1})
-	GameData.deploy_tower(0, Vector2i(5, 5))
+	GameData.deployed_towers.append({id = "pea_shooter", level = 1, grid_pos = Vector2i(5, 5), deploy_id = 1})
 	assert_false(_drag_manager._is_grid_available(Vector2i(5, 5)))
 	assert_true(_drag_manager._is_grid_available(Vector2i(6, 6)))
 
 func test_spawn_tower_node() -> void:
-	GameData.bag.append({id = "pea_shooter", type = "tower", level = 1})
-	var deploy_id: int = GameData.deploy_tower(0, Vector2i(5, 5))
-	_drag_manager._spawn_tower_node(deploy_id, "pea_shooter", 1, Vector2i(5, 5))
+	var deploy_id := 1
+	GameData.deployed_towers.append({id = "pea_shooter", level = 1, grid_pos = Vector2i(5, 5), deploy_id = deploy_id})
+	_drag_manager.spawn_tower_node(deploy_id, "pea_shooter", 1, Vector2i(5, 5))
 	assert_true(deploy_id in _drag_manager._tower_nodes)
 	assert_eq(_tower_container.get_child_count(), 1)
 
 func test_remove_tower_node() -> void:
-	GameData.bag.append({id = "pea_shooter", type = "tower", level = 1})
-	var deploy_id: int = GameData.deploy_tower(0, Vector2i(5, 5))
-	_drag_manager._spawn_tower_node(deploy_id, "pea_shooter", 1, Vector2i(5, 5))
+	var deploy_id := 1
+	GameData.deployed_towers.append({id = "pea_shooter", level = 1, grid_pos = Vector2i(5, 5), deploy_id = deploy_id})
+	_drag_manager.spawn_tower_node(deploy_id, "pea_shooter", 1, Vector2i(5, 5))
 	_drag_manager._remove_tower_node(deploy_id)
 	assert_false(deploy_id in _drag_manager._tower_nodes)
 
 func test_remove_tower_nodes_batch() -> void:
-	GameData.bag.append({id = "pea_shooter", type = "tower", level = 1})
-	GameData.bag.append({id = "ice_flower", type = "tower", level = 1})
-	var id1: int = GameData.deploy_tower(0, Vector2i(5, 5))
-	var id2: int = GameData.deploy_tower(0, Vector2i(10, 10))
-	_drag_manager._spawn_tower_node(id1, "pea_shooter", 1, Vector2i(5, 5))
-	_drag_manager._spawn_tower_node(id2, "ice_flower", 1, Vector2i(10, 10))
-	_drag_manager.remove_tower_nodes([id1, id2])
+	GameData.deployed_towers.append({id = "pea_shooter", level = 1, grid_pos = Vector2i(5, 5), deploy_id = 1})
+	GameData.deployed_towers.append({id = "ice_flower", level = 1, grid_pos = Vector2i(10, 10), deploy_id = 2})
+	_drag_manager.spawn_tower_node(1, "pea_shooter", 1, Vector2i(5, 5))
+	_drag_manager.spawn_tower_node(2, "ice_flower", 1, Vector2i(10, 10))
+	_drag_manager.remove_tower_nodes([1, 2])
 	assert_eq(_drag_manager._tower_nodes.size(), 0)

@@ -5,6 +5,8 @@ var _overlay: CanvasLayer
 func before_each() -> void:
 	GameData.reset()
 	GameData.coins = 20
+	GameData.deployed_weapons = []
+	GameData.deployed_towers = []
 	_overlay = load("res://scenes/ui/shop_overlay.tscn").instantiate()
 	add_child(_overlay)
 
@@ -25,14 +27,12 @@ func test_start_battle_signal() -> void:
 	_overlay._on_start_pressed()
 	assert_signal_emitted(_overlay, "start_battle_pressed")
 
-func test_buy_item_updates_bag() -> void:
-	_overlay.refresh_shop(true)
-	var slot_index := -1
-	for i in range(GameData.shop_slots.size()):
-		if GameData.shop_slots[i] != null and not GameData.shop_slots[i].is_empty():
-			slot_index = i
-			break
-	if slot_index >= 0:
-		var old_bag_size: int = GameData.bag.size()
-		_overlay._on_shop_slot_pressed(slot_index)
-		assert_gt(GameData.bag.size(), old_bag_size, "购买后背包应增加物品")
+func test_buy_weapon_updates_deployed() -> void:
+	GameData.coins = 100
+	GameData.shop_slots = [
+		{id = "bow", type = "weapon", cost = 3},
+		{}, {}, {}
+	]
+	_overlay._on_shop_slot_pressed(0)
+	assert_eq(GameData.deployed_weapons.size(), 1, "购买武器后应出现在 deployed_weapons")
+	assert_eq(GameData.deployed_weapons[0].id, "bow")

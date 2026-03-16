@@ -1,12 +1,11 @@
 extends GutTest
 ## ShopManager 单元测试
-## 覆盖：刷新商店、首次刷新保证推荐物品、购买逻辑、手动刷新
+## 覆盖：刷新商店、首次刷新保证推荐物品、购买武器/塔、手动刷新
 
 var _shop: ShopManager
 
 func before_each() -> void:
 	GameData.reset()
-	GameData.bag = []
 	GameData.deployed_weapons = []
 	GameData.deployed_towers = []
 	GameData.shop_slots = []
@@ -76,102 +75,133 @@ func test_first_shop_recommended_tower_is_second_slot() -> void:
 	_shop.refresh_shop(true)
 	assert_eq(GameData.shop_slots[1].id, "pea_shooter", "首次商店第 1 槽为推荐塔")
 
-# ===== buy_item =====
+# ===== buy_weapon =====
 
-func test_buy_item_deducts_coins() -> void:
+func test_buy_weapon_deducts_coins() -> void:
 	GameData.coins = 50
-	_shop.refresh_shop()
-	var slot: Dictionary = GameData.shop_slots[0]
-	if slot.is_empty():
-		pass_test("槽位为空，跳过测试")
-		return
-	var cost: int = slot.cost
-	_shop.buy_item(0)
-	assert_eq(GameData.coins, 50 - cost, "购买后金币应减少 cost")
-
-func test_buy_item_adds_to_bag() -> void:
-	_shop.refresh_shop()
-	var slot: Dictionary = GameData.shop_slots[0]
-	if slot.is_empty():
-		pass_test("槽位为空，跳过测试")
-		return
-	var expected_id: String = slot.id
-	_shop.buy_item(0)
-	assert_eq(GameData.bag.size(), 1, "购买后背包应有 1 个物品")
-	assert_eq(GameData.bag[0].id, expected_id, "背包物品 id 应匹配槽位")
-	assert_eq(GameData.bag[0].level, 1, "新购买物品应为 level 1")
-
-func test_buy_item_clears_slot() -> void:
-	_shop.refresh_shop()
-	if GameData.shop_slots[0].is_empty():
-		pass_test("槽位为空，跳过测试")
-		return
-	_shop.buy_item(0)
-	assert_true(GameData.shop_slots[0].is_empty(), "购买后槽位应被清空（空字典）")
-
-func test_buy_item_fails_insufficient_coins() -> void:
-	_shop.refresh_shop()
-	var slot: Dictionary = GameData.shop_slots[0]
-	if slot.is_empty():
-		pass_test("槽位为空，跳过测试")
-		return
-	GameData.coins = 0
-	var result: bool = _shop.buy_item(0)
-	assert_false(result, "金币不足时购买应失败")
-	assert_eq(GameData.bag.size(), 0, "购买失败后背包应为空")
-	assert_false(GameData.shop_slots[0].is_empty(), "购买失败后槽位应保留")
-
-func test_buy_item_fails_when_bag_full() -> void:
-	var config: ShopConfig = GameConfig.shop_config
-	for idx in range(config.bag_capacity):
-		GameData.bag.append({id = "bow", type = "weapon", level = 1})
-	_shop.refresh_shop()
-	if GameData.shop_slots[0].is_empty():
-		pass_test("槽位为空，跳过测试")
-		return
-	GameData.coins = 9999
-	var result: bool = _shop.buy_item(0)
-	assert_false(result, "背包满时购买应失败")
-	assert_eq(GameData.bag.size(), config.bag_capacity, "背包满时购买失败，物品数不变")
-
-func test_buy_item_fails_invalid_index() -> void:
-	_shop.refresh_shop()
-	var result: bool = _shop.buy_item(99)
-	assert_false(result, "无效索引购买应失败")
-
-func test_buy_item_fails_empty_slot() -> void:
-	GameData.shop_slots = [{}, {}, {}, {}]
-	var result: bool = _shop.buy_item(0)
-	assert_false(result, "空槽位购买应失败")
-
-func test_buy_item_returns_true_on_success() -> void:
-	GameData.coins = 9999
-	_shop.refresh_shop()
-	if GameData.shop_slots[0].is_empty():
-		pass_test("槽位为空，跳过测试")
-		return
-	var result: bool = _shop.buy_item(0)
-	assert_true(result, "购买成功应返回 true")
-
-# ===== buy_item 触发合成 =====
-
-func test_buy_item_triggers_merge_when_3_of_same() -> void:
-	# 背包中已有同 ID Lv1 物品 x2，再购买第 3 个触发合成 -> 变成 Lv2
-	GameData.coins = 9999
-	GameData.bag.append({id = "bow", type = "weapon", level = 1})
-	GameData.bag.append({id = "bow", type = "weapon", level = 1})
-	# 手动设置商店槽位为 bow Lv1
 	GameData.shop_slots = [
 		{id = "bow", type = "weapon", cost = 3},
 		{}, {}, {}
 	]
-	_shop.buy_item(0)
+	var coins_before: int = GameData.coins
+	_shop.buy_weapon(0)
+	assert_eq(GameData.coins, coins_before - 3, "购买武器后金币应减少")
+
+func test_buy_weapon_adds_to_deployed_weapons() -> void:
+	GameData.coins = 50
+	GameData.shop_slots = [
+		{id = "bow", type = "weapon", cost = 3},
+		{}, {}, {}
+	]
+	_shop.buy_weapon(0)
+	assert_eq(GameData.deployed_weapons.size(), 1, "购买武器后应出现在 deployed_weapons")
+	assert_eq(GameData.deployed_weapons[0].id, "bow")
+	assert_eq(GameData.deployed_weapons[0].level, 1)
+
+func test_buy_weapon_clears_slot() -> void:
+	GameData.coins = 50
+	GameData.shop_slots = [
+		{id = "bow", type = "weapon", cost = 3},
+		{}, {}, {}
+	]
+	_shop.buy_weapon(0)
+	assert_true(GameData.shop_slots[0].is_empty(), "购买后槽位应被清空")
+
+func test_buy_weapon_fails_insufficient_coins() -> void:
+	GameData.coins = 0
+	GameData.shop_slots = [
+		{id = "bow", type = "weapon", cost = 3},
+		{}, {}, {}
+	]
+	var result: bool = _shop.buy_weapon(0)
+	assert_false(result, "金币不足时购买应失败")
+	assert_eq(GameData.deployed_weapons.size(), 0)
+	assert_false(GameData.shop_slots[0].is_empty(), "购买失败后槽位应保留")
+
+func test_buy_weapon_fails_when_population_full() -> void:
+	GameData.player_level = 1
+	# 填满种群上限（cap=2）
+	GameData.deployed_weapons.append({id = "bow", level = 1})
+	GameData.deployed_towers.append({id = "pea_shooter", level = 1, grid_pos = Vector2i(0, 0)})
+	GameData.coins = 9999
+	GameData.shop_slots = [
+		{id = "bow", type = "weapon", cost = 3},
+		{}, {}, {}
+	]
+	var result: bool = _shop.buy_weapon(0)
+	assert_false(result, "种群满时购买应失败")
+
+func test_buy_weapon_fails_invalid_index() -> void:
+	_shop.refresh_shop()
+	var result: bool = _shop.buy_weapon(99)
+	assert_false(result, "无效索引购买应失败")
+
+func test_buy_weapon_fails_empty_slot() -> void:
+	GameData.shop_slots = [{}, {}, {}, {}]
+	var result: bool = _shop.buy_weapon(0)
+	assert_false(result, "空槽位购买应失败")
+
+func test_buy_weapon_returns_true_on_success() -> void:
+	GameData.coins = 9999
+	GameData.shop_slots = [
+		{id = "bow", type = "weapon", cost = 3},
+		{}, {}, {}
+	]
+	var result: bool = _shop.buy_weapon(0)
+	assert_true(result, "购买成功应返回 true")
+
+# ===== buy_weapon 触发合成 =====
+
+func test_buy_weapon_triggers_merge_when_3_of_same() -> void:
+	# deployed 中已有同 ID Lv1 物品 x2，再购买第 3 个触发合成 -> 变成 Lv2
+	GameData.coins = 9999
+	GameData.player_level = 4  # 人口上限 5，允许第 3 个装备
+	GameData.deployed_weapons.append({id = "bow", level = 1})
+	GameData.deployed_weapons.append({id = "bow", level = 1})
+	GameData.shop_slots = [
+		{id = "bow", type = "weapon", cost = 3},
+		{}, {}, {}
+	]
+	_shop.buy_weapon(0)
 	# 3 个 bow Lv1 -> 合成为 1 个 bow Lv2
 	var lv2_count: int = 0
-	for item in GameData.bag:
+	for item in GameData.deployed_weapons:
 		if item.id == "bow" and item.level == 2:
 			lv2_count += 1
 	assert_eq(lv2_count, 1, "3 个同 ID Lv1 购买后应合成为 1 个 Lv2")
+
+# ===== confirm_tower_purchase =====
+
+func test_confirm_tower_purchase_success() -> void:
+	GameData.coins = 50
+	GameData.shop_slots = [
+		{id = "pea_shooter", type = "tower", cost = 3},
+		{}, {}, {}
+	]
+	var deploy_id: int = _shop.confirm_tower_purchase(0, Vector2i(5, 5))
+	assert_gt(deploy_id, 0, "确认塔购买应返回 > 0 的 deploy_id")
+	assert_eq(GameData.deployed_towers.size(), 1)
+	assert_eq(GameData.deployed_towers[0].id, "pea_shooter")
+	assert_true(GameData.shop_slots[0].is_empty(), "购买后槽位应被清空")
+
+func test_get_tower_slot_returns_slot_data() -> void:
+	GameData.coins = 50
+	GameData.shop_slots = [
+		{id = "pea_shooter", type = "tower", cost = 3},
+		{}, {}, {}
+	]
+	var slot: Dictionary = _shop.get_tower_slot(0)
+	assert_false(slot.is_empty())
+	assert_eq(slot.id, "pea_shooter")
+
+func test_get_tower_slot_fails_for_weapon() -> void:
+	GameData.coins = 50
+	GameData.shop_slots = [
+		{id = "bow", type = "weapon", cost = 3},
+		{}, {}, {}
+	]
+	var slot: Dictionary = _shop.get_tower_slot(0)
+	assert_true(slot.is_empty(), "武器槽位不应被 get_tower_slot 返回")
 
 # ===== manual_refresh =====
 

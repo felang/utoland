@@ -8,7 +8,6 @@ func before_each() -> void:
 func test_default_values() -> void:
 	assert_eq(config.slot_count, 4)
 	assert_eq(config.refresh_cost, 2)
-	assert_eq(config.bag_capacity, 10)
 
 func test_item_cost() -> void:
 	assert_eq(config.item_cost, 3)
