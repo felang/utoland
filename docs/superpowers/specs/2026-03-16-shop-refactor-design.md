@@ -81,8 +81,8 @@ BottomRow (操作栏):
 
 ### 拖拽卖出武器
 
-1. 商店阶段，每个围绕角色旋转的武器节点添加 `Area2D` 碰撞区域用于点击检测
-2. 玩家点击某个武器 → `DragManager.start_weapon_drag(weapon_index)` → 武器节点半透明，生成拖拽预览
+1. 商店阶段，每个围绕角色旋转的武器节点添加 `Area2D` 碰撞区域用于点击检测，`Area2D.input_event` 信号连接到 `DragManager.start_weapon_drag(weapon_index)`
+2. 玩家点击某个武器 → 触发 `input_event` → `DragManager.start_weapon_drag(weapon_index)` → 武器节点半透明，生成拖拽预览
 3. 拖到回收区 → `GameData.sell_from_deployed_weapon(index)` → 返还金币，`WeaponManager.remove_weapon(index)` 移除武器节点
 4. 拖到其他地方 → 取消，武器回原位，恢复不透明
 
