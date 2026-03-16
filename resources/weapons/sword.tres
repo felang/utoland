@@ -13,6 +13,6 @@ attack_mode = 1
 max_level = 3
 damage_per_level = PackedFloat32Array(20, 38, 65)
 fire_rate_per_level = PackedFloat32Array(0.4, 0.32, 0.24)
-weapon_range_per_level = PackedFloat32Array(20, 24, 30)
+weapon_range_per_level = PackedFloat32Array(50, 60, 70)
 sell_price_per_level = PackedInt32Array(3, 7, 21)
 melee_config = ExtResource("2")

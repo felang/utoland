@@ -56,4 +56,3 @@ func create_projectile(p_data: ProjectileData, damage: float, from: Vector2, dir
 	var proj: ProjectileBase = p_data.projectile_scene.instantiate()
 	proj.setup(p_data, damage, from, direction, extra_pierce)
 	return proj
-
