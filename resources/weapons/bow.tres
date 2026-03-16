@@ -1,6 +1,7 @@
-[gd_resource type="Resource" script_class="WeaponData" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="WeaponData" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scripts/resources/weapon_data.gd" id="1"]
+[ext_resource type="Resource" path="res://resources/projectiles/arrow.tres" id="2"]
 
 [resource]
 script = ExtResource("1")
@@ -8,12 +9,10 @@ id = "bow"
 display_name = "弓"
 description = "单发射击的基础远程武器"
 icon_path = "res://assets/weapons/bow/sprite.png"
-weapon_type = "bow"
-projectile_type = "bullet"
+attack_mode = 0
 max_level = 3
 damage_per_level = PackedFloat32Array(8, 18, 34)
 fire_rate_per_level = PackedFloat32Array(0.5, 0.4, 0.3)
 weapon_range_per_level = PackedFloat32Array(150, 170, 200)
 sell_price_per_level = PackedInt32Array(3, 7, 21)
-bullet_speed = 300.0
-knockback_force = 40.0
+projectile_data = ExtResource("2")

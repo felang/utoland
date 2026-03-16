@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ProjectileData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/projectile_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+speed = 800.0
+lifetime = 5.0
+sprite_path = "res://assets/projectiles/archer.png"
+trail_enabled = false
+knockback_force = 0.0

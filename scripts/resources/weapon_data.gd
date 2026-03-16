@@ -6,8 +6,9 @@ extends Resource
 @export var display_name: String = ""
 @export var description: String = ""
 @export var icon_path: String = ""
-@export var weapon_type: String = ""
-@export var projectile_type: String = "bullet"
+
+@export_group("攻击模式")
+@export var attack_mode: int = 0  # 0=RANGED, 1=MELEE
 
 @export_group("等级系统")
 @export var max_level: int = 3
@@ -16,15 +17,8 @@ extends Resource
 @export var weapon_range_per_level: PackedFloat32Array = []
 @export var sell_price_per_level: PackedInt32Array = PackedInt32Array([])
 
-@export_group("通用属性")
-@export var knockback_force: float = 40.0
-@export var bullet_speed: float = 300.0
+@export_group("投射物配置（远程）")
+@export var projectile_data: ProjectileData = null
 
-@export_group("子弹专有")
-@export var bullet_count: int = 1
-
-@export_group("手里剑专有")
-@export var shuriken_speed: float = 175.0
-@export var outbound_distance: float = 100.0
-@export var return_speed_mult: float = 1.3
-@export var shuriken_max_lifetime: float = 5.0
+@export_group("近战配置")
+@export var melee_config: MeleeConfig = null

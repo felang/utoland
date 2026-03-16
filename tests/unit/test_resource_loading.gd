@@ -14,27 +14,27 @@ func test_weapon_bow_resource() -> void:
 	var w: WeaponData = GameConfig.weapons[Enums.WeaponId.BOW]
 	assert_eq(w.id, Enums.WeaponId.BOW)
 	assert_eq(w.display_name, "弓")
-	assert_eq(w.projectile_type, Enums.ProjectileId.BULLET)
+	assert_eq(w.attack_mode, 0, "弓应为远程模式")
 	assert_almost_eq(w.fire_rate_per_level[0], 0.5, 0.001)
 	assert_almost_eq(w.damage_per_level[0], 8.0, 0.001)
 	assert_almost_eq(w.weapon_range_per_level[0], 150.0, 0.001)
-	assert_eq(w.bullet_count, 1)
-	assert_eq(w.bullet_speed, 300.0)
+	assert_not_null(w.projectile_data, "弓应有 projectile_data")
+	assert_eq(w.projectile_data.speed, 300.0)
 
 func test_weapon_shuriken_resource() -> void:
 	assert_true(GameConfig.weapons.has(Enums.WeaponId.SHURIKEN), "应包含 shuriken")
 	var w: WeaponData = GameConfig.weapons[Enums.WeaponId.SHURIKEN]
-	assert_eq(w.projectile_type, Enums.ProjectileId.SHURIKEN)
+	assert_eq(w.attack_mode, 0, "手里剑应为远程模式")
 	assert_almost_eq(w.fire_rate_per_level[0], 0.8, 0.001)
 	assert_almost_eq(w.damage_per_level[0], 15.0, 0.001)
-	assert_eq(w.shuriken_speed, 175.0)
-	assert_eq(w.outbound_distance, 100.0)
-	assert_eq(w.return_speed_mult, 1.3)
+	assert_not_null(w.projectile_data, "手里剑应有 projectile_data")
+	assert_eq(w.projectile_data.speed, 175.0)
 
 func test_weapon_sword_resource() -> void:
 	assert_true(GameConfig.weapons.has(Enums.WeaponId.SWORD), "应包含 sword")
 	var w: WeaponData = GameConfig.weapons[Enums.WeaponId.SWORD]
-	assert_eq(w.weapon_type, "sword")
+	assert_eq(w.attack_mode, 1, "剑应为近战模式")
+	assert_not_null(w.melee_config, "剑应有 melee_config")
 	assert_almost_eq(w.damage_per_level[0], 20.0, 0.001)
 
 
@@ -189,13 +189,13 @@ func test_normal_enemy_not_boss():
 	assert_false(ed.is_boss, "normal 不应标记为 is_boss")
 
 
-func test_weapon_has_weapon_type():
+func test_weapon_has_attack_mode():
 	var bow: WeaponData = GameConfig.weapons[Enums.WeaponId.BOW]
-	assert_eq(bow.weapon_type, "bow", "bow weapon_type 应为 bow")
+	assert_eq(bow.attack_mode, 0, "bow 应为远程模式")
 	var shuriken: WeaponData = GameConfig.weapons[Enums.WeaponId.SHURIKEN]
-	assert_eq(shuriken.weapon_type, "shuriken", "shuriken weapon_type 应为 shuriken")
+	assert_eq(shuriken.attack_mode, 0, "shuriken 应为远程模式")
 	var sword: WeaponData = GameConfig.weapons[Enums.WeaponId.SWORD]
-	assert_eq(sword.weapon_type, "sword", "sword weapon_type 应为 sword")
+	assert_eq(sword.attack_mode, 1, "sword 应为近战模式")
 
 
 func test_player_const_unchanged() -> void:

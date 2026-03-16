@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="MeleeConfig" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/melee_config.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+thrust_distance = 15.0
+hit_angle = 90.0
+hit_radius = 8.0
+knockback_force = 80.0

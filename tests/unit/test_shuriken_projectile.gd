@@ -30,7 +30,7 @@ func test_max_lifetime_from_config():
 	await get_tree().process_frame
 	b.setup(10.0, 50.0, Vector2.ZERO, Vector2.RIGHT)
 	var w: WeaponData = GameConfig.weapons[Enums.WeaponId.SHURIKEN]
-	assert_eq(b.max_lifetime, w.shuriken_max_lifetime, "max_lifetime 应匹配配置")
+	assert_eq(b.max_lifetime, w.projectile_data.lifetime, "max_lifetime 应匹配配置")
 
 func test_hit_count_starts_at_zero():
 	var b = _make_shuriken()

@@ -1,4 +1,5 @@
 # test_weapon_manager.gd — WeaponManager 单元测试
+# 注意：WeaponManager 将在后续任务中重构，当前测试仅验证基本初始化
 extends GutTest
 
 func test_weapon_manager_starts_empty():
@@ -11,8 +12,7 @@ func test_add_weapon_creates_bow_weapon():
 	add_child_autofree(mgr)
 	var data = WeaponData.new()
 	data.id = "test_bow"
-	data.projectile_type = Enums.ProjectileId.BULLET
-	data.weapon_type = "bow"
+	data.attack_mode = 0
 	data.fire_rate_per_level = PackedFloat32Array([0.5])
 	data.damage_per_level = PackedFloat32Array([10.0])
 	data.weapon_range_per_level = PackedFloat32Array([300.0])
@@ -25,8 +25,7 @@ func test_add_weapon_creates_shuriken_weapon():
 	add_child_autofree(mgr)
 	var data = WeaponData.new()
 	data.id = "test_shuriken"
-	data.projectile_type = Enums.ProjectileId.SHURIKEN
-	data.weapon_type = "shuriken"
+	data.attack_mode = 0
 	data.fire_rate_per_level = PackedFloat32Array([1.0])
 	data.damage_per_level = PackedFloat32Array([15.0])
 	data.weapon_range_per_level = PackedFloat32Array([200.0])
@@ -39,8 +38,7 @@ func test_add_weapon_creates_sword_weapon():
 	add_child_autofree(mgr)
 	var data = WeaponData.new()
 	data.id = "test_sword"
-	data.projectile_type = ""
-	data.weapon_type = "sword"
+	data.attack_mode = 1
 	data.fire_rate_per_level = PackedFloat32Array([0.4])
 	data.damage_per_level = PackedFloat32Array([20.0])
 	data.weapon_range_per_level = PackedFloat32Array([60.0])
