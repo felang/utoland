@@ -1,14 +1,14 @@
 [gd_scene format=3 uid="uid://ucsglghc6mnm"]
 
-[ext_resource type="Script" uid="uid://numv2t5y702l" path="res://scripts/entities/towers/tower_slow.gd" id="1_scoor"]
+[ext_resource type="Script" uid="uid://ckwxfmslcyshb" path="res://scripts/entities/towers/tower_shooter.gd" id="1_shooter"]
 [ext_resource type="Texture2D" path="res://assets/towers/ice_flower/sprite.png" id="2_sprite"]
 [ext_resource type="Script" path="res://scripts/components/health_component.gd" id="3_health"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_3hf2r"]
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_body"]
 size = Vector2(16, 16)
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_slow"]
-radius = 200.0
+[sub_resource type="CircleShape2D" id="CircleShape2D_detect"]
+radius = 100.0
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_ice"]
 animations = [{
@@ -29,10 +29,10 @@ animations = [{
 "speed": 5.0
 }]
 
-[node name="TowerSlow" type="StaticBody2D"]
+[node name="TowerShooter" type="StaticBody2D"]
 collision_layer = 8
 collision_mask = 2
-script = ExtResource("1_scoor")
+script = ExtResource("1_shooter")
 
 [node name="Visual" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_ice")
@@ -40,14 +40,19 @@ animation = &"idle"
 autoplay = "idle"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-shape = SubResource("RectangleShape2D_3hf2r")
+shape = SubResource("RectangleShape2D_body")
 
-[node name="SlowArea" type="Area2D" parent="."]
+[node name="DetectArea" type="Area2D" parent="."]
 collision_layer = 0
 collision_mask = 2
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="SlowArea"]
-shape = SubResource("CircleShape2D_slow")
+[node name="CollisionShape2D" type="CollisionShape2D" parent="DetectArea"]
+shape = SubResource("CircleShape2D_detect")
+
+[node name="ShootTimer" type="Timer" parent="."]
+wait_time = 0.8
+one_shot = false
+autostart = false
 
 [node name="HealthComponent" type="Node" parent="."]
 script = ExtResource("3_health")
