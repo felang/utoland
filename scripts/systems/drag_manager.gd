@@ -1,7 +1,7 @@
 extends Node
-## 统一拖拽管理器 — 管理塔放置和地图上塔的移动
+## 统一拖拽管理器 — 管理塔放置、移动、回收和武器卖出
 
-enum DragSource { NONE, PLACE_TOWER, MAP_TOWER }
+enum DragSource { NONE, PLACE_TOWER, MAP_TOWER, WEAPON }
 
 var _tower_container: Node2D
 var _player: Node2D
@@ -19,6 +19,10 @@ var _drag_original_deploy_id: int = -1
 
 var _on_placed_callback: Callable
 var _on_cancelled_callback: Callable
+
+var _recycle_area: Control = null
+var _drag_weapon_index: int = -1
+var _on_weapon_sold_callback: Callable
 
 func initialize(tower_container: Node2D, player: Node2D) -> void:
 	_tower_container = tower_container
@@ -45,6 +49,23 @@ func start_map_tower_drag(deploy_id: int) -> void:
 			_start_drag(DragSource.MAP_TOWER)
 			_tower_nodes[deploy_id].modulate.a = 0.3
 			break
+
+func set_recycle_area(area: Control) -> void:
+	_recycle_area = area
+
+func is_over_recycle_area(global_pos: Vector2) -> bool:
+	if _recycle_area == null:
+		return false
+	var rect := Rect2(_recycle_area.global_position, _recycle_area.size)
+	return rect.has_point(global_pos)
+
+func start_weapon_drag(weapon_index: int, on_sold: Callable) -> void:
+	if _is_dragging:
+		return
+	_drag_weapon_index = weapon_index
+	_on_weapon_sold_callback = on_sold
+	_drag_data = {weapon_index = weapon_index}
+	_start_drag(DragSource.WEAPON)
 
 func _start_drag(source: DragSource) -> void:
 	_is_dragging = true
@@ -80,6 +101,8 @@ func _end_drag(global_pos: Vector2) -> void:
 			_try_place_new_tower(global_pos)
 		DragSource.MAP_TOWER:
 			_try_move_tower(global_pos)
+		DragSource.WEAPON:
+			_try_sell_weapon(global_pos)
 	_cleanup_drag()
 
 func _try_place_new_tower(global_pos: Vector2) -> void:
@@ -93,6 +116,12 @@ func _try_place_new_tower(global_pos: Vector2) -> void:
 
 func _try_move_tower(global_pos: Vector2) -> void:
 	var deploy_id: int = _drag_data.deploy_id
+	# 回收区检测
+	if is_over_recycle_area(global_pos):
+		var refund: int = GameData.sell_from_deployed_tower(deploy_id)
+		if refund > 0:
+			_remove_tower_node(deploy_id)
+			return
 	var grid_pos := _world_to_grid(global_pos)
 	if _is_valid_grid_pos(grid_pos) and _is_grid_available(grid_pos):
 		if GameData.move_tower(deploy_id, grid_pos):
@@ -101,6 +130,13 @@ func _try_move_tower(global_pos: Vector2) -> void:
 			return
 	if deploy_id in _tower_nodes:
 		_tower_nodes[deploy_id].modulate.a = 1.0
+
+func _try_sell_weapon(global_pos: Vector2) -> void:
+	if is_over_recycle_area(global_pos) and _drag_weapon_index >= 0:
+		if _on_weapon_sold_callback.is_valid():
+			_on_weapon_sold_callback.call(_drag_weapon_index)
+	_drag_weapon_index = -1
+	_on_weapon_sold_callback = Callable()
 
 func _cancel_drag() -> void:
 	if _drag_source == DragSource.MAP_TOWER and _drag_original_deploy_id >= 0:
@@ -124,6 +160,8 @@ func _cleanup_drag() -> void:
 	if _range_circle:
 		_range_circle.queue_free()
 		_range_circle = null
+	_drag_weapon_index = -1
+	_on_weapon_sold_callback = Callable()
 	if _player and _player.has_method("set_input_enabled"):
 		_player.set_input_enabled(true)
 
@@ -132,6 +170,10 @@ func spawn_tower_node(deploy_id: int, tower_id: String, level: int, grid_pos: Ve
 	tower.position = _grid_to_world(grid_pos)
 	_tower_container.add_child(tower)
 	_tower_nodes[deploy_id] = tower
+
+func upgrade_tower_node(deploy_id: int, tower_id: String, new_level: int, grid_pos: Vector2i) -> void:
+	_remove_tower_node(deploy_id)
+	spawn_tower_node(deploy_id, tower_id, new_level, grid_pos)
 
 func _remove_tower_node(deploy_id: int) -> void:
 	if deploy_id in _tower_nodes:
