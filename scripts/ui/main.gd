@@ -37,6 +37,9 @@ func _ready() -> void:
 	# 进入首次 SHOP 阶段
 	_enter_shop_phase(true)
 
+	# === DEBUG: hardcode 放置塔测试精灵效果 ===
+	_debug_spawn_towers()
+
 func _enter_shop_phase(is_first: bool = false) -> void:
 	current_phase = Phase.SHOP
 	_shop_overlay.refresh_shop(is_first)
@@ -70,6 +73,19 @@ func _load_map() -> void:
 	var map_instance = load(map_data.map_scene).instantiate()
 	add_child(map_instance)
 	move_child(map_instance, 0)
+
+func _debug_spawn_towers() -> void:
+	var pea = SceneFactory.create_tower(Enums.TowerId.PEA_SHOOTER, 1)
+	pea.position = Vector2(-40, 0)
+	_tower_container.add_child(pea)
+
+	# var ice = SceneFactory.create_tower(Enums.TowerId.ICE_FLOWER, 1)
+	# ice.position = Vector2(0, 0)
+	# _tower_container.add_child(ice)
+
+	# var sun = SceneFactory.create_tower(Enums.TowerId.SUNFLOWER, 1)
+	# sun.position = Vector2(40, 0)
+	# _tower_container.add_child(sun)
 
 func _on_coins_generated(amount: int, _pos: Vector2) -> void:
 	var player: Node2D = get_tree().get_first_node_in_group(Enums.Group.PLAYER)

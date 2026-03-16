@@ -132,6 +132,10 @@ func reset() -> void:
 	# 初始武器：开局自动装备
 	if char_data.starting_weapon != "":
 		deployed_weapons.append({id = char_data.starting_weapon, level = 1})
+	# # TODO: 临时 hardcode 三把武器用于测试，后续删除
+	# deployed_weapons.append({id = "bow", level = 1})
+	# deployed_weapons.append({id = "shuriken", level = 1})
+	# deployed_weapons.append({id = "sword", level = 1})
 
 # ===== 种群系统 =====
 

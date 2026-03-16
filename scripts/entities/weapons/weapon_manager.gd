@@ -4,7 +4,7 @@
 class_name WeaponManager
 extends Node2D
 
-const ORBIT_RADIUS: float = 12.0
+const ORBIT_RADIUS: float = 15.0
 const ORBIT_SPEED: float = TAU / 8.0  # 1 圈 / 8 秒
 const SPRITE_SIZE: int = 6
 
