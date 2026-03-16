@@ -14,8 +14,17 @@ const WEAPON_COLORS: Dictionary = {
 	"sword": Color.RED,
 }
 
+# 素材默认朝向补偿（angle=0 为朝右）
+# 朝下的素材: -PI/2, 朝上的素材: +PI/2
+const SPRITE_ROTATION_OFFSET: Dictionary = {
+	"bow": -PI / 2.0,      # 素材朝下
+	"shuriken": 0.0,        # 旋转武器无所谓
+	"sword": PI / 2.0,      # 素材朝上
+}
+
 var _weapons: Array[Weapon] = []
 var _weapon_sprites: Array[Sprite2D] = []
+var _sprite_rot_offsets: Array[float] = []
 var _orbit_angle: float = 0.0
 var _current_target: Node2D = null
 
@@ -40,6 +49,7 @@ func _add_weapon(data: WeaponData) -> Weapon:
 	var sprite := _create_weapon_sprite(data)
 	add_child(sprite)
 	_weapon_sprites.append(sprite)
+	_sprite_rot_offsets.append(SPRITE_ROTATION_OFFSET.get(data.weapon_type, 0.0))
 	weapon.sprite = sprite
 	return weapon
 
@@ -76,8 +86,8 @@ func _update_sprites(delta: float) -> void:
 	for i in range(count):
 		var angle: float = _orbit_angle + angle_step * i
 		_weapon_sprites[i].position = Vector2(cos(angle), sin(angle)) * ORBIT_RADIUS
-		# 精灵朝向轨道角度（素材默认朝下=PI/2，补偿 -PI/2）
-		_weapon_sprites[i].rotation = angle - PI / 2.0
+		# 精灵朝向轨道角度，根据素材默认朝向补偿
+		_weapon_sprites[i].rotation = angle + _sprite_rot_offsets[i]
 
 func _find_closest_enemy(range_limit: float = INF) -> Node2D:
 	if not is_inside_tree():
