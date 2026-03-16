@@ -64,9 +64,6 @@ class Stat:
 	const ATTACK_SPEED_MULT = "attack_speed_mult"
 	const TOWER_MULT = "tower_mult"
 
-# 回旋镖状态
-enum BoomerangState { OUTBOUND, RETURNING }
-
 # 动画名
 class Anim:
 	const IDLE = "idle"

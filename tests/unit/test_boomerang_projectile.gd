@@ -10,37 +10,30 @@ func _make_boomerang() -> BoomerangProjectile:
 	add_child_autofree(b)
 	return b
 
-func test_boomerang_moves_outbound():
+func test_boomerang_moves_in_direction():
 	var b = _make_boomerang()
 	await get_tree().process_frame
 	b.setup(10.0, 50.0, Vector2.ZERO, Vector2.RIGHT)
 	b._physics_process(0.1)
-	assert_true(b.global_position.x > 0.0, "should move right")
+	assert_true(b.global_position.x > 0.0, "应向右飞行")
 
-func test_boomerang_switches_to_returning_after_distance():
+func test_boomerang_rotates():
 	var b = _make_boomerang()
 	await get_tree().process_frame
 	b.setup(10.0, 50.0, Vector2.ZERO, Vector2.RIGHT)
-	b._traveled = b.outbound_distance + 1.0
-	b._physics_process(0.016)
-	assert_eq(b._state, Enums.BoomerangState.RETURNING)
-
-func test_boomerang_returns_toward_player():
-	var b = _make_boomerang()
-	await get_tree().process_frame
-	b.setup(10.0, 50.0, Vector2(100, 0), Vector2.RIGHT)
-	b._state = Enums.BoomerangState.RETURNING
-	var player_node = Node2D.new()
-	player_node.global_position = Vector2(-100, 0)
-	add_child_autofree(player_node)
-	b.set_player(player_node)
-	var start_x: float = b.global_position.x
+	var rot_before: float = b.rotation
 	b._physics_process(0.1)
-	assert_true(b.global_position.x < start_x, "should move toward player")
+	assert_ne(b.rotation, rot_before, "应旋转")
 
 func test_max_lifetime_from_config():
 	var b = _make_boomerang()
 	await get_tree().process_frame
 	b.setup(10.0, 50.0, Vector2.ZERO, Vector2.RIGHT)
 	var w: WeaponData = GameConfig.weapons[Enums.WeaponId.BOOMERANG]
-	assert_eq(b.max_lifetime, w.boomerang_max_lifetime, "max_lifetime should match WeaponData config")
+	assert_eq(b.max_lifetime, w.boomerang_max_lifetime, "max_lifetime 应匹配配置")
+
+func test_hit_count_starts_at_zero():
+	var b = _make_boomerang()
+	await get_tree().process_frame
+	b.setup(10.0, 50.0, Vector2.ZERO, Vector2.RIGHT)
+	assert_eq(b._hit_count, 0)
