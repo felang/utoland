@@ -15,6 +15,7 @@ extends Resource
 @export var fire_rate_per_level: PackedFloat32Array = []
 @export var attack_range_per_level: PackedFloat32Array = []
 @export var slow_ratio_per_level: PackedFloat32Array = []
+@export var slow_duration_per_level: PackedFloat32Array = []
 @export var sell_price_per_level: PackedInt32Array = PackedInt32Array([])
 
 @export_group("向日葵专有")
