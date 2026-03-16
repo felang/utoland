@@ -6,6 +6,7 @@ extends Resource
 @export var display_name: String = ""
 @export var description: String = ""
 @export var icon_path: String = ""
+@export var projectile_sprite_path: String = ""
 
 @export_group("等级系统")
 @export var max_level: int = 3
