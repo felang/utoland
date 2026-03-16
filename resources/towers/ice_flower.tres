@@ -5,11 +5,14 @@
 [resource]
 script = ExtResource("1")
 id = "ice_flower"
-display_name = "减速塔"
-description = "散发寒气减速周围敌人。冬天的花朵，盛开在最不该温暖的地方。"
+display_name = "冰花"
+description = "射出寒冰弹，命中敌人造成伤害并减速。"
 icon_path = "res://assets/towers/ice_flower/sprite.png"
 max_level = 3
 hp_per_level = PackedFloat32Array(70, 125, 200)
-slow_ratio_per_level = PackedFloat32Array(0.3, 0.4, 0.5)
+damage_per_level = PackedFloat32Array(3, 5, 8)
+fire_rate_per_level = PackedFloat32Array(0.8, 0.7, 0.6)
 attack_range_per_level = PackedFloat32Array(100, 120, 150)
+slow_ratio_per_level = PackedFloat32Array(0.3, 0.4, 0.5)
+slow_duration_per_level = PackedFloat32Array(1.5, 2.0, 2.5)
 sell_price_per_level = PackedInt32Array(3, 7, 21)
