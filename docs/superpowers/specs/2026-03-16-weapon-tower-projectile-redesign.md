@@ -198,6 +198,8 @@ ProjectileBase (Node2D)
   projectile_type — 移入 ProjectileData.projectile_scene
   bullet_speed — 移入 ProjectileData.speed
   knockback_force — 移入 ProjectileData.knockback_force 或 MeleeConfig.knockback_force
+  weapon_type — 由 attack_mode 替代（WeaponManager 仍用 weapon_id 字符串区分手里剑子类）
+  bullet_count — 当前始终为 1，未使用，直接删除
 
 手里剑专有字段迁移：
   shuriken_speed → 使用 ProjectileData.speed（手里剑的 ProjectileData.tres 中配置）
@@ -220,6 +222,9 @@ ProjectileBase (Node2D)
 
 新增：
   @export projectile_data: ProjectileData  # 射手塔的投射物配置
+
+删除：
+  projectile_sprite_path — 移入 ProjectileData.sprite_path
 
 保留（用于 per_level 覆写 ProjectileData，见上方冰花塔说明）：
   slow_ratio_per_level
