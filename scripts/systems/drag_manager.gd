@@ -218,7 +218,7 @@ func _update_preview(global_pos: Vector2) -> void:
 			_recycle_area.modulate = Color.WHITE
 			_hide_recycle_hint()
 
-func _update_recycle_hint(global_pos: Vector2) -> void:
+func _update_recycle_hint(_global_pos: Vector2) -> void:
 	var refund: int = _get_drag_refund()
 	if refund <= 0:
 		return
