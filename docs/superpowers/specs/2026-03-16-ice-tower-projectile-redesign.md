@@ -21,6 +21,8 @@
 
 ### 1. tower_shooter.gd 扩展
 
+**移除 `_ready()` 中硬编码的 `tower_type = Enums.TowerId.PEA_SHOOTER`**。`tower_type` 由 `SceneFactory.create_tower()` 在实例化时注入，`_ready()` 中的赋值会覆盖工厂注入值，导致冰花塔被错误识别为射手塔。其他塔脚本（tower_generator）也有同样问题，一并移除。
+
 在 `_apply_level_stats()` 中新增减速数据读取：
 
 ```gdscript
@@ -51,8 +53,10 @@ if slow_on_hit > 0.0:
 `scripts/resources/tower_data.gd` 新增字段：
 
 ```gdscript
-@export var slow_duration_per_level: Array[float] = []
+@export var slow_duration_per_level: PackedFloat32Array = []
 ```
+
+类型使用 `PackedFloat32Array`，与现有 `slow_ratio_per_level` 保持一致。
 
 `slow_ratio_per_level` 已存在，无需修改。
 
@@ -77,7 +81,7 @@ sell_price_per_level = [3, 7, 21]
 - 根节点脚本从 `tower_slow.gd` 改为 `tower_shooter.gd`
 - 移除 `SlowArea` 节点（Area2D + CollisionShape2D）
 - 添加 `DetectArea` 节点（Area2D + CircleShape2D），collision_mask = 2
-- 添加 `ShootTimer` 节点（Timer，one_shot=true）
+- 添加 `ShootTimer` 节点（Timer，one_shot=false，与射手塔一致）
 - 保留 `Visual`（AnimatedSprite2D）和 `HealthComponent`
 
 ### 5. 清理
@@ -106,8 +110,13 @@ ShootTimer 超时
   → 减速持续 N 秒后 SlowHandler 自动移除
 ```
 
+## 前置条件
+
+- `ice_flower.tres` 当前缺少 `damage_per_level` 和 `fire_rate_per_level`，必须在场景脚本切换前添加，否则 `tower_shooter._apply_level_stats()` 会数组越界崩溃
+- 场景修改（步骤 4）必须在删除 `tower_slow.gd`（步骤 5）之前完成
+
 ## 风险与注意事项
 
 - `tower_shooter.gd` 新增的减速字段对射手塔无影响（数组为空，值为 0）
 - 合成系统不受影响（合成只关心 id 和 level）
-- 需验证 BulletProjectile 的 `slow_on_hit` 路径确实调用了 `apply_timed_slow`
+- BulletProjectile 的 `slow_on_hit` 路径已验证会调用 `apply_timed_slow`（bullet_projectile.gd:80-84）
