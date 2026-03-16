@@ -62,6 +62,9 @@ AttackerComponent (Node)
 │   get_final_damage() → base_damage * damage_multiplier
 │   get_final_cooldown() → base_cooldown / speed_multiplier
 │   update_stats(damage, range, cooldown) — 升级时更新
+│   注：cooldown 参数接收的是 WeaponData/TowerData 的 fire_rate_per_level 值。
+│   这些值语义上是"攻击间隔（秒）"而非频率，即 cooldown。命名沿用 fire_rate 以保持
+│   与现有 .tres 配置文件一致，AttackerComponent 内部存为 base_cooldown。
 │
 ├─ 信号：
 │   attack_fired(target: Node2D, projectile_data: ProjectileData)
@@ -132,11 +135,15 @@ ProjectileBase (Node2D)
 ├─ data: ProjectileData
 ├─ Hitbox 子节点
 │
-├─ setup(data: ProjectileData, damage: float, from: Vector2, direction: Vector2):
+├─ setup(data: ProjectileData, damage: float, from: Vector2, direction: Vector2, extra_pierce: int = 0):
 │   → 从 data 读取 speed/lifetime/sprite/trail
 │   → 设置 Hitbox.damage, Hitbox.knockback_force
-│   → 加载并附加精灵
+│   → _pierce_count = data.base_pierce_count + extra_pierce
+│   → 加载并附加精灵（从 data.sprite_path）
 │   → 启动生命计时器
+│   注：签名与当前 Projectile.setup(damage, knockback, from, dir) 不兼容，为 breaking change。
+│   受影响调用者：tower_shooter.gd、bow_weapon.gd、bullet_projectile._spawn_split_bullets()（将被删除）。
+│   迁移时统一更新为新签名。
 │
 ├─ 信号：
 │   hit(position: Vector2, direction: Vector2)  # 命中时发射，供外部监听（如分裂）
@@ -185,7 +192,7 @@ ProjectileBase (Node2D)
   @export attack_mode: AttackMode  # RANGED / MELEE
   @export projectile_data: ProjectileData  # 远程武器的投射物配置
   @export melee_config: MeleeConfig  # 近战武器的攻击配置
-  @export sprite_path: String  # 武器浮动精灵路径
+  （icon_path 已存在，用于武器浮动精灵和商店图标，保留不变）
 
 删除：
   projectile_type — 移入 ProjectileData.projectile_scene
@@ -197,7 +204,7 @@ ProjectileBase (Node2D)
   shuriken_max_lifetime → 使用 ProjectileData.lifetime
   outbound_distance, return_speed_mult → 移入 ShurikenProjectile 脚本的 @export 字段
     （这些是弹跳飞行行为参数，属于 ShurikenProjectile 子类特有，不适合放在通用 ProjectileData 中）
-  bounce_range → 同上，移入 ShurikenProjectile @export
+  bounce_range → 已在 ShurikenProjectile 中（当前为 var bounce_range = 150.0），改为 @export 即可
 ```
 
 ### 6. TowerData 调整
@@ -341,9 +348,10 @@ ShootTimer 节点删除，由 AttackerComponent 内部冷却替代。
 
 新增：
   create_projectile(data: ProjectileData, damage: float,
-                    from: Vector2, direction: Vector2) -> ProjectileBase:
+                    from: Vector2, direction: Vector2,
+                    extra_pierce: int = 0) -> ProjectileBase:
     var proj = data.projectile_scene.instantiate()
-    proj.setup(data, damage, from, direction)
+    proj.setup(data, damage, from, direction, extra_pierce)
     return proj
 ```
 
@@ -406,7 +414,7 @@ func _apply_passive_to_weapons():
 | 重构 | `scripts/entities/projectiles/projectile.gd` → `projectile_base.gd` |
 | 重构 | `scripts/entities/projectiles/bullet_projectile.gd` → 合并到 projectile_base |
 | 重构 | `scripts/resources/weapon_data.gd` — 新增字段，删除散字段 |
-| 重构 | `scripts/resources/tower_data.gd` — 新增 projectile_data，删除 slow 散字段 |
+| 重构 | `scripts/resources/tower_data.gd` — 新增 projectile_data，保留 slow per_level 字段（用于动态覆写） |
 | 重构 | `scripts/core/scene_factory.gd` — 统一 create_projectile() |
 | 删除 | `scripts/entities/weapons/bow_weapon.gd` |
 | 删除 | `scripts/entities/weapons/sword_weapon.gd` |
