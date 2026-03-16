@@ -52,17 +52,18 @@ func _add_weapon(data: WeaponData) -> Weapon:
 	return weapon
 
 func tick(delta: float) -> void:
-	# 取所有武器中最大的射程作为搜索范围
+	# 攻击目标：受射程限制
 	var max_range: float = 0.0
 	for weapon in _weapons:
 		if weapon.weapon_data:
 			var wr: float = weapon.get_weapon_range()
 			if wr > max_range:
 				max_range = wr
-	_current_target = _find_closest_enemy(max_range)
+	var attack_target: Node2D = _find_closest_enemy(max_range)
 	for weapon in _weapons:
-		weapon.tick(delta, _current_target)
-	# 更新漂浮精灵位置
+		weapon.tick(delta, attack_target)
+	# 朝向目标：不限射程，始终朝向最近敌人
+	_current_target = _find_closest_enemy(INF)
 	_update_sprites(delta)
 
 func _update_sprites(delta: float) -> void:
