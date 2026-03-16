@@ -1,11 +1,9 @@
 # WeaponManager — 统一管理玩家所有武器
-# 每帧查找一次最近敌人，分发给所有武器的 tick()
-# 武器精灵围绕角色漂浮显示
 class_name WeaponManager
 extends Node2D
 
 const ORBIT_RADIUS: float = 15.0
-const ORBIT_SPEED: float = TAU / 8.0  # 1 圈 / 8 秒
+const ORBIT_SPEED: float = TAU / 8.0
 const SPRITE_SIZE: int = 6
 
 const WEAPON_COLORS: Dictionary = {
@@ -14,12 +12,10 @@ const WEAPON_COLORS: Dictionary = {
 	"sword": Color.RED,
 }
 
-# 素材默认朝向补偿（angle=0 为朝右）
-# 朝下的素材: -PI/2, 朝上的素材: +PI/2
 const SPRITE_ROTATION_OFFSET: Dictionary = {
-	"bow": -PI / 2.0,      # 素材朝下
-	"shuriken": 0.0,        # 旋转武器无所谓
-	"sword": PI / 2.0,      # 素材朝上
+	"bow": -PI / 2.0,
+	"shuriken": 0.0,
+	"sword": PI / 2.0,
 }
 
 var _weapons: Array[Weapon] = []
@@ -33,60 +29,89 @@ func initialize(weapon_entries: Array[Dictionary]) -> void:
 		if not GameConfig.weapons.has(entry.id):
 			push_error("WeaponManager: 未知武器 id: " + entry.id)
 			continue
-		var weapon: Weapon = _add_weapon(GameConfig.weapons[entry.id])
+		var data: WeaponData = GameConfig.weapons[entry.id]
+		var weapon: Weapon = _add_weapon(data, entry.id)
 		if weapon:
 			weapon.set_level(entry.level)
+			_apply_passive_to_weapon(weapon)
 
-func _add_weapon(data: WeaponData) -> Weapon:
-	var weapon: Weapon = _create_weapon(data.weapon_type)
+func _add_weapon(data: WeaponData, weapon_id: String) -> Weapon:
+	var weapon: Weapon = _create_weapon(weapon_id)
 	if not weapon:
 		return null
 	weapon.initialize(data)
 	weapon.owner_node = get_parent() as Node2D
+	weapon.attacker.target_finder = _find_nearest_enemy
 	add_child(weapon)
 	_weapons.append(weapon)
 	# 创建漂浮精灵
-	var sprite := _create_weapon_sprite(data)
-	add_child(sprite)
-	_weapon_sprites.append(sprite)
-	_sprite_rot_offsets.append(SPRITE_ROTATION_OFFSET.get(data.weapon_type, 0.0))
-	weapon.sprite = sprite
+	var spr := _create_weapon_sprite(data, weapon_id)
+	add_child(spr)
+	_weapon_sprites.append(spr)
+	_sprite_rot_offsets.append(SPRITE_ROTATION_OFFSET.get(weapon_id, 0.0))
+	weapon.sprite = spr
+	# 监听投射物创建（分裂系统，Task 18）
+	weapon.projectile_created.connect(_on_weapon_projectile_created)
 	return weapon
 
 func tick(delta: float) -> void:
-	# 攻击目标：受射程限制
-	var max_range: float = 0.0
 	for weapon in _weapons:
-		if weapon.weapon_data:
-			var wr: float = weapon.get_weapon_range()
-			if wr > max_range:
-				max_range = wr
-	var attack_target: Node2D = _find_closest_enemy(max_range)
-	for weapon in _weapons:
-		weapon.tick(delta, attack_target)
-	# 朝向目标：不限射程，始终朝向最近敌人
-	_current_target = _find_closest_enemy(INF)
+		weapon.attacker.tick(delta)
+	_current_target = _find_closest_enemy_unlimited()
 	_update_sprites(delta)
+
+func _find_nearest_enemy(range_limit: float) -> Node2D:
+	if not is_inside_tree():
+		return null
+	var owner_nd: Node2D = get_parent() as Node2D
+	if not owner_nd:
+		return null
+	var enemies: Array[Node] = get_tree().get_nodes_in_group(Enums.Group.ENEMIES)
+	var closest: Node2D = null
+	var min_dist: float = range_limit
+	for enemy in enemies:
+		if enemy is Node2D:
+			var dist: float = owner_nd.global_position.distance_to(enemy.global_position)
+			if dist < min_dist:
+				min_dist = dist
+				closest = enemy
+	return closest
+
+func _find_closest_enemy_unlimited() -> Node2D:
+	return _find_nearest_enemy(INF)
+
+func _apply_passive_to_weapon(weapon: Weapon) -> void:
+	var dmg_mult: float = GameData.player_stats.get(Enums.Stat.DAMAGE_MULT, 1.0)
+	var spd_mult: float = GameData.player_stats.get(Enums.Stat.ATTACK_SPEED_MULT, 1.0)
+	weapon.attacker.damage_multiplier = dmg_mult
+	weapon.attacker.speed_multiplier = spd_mult
+
+func _on_weapon_projectile_created(proj: ProjectileBase) -> void:
+	# 分裂系统占位（Task 18 实现）
+	pass
+
+func _create_weapon(weapon_id: String) -> Weapon:
+	match weapon_id:
+		"shuriken":
+			return ShurikenWeapon.new()
+		_:
+			return Weapon.new()
 
 func _update_sprites(delta: float) -> void:
 	if _weapon_sprites.is_empty():
 		return
-	# 慢速环绕
 	_orbit_angle += ORBIT_SPEED * delta
 	var count: int = _weapon_sprites.size()
 	var angle_step: float = TAU / count
-	# 计算朝向角度（有目标朝目标，无目标朝轨道外侧）
 	var has_target: bool = _current_target != null and is_instance_valid(_current_target)
 	var target_angle: float = 0.0
 	if has_target:
-		var owner_node: Node2D = get_parent() as Node2D
-		if owner_node:
-			target_angle = owner_node.global_position.direction_to(_current_target.global_position).angle()
+		var owner_nd: Node2D = get_parent() as Node2D
+		if owner_nd:
+			target_angle = owner_nd.global_position.direction_to(_current_target.global_position).angle()
 	for i in range(count):
-		# 环绕位置：均匀分布 + 慢速旋转
 		var slot_angle: float = _orbit_angle + angle_step * i
 		_weapon_sprites[i].position = Vector2(cos(slot_angle), sin(slot_angle)) * ORBIT_RADIUS
-		# 精灵朝向：有目标朝目标，无目标朝轨道外侧
 		var face_angle: float
 		if has_target:
 			face_angle = target_angle
@@ -94,39 +119,13 @@ func _update_sprites(delta: float) -> void:
 			face_angle = slot_angle
 		_weapon_sprites[i].rotation = face_angle + _sprite_rot_offsets[i]
 
-func _find_closest_enemy(range_limit: float = INF) -> Node2D:
-	if not is_inside_tree():
-		return null
-	var owner_node: Node2D = get_parent() as Node2D
-	if not owner_node:
-		return null
-	var enemies: Array[Node] = get_tree().get_nodes_in_group(Enums.Group.ENEMIES)
-	var closest: Node2D = null
-	var min_dist: float = range_limit  # 只考虑射程内的敌人
-	for enemy in enemies:
-		if enemy is Node2D:
-			var dist: float = owner_node.global_position.distance_to(enemy.global_position)
-			if dist < min_dist:
-				min_dist = dist
-				closest = enemy
-	return closest
-
-func _create_weapon(weapon_type: String) -> Weapon:
-	match weapon_type:
-		"bow":       return BowWeapon.new()
-		"shuriken": return ShurikenWeapon.new()
-		"sword":     return SwordWeapon.new()
-	push_error("WeaponManager: 未知 weapon_type: " + weapon_type)
-	return null
-
-func _create_weapon_sprite(data: WeaponData) -> Sprite2D:
-	var sprite := Sprite2D.new()
-	sprite.z_index = 1
-	# 优先加载 icon_path 图片，无则用彩色圆形占位
+func _create_weapon_sprite(data: WeaponData, weapon_id: String) -> Sprite2D:
+	var spr := Sprite2D.new()
+	spr.z_index = 1
 	if data.icon_path != "" and ResourceLoader.exists(data.icon_path):
-		sprite.texture = load(data.icon_path)
+		spr.texture = load(data.icon_path)
 	else:
-		var color: Color = WEAPON_COLORS.get(data.weapon_type, Color.WHITE)
+		var color: Color = WEAPON_COLORS.get(weapon_id, Color.WHITE)
 		var img := Image.create(SPRITE_SIZE, SPRITE_SIZE, false, Image.FORMAT_RGBA8)
 		var center := Vector2(SPRITE_SIZE / 2.0, SPRITE_SIZE / 2.0)
 		var radius: float = SPRITE_SIZE / 2.0
@@ -137,5 +136,5 @@ func _create_weapon_sprite(data: WeaponData) -> Sprite2D:
 					img.set_pixel(x, y, color)
 				else:
 					img.set_pixel(x, y, Color.TRANSPARENT)
-		sprite.texture = ImageTexture.create_from_image(img)
-	return sprite
+		spr.texture = ImageTexture.create_from_image(img)
+	return spr

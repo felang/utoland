@@ -14,29 +14,29 @@ func test_weapon_data_level_values_increase():
 		assert_gt(wd.damage_per_level[i], wd.damage_per_level[i - 1],
 			"Lv%d 伤害应大于 Lv%d" % [i + 1, i])
 
-func test_weapon_get_damage_reads_level():
-	var weapon := BowWeapon.new()
+func test_weapon_set_level_reads_correct_stats():
+	var weapon := Weapon.new()
 	var wd: WeaponData = GameConfig.weapons["bow"]
+	add_child_autofree(weapon)
 	weapon.initialize(wd)
 	weapon.set_level(3)
-	assert_almost_eq(weapon.get_damage(), wd.damage_per_level[2], 0.01,
+	assert_almost_eq(weapon.attacker.base_damage, wd.damage_per_level[2], 0.01,
 		"Lv3 伤害应读 damage_per_level[2]")
-	add_child_autofree(weapon)
 
-func test_weapon_get_fire_rate_reads_level():
-	var weapon := BowWeapon.new()
+func test_weapon_attacker_cooldown_reads_level():
+	var weapon := Weapon.new()
 	var wd: WeaponData = GameConfig.weapons["bow"]
+	add_child_autofree(weapon)
 	weapon.initialize(wd)
 	weapon.set_level(1)
-	assert_almost_eq(weapon.get_fire_rate(), wd.fire_rate_per_level[0], 0.01,
-		"Lv1 射速应读 fire_rate_per_level[0]")
-	add_child_autofree(weapon)
+	assert_almost_eq(weapon.attacker.base_cooldown, wd.fire_rate_per_level[0], 0.01,
+		"Lv1 cooldown 应读 fire_rate_per_level[0]")
 
-func test_weapon_get_weapon_range_reads_level():
-	var weapon := BowWeapon.new()
+func test_weapon_attacker_range_reads_level():
+	var weapon := Weapon.new()
 	var wd: WeaponData = GameConfig.weapons["bow"]
+	add_child_autofree(weapon)
 	weapon.initialize(wd)
 	weapon.set_level(3)
-	assert_almost_eq(weapon.get_weapon_range(), wd.weapon_range_per_level[2], 0.01,
+	assert_almost_eq(weapon.attacker.attack_range, wd.weapon_range_per_level[2], 0.01,
 		"Lv3 射程应读 weapon_range_per_level[2]")
-	add_child_autofree(weapon)
