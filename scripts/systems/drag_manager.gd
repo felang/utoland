@@ -23,6 +23,7 @@ var _on_cancelled_callback: Callable
 var _recycle_area: Control = null
 var _drag_weapon_index: int = -1
 var _on_weapon_sold_callback: Callable
+var _recycle_hint_label: Label = null
 
 func initialize(tower_container: Node2D, player: Node2D) -> void:
 	_tower_container = tower_container
@@ -160,6 +161,9 @@ func _cleanup_drag() -> void:
 	if _range_circle:
 		_range_circle.queue_free()
 		_range_circle = null
+	if _recycle_area:
+		_recycle_area.modulate = Color.WHITE
+	_hide_recycle_hint()
 	_drag_weapon_index = -1
 	_on_weapon_sold_callback = Callable()
 	if _player and _player.has_method("set_input_enabled"):
@@ -205,6 +209,50 @@ func _update_preview(global_pos: Vector2) -> void:
 			_range_circle.modulate = Color.GREEN if is_valid else Color.RED
 	else:
 		_preview_node.global_position = global_pos
+	# 回收区反馈（对塔移动和武器拖拽生效）
+	if _recycle_area and _drag_source in [DragSource.MAP_TOWER, DragSource.WEAPON]:
+		if is_over_recycle_area(global_pos):
+			_recycle_area.modulate = Color(1, 0.3, 0.3)
+			_update_recycle_hint(global_pos)
+		else:
+			_recycle_area.modulate = Color.WHITE
+			_hide_recycle_hint()
+
+func _update_recycle_hint(global_pos: Vector2) -> void:
+	var refund: int = _get_drag_refund()
+	if refund <= 0:
+		return
+	if _recycle_hint_label == null:
+		_recycle_hint_label = Label.new()
+		_recycle_hint_label.add_theme_font_size_override("font_size", 12)
+		_recycle_area.add_child(_recycle_hint_label)
+	_recycle_hint_label.text = "$%d" % refund
+	_recycle_hint_label.visible = true
+
+func _hide_recycle_hint() -> void:
+	if _recycle_hint_label:
+		_recycle_hint_label.visible = false
+
+func _get_drag_refund() -> int:
+	match _drag_source:
+		DragSource.MAP_TOWER:
+			var deploy_id: int = _drag_data.get("deploy_id", -1)
+			for entry in GameData.deployed_towers:
+				if entry.deploy_id == deploy_id:
+					var data: Resource = GameConfig.towers.get(entry.id)
+					if data:
+						return data.sell_price_per_level[entry.level - 1]
+			return 0
+		DragSource.WEAPON:
+			var weapon_index: int = _drag_data.get("weapon_index", -1)
+			if weapon_index >= 0 and weapon_index < GameData.deployed_weapons.size():
+				var entry: Dictionary = GameData.deployed_weapons[weapon_index]
+				var data: Resource = GameConfig.weapons.get(entry.id)
+				if data:
+					return data.sell_price_per_level[entry.level - 1]
+			return 0
+		_:
+			return 0
 
 func _grid_to_world(grid_pos: Vector2i) -> Vector2:
 	return Vector2(
