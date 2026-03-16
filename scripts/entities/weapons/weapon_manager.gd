@@ -1,9 +1,23 @@
 # WeaponManager — 统一管理玩家所有武器
 # 每帧查找一次最近敌人，分发给所有武器的 tick()
+# 武器精灵围绕角色漂浮显示
 class_name WeaponManager
-extends Node
+extends Node2D
+
+const ORBIT_RADIUS: float = 20.0
+const ORBIT_SPEED: float = TAU / 2.0  # 1 圈 / 2 秒
+const SPRITE_SIZE: int = 6
+
+const WEAPON_COLORS: Dictionary = {
+	"bow": Color.GREEN,
+	"boomerang": Color.CORNFLOWER_BLUE,
+	"sword": Color.RED,
+}
 
 var _weapons: Array[Weapon] = []
+var _weapon_sprites: Array[Sprite2D] = []
+var _orbit_angle: float = 0.0
+var _current_target: Node2D = null
 
 func initialize(weapon_entries: Array[Dictionary]) -> void:
 	for entry in weapon_entries:
@@ -22,6 +36,10 @@ func _add_weapon(data: WeaponData) -> Weapon:
 	weapon.owner_node = get_parent() as Node2D
 	add_child(weapon)
 	_weapons.append(weapon)
+	# 创建漂浮精灵
+	var sprite := _create_weapon_sprite(data.weapon_type)
+	add_child(sprite)
+	_weapon_sprites.append(sprite)
 	return weapon
 
 func tick(delta: float) -> void:
@@ -32,9 +50,31 @@ func tick(delta: float) -> void:
 			var wr: float = weapon.get_weapon_range()
 			if wr > max_range:
 				max_range = wr
-	var target: Node2D = _find_closest_enemy(max_range)
+	_current_target = _find_closest_enemy(max_range)
 	for weapon in _weapons:
-		weapon.tick(delta, target)
+		weapon.tick(delta, _current_target)
+	# 更新漂浮精灵位置
+	_update_sprites(delta)
+
+func _update_sprites(delta: float) -> void:
+	if _weapon_sprites.is_empty():
+		return
+	var count: int = _weapon_sprites.size()
+	var angle_step: float = TAU / count
+	if _current_target == null:
+		# 无目标：匀速环绕
+		_orbit_angle += ORBIT_SPEED * delta
+	else:
+		# 有目标：朝向目标方向
+		var owner_node: Node2D = get_parent() as Node2D
+		if owner_node:
+			var dir: Vector2 = owner_node.global_position.direction_to(_current_target.global_position)
+			var target_angle: float = dir.angle()
+			# 平滑过渡到目标角度
+			_orbit_angle = lerp_angle(_orbit_angle, target_angle, 8.0 * delta)
+	for i in range(count):
+		var angle: float = _orbit_angle + angle_step * i
+		_weapon_sprites[i].position = Vector2(cos(angle), sin(angle)) * ORBIT_RADIUS
 
 func _find_closest_enemy(range_limit: float = INF) -> Node2D:
 	if not is_inside_tree():
@@ -60,3 +100,21 @@ func _create_weapon(weapon_type: String) -> Weapon:
 		"sword":     return SwordWeapon.new()
 	push_error("WeaponManager: 未知 weapon_type: " + weapon_type)
 	return null
+
+func _create_weapon_sprite(weapon_type: String) -> Sprite2D:
+	var sprite := Sprite2D.new()
+	var color: Color = WEAPON_COLORS.get(weapon_type, Color.WHITE)
+	# 创建圆形纹理
+	var img := Image.create(SPRITE_SIZE, SPRITE_SIZE, false, Image.FORMAT_RGBA8)
+	var center := Vector2(SPRITE_SIZE / 2.0, SPRITE_SIZE / 2.0)
+	var radius: float = SPRITE_SIZE / 2.0
+	for x in range(SPRITE_SIZE):
+		for y in range(SPRITE_SIZE):
+			var dist: float = Vector2(x + 0.5, y + 0.5).distance_to(center)
+			if dist <= radius:
+				img.set_pixel(x, y, color)
+			else:
+				img.set_pixel(x, y, Color.TRANSPARENT)
+	sprite.texture = ImageTexture.create_from_image(img)
+	sprite.z_index = 1
+	return sprite
