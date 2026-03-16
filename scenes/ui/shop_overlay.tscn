@@ -39,46 +39,6 @@ text = "人口 0/2"
 layout_mode = 2
 text = "Wave 0"
 
-[node name="Spacer" type="Control" parent="ShopPanel/VBoxContainer/TopRow"]
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="LevelUpButton" type="Button" parent="ShopPanel/VBoxContainer/TopRow"]
-layout_mode = 2
-text = "Lv↑"
-
-[node name="RefreshButton" type="Button" parent="ShopPanel/VBoxContainer/TopRow"]
-layout_mode = 2
-text = "刷新 $2"
-
-[node name="StartButton" type="Button" parent="ShopPanel/VBoxContainer/TopRow"]
-layout_mode = 2
-text = "开战"
-
-[node name="ShopRow" type="HBoxContainer" parent="ShopPanel/VBoxContainer"]
+[node name="BottomRow" type="HBoxContainer" parent="ShopPanel/VBoxContainer"]
 layout_mode = 2
 theme_override_constants/separation = 4
-
-[node name="ShopSlot0" type="Button" parent="ShopPanel/VBoxContainer/ShopRow"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "空"
-
-[node name="ShopSlot1" type="Button" parent="ShopPanel/VBoxContainer/ShopRow"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "空"
-
-[node name="ShopSlot2" type="Button" parent="ShopPanel/VBoxContainer/ShopRow"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "空"
-
-[node name="ShopSlot3" type="Button" parent="ShopPanel/VBoxContainer/ShopRow"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "空"
-
-[node name="BagRow" type="HBoxContainer" parent="ShopPanel/VBoxContainer"]
-layout_mode = 2
-theme_override_constants/separation = 2

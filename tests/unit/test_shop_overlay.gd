@@ -4,7 +4,8 @@ var _overlay: CanvasLayer
 
 func before_each() -> void:
 	GameData.reset()
-	GameData.coins = 20
+	GameData.coins = 100
+	GameData.player_level = 1
 	GameData.deployed_weapons = []
 	GameData.deployed_towers = []
 	_overlay = load("res://scenes/ui/shop_overlay.tscn").instantiate()
@@ -13,26 +14,27 @@ func before_each() -> void:
 func after_each() -> void:
 	_overlay.queue_free()
 
-func test_refresh_shop_populates_slots() -> void:
-	_overlay.refresh_shop(true)
-	var has_items := false
-	for slot in GameData.shop_slots:
-		if slot != null and not slot.is_empty():
-			has_items = true
+func test_refresh_shop_populates_cards() -> void:
+	_overlay.refresh_shop()
+	assert_eq(GameData.shop_slots.size(), 4)
+	var has_item := false
+	for label in _overlay._card_names:
+		if label.text != "已售出":
+			has_item = true
 			break
-	assert_true(has_items, "刷新后商店应有物品")
+	assert_true(has_item, "刷新后应有可购买的卡片")
 
 func test_start_battle_signal() -> void:
 	watch_signals(_overlay)
 	_overlay._on_start_pressed()
 	assert_signal_emitted(_overlay, "start_battle_pressed")
 
-func test_buy_weapon_updates_deployed() -> void:
-	GameData.coins = 100
-	GameData.shop_slots = [
-		{id = "bow", type = "weapon", cost = 3},
-		{}, {}, {}
-	]
-	_overlay._on_shop_slot_pressed(0)
-	assert_eq(GameData.deployed_weapons.size(), 1, "购买武器后应出现在 deployed_weapons")
-	assert_eq(GameData.deployed_weapons[0].id, "bow")
+func test_card_disabled_when_insufficient_coins() -> void:
+	GameData.coins = 0
+	_overlay.refresh_shop()
+	for i in range(_overlay._card_buttons.size()):
+		if i < GameData.shop_slots.size() and not GameData.shop_slots[i].is_empty():
+			assert_true(_overlay._card_buttons[i].disabled, "金币不足时卡片应禁用")
+
+func test_recycle_area_exists() -> void:
+	assert_not_null(_overlay.get_recycle_area())
