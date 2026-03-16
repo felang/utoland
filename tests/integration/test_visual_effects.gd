@@ -23,12 +23,12 @@ func test_bullet_projectile_creates_trail():
 			break
 	assert_true(has_trail, "子弹投射物应有 Line2D 拖尾子节点")
 
-func test_boomerang_projectile_rotates():
-	var boomerang: BoomerangProjectile = SceneFactory.create_boomerang_projectile()
-	add_child_autoqfree(boomerang)
-	boomerang.weapon_data = GameConfig.weapons[Enums.WeaponId.BOOMERANG]
-	boomerang.setup(10.0, 0.0, Vector2.ZERO, Vector2.RIGHT)
-	var initial_rotation: float = boomerang.rotation
+func test_shuriken_projectile_rotates():
+	var shuriken: ShurikenProjectile = SceneFactory.create_shuriken_projectile()
+	add_child_autoqfree(shuriken)
+	shuriken.weapon_data = GameConfig.weapons[Enums.WeaponId.SHURIKEN]
+	shuriken.setup(10.0, 0.0, Vector2.ZERO, Vector2.RIGHT)
+	var initial_rotation: float = shuriken.rotation
 	await get_tree().create_timer(0.1).timeout
-	assert_ne(boomerang.rotation, initial_rotation, "回旋镖投射物应持续旋转")
+	assert_ne(shuriken.rotation, initial_rotation, "手里剑投射物应持续旋转")
 

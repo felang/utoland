@@ -56,13 +56,13 @@ extends Resource
 @export var bullet_trail_color: Color = Color(1, 1, 0, 0.6)
 @export var bullet_trail_max_points: int = 4
 
-# 回旋镖特效
-@export var boomerang_rotation_speed: float = 720.0
-@export var boomerang_trail_points: int = 6
-@export var boomerang_trail_width: float = 3.0
-@export var boomerang_trail_color: Color = Color(0.2, 0.8, 1.0, 0.6)
-@export var boomerang_return_rotation_mult: float = 1.5
-@export var boomerang_return_distance: float = 7.5
+# 手里剑特效
+@export var shuriken_rotation_speed: float = 720.0
+@export var shuriken_trail_points: int = 6
+@export var shuriken_trail_width: float = 3.0
+@export var shuriken_trail_color: Color = Color(0.2, 0.8, 1.0, 0.6)
+@export var shuriken_return_rotation_mult: float = 1.5
+@export var shuriken_return_distance: float = 7.5
 
 # 激光特效
 @export var laser_beam_width: float = 3.0

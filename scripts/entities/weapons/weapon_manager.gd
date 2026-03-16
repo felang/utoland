@@ -10,7 +10,7 @@ const SPRITE_SIZE: int = 6
 
 const WEAPON_COLORS: Dictionary = {
 	"bow": Color.GREEN,
-	"boomerang": Color.CORNFLOWER_BLUE,
+	"shuriken": Color.CORNFLOWER_BLUE,
 	"sword": Color.RED,
 }
 
@@ -99,7 +99,7 @@ func _find_closest_enemy(range_limit: float = INF) -> Node2D:
 func _create_weapon(weapon_type: String) -> Weapon:
 	match weapon_type:
 		"bow":       return BowWeapon.new()
-		"boomerang": return BoomerangWeapon.new()
+		"shuriken": return ShurikenWeapon.new()
 		"sword":     return SwordWeapon.new()
 	push_error("WeaponManager: 未知 weapon_type: " + weapon_type)
 	return null

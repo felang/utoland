@@ -21,13 +21,13 @@ func test_weapon_bow_resource() -> void:
 	assert_eq(w.bullet_count, 1)
 	assert_eq(w.bullet_speed, 300.0)
 
-func test_weapon_boomerang_resource() -> void:
-	assert_true(GameConfig.weapons.has(Enums.WeaponId.BOOMERANG), "应包含 boomerang")
-	var w: WeaponData = GameConfig.weapons[Enums.WeaponId.BOOMERANG]
-	assert_eq(w.projectile_type, Enums.ProjectileId.BOOMERANG)
+func test_weapon_shuriken_resource() -> void:
+	assert_true(GameConfig.weapons.has(Enums.WeaponId.SHURIKEN), "应包含 shuriken")
+	var w: WeaponData = GameConfig.weapons[Enums.WeaponId.SHURIKEN]
+	assert_eq(w.projectile_type, Enums.ProjectileId.SHURIKEN)
 	assert_almost_eq(w.fire_rate_per_level[0], 0.8, 0.001)
 	assert_almost_eq(w.damage_per_level[0], 15.0, 0.001)
-	assert_eq(w.boomerang_speed, 175.0)
+	assert_eq(w.shuriken_speed, 175.0)
 	assert_eq(w.outbound_distance, 100.0)
 	assert_eq(w.return_speed_mult, 1.3)
 
@@ -136,12 +136,12 @@ func test_character_kaze_resource() -> void:
 func test_character_merlin_resource() -> void:
 	var c: CharacterData = GameConfig.characters[Enums.Character.MERLIN]
 	assert_eq(c.display_name, "梅林")
-	assert_eq(c.recommended_weapon, Enums.WeaponId.BOOMERANG)
+	assert_eq(c.recommended_weapon, Enums.WeaponId.SHURIKEN)
 
 func test_character_nemo_resource() -> void:
 	var c: CharacterData = GameConfig.characters[Enums.Character.NEMO]
 	assert_eq(c.display_name, "尼莫")
-	assert_eq(c.recommended_weapon, Enums.WeaponId.BOOMERANG)
+	assert_eq(c.recommended_weapon, Enums.WeaponId.SHURIKEN)
 
 func test_character_has_sprite_frames_path() -> void:
 	var c: CharacterData = GameConfig.characters[Enums.Character.DORA]
@@ -192,8 +192,8 @@ func test_normal_enemy_not_boss():
 func test_weapon_has_weapon_type():
 	var bow: WeaponData = GameConfig.weapons[Enums.WeaponId.BOW]
 	assert_eq(bow.weapon_type, "bow", "bow weapon_type 应为 bow")
-	var boom: WeaponData = GameConfig.weapons[Enums.WeaponId.BOOMERANG]
-	assert_eq(boom.weapon_type, "boomerang", "boomerang weapon_type 应为 boomerang")
+	var shuriken: WeaponData = GameConfig.weapons[Enums.WeaponId.SHURIKEN]
+	assert_eq(shuriken.weapon_type, "shuriken", "shuriken weapon_type 应为 shuriken")
 	var sword: WeaponData = GameConfig.weapons[Enums.WeaponId.SWORD]
 	assert_eq(sword.weapon_type, "sword", "sword weapon_type 应为 sword")
 

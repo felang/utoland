@@ -20,19 +20,19 @@ func test_add_weapon_creates_bow_weapon():
 	assert_eq(mgr._weapons.size(), 1)
 	assert_true(mgr._weapons[0] is BowWeapon)
 
-func test_add_weapon_creates_boomerang_weapon():
+func test_add_weapon_creates_shuriken_weapon():
 	var mgr = WeaponManager.new()
 	add_child_autofree(mgr)
 	var data = WeaponData.new()
-	data.id = "test_boomerang"
-	data.projectile_type = Enums.ProjectileId.BOOMERANG
-	data.weapon_type = "boomerang"
+	data.id = "test_shuriken"
+	data.projectile_type = Enums.ProjectileId.SHURIKEN
+	data.weapon_type = "shuriken"
 	data.fire_rate_per_level = PackedFloat32Array([1.0])
 	data.damage_per_level = PackedFloat32Array([15.0])
 	data.weapon_range_per_level = PackedFloat32Array([200.0])
 	mgr._add_weapon(data)
 	assert_eq(mgr._weapons.size(), 1)
-	assert_true(mgr._weapons[0] is BoomerangWeapon)
+	assert_true(mgr._weapons[0] is ShurikenWeapon)
 
 func test_add_weapon_creates_sword_weapon():
 	var mgr = WeaponManager.new()

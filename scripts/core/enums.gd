@@ -28,7 +28,7 @@ class Character:
 # 武器 ID
 class WeaponId:
 	const BOW = "bow"
-	const BOOMERANG = "boomerang"
+	const SHURIKEN = "shuriken"
 	const SWORD = "sword"
 
 # 敌人类型
@@ -49,7 +49,7 @@ class TowerId:
 # 投射物类型
 class ProjectileId:
 	const BULLET = "bullet"
-	const BOOMERANG = "boomerang"
+	const SHURIKEN = "shuriken"
 
 # 地图 ID
 class Map:

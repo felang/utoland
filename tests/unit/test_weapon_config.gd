@@ -8,19 +8,19 @@ func test_weapons_count():
 func test_bow_has_projectile_type():
 	assert_eq(GameConfig.weapons[Enums.WeaponId.BOW].projectile_type, Enums.ProjectileId.BULLET, "弓弹道类型应为 bullet")
 
-func test_boomerang_has_projectile_type():
-	assert_eq(GameConfig.weapons[Enums.WeaponId.BOOMERANG].projectile_type, Enums.ProjectileId.BOOMERANG, "回旋镖弹道类型应为 boomerang")
+func test_shuriken_has_projectile_type():
+	assert_eq(GameConfig.weapons[Enums.WeaponId.SHURIKEN].projectile_type, Enums.ProjectileId.SHURIKEN, "手里剑弹道类型应为 shuriken")
 
 func test_all_weapons_have_range():
 	for weapon_id in GameConfig.weapons:
 		var w: WeaponData = GameConfig.weapons[weapon_id]
 		assert_gt(w.weapon_range_per_level[0], 0.0, "武器 %s 应有正的射程" % weapon_id)
 
-func test_boomerang_has_required_fields():
-	var w: WeaponData = GameConfig.weapons[Enums.WeaponId.BOOMERANG]
-	assert_gt(w.boomerang_speed, 0.0, "回旋镖应有 speed")
-	assert_gt(w.outbound_distance, 0.0, "回旋镖应有 outbound_distance")
-	assert_gt(w.return_speed_mult, 0.0, "回旋镖应有 return_speed_mult")
+func test_shuriken_has_required_fields():
+	var w: WeaponData = GameConfig.weapons[Enums.WeaponId.SHURIKEN]
+	assert_gt(w.shuriken_speed, 0.0, "手里剑应有 speed")
+	assert_gt(w.outbound_distance, 0.0, "手里剑应有 outbound_distance")
+	assert_gt(w.return_speed_mult, 0.0, "手里剑应有 return_speed_mult")
 
 func test_all_weapons_have_weapon_type():
 	for id in GameConfig.weapons:

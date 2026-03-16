@@ -17,7 +17,7 @@ var _enemy_scenes: Dictionary = {
 }
 
 var _bullet_projectile_scene: PackedScene = preload("res://scenes/entities/projectiles/bullet_projectile.tscn")
-var _boomerang_projectile_scene: PackedScene = preload("res://scenes/entities/projectiles/boomerang_projectile.tscn")
+var _shuriken_projectile_scene: PackedScene = preload("res://scenes/entities/projectiles/shuriken_projectile.tscn")
 var _coin_scene: PackedScene = preload("res://scenes/entities/coin.tscn")
 
 # Tower creation — 注入 TowerData Resource，level 直接注入
@@ -55,6 +55,6 @@ func create_coin() -> Area2D:
 func create_bullet_projectile() -> BulletProjectile:
 	return _bullet_projectile_scene.instantiate()
 
-# BoomerangProjectile creation — 新投射物系统
-func create_boomerang_projectile() -> BoomerangProjectile:
-	return _boomerang_projectile_scene.instantiate()
+# ShurikenProjectile creation — 新投射物系统
+func create_shuriken_projectile() -> ShurikenProjectile:
+	return _shuriken_projectile_scene.instantiate()

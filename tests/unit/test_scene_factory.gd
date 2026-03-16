@@ -104,10 +104,10 @@ func test_create_bullet_projectile():
 	assert_not_null(bullet, "BulletProjectile should be created")
 	bullet.queue_free()
 
-func test_create_boomerang_projectile():
-	var boomerang = SceneFactory.create_boomerang_projectile()
-	assert_not_null(boomerang, "BoomerangProjectile should be created")
-	boomerang.queue_free()
+func test_create_shuriken_projectile():
+	var shuriken = SceneFactory.create_shuriken_projectile()
+	assert_not_null(shuriken, "ShurikenProjectile should be created")
+	shuriken.queue_free()
 
 func test_all_towers_can_be_created():
 	var all_ids: Array[String] = [
@@ -124,7 +124,7 @@ func test_all_towers_can_be_created():
 
 func test_all_weapons_loaded():
 	var all_ids: Array[String] = [
-		Enums.WeaponId.BOW, Enums.WeaponId.BOOMERANG, Enums.WeaponId.SWORD,
+		Enums.WeaponId.BOW, Enums.WeaponId.SHURIKEN, Enums.WeaponId.SWORD,
 	]
 	for id in all_ids:
 		assert_true(GameConfig.weapons.has(id), "应包含武器: " + id)

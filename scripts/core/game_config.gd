@@ -101,7 +101,7 @@ const SPRITES = {
 	},
 	"projectiles": {
 		"bullet": "res://assets/projectiles/kunai.png",
-		"boomerang": "res://assets/projectiles/shuriken.png"
+		"shuriken": "res://assets/projectiles/shuriken.png"
 	},
 	"items": {
 		"coin": "res://assets/items/gold_coin.png"

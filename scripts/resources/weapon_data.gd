@@ -23,8 +23,8 @@ extends Resource
 @export_group("子弹专有")
 @export var bullet_count: int = 1
 
-@export_group("回旋镖专有")
-@export var boomerang_speed: float = 175.0
+@export_group("手里剑专有")
+@export var shuriken_speed: float = 175.0
 @export var outbound_distance: float = 100.0
 @export var return_speed_mult: float = 1.3
-@export var boomerang_max_lifetime: float = 5.0
+@export var shuriken_max_lifetime: float = 5.0

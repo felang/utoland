@@ -106,7 +106,7 @@ func test_merlin_starting_gold() -> void:
 
 func test_merlin_recommended_weapon() -> void:
 	var cd: CharacterData = GameConfig.characters[Enums.Character.MERLIN]
-	assert_eq(cd.recommended_weapon, "boomerang", "Merlin recommended_weapon 应为 boomerang")
+	assert_eq(cd.recommended_weapon, "shuriken", "Merlin recommended_weapon 应为 shuriken")
 
 func test_merlin_recommended_tower() -> void:
 	var cd: CharacterData = GameConfig.characters[Enums.Character.MERLIN]
@@ -139,7 +139,7 @@ func test_nemo_starting_gold() -> void:
 
 func test_nemo_recommended_weapon() -> void:
 	var cd: CharacterData = GameConfig.characters[Enums.Character.NEMO]
-	assert_eq(cd.recommended_weapon, "boomerang", "Nemo recommended_weapon 应为 boomerang")
+	assert_eq(cd.recommended_weapon, "shuriken", "Nemo recommended_weapon 应为 shuriken")
 
 func test_nemo_recommended_tower() -> void:
 	var cd: CharacterData = GameConfig.characters[Enums.Character.NEMO]

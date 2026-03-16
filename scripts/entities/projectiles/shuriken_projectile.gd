@@ -1,6 +1,6 @@
-# BoomerangProjectile — 飞镖投射物
+# ShurikenProjectile — 手里剑投射物
 # 直线飞行 → 命中敌人 → 弹射到附近另一个敌人 → 消失
-class_name BoomerangProjectile
+class_name ShurikenProjectile
 extends Projectile
 
 var weapon_data: WeaponData = null
@@ -25,17 +25,17 @@ func _on_setup(direction: Vector2) -> void:
 	_hit_count = 0
 	_bounce_target = null
 	_hit_enemies = []
-	assert(weapon_data != null, "BoomerangProjectile: weapon_data 未注入")
-	speed = weapon_data.boomerang_speed
-	max_lifetime = weapon_data.boomerang_max_lifetime
+	assert(weapon_data != null, "ShurikenProjectile: weapon_data 未注入")
+	speed = weapon_data.shuriken_speed
+	max_lifetime = weapon_data.shuriken_max_lifetime
 	# 特效配置
 	var fx: EffectConfigData = GameConfig.effects
-	_trail_max_points = fx.boomerang_trail_points
-	_rotation_speed = deg_to_rad(fx.boomerang_rotation_speed)
+	_trail_max_points = fx.shuriken_trail_points
+	_rotation_speed = deg_to_rad(fx.shuriken_rotation_speed)
 	# 拖尾
 	_trail = Line2D.new()
-	_trail.width = fx.boomerang_trail_width
-	_trail.default_color = fx.boomerang_trail_color
+	_trail.width = fx.shuriken_trail_width
+	_trail.default_color = fx.shuriken_trail_color
 	_trail.top_level = true
 	_trail.z_index = -1
 	add_child(_trail)
