@@ -133,6 +133,9 @@ func reset() -> void:
 	_recommended_weapon = char_data.recommended_weapon
 	_recommended_tower = char_data.recommended_tower
 	_next_deploy_id = 1
+	# 初始武器：开局自动装备
+	if char_data.starting_weapon != "":
+		deployed_weapons.append({id = char_data.starting_weapon, level = 1})
 
 # ===== 种群系统 =====
 

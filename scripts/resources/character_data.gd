@@ -10,6 +10,8 @@ extends Resource
 @export var attack_speed_mult: float = 1.0
 ## 初始资金（与 GameConfig.PLAYER["initial_coins"] 叠加）
 @export var starting_gold: int = 0
+## 初始武器 ID（开局自动装备，空字符串表示无）
+@export var starting_weapon: String = ""
 ## 角色推荐武器 ID（商店首次访问保证出现）
 @export var recommended_weapon: String = ""
 ## 角色推荐塔 ID（商店首次访问保证出现）
