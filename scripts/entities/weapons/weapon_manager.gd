@@ -23,6 +23,10 @@ var _weapon_sprites: Array[Sprite2D] = []
 var _sprite_rot_offsets: Array[float] = []
 var _orbit_angle: float = 0.0
 var _current_target: Node2D = null
+var _on_weapon_drag_callback: Callable
+
+func set_weapon_drag_callback(callback: Callable) -> void:
+	_on_weapon_drag_callback = callback
 
 func initialize(weapon_entries: Array[Dictionary]) -> void:
 	for entry in weapon_entries:
@@ -84,6 +88,17 @@ func _add_weapon(data: WeaponData, weapon_id: String) -> Weapon:
 	_weapon_sprites.append(spr)
 	_sprite_rot_offsets.append(SPRITE_ROTATION_OFFSET.get(weapon_id, 0.0))
 	weapon.sprite = spr
+	# 添加点击区域（供商店阶段拖拽卖出用）
+	var click_area := Area2D.new()
+	click_area.name = "ClickArea"
+	click_area.input_pickable = true
+	var shape := CollisionShape2D.new()
+	var circle := CircleShape2D.new()
+	circle.radius = SPRITE_SIZE * 1.5
+	shape.shape = circle
+	click_area.add_child(shape)
+	spr.add_child(click_area)
+	click_area.input_event.connect(_on_weapon_click.bind(_weapons.size() - 1))
 	# 监听投射物创建（分裂系统，Task 18）
 	weapon.projectile_created.connect(_on_weapon_projectile_created)
 	return weapon
@@ -119,6 +134,11 @@ func _apply_passive_to_weapon(weapon: Weapon) -> void:
 	var spd_mult: float = GameData.player_stats.get(Enums.Stat.ATTACK_SPEED_MULT, 1.0)
 	weapon.attacker.damage_multiplier = dmg_mult
 	weapon.attacker.speed_multiplier = spd_mult
+
+func _on_weapon_click(_viewport: Node, event: InputEvent, _shape_idx: int, weapon_index: int) -> void:
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+		if _on_weapon_drag_callback.is_valid():
+			_on_weapon_drag_callback.call(weapon_index)
 
 func _on_weapon_projectile_created(proj: ProjectileBase) -> void:
 	if GameData.split_count <= 0:
