@@ -17,7 +17,7 @@ func test_tower_data_has_level_fields():
 func test_tower_ice_flower_has_level_fields():
 	var td: TowerData = GameConfig.towers["ice_flower"]
 	assert_eq(td.hp_per_level.size(), 3, "冰花塔应有 3 级 HP")
-
-func test_tower_slow_has_level_fields():
-	var td: TowerData = GameConfig.towers["ice_flower"]
-	assert_eq(td.slow_ratio_per_level.size(), 3, "减速塔应有 3 级减速比例")
+	assert_eq(td.damage_per_level.size(), 3, "冰花塔应有 3 级伤害")
+	assert_eq(td.fire_rate_per_level.size(), 3, "冰花塔应有 3 级射速")
+	assert_eq(td.slow_ratio_per_level.size(), 3, "冰花塔应有 3 级减速比例")
+	assert_eq(td.slow_duration_per_level.size(), 3, "冰花塔应有 3 级减速持续")

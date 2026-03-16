@@ -10,7 +10,7 @@ func test_create_tower_shooter():
 	assert_eq(tower.tower_type, Enums.TowerId.PEA_SHOOTER, "Tower type should be 'pea_shooter'")
 	tower.queue_free()
 
-func test_create_tower_slow():
+func test_create_tower_ice_flower():
 	var tower = SceneFactory.create_tower(Enums.TowerId.ICE_FLOWER)
 	assert_not_null(tower, "Ice flower tower should be created")
 	assert_eq(tower.tower_type, Enums.TowerId.ICE_FLOWER, "Tower type should be 'ice_flower'")
