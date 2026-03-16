@@ -465,12 +465,149 @@ git add scripts/systems/drag_manager.gd tests/unit/test_drag_manager.gd
 git commit -m "feat: DragManager 回收区检测、塔升级、武器拖拽卖出"
 ```
 
-## Chunk 4: ShopOverlay 卡片 UI 重构
+## Chunk 4: 武器拖拽卖出 + 回收区视觉反馈
 
-### Task 5: 重构 shop_overlay.tscn 场景结构
+### Task 5: 武器节点 Area2D 点击检测
+
+**Files:**
+- Modify: `scripts/entities/weapons/weapon_manager.gd`
+
+- [ ] **Step 1: 在 WeaponManager 中为每个武器精灵添加点击区域**
+
+在 `_create_weapon_sprite` 方法中，为精灵添加 `Area2D` + `CollisionShape2D` 用于点击检测：
+
+```gdscript
+# 在 _add_weapon 方法末尾、return weapon 之前添加：
+# 添加点击区域（供商店阶段拖拽卖出用）
+var click_area := Area2D.new()
+click_area.name = "ClickArea"
+click_area.input_pickable = true
+var shape := CollisionShape2D.new()
+var circle := CircleShape2D.new()
+circle.radius = SPRITE_SIZE * 1.5  # 稍大于精灵方便点击
+shape.shape = circle
+click_area.add_child(shape)
+spr.add_child(click_area)
+click_area.input_event.connect(_on_weapon_click.bind(_weapons.size() - 1))
+```
+
+新增回调方法：
+
+```gdscript
+var _on_weapon_drag_callback: Callable
+
+func set_weapon_drag_callback(callback: Callable) -> void:
+	_on_weapon_drag_callback = callback
+
+func _on_weapon_click(_viewport: Node, event: InputEvent, _shape_idx: int, weapon_index: int) -> void:
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+		if _on_weapon_drag_callback.is_valid():
+			_on_weapon_drag_callback.call(weapon_index)
+```
+
+- [ ] **Step 2: 运行 weapon_manager 测试确认无破坏**
+
+Run: `/Applications/Godot.app/Contents/MacOS/Godot --headless --script addons/gut/gut_cmdln.gd -gdir=res://tests/unit -ginclude_subdirs -gexit -gtest=test_weapon_manager.gd`
+Expected: PASS
+
+- [ ] **Step 3: 提交**
+
+```bash
+git add scripts/entities/weapons/weapon_manager.gd
+git commit -m "feat: 武器精灵添加 Area2D 点击检测区域"
+```
+
+### Task 6: 回收区拖拽视觉反馈
+
+**Files:**
+- Modify: `scripts/systems/drag_manager.gd`
+
+- [ ] **Step 1: 在 _update_preview 中添加回收区高亮逻辑**
+
+在 `_update_preview` 方法末尾添加回收区反馈：
+
+```gdscript
+# 在 _update_preview 末尾追加
+if _recycle_area and _drag_source in [DragSource.MAP_TOWER, DragSource.WEAPON]:
+	if is_over_recycle_area(global_pos):
+		_recycle_area.modulate = Color(1, 0.3, 0.3)  # 红色高亮
+		# 显示返还金额
+		_update_recycle_hint(global_pos)
+	else:
+		_recycle_area.modulate = Color.WHITE
+		_hide_recycle_hint()
+```
+
+新增方法：
+
+```gdscript
+var _recycle_hint_label: Label = null
+
+func _update_recycle_hint(global_pos: Vector2) -> void:
+	var refund: int = _get_drag_refund()
+	if refund <= 0:
+		return
+	if _recycle_hint_label == null:
+		_recycle_hint_label = Label.new()
+		_recycle_hint_label.add_theme_font_size_override("font_size", 12)
+		_recycle_area.add_child(_recycle_hint_label)
+	_recycle_hint_label.text = "$%d" % refund
+	_recycle_hint_label.visible = true
+
+func _hide_recycle_hint() -> void:
+	if _recycle_hint_label:
+		_recycle_hint_label.visible = false
+
+func _get_drag_refund() -> int:
+	match _drag_source:
+		DragSource.MAP_TOWER:
+			var deploy_id: int = _drag_data.get("deploy_id", -1)
+			for entry in GameData.deployed_towers:
+				if entry.deploy_id == deploy_id:
+					var data: Resource = GameConfig.towers.get(entry.id)
+					if data:
+						return data.sell_price_per_level[entry.level - 1]
+			return 0
+		DragSource.WEAPON:
+			var weapon_index: int = _drag_data.get("weapon_index", -1)
+			if weapon_index >= 0 and weapon_index < GameData.deployed_weapons.size():
+				var entry: Dictionary = GameData.deployed_weapons[weapon_index]
+				var data: Resource = GameConfig.weapons.get(entry.id)
+				if data:
+					return data.sell_price_per_level[entry.level - 1]
+			return 0
+		_:
+			return 0
+```
+
+在 `_cleanup_drag` 末尾添加：
+
+```gdscript
+if _recycle_area:
+	_recycle_area.modulate = Color.WHITE
+_hide_recycle_hint()
+```
+
+- [ ] **Step 2: 运行 drag_manager 测试**
+
+Run: `/Applications/Godot.app/Contents/MacOS/Godot --headless --script addons/gut/gut_cmdln.gd -gdir=res://tests/unit -ginclude_subdirs -gexit -gtest=test_drag_manager.gd`
+Expected: PASS
+
+- [ ] **Step 3: 提交**
+
+```bash
+git add scripts/systems/drag_manager.gd
+git commit -m "feat: 回收区拖拽高亮和返还金额显示"
+```
+
+## Chunk 5: ShopOverlay 卡片 UI 重构
+
+### Task 7: 重构 shop_overlay.tscn 和 shop_overlay.gd（合并提交，避免中间状态破坏）
 
 **Files:**
 - Modify: `scenes/ui/shop_overlay.tscn`
+- Modify: `scripts/ui/shop_overlay.gd`
+- Test: `tests/unit/test_shop_overlay.gd`
 
 - [ ] **Step 1: 重写场景文件**
 
@@ -508,20 +645,7 @@ ShopOverlay (CanvasLayer, layer=10)
 
 实际 `.tscn` 保留：ShopPanel → VBoxContainer → TopRow + BottomRow（HBoxContainer），其余由代码创建。
 
-- [ ] **Step 2: 提交场景修改**
-
-```bash
-git add scenes/ui/shop_overlay.tscn
-git commit -m "refactor: shop_overlay.tscn 删除 BagRow，改为两行布局骨架"
-```
-
-### Task 6: 重写 shop_overlay.gd 卡片逻辑
-
-**Files:**
-- Modify: `scripts/ui/shop_overlay.gd`
-- Test: `tests/unit/test_shop_overlay.gd`
-
-- [ ] **Step 1: 重写 shop_overlay.gd**
+- [ ] **Step 2: 重写 shop_overlay.gd**
 
 完整重写 `scripts/ui/shop_overlay.gd`：
 
@@ -953,9 +1077,9 @@ git add scripts/ui/shop_overlay.gd scenes/ui/shop_overlay.tscn tests/unit/test_s
 git commit -m "feat: ShopOverlay 卡片 UI 重构，回收区，两行布局"
 ```
 
-## Chunk 5: main.gd 集成和清理
+## Chunk 6: main.gd 集成和清理
 
-### Task 7: main.gd 清理和集成
+### Task 8: main.gd 清理和集成
 
 **Files:**
 - Modify: `scripts/ui/main.gd`
@@ -991,7 +1115,12 @@ func _ready() -> void:
 	# WeaponManager 注入（Player 的子节点）
 	var player: Node2D = $Player
 	if player.has_node("WeaponManager"):
-		_shop_overlay.weapon_manager = player.get_node("WeaponManager")
+		var wm: WeaponManager = player.get_node("WeaponManager")
+		_shop_overlay.weapon_manager = wm
+		# 武器点击 → 拖拽卖出
+		wm.set_weapon_drag_callback(func(weapon_index: int):
+			_drag_manager.start_weapon_drag(weapon_index, _shop_overlay._on_weapon_sold)
+		)
 
 	# 回收区注入
 	_drag_manager.set_recycle_area(_shop_overlay.get_recycle_area())
@@ -1064,7 +1193,7 @@ git add scripts/ui/main.gd
 git commit -m "refactor: main.gd 删除调试代码，注入 weapon_manager 和回收区"
 ```
 
-### Task 8: 清理 EventBus 废弃信号
+### Task 9: 清理 EventBus 废弃信号
 
 **Files:**
 - Modify: `scripts/core/event_bus.gd`
@@ -1093,9 +1222,9 @@ git add scripts/core/event_bus.gd
 git commit -m "chore: 清理 EventBus 废弃信号 item_deployed/item_undeployed"
 ```
 
-## Chunk 6: 端到端验证
+## Chunk 7: 端到端验证
 
-### Task 9: 全量测试 + 编辑器验证
+### Task 10: 全量测试 + 编辑器验证
 
 - [ ] **Step 1: 运行全部单元测试**
 
