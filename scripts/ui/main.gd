@@ -23,6 +23,19 @@ func _ready() -> void:
 	_drag_manager.initialize(_tower_container, $Player)
 	_shop_overlay.drag_manager = _drag_manager
 
+	# WeaponManager 注入（Player 的子节点）
+	var player: Node2D = $Player
+	if player.has_node("WeaponManager"):
+		var wm: WeaponManager = player.get_node("WeaponManager")
+		_shop_overlay.weapon_manager = wm
+		# 武器点击 → 拖拽卖出
+		wm.set_weapon_drag_callback(func(weapon_index: int):
+			_drag_manager.start_weapon_drag(weapon_index, _shop_overlay._on_weapon_sold)
+		)
+
+	# 回收区注入
+	_drag_manager.set_recycle_area(_shop_overlay.get_recycle_area())
+
 	# 暂停覆盖层
 	var pause_overlay = load("res://scripts/ui/pause_overlay.gd").new()
 	add_child(pause_overlay)
@@ -37,8 +50,6 @@ func _ready() -> void:
 	# 进入首次 SHOP 阶段
 	_enter_shop_phase(true)
 
-	# === DEBUG: hardcode 放置塔测试精灵效果 ===
-	_debug_spawn_towers()
 
 func _enter_shop_phase(is_first: bool = false) -> void:
 	current_phase = Phase.SHOP
@@ -74,18 +85,6 @@ func _load_map() -> void:
 	add_child(map_instance)
 	move_child(map_instance, 0)
 
-func _debug_spawn_towers() -> void:
-	var pea = SceneFactory.create_tower(Enums.TowerId.PEA_SHOOTER, 1)
-	pea.position = Vector2(-40, 0)
-	_tower_container.add_child(pea)
-
-	# var ice = SceneFactory.create_tower(Enums.TowerId.ICE_FLOWER, 1)
-	# ice.position = Vector2(0, 0)
-	# _tower_container.add_child(ice)
-
-	# var sun = SceneFactory.create_tower(Enums.TowerId.SUNFLOWER, 1)
-	# sun.position = Vector2(40, 0)
-	# _tower_container.add_child(sun)
 
 func _on_coins_generated(amount: int, _pos: Vector2) -> void:
 	var player: Node2D = get_tree().get_first_node_in_group(Enums.Group.PLAYER)
