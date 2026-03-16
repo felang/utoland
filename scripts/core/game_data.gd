@@ -149,6 +149,20 @@ func get_population_used() -> int:
 func can_deploy() -> bool:
 	return get_population_used() < get_population_cap()
 
+## 判断是否可以购买指定物品（考虑合成释放人口）
+func can_buy_item(item_id: String, item_level: int) -> bool:
+	if can_deploy():
+		return true
+	# 人口满，检查是否能触发合成（已有 ≥2 个同 id 同 level）
+	var count: int = 0
+	for w in deployed_weapons:
+		if w.id == item_id and w.level == item_level:
+			count += 1
+	for t in deployed_towers:
+		if t.id == item_id and t.level == item_level:
+			count += 1
+	return count >= 2
+
 # ===== 等级升级 =====
 
 func buy_level_up() -> bool:
