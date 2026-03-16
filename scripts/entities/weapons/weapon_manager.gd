@@ -5,7 +5,6 @@ class_name WeaponManager
 extends Node2D
 
 const ORBIT_RADIUS: float = 20.0
-const ORBIT_SPEED: float = TAU / 2.0  # 1 圈 / 2 秒
 const SPRITE_SIZE: int = 6
 
 const WEAPON_COLORS: Dictionary = {
@@ -25,7 +24,6 @@ const SPRITE_ROTATION_OFFSET: Dictionary = {
 var _weapons: Array[Weapon] = []
 var _weapon_sprites: Array[Sprite2D] = []
 var _sprite_rot_offsets: Array[float] = []
-var _orbit_angle: float = 0.0
 var _current_target: Node2D = null
 
 func initialize(weapon_entries: Array[Dictionary]) -> void:
@@ -72,22 +70,24 @@ func _update_sprites(delta: float) -> void:
 		return
 	var count: int = _weapon_sprites.size()
 	var angle_step: float = TAU / count
-	if _current_target == null:
-		# 无目标：匀速环绕
-		_orbit_angle += ORBIT_SPEED * delta
-	else:
-		# 有目标：朝向目标方向
+	# 计算朝向角度（有目标朝目标，无目标各自朝轨道外侧）
+	var has_target: bool = _current_target != null and is_instance_valid(_current_target)
+	var target_angle: float = 0.0
+	if has_target:
 		var owner_node: Node2D = get_parent() as Node2D
 		if owner_node:
-			var dir: Vector2 = owner_node.global_position.direction_to(_current_target.global_position)
-			var target_angle: float = dir.angle()
-			# 平滑过渡到目标角度
-			_orbit_angle = lerp_angle(_orbit_angle, target_angle, 8.0 * delta)
+			target_angle = owner_node.global_position.direction_to(_current_target.global_position).angle()
 	for i in range(count):
-		var angle: float = _orbit_angle + angle_step * i
-		_weapon_sprites[i].position = Vector2(cos(angle), sin(angle)) * ORBIT_RADIUS
-		# 精灵朝向轨道角度，根据素材默认朝向补偿
-		_weapon_sprites[i].rotation = angle + _sprite_rot_offsets[i]
+		# 固定位置：均匀分布在圆上
+		var slot_angle: float = angle_step * i
+		_weapon_sprites[i].position = Vector2(cos(slot_angle), sin(slot_angle)) * ORBIT_RADIUS
+		# 精灵朝向：有目标朝目标，无目标朝轨道外侧
+		var face_angle: float
+		if has_target:
+			face_angle = target_angle
+		else:
+			face_angle = slot_angle
+		_weapon_sprites[i].rotation = face_angle + _sprite_rot_offsets[i]
 
 func _find_closest_enemy(range_limit: float = INF) -> Node2D:
 	if not is_inside_tree():
