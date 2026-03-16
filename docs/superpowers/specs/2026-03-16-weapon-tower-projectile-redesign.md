@@ -65,7 +65,7 @@ AttackerComponent (Node)
 │
 ├─ 信号：
 │   attack_fired(target: Node2D, projectile_data: ProjectileData)
-│   melee_hit(enemies: Array[Node2D])
+│   melee_triggered(target: Node2D, melee_config: MeleeConfig)
 │   target_changed(new_target: Node2D)
 ```
 
@@ -75,7 +75,13 @@ AttackerComponent (Node)
 
 **RANGED 模式：** 冷却就绪 + 有目标 → 发射 `attack_fired` 信号，宿主监听后调 SceneFactory 创建投射物。AttackerComponent 不依赖 SceneFactory。
 
-**MELEE 模式：** 冷却就绪 + 有目标 → 创建临时 Area2D（使用 MeleeConfig 的角度、半径），检测范围内所有敌人 Hurtbox，发射 `melee_hit` 信号。临时 Area2D 在攻击动画结束后自动销毁。
+**MELEE 模式：** 冷却就绪 + 有目标 → 发射 `melee_triggered(target, melee_config)` 信号。宿主（Weapon）监听后：
+1. 创建临时 Area2D 挂在精灵上，连接 `area_entered` 信号
+2. 用 Tween 播放突刺动画（精灵前进 `thrust_distance` 再收回）
+3. 动画过程中 `area_entered` 检测到 Hurtbox → 收集命中敌人，发射 `Hurtbox.hit_taken`
+4. 动画结束回调中 `queue_free()` 临时 Area2D
+
+这样保留了当前 SwordWeapon 的 Tween 突刺视觉效果，同时避免了"同帧创建 Area2D 无法检测"的 Godot 物理时序问题（Area2D 存活多帧，通过 `area_entered` 信号异步检测）。AttackerComponent 只负责冷却和触发，不负责近战的碰撞检测细节。
 
 **加成系统：** 外部（WeaponManager 的被动系统、塔的 buff 系统）直接设置 `damage_multiplier` / `speed_multiplier`，AttackerComponent 在计算最终伤害/冷却时使用。不知道加成来源是什么。
 
@@ -94,12 +100,14 @@ ProjectileData (Resource)
 │
 ├─ 命中效果（数据驱动）：
 │   @export knockback_force: float = 0.0
-│   @export pierce_count: int = 0
+│   @export base_pierce_count: int = 0   # 基础穿透次数
 │   @export slow_ratio: float = 0.0
 │   @export slow_duration: float = 0.0
 ```
 
 投射物实例在 `setup()` 时从 ProjectileData 读取所有配置，不再访问 GameData。
+
+**Pierce 动态加成：** `ProjectileData.base_pierce_count` 是静态基础值（写在 .tres 中）。运行时被动加成的穿透通过 `setup()` 的额外参数注入：`setup(data, damage, from, direction, extra_pierce: int = 0)`。投射物实际穿透次数 = `data.base_pierce_count + extra_pierce`。WeaponManager 在创建投射物时从 `GameData.pierce_count` 读取 extra_pierce 并传入。塔的投射物不受被动穿透影响（extra_pierce=0）。
 
 ### 3. MeleeConfig
 
@@ -130,9 +138,13 @@ ProjectileBase (Node2D)
 │   → 加载并附加精灵
 │   → 启动生命计时器
 │
+├─ 信号：
+│   hit(position: Vector2, direction: Vector2)  # 命中时发射，供外部监听（如分裂）
+│
 ├─ _on_hit(enemy):
 │   → data.slow_ratio > 0 → enemy.slow_handler.apply_timed_slow(...)
-│   → data.pierce_count > 0 → hit_count += 1, 超出则销毁
+│   → emit hit(global_position, _direction)
+│   → pierce_count(= data.base_pierce_count + extra_pierce) > 0 → hit_count += 1, 超出则销毁
 │   → else → 直接销毁
 │
 ├─ _physics_process: 直线飞行（默认行为）
@@ -140,9 +152,24 @@ ProjectileBase (Node2D)
 
 **BulletProjectile 合并到 ProjectileBase：** 当前 BulletProjectile 的直线飞行 + 命中效果就是默认行为。trail 系统保留在 ProjectileBase 中。
 
-**split（分裂）移出投射物：** 分裂是被动技能效果，改由被动系统在 `attack_fired` 信号链中处理，不再由投射物自己负责。
+**split（分裂）移出投射物：** 分裂是被动技能效果，不再由投射物自己读取 GameData 处理。改为：
+1. WeaponManager 监听自己创建的每个投射物的 `hit` 信号（ProjectileBase 命中时新增发射 `hit(position, direction)` 信号）
+2. WeaponManager 检查 `GameData.split_count > 0` 且投射物非分裂子弹（`is_split` meta）
+3. 若满足条件，WeaponManager 调 `SceneFactory.create_projectile()` 生成分裂子弹，设置 `set_meta("is_split", true)`，伤害 = 原伤害 * `GameData.split_damage_mult`
+4. 分裂子弹不会再次分裂（通过 `is_split` meta 判断）
 
-**ShurikenProjectile 保留为子类：** 覆写飞行逻辑（二段弹跳），其余（命中效果、trail）继承 ProjectileBase。
+这样分裂逻辑完全在 WeaponManager 中，投射物保持纯净。塔的投射物不触发分裂（塔不经过 WeaponManager）。
+
+**ShurikenProjectile 保留为子类：** `extends ProjectileBase`（原 `extends Projectile`，需更新）。覆写飞行逻辑（二段弹跳），其余（命中效果、trail）继承 ProjectileBase。
+
+**class_name 更名影响：** `Projectile` → `ProjectileBase`。所有 `extends Projectile` 和类型引用需更新。涉及文件：`shuriken_projectile.gd`、`scene_factory.gd`、测试文件。
+
+**音效触发：** 攻击音效在宿主的信号处理器中播放（与当前一致）：
+- Weapon._on_attack_fired / _on_melee_triggered 中调 `AudioManager.play("shoot")`
+- TowerShooter._on_attack_fired 中调 `AudioManager.play("shoot")`
+不放在 AttackerComponent 中（组件不依赖 AudioManager）。
+
+**精灵附加统一到 ProjectileBase.setup()：** 当前 BowWeapon 和 TowerShooter 各自创建 Sprite2D 附加到投射物。重构后统一由 `ProjectileBase.setup()` 从 `data.sprite_path` 加载并附加精灵，调用者不再处理。
 
 ### 5. WeaponData 调整
 
@@ -151,7 +178,8 @@ ProjectileBase (Node2D)
 ```
 保留：
   damage_per_level, fire_rate_per_level, weapon_range_per_level
-  sell_price_per_level, rarity
+  sell_price_per_level
+  （注：rarity 字段当前不在 WeaponData 中，在 ShopConfig 商店系统管理，不涉及本次重构）
 
 新增：
   @export attack_mode: AttackMode  # RANGED / MELEE
@@ -162,9 +190,14 @@ ProjectileBase (Node2D)
 删除：
   projectile_type — 移入 ProjectileData.projectile_scene
   bullet_speed — 移入 ProjectileData.speed
-  knockback_force — 移入 ProjectileData/MeleeConfig
-  shuriken_speed, outbound_distance, return_speed_mult, shuriken_max_lifetime
-    — 移入手里剑的 ProjectileData 或 ShurikenProjectile 自身配置
+  knockback_force — 移入 ProjectileData.knockback_force 或 MeleeConfig.knockback_force
+
+手里剑专有字段迁移：
+  shuriken_speed → 使用 ProjectileData.speed（手里剑的 ProjectileData.tres 中配置）
+  shuriken_max_lifetime → 使用 ProjectileData.lifetime
+  outbound_distance, return_speed_mult → 移入 ShurikenProjectile 脚本的 @export 字段
+    （这些是弹跳飞行行为参数，属于 ShurikenProjectile 子类特有，不适合放在通用 ProjectileData 中）
+  bounce_range → 同上，移入 ShurikenProjectile @export
 ```
 
 ### 6. TowerData 调整
@@ -174,18 +207,30 @@ ProjectileBase (Node2D)
 ```
 保留：
   hp_per_level, damage_per_level, fire_rate_per_level, attack_range_per_level
-  sell_price_per_level, rarity
+  sell_price_per_level
   generate_amount_per_level, generate_interval_per_level（向日葵用）
+  （注：rarity 字段同 WeaponData，由商店系统管理）
 
 新增：
   @export projectile_data: ProjectileData  # 射手塔的投射物配置
 
-删除：
-  slow_ratio_per_level — 移入 ProjectileData.slow_ratio
-  slow_duration_per_level — 移入 ProjectileData.slow_duration
+保留（用于 per_level 覆写 ProjectileData，见上方冰花塔说明）：
+  slow_ratio_per_level
+  slow_duration_per_level
 ```
 
-注意：冰花塔的减速参数不再是 per_level 数组，而是固定在 ProjectileData 中。如果未来需要 per_level 减速，可以为每个等级创建不同的 ProjectileData，或在 TowerShooter 升级时动态修改 projectile_data 的值。当前 3 级塔的减速比例固定，不需要 per_level。
+**冰花塔 per_level 减速处理：** 当前 ice_flower.tres 有 per_level 减速值（Lv1: 0.3/1.5s, Lv2: 0.4/2.0s, Lv3: 0.5/2.5s）。ProjectileData 的 slow_ratio/slow_duration 是固定值，无法表达 per_level。解决方案：TowerShooter 在 `_apply_level_stats()` 时，动态覆写 `projectile_data.slow_ratio` 和 `projectile_data.slow_duration`（Resource 是引用类型，需要 `duplicate()` 避免污染原始配置）。即：
+```gdscript
+func _apply_level_stats():
+    # ... 其他 stats 更新 ...
+    if data.slow_ratio_per_level.size() > 0:
+        # duplicate 避免修改原始 Resource
+        var proj_data = data.projectile_data.duplicate()
+        proj_data.slow_ratio = data.slow_ratio_per_level[idx]
+        proj_data.slow_duration = data.slow_duration_per_level[idx]
+        attacker.projectile_data = proj_data
+```
+TowerData 保留 `slow_ratio_per_level` 和 `slow_duration_per_level` 字段（不删除），用于 per_level 覆写。
 
 ### 7. Weapon 脚本重构
 
@@ -197,22 +242,27 @@ Weapon (Node)
 ├─ attacker: AttackerComponent  # 动态创建的子节点
 ├─ _level: int
 │
-├─ initialize(data, level, owner_node):
+├─ initialize(data: WeaponData) → void:
+│   → 保存 data
 │   → 创建 AttackerComponent 并 add_child
-│   → attacker.init(
+│   → 连接 attacker 信号（attack_fired / melee_triggered）
+│
+├─ set_level(level: int) → void:
+│   → _level = level
+│   → attacker.update_stats(
 │       damage = data.damage_per_level[level-1],
 │       range = data.weapon_range_per_level[level-1],
-│       cooldown = data.fire_rate_per_level[level-1],
-│       attack_mode = data.attack_mode,
-│       projectile_data = data.projectile_data,
-│       melee_config = data.melee_config)
-│   → 连接 attacker 信号
+│       cooldown = data.fire_rate_per_level[level-1])
+│   → attacker.attack_mode = data.attack_mode
+│   → attacker.projectile_data = data.projectile_data
+│   → attacker.melee_config = data.melee_config
 │
 ├─ _on_attack_fired(target, proj_data):
-│   → 调 SceneFactory.create_projectile(proj_data, damage, pos, dir)
+│   → 调 SceneFactory.create_projectile(proj_data, damage, pos, dir, extra_pierce)
 │
-├─ _on_melee_hit(enemies):
-│   → 对每个敌人应用伤害和击退
+├─ _on_melee_triggered(target, melee_config):
+│   → 创建临时 Area2D + Tween 突刺动画（详见 AttackerComponent MELEE 模式说明）
+│   → area_entered 检测到 Hurtbox → 发射 hit_taken 信号
 ```
 
 **删除 BowWeapon 和 SwordWeapon 子类：** 通用 Weapon + WeaponData.attack_mode 即可覆盖。
@@ -236,9 +286,16 @@ Weapon (Node)
   × 武器类型判断（WeaponData.attack_mode 决定）
   × 被动名硬编码（统一读 player_stats multiplier）
 
-创建逻辑简化：
-  "bow" / "sword" → Weapon.new()
-  "shuriken"      → ShurikenWeapon.new()
+创建流程（_add_weapon）：
+  1. 根据 weapon_id match 创建实例：
+     "bow" / "sword" → Weapon.new()
+     "shuriken"      → ShurikenWeapon.new()
+  2. weapon.initialize(data)  # 传入 WeaponData
+  3. weapon.set_level(level)  # 配置等级参数
+  4. weapon.owner_node = player  # 设置宿主引用
+  5. weapon.attacker.target_finder = _find_nearest_enemy  # 注入目标查找
+  6. _apply_passive_to_weapon(weapon)  # 注入被动 multiplier
+  ShurikenWeapon 继承 Weapon，initialize/set_level 签名不变，仅覆写 _on_attack_fired
 ```
 
 ### 9. TowerShooter 调整
@@ -260,8 +317,15 @@ TowerShooter (extends Tower)
 │   → SceneFactory.create_projectile(proj_data, attacker.get_final_damage(), ...)
 │   → play_attack_animation()
 │
-├─ apply_buff → attacker.damage_multiplier / speed_multiplier
-├─ _apply_level_stats → attacker.update_stats(...)
+├─ apply_buff(dmg_mult, spd_mult, source_id):
+│   → attacker.damage_multiplier = dmg_mult
+│   → attacker.speed_multiplier = spd_mult
+│
+├─ _apply_level_stats():
+│   → attacker.update_stats(damage, range, cooldown)  # 从 TowerData per_level 读取
+│   → 基础 damage 已包含 TOWER_MULT：
+│       damage = data.damage_per_level[idx] * GameData.player_stats.get(Enums.Stat.TOWER_MULT, 1.0)
+│   → 冰花塔 per_level slow 覆写（见 TowerData 调整说明）
 ```
 
 ShootTimer 节点删除，由 AttackerComponent 内部冷却替代。
@@ -287,9 +351,17 @@ ShootTimer 节点删除，由 AttackerComponent 内部冷却替代。
 
 新增文件：`scripts/core/collision_layers.gd`
 
-```
+```gdscript
 class_name CollisionLayers
 
+# 层编号（1-32），用于 set_collision_layer_value() / set_collision_mask_value()
+const PLAYER_LAYER = 1     # bit value: 1
+const ENEMY_LAYER = 2      # bit value: 2
+const HITBOX_LAYER = 3     # bit value: 4
+const TOWER_LAYER = 4      # bit value: 8
+const HURTBOX_LAYER = 8    # bit value: 128
+
+# 位掩码值，用于直接赋值 collision_layer / collision_mask
 const PLAYER = 1
 const ENEMY = 2
 const HITBOX = 4
@@ -297,7 +369,7 @@ const TOWER = 8
 const HURTBOX = 128
 ```
 
-所有脚本中的碰撞层魔数替换为此常量引用。
+脚本中使用位掩码常量（`collision_layer = CollisionLayers.HITBOX`），`.tscn` 场景文件中的层配置通过编辑器设置（不需要代码修改，但确保与常量一致）。
 
 ### 12. 被动加成改造
 
@@ -376,8 +448,11 @@ TowerShooter._process(delta)
 WeaponManager.tick(delta)
 → weapon.attacker.tick(delta)
 → attacker: cooldown就绪 → target_finder.call(range) → 返回敌人
-→ attacker: MELEE模式 → 创建临时 HitArea(MeleeConfig)
-→ 检测范围内敌人 Hurtbox → emit melee_hit(enemies)
-→ weapon._on_melee_hit: 对每个敌人应用伤害和击退
-→ 临时 HitArea 自动销毁
+→ attacker: MELEE模式 → emit melee_triggered(target, melee_config)
+→ weapon._on_melee_triggered:
+  → 创建临时 Area2D(layer=HITBOX, mask=HURTBOX) 挂在精灵上
+  → Tween 突刺动画：精灵前进 thrust_distance 再收回（0.1s + 0.1s）
+  → 动画过程中 area_entered → Hurtbox.hit_taken.emit(damage, knockback)
+  → 动画结束 → queue_free() 临时 Area2D
+→ AudioManager.play("shoot")
 ```
