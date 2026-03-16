@@ -41,7 +41,9 @@ func _add_weapon(data: WeaponData, weapon_id: String) -> Weapon:
 		return null
 	weapon.initialize(data)
 	weapon.owner_node = get_parent() as Node2D
-	weapon.attacker.target_finder = _find_nearest_enemy
+	weapon.attacker.target_finder = func(range_limit: float) -> Node2D:
+		var origin: Vector2 = weapon.get_fire_position()
+		return _find_nearest_enemy_from(origin, range_limit)
 	add_child(weapon)
 	_weapons.append(weapon)
 	# 创建漂浮精灵
@@ -60,25 +62,25 @@ func tick(delta: float) -> void:
 	_current_target = _find_closest_enemy_unlimited()
 	_update_sprites(delta)
 
-func _find_nearest_enemy(range_limit: float) -> Node2D:
+func _find_nearest_enemy_from(origin: Vector2, range_limit: float) -> Node2D:
 	if not is_inside_tree():
-		return null
-	var owner_nd: Node2D = get_parent() as Node2D
-	if not owner_nd:
 		return null
 	var enemies: Array[Node] = get_tree().get_nodes_in_group(Enums.Group.ENEMIES)
 	var closest: Node2D = null
 	var min_dist: float = range_limit
 	for enemy in enemies:
 		if enemy is Node2D:
-			var dist: float = owner_nd.global_position.distance_to(enemy.global_position)
+			var dist: float = origin.distance_to(enemy.global_position)
 			if dist < min_dist:
 				min_dist = dist
 				closest = enemy
 	return closest
 
 func _find_closest_enemy_unlimited() -> Node2D:
-	return _find_nearest_enemy(INF)
+	var owner_nd: Node2D = get_parent() as Node2D
+	if not owner_nd:
+		return null
+	return _find_nearest_enemy_from(owner_nd.global_position, INF)
 
 func _apply_passive_to_weapon(weapon: Weapon) -> void:
 	var dmg_mult: float = GameData.player_stats.get(Enums.Stat.DAMAGE_MULT, 1.0)

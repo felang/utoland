@@ -84,7 +84,7 @@ func _on_melee_triggered(target: Node2D, config: MeleeConfig) -> void:
 	sprite.add_child(thrust_hitbox)
 	# 突刺动画
 	var original_pos: Vector2 = sprite.position
-	var thrust_pos: Vector2 = original_pos + thrust_direction * config.thrust_distance
+	var thrust_pos: Vector2 = original_pos + thrust_direction * attacker.attack_range
 	var tween := sprite.create_tween()
 	tween.tween_property(sprite, "position", thrust_pos, 0.1).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_QUAD)
 	tween.tween_property(sprite, "position", original_pos, 0.1).set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_QUAD)
