@@ -8,7 +8,7 @@ const SPLIT_LIFETIME: float = 1.5             # 分裂弹存活时间（秒）
 const SPLIT_KNOCKBACK_MULT: float = 0.5       # 分裂弹击退倍率
 const SPLIT_SPREAD_ANGLE: float = PI / 2      # 分裂弹扩散角度（弧度，±90°）
 
-var speed: float = 300.0
+var speed: float = 800.0
 var lifetime: float = 5.0
 var slow_on_hit: float = 0.0
 var slow_duration: float = 0.0
@@ -19,18 +19,21 @@ var _trail_positions: Array[Vector2] = []
 var _trail_max_points: int = 4
 ## 穿甲弹：当前已穿透的敌人数
 var _hit_count: int = 0
+## 是否显示拖尾
+var show_trail: bool = true
 
 func _on_setup(direction: Vector2) -> void:
 	_direction = direction
 	_elapsed = 0.0
-	var fx: EffectConfigData = GameConfig.effects
-	_trail_max_points = fx.bullet_trail_max_points
-	_trail = Line2D.new()
-	_trail.width = fx.bullet_trail_width
-	_trail.default_color = fx.bullet_trail_color
-	_trail.z_index = -1
-	_trail.top_level = true
-	add_child(_trail)
+	if show_trail:
+		var fx: EffectConfigData = GameConfig.effects
+		_trail_max_points = fx.bullet_trail_max_points
+		_trail = Line2D.new()
+		_trail.width = fx.bullet_trail_width
+		_trail.default_color = fx.bullet_trail_color
+		_trail.z_index = -1
+		_trail.top_level = true
+		add_child(_trail)
 	hitbox.area_entered.connect(_on_hitbox_area_entered)
 
 func _physics_process(delta: float) -> void:
