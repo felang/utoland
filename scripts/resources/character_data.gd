@@ -14,8 +14,6 @@ extends Resource
 @export var recommended_weapon: String = ""
 ## 角色推荐塔 ID（商店首次访问保证出现）
 @export var recommended_tower: String = ""
-## 协同标签（使用 Enums.Tag 常量）
-@export var tag: String = ""
 ## 旧被动技能类型（已弃用，保留兼容 .tres 文件）
 @export var passive_type: String = ""
 ## 被动技能数值

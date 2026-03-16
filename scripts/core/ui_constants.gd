@@ -14,11 +14,6 @@ const COLOR_BUTTON_HOVER := Color("#3a3a6a")
 const COLOR_BUTTON_PRESSED := Color("#1a1a3a")
 const COLOR_BUTTON_DISABLED := Color("#333333")
 
-# 稀有度色
-const COLOR_RARITY_COMMON := Color("#9e9e9e")
-const COLOR_RARITY_RARE := Color("#4fc3f7")
-const COLOR_RARITY_EPIC := Color("#ab47bc")
-
 # 亲和色
 const COLOR_AFFINITY_SHOOTER := Color("#3388ff")
 const COLOR_AFFINITY_ENGINEER := Color("#33cc55")
@@ -45,15 +40,6 @@ const BUTTON_PADDING_H := 12
 const BUTTON_PADDING_V := 8
 
 # ===== 辅助方法 =====
-
-static func get_rarity_color(rarity: String) -> Color:
-	match rarity:
-		"rare":
-			return COLOR_RARITY_RARE
-		"epic":
-			return COLOR_RARITY_EPIC
-		_:
-			return COLOR_RARITY_COMMON
 
 static func create_panel_stylebox(bg_color := COLOR_BG_PANEL_ALPHA, corner := CORNER_RADIUS_PANEL, border_color := Color.TRANSPARENT, border_width := 0) -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
