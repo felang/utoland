@@ -18,7 +18,7 @@ func fire(target: Node2D) -> void:
 	if _is_thrusting:
 		return
 	_base_damage = get_damage() * GameData.player_stats.get(Enums.Stat.DAMAGE_MULT, 1.0)
-	_thrust_direction = owner_node.global_position.direction_to(target.global_position)
+	_thrust_direction = sprite.global_position.direction_to(target.global_position)
 	_hit_enemies.clear()
 	_is_thrusting = true
 	# 创建突刺 hitbox 挂在精灵上
