@@ -3,7 +3,7 @@ extends GutTest
 func _make_weapon_option() -> Dictionary:
 	return {
 		"type": "weapon",
-		"id": Enums.WeaponId.RIFLE,
+		"id": Enums.WeaponId.BOW,
 		"is_new": false,
 		"current_level": 1,
 		"target_level": 2,

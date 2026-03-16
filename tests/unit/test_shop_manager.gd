@@ -1,6 +1,6 @@
 extends GutTest
 ## ShopManager 单元测试
-## 覆盖：刷新商店、首次刷新保证推荐物品、购买逻辑、手动刷新、稀有度权重
+## 覆盖：刷新商店、首次刷新保证推荐物品、购买逻辑、手动刷新
 
 var _shop: ShopManager
 
@@ -27,16 +27,14 @@ func test_refresh_shop_slots_have_required_fields() -> void:
 			continue
 		assert_true(slot.has("id"), "槽位应有 id")
 		assert_true(slot.has("type"), "槽位应有 type")
-		assert_true(slot.has("rarity"), "槽位应有 rarity")
 		assert_true(slot.has("cost"), "槽位应有 cost")
 
-func test_refresh_shop_level1_all_rarity0() -> void:
-	# level 1 权重 [100, 0, 0]，所有物品均为 common (rarity 0)
-	GameData.player_level = 1
+func test_refresh_shop_all_cost_equals_item_cost() -> void:
+	var config: ShopConfig = GameConfig.shop_config
 	_shop.refresh_shop()
 	for slot in GameData.shop_slots:
 		if not slot.is_empty():
-			assert_eq(slot.rarity, 0, "等级 1 时所有槽位应为稀有度 0")
+			assert_eq(slot.cost, config.item_cost, "所有槽位费用应为 item_cost")
 
 func test_refresh_shop_type_is_weapon_or_tower() -> void:
 	_shop.refresh_shop()
@@ -47,17 +45,17 @@ func test_refresh_shop_type_is_weapon_or_tower() -> void:
 # ===== 首次刷新保证推荐物品 =====
 
 func test_first_shop_has_recommended_weapon() -> void:
-	GameData._recommended_weapon = "rifle"
+	GameData._recommended_weapon = "bow"
 	GameData._recommended_tower = "pea_shooter"
 	_shop.refresh_shop(true)
 	var ids: Array[String] = []
 	for slot in GameData.shop_slots:
 		if not slot.is_empty():
 			ids.append(slot.id)
-	assert_true("rifle" in ids, "首次商店应包含推荐武器 rifle")
+	assert_true("bow" in ids, "首次商店应包含推荐武器 bow")
 
 func test_first_shop_has_recommended_tower() -> void:
-	GameData._recommended_weapon = "rifle"
+	GameData._recommended_weapon = "bow"
 	GameData._recommended_tower = "pea_shooter"
 	_shop.refresh_shop(true)
 	var ids: Array[String] = []
@@ -67,13 +65,13 @@ func test_first_shop_has_recommended_tower() -> void:
 	assert_true("pea_shooter" in ids, "首次商店应包含推荐塔 pea_shooter")
 
 func test_first_shop_recommended_weapon_is_first_slot() -> void:
-	GameData._recommended_weapon = "rifle"
+	GameData._recommended_weapon = "bow"
 	GameData._recommended_tower = "pea_shooter"
 	_shop.refresh_shop(true)
-	assert_eq(GameData.shop_slots[0].id, "rifle", "首次商店第 0 槽为推荐武器")
+	assert_eq(GameData.shop_slots[0].id, "bow", "首次商店第 0 槽为推荐武器")
 
 func test_first_shop_recommended_tower_is_second_slot() -> void:
-	GameData._recommended_weapon = "rifle"
+	GameData._recommended_weapon = "bow"
 	GameData._recommended_tower = "pea_shooter"
 	_shop.refresh_shop(true)
 	assert_eq(GameData.shop_slots[1].id, "pea_shooter", "首次商店第 1 槽为推荐塔")
@@ -126,7 +124,7 @@ func test_buy_item_fails_insufficient_coins() -> void:
 func test_buy_item_fails_when_bag_full() -> void:
 	var config: ShopConfig = GameConfig.shop_config
 	for idx in range(config.bag_capacity):
-		GameData.bag.append({id = "rifle", type = "weapon", level = 1})
+		GameData.bag.append({id = "bow", type = "weapon", level = 1})
 	_shop.refresh_shop()
 	if GameData.shop_slots[0].is_empty():
 		pass_test("槽位为空，跳过测试")
@@ -158,20 +156,20 @@ func test_buy_item_returns_true_on_success() -> void:
 # ===== buy_item 触发合成 =====
 
 func test_buy_item_triggers_merge_when_3_of_same() -> void:
-	# 背包中已有同 ID Lv1 物品 x2，再购买第 3 个触发合成 → 变成 Lv2
+	# 背包中已有同 ID Lv1 物品 x2，再购买第 3 个触发合成 -> 变成 Lv2
 	GameData.coins = 9999
-	GameData.bag.append({id = "rifle", type = "weapon", level = 1})
-	GameData.bag.append({id = "rifle", type = "weapon", level = 1})
-	# 手动设置商店槽位为 rifle Lv1
+	GameData.bag.append({id = "bow", type = "weapon", level = 1})
+	GameData.bag.append({id = "bow", type = "weapon", level = 1})
+	# 手动设置商店槽位为 bow Lv1
 	GameData.shop_slots = [
-		{id = "rifle", type = "weapon", rarity = 0, cost = 3},
+		{id = "bow", type = "weapon", cost = 3},
 		{}, {}, {}
 	]
 	_shop.buy_item(0)
-	# 3 个 rifle Lv1 → 合成为 1 个 rifle Lv2
+	# 3 个 bow Lv1 -> 合成为 1 个 bow Lv2
 	var lv2_count: int = 0
 	for item in GameData.bag:
-		if item.id == "rifle" and item.level == 2:
+		if item.id == "bow" and item.level == 2:
 			lv2_count += 1
 	assert_eq(lv2_count, 1, "3 个同 ID Lv1 购买后应合成为 1 个 Lv2")
 
@@ -213,13 +211,12 @@ func test_manual_refresh_generates_new_slots() -> void:
 	_shop.manual_refresh()
 	assert_eq(GameData.shop_slots.size(), 4, "手动刷新后应有 4 个槽位")
 
-# ===== 槽位费用匹配稀有度 =====
+# ===== 槽位费用匹配 item_cost =====
 
-func test_slot_cost_matches_rarity_config() -> void:
+func test_slot_cost_matches_item_cost() -> void:
 	var config: ShopConfig = GameConfig.shop_config
 	_shop.refresh_shop()
 	for slot in GameData.shop_slots:
 		if not slot.is_empty():
-			var expected_cost: int = config.cost_by_rarity[slot.rarity]
-			assert_eq(slot.cost, expected_cost,
-				"槽位费用应与稀有度对应的 cost_by_rarity 一致 (rarity=%d)" % slot.rarity)
+			assert_eq(slot.cost, config.item_cost,
+				"槽位费用应与 item_cost 一致")

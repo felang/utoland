@@ -18,12 +18,3 @@ func test_all_towers_have_max_level_3() -> void:
 		var td: TowerData = GameConfig.towers[tower_id]
 		assert_eq(td.max_level, 3,
 			"%s 的 max_level 应为 3" % tower_id)
-
-func test_bamboo_charge_time() -> void:
-	var td: TowerData = GameConfig.towers[Enums.TowerId.BAMBOO]
-	assert_almost_eq(td.charge_time, 12.0, 0.001, "Bamboo charge_time 应为 12.0")
-
-# --- Dandelion ---
-func test_dandelion_knockback_interval() -> void:
-	var td: TowerData = GameConfig.towers[Enums.TowerId.DANDELION]
-	assert_almost_eq(td.knockback_interval, 4.0, 0.001, "Dandelion knockback_interval 应为 4.0")

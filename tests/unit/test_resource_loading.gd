@@ -7,13 +7,13 @@ extends GutTest
 # ===== 武器资源加载 =====
 
 func test_weapons_loaded_count() -> void:
-	assert_eq(GameConfig.weapons.size(), 10, "应加载 10 种武器")
+	assert_eq(GameConfig.weapons.size(), 3, "应加载 3 种武器")
 
-func test_weapon_rifle_resource() -> void:
-	assert_true(GameConfig.weapons.has(Enums.WeaponId.RIFLE), "应包含 rifle")
-	var w: WeaponData = GameConfig.weapons[Enums.WeaponId.RIFLE]
-	assert_eq(w.id, Enums.WeaponId.RIFLE)
-	assert_eq(w.display_name, "步枪")
+func test_weapon_bow_resource() -> void:
+	assert_true(GameConfig.weapons.has(Enums.WeaponId.BOW), "应包含 bow")
+	var w: WeaponData = GameConfig.weapons[Enums.WeaponId.BOW]
+	assert_eq(w.id, Enums.WeaponId.BOW)
+	assert_eq(w.display_name, "弓")
 	assert_eq(w.projectile_type, Enums.ProjectileId.BULLET)
 	assert_almost_eq(w.fire_rate_per_level[0], 0.12, 0.001)
 	assert_almost_eq(w.damage_per_level[0], 8.0, 0.001)
@@ -31,15 +31,11 @@ func test_weapon_boomerang_resource() -> void:
 	assert_eq(w.outbound_distance, 100.0)
 	assert_eq(w.return_speed_mult, 1.3)
 
-func test_weapon_laser_resource() -> void:
-	assert_true(GameConfig.weapons.has(Enums.WeaponId.LASER), "应包含 laser")
-	var w: WeaponData = GameConfig.weapons[Enums.WeaponId.LASER]
-	assert_eq(w.projectile_type, Enums.ProjectileId.LASER)
-	assert_almost_eq(w.fire_rate_per_level[0], 0.15, 0.001)
-	assert_almost_eq(w.damage_per_level[0], 12.0, 0.001)
-	assert_eq(w.beam_range, 200.0)
-	assert_eq(w.beam_width, 2.0)
-	assert_eq(w.beam_duration, 0.08)
+func test_weapon_sword_resource() -> void:
+	assert_true(GameConfig.weapons.has(Enums.WeaponId.SWORD), "应包含 sword")
+	var w: WeaponData = GameConfig.weapons[Enums.WeaponId.SWORD]
+	assert_eq(w.weapon_type, "sword")
+	assert_almost_eq(w.damage_per_level[0], 20.0, 0.001)
 
 
 # ===== 敌人资源加载 =====
@@ -75,7 +71,7 @@ func test_enemy_tank_resource() -> void:
 # ===== 塔资源加载 =====
 
 func test_towers_loaded_count() -> void:
-	assert_eq(GameConfig.towers.size(), 15, "应加载 15 种塔")
+	assert_eq(GameConfig.towers.size(), 3, "应加载 3 种塔")
 
 func test_tower_pea_shooter_resource() -> void:
 	var t: TowerData = GameConfig.towers[Enums.TowerId.PEA_SHOOTER]
@@ -84,11 +80,6 @@ func test_tower_pea_shooter_resource() -> void:
 	assert_almost_eq(t.damage_per_level[0], 15.0, 0.001)
 	assert_almost_eq(t.fire_rate_per_level[0], 1.0, 0.001)
 	assert_almost_eq(t.attack_range_per_level[0], 150.0, 0.001)
-
-func test_tower_stump_resource() -> void:
-	var t: TowerData = GameConfig.towers[Enums.TowerId.STUMP]
-	assert_almost_eq(t.hp_per_level[0], 300.0, 0.001)
-	assert_almost_eq(t.damage_per_level[0], 0.0, 0.001)
 
 func test_tower_ice_flower_resource() -> void:
 	var t: TowerData = GameConfig.towers[Enums.TowerId.ICE_FLOWER]
@@ -130,27 +121,27 @@ func test_character_dora_resource() -> void:
 	assert_eq(c.max_hp, 100.0)
 	assert_eq(c.speed, 100.0)
 	assert_eq(c.damage_mult, 1.0)
-	assert_eq(c.recommended_weapon, Enums.WeaponId.RIFLE)
+	assert_eq(c.recommended_weapon, Enums.WeaponId.BOW)
 
 func test_character_gorg_resource() -> void:
 	var c: CharacterData = GameConfig.characters[Enums.Character.GORG]
 	assert_eq(c.display_name, "格格")
-	assert_eq(c.recommended_weapon, Enums.WeaponId.BLADE)
+	assert_eq(c.recommended_weapon, Enums.WeaponId.SWORD)
 
 func test_character_kaze_resource() -> void:
 	var c: CharacterData = GameConfig.characters[Enums.Character.KAZE]
 	assert_eq(c.display_name, "风")
-	assert_eq(c.recommended_weapon, Enums.WeaponId.MINIGUN)
+	assert_eq(c.recommended_weapon, Enums.WeaponId.BOW)
 
 func test_character_merlin_resource() -> void:
 	var c: CharacterData = GameConfig.characters[Enums.Character.MERLIN]
 	assert_eq(c.display_name, "梅林")
-	assert_eq(c.recommended_weapon, Enums.WeaponId.LASER)
+	assert_eq(c.recommended_weapon, Enums.WeaponId.BOOMERANG)
 
 func test_character_nemo_resource() -> void:
 	var c: CharacterData = GameConfig.characters[Enums.Character.NEMO]
 	assert_eq(c.display_name, "尼莫")
-	assert_eq(c.recommended_weapon, Enums.WeaponId.ICE_GUN)
+	assert_eq(c.recommended_weapon, Enums.WeaponId.BOOMERANG)
 
 func test_character_has_sprite_frames_path() -> void:
 	var c: CharacterData = GameConfig.characters[Enums.Character.DORA]
@@ -199,12 +190,12 @@ func test_normal_enemy_not_boss():
 
 
 func test_weapon_has_weapon_type():
-	var rifle: WeaponData = GameConfig.weapons[Enums.WeaponId.RIFLE]
-	assert_eq(rifle.weapon_type, "bullet", "rifle weapon_type 应为 bullet")
+	var bow: WeaponData = GameConfig.weapons[Enums.WeaponId.BOW]
+	assert_eq(bow.weapon_type, "bow", "bow weapon_type 应为 bow")
 	var boom: WeaponData = GameConfig.weapons[Enums.WeaponId.BOOMERANG]
 	assert_eq(boom.weapon_type, "boomerang", "boomerang weapon_type 应为 boomerang")
-	var laser: WeaponData = GameConfig.weapons[Enums.WeaponId.LASER]
-	assert_eq(laser.weapon_type, "laser", "laser weapon_type 应为 laser")
+	var sword: WeaponData = GameConfig.weapons[Enums.WeaponId.SWORD]
+	assert_eq(sword.weapon_type, "sword", "sword weapon_type 应为 sword")
 
 
 func test_player_const_unchanged() -> void:

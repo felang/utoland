@@ -47,7 +47,7 @@ func test_get_population_used_empty() -> void:
 	assert_eq(GameData.get_population_used(), 0)
 
 func test_get_population_used_with_deployed() -> void:
-	GameData.deployed_weapons.append({id = "rifle", level = 1})
+	GameData.deployed_weapons.append({id = "bow", level = 1})
 	GameData.deployed_towers.append({id = "pea_shooter", level = 1, grid_pos = Vector2i(0, 0)})
 	assert_eq(GameData.get_population_used(), 2)
 
@@ -61,7 +61,7 @@ func test_can_deploy_when_under_cap() -> void:
 func test_can_deploy_when_at_cap() -> void:
 	GameData.player_level = 1
 	# cap=2, fill with 2 deployed
-	GameData.deployed_weapons.append({id = "rifle", level = 1})
+	GameData.deployed_weapons.append({id = "bow", level = 1})
 	GameData.deployed_towers.append({id = "pea_shooter", level = 1, grid_pos = Vector2i(0, 0)})
 	assert_false(GameData.can_deploy())
 
@@ -73,7 +73,7 @@ func test_can_buy_when_bag_empty() -> void:
 func test_can_buy_when_bag_full() -> void:
 	var config: ShopConfig = GameConfig.shop_config
 	for idx in range(config.bag_capacity):
-		GameData.bag.append({id = "rifle", type = "weapon", level = 1})
+		GameData.bag.append({id = "bow", type = "weapon", level = 1})
 	assert_false(GameData.can_buy())
 
 # ===== buy_level_up =====
@@ -119,20 +119,20 @@ func test_buy_level_up_emits_signal() -> void:
 
 func test_deploy_weapon_success() -> void:
 	GameData.player_level = 1
-	GameData.bag.append({id = "rifle", type = "weapon", level = 1})
+	GameData.bag.append({id = "bow", type = "weapon", level = 1})
 	var result: bool = GameData.deploy_weapon(0)
 	assert_true(result)
 	assert_eq(GameData.bag.size(), 0)
 	assert_eq(GameData.deployed_weapons.size(), 1)
-	assert_eq(GameData.deployed_weapons[0].id, "rifle")
+	assert_eq(GameData.deployed_weapons[0].id, "bow")
 	assert_eq(GameData.deployed_weapons[0].level, 1)
 
 func test_deploy_weapon_fails_when_population_full() -> void:
 	GameData.player_level = 1
 	# 填满种群上限（cap=2）
-	GameData.deployed_weapons.append({id = "laser", level = 1})
+	GameData.deployed_weapons.append({id = "bow", level = 1})
 	GameData.deployed_towers.append({id = "pea_shooter", level = 1, grid_pos = Vector2i(0, 0)})
-	GameData.bag.append({id = "rifle", type = "weapon", level = 1})
+	GameData.bag.append({id = "bow", type = "weapon", level = 1})
 	var result: bool = GameData.deploy_weapon(0)
 	assert_false(result)
 	assert_eq(GameData.bag.size(), 1)
@@ -152,11 +152,11 @@ func test_deploy_weapon_fails_invalid_index() -> void:
 # ===== undeploy_weapon =====
 
 func test_undeploy_weapon_success() -> void:
-	GameData.deployed_weapons.append({id = "rifle", level = 2})
+	GameData.deployed_weapons.append({id = "bow", level = 2})
 	GameData.undeploy_weapon(0)
 	assert_eq(GameData.deployed_weapons.size(), 0)
 	assert_eq(GameData.bag.size(), 1)
-	assert_eq(GameData.bag[0].id, "rifle")
+	assert_eq(GameData.bag[0].id, "bow")
 	assert_eq(GameData.bag[0].type, "weapon")
 	assert_eq(GameData.bag[0].level, 2)
 
@@ -179,7 +179,7 @@ func test_deploy_tower_success() -> void:
 
 func test_deploy_tower_fails_wrong_type() -> void:
 	GameData.player_level = 2
-	GameData.bag.append({id = "rifle", type = "weapon", level = 1})
+	GameData.bag.append({id = "bow", type = "weapon", level = 1})
 	var result: int = GameData.deploy_tower(0, Vector2i(0, 0))
 	assert_eq(result, 0)
 	assert_eq(GameData.bag.size(), 1)
@@ -194,7 +194,7 @@ func test_deploy_tower_returns_deploy_id() -> void:
 func test_deploy_tower_increments_deploy_id() -> void:
 	GameData.player_level = 3
 	GameData.bag.append({id = "pea_shooter", type = "tower", level = 1})
-	GameData.bag.append({id = "stump", type = "tower", level = 1})
+	GameData.bag.append({id = "ice_flower", type = "tower", level = 1})
 	var id1: int = GameData.deploy_tower(0, Vector2i(5, 5))
 	var id2: int = GameData.deploy_tower(0, Vector2i(10, 10))
 	assert_ne(id1, id2)
@@ -235,7 +235,7 @@ func test_undeploy_tower_invalid_deploy_id() -> void:
 func test_undeploy_tower_correct_item_when_multiple() -> void:
 	GameData.player_level = 3
 	GameData.bag.append({id = "pea_shooter", type = "tower", level = 1})
-	GameData.bag.append({id = "stump", type = "tower", level = 1})
+	GameData.bag.append({id = "ice_flower", type = "tower", level = 1})
 	var id1: int = GameData.deploy_tower(0, Vector2i(5, 5))
 	var id2: int = GameData.deploy_tower(0, Vector2i(10, 10))
 	GameData.undeploy_tower(id1)
@@ -245,8 +245,8 @@ func test_undeploy_tower_correct_item_when_multiple() -> void:
 # ===== sell_from_bag =====
 
 func test_sell_from_bag_lv1_weapon() -> void:
-	# rifle lv1 sell_price = 3
-	GameData.bag.append({id = "rifle", type = "weapon", level = 1})
+	# bow lv1 sell_price = 3
+	GameData.bag.append({id = "bow", type = "weapon", level = 1})
 	var initial_coins: int = GameData.coins
 	var refund: int = GameData.sell_from_bag(0)
 	assert_eq(refund, 3)
@@ -254,8 +254,8 @@ func test_sell_from_bag_lv1_weapon() -> void:
 	assert_eq(GameData.bag.size(), 0)
 
 func test_sell_from_bag_lv2_weapon() -> void:
-	# rifle lv2 sell_price = 7
-	GameData.bag.append({id = "rifle", type = "weapon", level = 2})
+	# bow lv2 sell_price = 7
+	GameData.bag.append({id = "bow", type = "weapon", level = 2})
 	var initial_coins: int = GameData.coins
 	var refund: int = GameData.sell_from_bag(0)
 	assert_eq(refund, 7)
@@ -279,8 +279,8 @@ func test_sell_from_bag_invalid_index() -> void:
 # ===== sell_from_deployed_weapon =====
 
 func test_sell_from_deployed_weapon() -> void:
-	# rifle lv1 sell_price = 3
-	GameData.deployed_weapons.append({id = "rifle", level = 1})
+	# bow lv1 sell_price = 3
+	GameData.deployed_weapons.append({id = "bow", level = 1})
 	var initial_coins: int = GameData.coins
 	var refund: int = GameData.sell_from_deployed_weapon(0)
 	assert_eq(refund, 3)
@@ -328,7 +328,7 @@ func test_move_tower_invalid_id() -> void:
 func test_move_tower_occupied() -> void:
 	GameData.player_level = 3
 	GameData.bag.append({id = "pea_shooter", type = "tower", level = 1})
-	GameData.bag.append({id = "stump", type = "tower", level = 1})
+	GameData.bag.append({id = "ice_flower", type = "tower", level = 1})
 	GameData.deploy_tower(0, Vector2i(5, 5))
 	var id2: int = GameData.deploy_tower(0, Vector2i(10, 10))
 	var result: bool = GameData.move_tower(id2, Vector2i(5, 5))

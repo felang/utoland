@@ -6,19 +6,19 @@ func test_weapon_manager_starts_empty():
 	add_child_autofree(mgr)
 	assert_eq(mgr._weapons.size(), 0)
 
-func test_add_weapon_creates_bullet_weapon():
+func test_add_weapon_creates_bow_weapon():
 	var mgr = WeaponManager.new()
 	add_child_autofree(mgr)
 	var data = WeaponData.new()
-	data.id = "test_bullet"
+	data.id = "test_bow"
 	data.projectile_type = Enums.ProjectileId.BULLET
-	data.weapon_type = "bullet"
+	data.weapon_type = "bow"
 	data.fire_rate_per_level = PackedFloat32Array([0.5])
 	data.damage_per_level = PackedFloat32Array([10.0])
 	data.weapon_range_per_level = PackedFloat32Array([300.0])
 	mgr._add_weapon(data)
 	assert_eq(mgr._weapons.size(), 1)
-	assert_true(mgr._weapons[0] is BulletWeapon)
+	assert_true(mgr._weapons[0] is BowWeapon)
 
 func test_add_weapon_creates_boomerang_weapon():
 	var mgr = WeaponManager.new()
@@ -34,16 +34,16 @@ func test_add_weapon_creates_boomerang_weapon():
 	assert_eq(mgr._weapons.size(), 1)
 	assert_true(mgr._weapons[0] is BoomerangWeapon)
 
-func test_add_weapon_creates_laser_weapon():
+func test_add_weapon_creates_sword_weapon():
 	var mgr = WeaponManager.new()
 	add_child_autofree(mgr)
 	var data = WeaponData.new()
-	data.id = "test_laser"
-	data.projectile_type = Enums.ProjectileId.LASER
-	data.weapon_type = "laser"
-	data.fire_rate_per_level = PackedFloat32Array([2.0])
-	data.damage_per_level = PackedFloat32Array([30.0])
-	data.weapon_range_per_level = PackedFloat32Array([400.0])
+	data.id = "test_sword"
+	data.projectile_type = ""
+	data.weapon_type = "sword"
+	data.fire_rate_per_level = PackedFloat32Array([0.4])
+	data.damage_per_level = PackedFloat32Array([20.0])
+	data.weapon_range_per_level = PackedFloat32Array([60.0])
 	mgr._add_weapon(data)
 	assert_eq(mgr._weapons.size(), 1)
-	assert_true(mgr._weapons[0] is LaserWeapon)
+	assert_true(mgr._weapons[0] is SwordWeapon)

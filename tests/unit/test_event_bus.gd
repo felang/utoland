@@ -68,5 +68,5 @@ func test_tower_placed_signal():
 
 func test_tower_destroyed_signal():
 	watch_signals(EventBus)
-	EventBus.tower_destroyed.emit(Enums.TowerId.STUMP, Vector2(150, 250))
+	EventBus.tower_destroyed.emit(Enums.TowerId.ICE_FLOWER, Vector2(150, 250))
 	assert_signal_emitted(EventBus, "tower_destroyed")

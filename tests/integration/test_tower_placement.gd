@@ -21,13 +21,13 @@ func test_place_shooter_tower():
 	assert_gt(tower.health.current_hp, 0, "Tower should have positive HP")
 
 func test_place_wall_tower():
-	var tower = SceneFactory.create_tower(Enums.TowerId.STUMP)
+	var tower = SceneFactory.create_tower(Enums.TowerId.ICE_FLOWER)
 	assert_not_null(tower, "Wall tower should be created")
 
 	test_scene.add_child(tower)
 	tower.global_position = Vector2(200, 200)
 
-	assert_eq(tower.tower_type, Enums.TowerId.STUMP, "Tower type should be 'wall'")
+	assert_eq(tower.tower_type, Enums.TowerId.ICE_FLOWER, "Tower type should be 'wall'")
 	assert_true(tower.is_in_group(Enums.Group.TOWERS), "Tower should be in 'towers' group")
 
 func test_place_slow_tower():
@@ -42,7 +42,7 @@ func test_place_slow_tower():
 
 func test_tower_data_sell_price():
 	var shooter_td: TowerData = GameConfig.towers[Enums.TowerId.PEA_SHOOTER]
-	var wall_td: TowerData = GameConfig.towers[Enums.TowerId.STUMP]
+	var wall_td: TowerData = GameConfig.towers[Enums.TowerId.ICE_FLOWER]
 	var slow_td: TowerData = GameConfig.towers[Enums.TowerId.ICE_FLOWER]
 
 	assert_gt(shooter_td.sell_price_per_level[0], 0, "Shooter sell price should be positive")
@@ -90,8 +90,8 @@ func test_tower_hp_from_config():
 	var expected_hp = GameConfig.towers[Enums.TowerId.PEA_SHOOTER].hp_per_level[0]
 	assert_eq(shooter.health.current_hp, expected_hp, "Shooter tower HP should match config")
 
-	var wall = SceneFactory.create_tower(Enums.TowerId.STUMP)
+	var wall = SceneFactory.create_tower(Enums.TowerId.ICE_FLOWER)
 	test_scene.add_child(wall)
 
-	expected_hp = GameConfig.towers[Enums.TowerId.STUMP].hp_per_level[0]
+	expected_hp = GameConfig.towers[Enums.TowerId.ICE_FLOWER].hp_per_level[0]
 	assert_eq(wall.health.current_hp, expected_hp, "Wall tower HP should match config")

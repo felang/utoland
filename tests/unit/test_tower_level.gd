@@ -14,9 +14,9 @@ func test_tower_data_has_level_fields():
 	assert_eq(td.damage_per_level.size(), 3, "damage_per_level 应有 3 级")
 	assert_eq(td.sell_price_per_level.size(), 3, "sell_price_per_level 应有 3 级")
 
-func test_tower_wall_has_level_fields():
-	var td: TowerData = GameConfig.towers["stump"]
-	assert_eq(td.hp_per_level.size(), 3, "墙塔应有 3 级 HP")
+func test_tower_ice_flower_has_level_fields():
+	var td: TowerData = GameConfig.towers["ice_flower"]
+	assert_eq(td.hp_per_level.size(), 3, "冰花塔应有 3 级 HP")
 
 func test_tower_slow_has_level_fields():
 	var td: TowerData = GameConfig.towers["ice_flower"]

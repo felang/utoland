@@ -164,7 +164,7 @@ func test_enemy_drops_correct_coin_count():
 
 func test_tower_takes_damage_from_enemy():
 	# Test that tower can take damage
-	var tower = SceneFactory.create_tower(Enums.TowerId.STUMP)
+	var tower = SceneFactory.create_tower(Enums.TowerId.ICE_FLOWER)
 	test_scene.add_child(tower)
 
 	var initial_hp = tower.health.current_hp
@@ -176,7 +176,7 @@ func test_tower_takes_damage_from_enemy():
 
 func test_tower_destroyed_at_zero_hp():
 	# Test that tower is destroyed when HP reaches zero
-	var tower = SceneFactory.create_tower(Enums.TowerId.STUMP)
+	var tower = SceneFactory.create_tower(Enums.TowerId.ICE_FLOWER)
 	test_scene.add_child(tower)
 
 	var initial_hp = tower.health.current_hp

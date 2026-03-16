@@ -58,10 +58,10 @@ func test_remove_tower_node() -> void:
 
 func test_remove_tower_nodes_batch() -> void:
 	GameData.bag.append({id = "pea_shooter", type = "tower", level = 1})
-	GameData.bag.append({id = "stump", type = "tower", level = 1})
+	GameData.bag.append({id = "ice_flower", type = "tower", level = 1})
 	var id1: int = GameData.deploy_tower(0, Vector2i(5, 5))
 	var id2: int = GameData.deploy_tower(0, Vector2i(10, 10))
 	_drag_manager._spawn_tower_node(id1, "pea_shooter", 1, Vector2i(5, 5))
-	_drag_manager._spawn_tower_node(id2, "stump", 1, Vector2i(10, 10))
+	_drag_manager._spawn_tower_node(id2, "ice_flower", 1, Vector2i(10, 10))
 	_drag_manager.remove_tower_nodes([id1, id2])
 	assert_eq(_drag_manager._tower_nodes.size(), 0)

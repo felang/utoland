@@ -3,16 +3,13 @@ extends GutTest
 # 验证 GameConfig.weapons 包含正确的武器配置
 
 func test_weapons_count():
-	assert_eq(GameConfig.weapons.size(), 10, "应有 10 把武器")
+	assert_eq(GameConfig.weapons.size(), 3, "应有 3 把武器")
 
-func test_rifle_has_projectile_type():
-	assert_eq(GameConfig.weapons[Enums.WeaponId.RIFLE].projectile_type, Enums.ProjectileId.BULLET, "步枪弹道类型应为 bullet")
+func test_bow_has_projectile_type():
+	assert_eq(GameConfig.weapons[Enums.WeaponId.BOW].projectile_type, Enums.ProjectileId.BULLET, "弓弹道类型应为 bullet")
 
 func test_boomerang_has_projectile_type():
 	assert_eq(GameConfig.weapons[Enums.WeaponId.BOOMERANG].projectile_type, Enums.ProjectileId.BOOMERANG, "回旋镖弹道类型应为 boomerang")
-
-func test_laser_has_projectile_type():
-	assert_eq(GameConfig.weapons[Enums.WeaponId.LASER].projectile_type, Enums.ProjectileId.LASER, "激光枪弹道类型应为 laser")
 
 func test_all_weapons_have_range():
 	for weapon_id in GameConfig.weapons:
@@ -25,55 +22,19 @@ func test_boomerang_has_required_fields():
 	assert_gt(w.outbound_distance, 0.0, "回旋镖应有 outbound_distance")
 	assert_gt(w.return_speed_mult, 0.0, "回旋镖应有 return_speed_mult")
 
-func test_laser_has_required_fields():
-	var w: WeaponData = GameConfig.weapons[Enums.WeaponId.LASER]
-	assert_gt(w.beam_range, 0.0, "激光应有 beam_range")
-	assert_gt(w.beam_width, 0.0, "激光应有 beam_width")
-	assert_gt(w.beam_duration, 0.0, "激光应有 beam_duration")
-
 func test_all_weapons_have_weapon_type():
 	for id in GameConfig.weapons:
 		var w: WeaponData = GameConfig.weapons[id]
 		assert_ne(w.weapon_type, "", id + " 应有 weapon_type")
 
-func test_shotgun_resource_loaded():
-	assert_true(GameConfig.weapons.has(Enums.WeaponId.SHOTGUN), "应包含 shotgun")
-	var w: WeaponData = GameConfig.weapons[Enums.WeaponId.SHOTGUN]
-	assert_eq(w.weapon_type, "shotgun")
+func test_bow_resource_loaded():
+	assert_true(GameConfig.weapons.has(Enums.WeaponId.BOW), "应包含 bow")
+	var w: WeaponData = GameConfig.weapons[Enums.WeaponId.BOW]
+	assert_eq(w.weapon_type, "bow")
 	assert_eq(w.projectile_type, Enums.ProjectileId.BULLET)
-	assert_gt(w.bullet_count, 1, "霰弹枪应发射多颗子弹")
+	assert_eq(w.bullet_count, 1, "弓应发射 1 颗子弹")
 
-func test_minigun_resource_loaded():
-	assert_true(GameConfig.weapons.has(Enums.WeaponId.MINIGUN))
-	var w: WeaponData = GameConfig.weapons[Enums.WeaponId.MINIGUN]
-	assert_eq(w.weapon_type, "minigun")
-	assert_lt(w.fire_rate_per_level[0], 0.1, "加特林射速应极快")
-
-func test_ice_gun_resource_loaded():
-	assert_true(GameConfig.weapons.has(Enums.WeaponId.ICE_GUN))
-	var w: WeaponData = GameConfig.weapons[Enums.WeaponId.ICE_GUN]
-	assert_eq(w.weapon_type, "ice_gun")
-	assert_gt(w.slow_on_hit, 0.0, "冰冻枪应有 slow_on_hit")
-
-func test_rocket_resource_loaded():
-	assert_true(GameConfig.weapons.has(Enums.WeaponId.ROCKET))
-	var w: WeaponData = GameConfig.weapons[Enums.WeaponId.ROCKET]
-	assert_eq(w.weapon_type, "rocket")
-	assert_gt(w.explosion_radius_per_level.size(), 0, "应有爆炸半径配置")
-
-func test_lightning_resource_loaded():
-	assert_true(GameConfig.weapons.has(Enums.WeaponId.LIGHTNING))
-	var w: WeaponData = GameConfig.weapons[Enums.WeaponId.LIGHTNING]
-	assert_eq(w.weapon_type, "lightning")
-	assert_gt(w.chain_count, 0)
-
-func test_blade_resource_loaded():
-	assert_true(GameConfig.weapons.has(Enums.WeaponId.BLADE))
-	var w: WeaponData = GameConfig.weapons[Enums.WeaponId.BLADE]
-	assert_eq(w.weapon_type, "blade")
-
-func test_flamethrower_resource_loaded():
-	assert_true(GameConfig.weapons.has(Enums.WeaponId.FLAMETHROWER))
-	var w: WeaponData = GameConfig.weapons[Enums.WeaponId.FLAMETHROWER]
-	assert_eq(w.weapon_type, "flamethrower")
-	assert_gt(w.flame_cone_angle, 0.0)
+func test_sword_resource_loaded():
+	assert_true(GameConfig.weapons.has(Enums.WeaponId.SWORD), "应包含 sword")
+	var w: WeaponData = GameConfig.weapons[Enums.WeaponId.SWORD]
+	assert_eq(w.weapon_type, "sword")

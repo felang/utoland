@@ -24,10 +24,6 @@ func test_tower_sizes_match_new_standard():
 	add_child_autofree(shooter)
 	assert_eq(shooter.get_node("CollisionShape2D").shape.size, Vector2(16, 16))
 
-	var wall = SceneFactory.create_tower(Enums.TowerId.STUMP)
-	add_child_autofree(wall)
-	assert_eq(wall.get_node("CollisionShape2D").shape.size, Vector2(16, 16))
-
 	var slow = SceneFactory.create_tower(Enums.TowerId.ICE_FLOWER)
 	add_child_autofree(slow)
 	assert_eq(slow.get_node("CollisionShape2D").shape.size, Vector2(16, 16))
