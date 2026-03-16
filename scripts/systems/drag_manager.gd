@@ -24,6 +24,7 @@ var _recycle_area: Control = null
 var _drag_weapon_index: int = -1
 var _on_weapon_sold_callback: Callable
 var _recycle_hint_label: Label = null
+var _grid_overlay: Node2D = null
 
 func initialize(tower_container: Node2D, player: Node2D) -> void:
 	_tower_container = tower_container
@@ -72,6 +73,8 @@ func _start_drag(source: DragSource) -> void:
 	_is_dragging = true
 	_drag_source = source
 	_create_preview()
+	if source in [DragSource.PLACE_TOWER, DragSource.MAP_TOWER]:
+		_show_grid_overlay()
 	if _player and _player.has_method("set_input_enabled"):
 		_player.set_input_enabled(false)
 
@@ -158,9 +161,8 @@ func _cleanup_drag() -> void:
 	if _preview_node:
 		_preview_node.queue_free()
 		_preview_node = null
-	if _range_circle:
-		_range_circle.queue_free()
-		_range_circle = null
+	_range_circle = null  # _range_circle 是 _preview_node 的子节点，随父节点释放
+	_hide_grid_overlay()
 	if _recycle_area:
 		_recycle_area.modulate = Color.WHITE
 	_hide_recycle_hint()
@@ -190,12 +192,31 @@ func remove_tower_nodes(consumed_deploy_ids: Array) -> void:
 
 func _create_preview() -> void:
 	_preview_node = Node2D.new()
-	var sprite := Sprite2D.new()
-	sprite.modulate = Color(1, 1, 1, 0.5)
-	_preview_node.add_child(sprite)
-	if _drag_source in [DragSource.PLACE_TOWER, DragSource.MAP_TOWER]:
-		_range_circle = Node2D.new()
-		_preview_node.add_child(_range_circle)
+	if _drag_source == DragSource.PLACE_TOWER:
+		var tower_id: String = _drag_data.tower_id
+		# 用实际塔场景作为半透明预览
+		var tower_preview: Node2D = SceneFactory.create_tower(tower_id, 1)
+		tower_preview.modulate = Color(1, 1, 1, 0.5)
+		tower_preview.set_process(false)
+		tower_preview.set_physics_process(false)
+		_preview_node.add_child(tower_preview)
+		# 攻击范围指示圆
+		var tower_data: TowerData = GameConfig.towers.get(tower_id)
+		if tower_data and tower_data.attack_range_per_level.size() > 0:
+			_range_circle = RangeIndicator.new()
+			_range_circle.set_range(tower_data.attack_range_per_level[0])
+			_preview_node.add_child(_range_circle)
+	elif _drag_source == DragSource.MAP_TOWER:
+		# 移动已有塔时也显示范围
+		var deploy_id: int = _drag_data.get("deploy_id", -1)
+		for entry in GameData.deployed_towers:
+			if entry.deploy_id == deploy_id:
+				var tower_data: TowerData = GameConfig.towers.get(entry.id)
+				if tower_data and tower_data.attack_range_per_level.size() >= entry.level:
+					_range_circle = RangeIndicator.new()
+					_range_circle.set_range(tower_data.attack_range_per_level[entry.level - 1])
+					_preview_node.add_child(_range_circle)
+				break
 	_tower_container.get_parent().add_child(_preview_node)
 
 func _update_preview(global_pos: Vector2) -> void:
@@ -206,7 +227,7 @@ func _update_preview(global_pos: Vector2) -> void:
 		_preview_node.global_position = _grid_to_world(grid_pos)
 		var is_valid := _is_valid_grid_pos(grid_pos) and _is_grid_available(grid_pos)
 		if _range_circle:
-			_range_circle.modulate = Color.GREEN if is_valid else Color.RED
+			_range_circle.modulate = Color(0.3, 1.0, 0.3, 1.0) if is_valid else Color(1.0, 0.3, 0.3, 1.0)
 	else:
 		_preview_node.global_position = global_pos
 	# 回收区反馈（对塔移动和武器拖拽生效）
@@ -256,14 +277,14 @@ func _get_drag_refund() -> int:
 
 func _grid_to_world(grid_pos: Vector2i) -> Vector2:
 	return Vector2(
-		grid_pos.x * GameConfig.GRID_SIZE + GameConfig.GRID_SIZE / 2.0,
-		grid_pos.y * GameConfig.GRID_SIZE + GameConfig.GRID_SIZE / 2.0
+		grid_pos.x * GameConfig.GRID_SIZE + GameConfig.GRID_SIZE / 2.0 - GameConfig.MAP_HALF_WIDTH,
+		grid_pos.y * GameConfig.GRID_SIZE + GameConfig.GRID_SIZE / 2.0 - GameConfig.MAP_HALF_HEIGHT
 	)
 
 func _world_to_grid(world_pos: Vector2) -> Vector2i:
 	return Vector2i(
-		int(world_pos.x / GameConfig.GRID_SIZE),
-		int(world_pos.y / GameConfig.GRID_SIZE)
+		int((world_pos.x + GameConfig.MAP_HALF_WIDTH) / GameConfig.GRID_SIZE),
+		int((world_pos.y + GameConfig.MAP_HALF_HEIGHT) / GameConfig.GRID_SIZE)
 	)
 
 func _is_valid_grid_pos(grid_pos: Vector2i) -> bool:
@@ -277,3 +298,14 @@ func _is_grid_available(grid_pos: Vector2i) -> bool:
 				continue
 			return false
 	return true
+
+func _show_grid_overlay() -> void:
+	if _grid_overlay == null:
+		_grid_overlay = GridOverlay.new()
+		_grid_overlay.z_index = 1
+		_tower_container.get_parent().add_child(_grid_overlay)
+	_grid_overlay.visible = true
+
+func _hide_grid_overlay() -> void:
+	if _grid_overlay:
+		_grid_overlay.visible = false

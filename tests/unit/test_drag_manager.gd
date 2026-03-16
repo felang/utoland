@@ -20,13 +20,24 @@ func after_each() -> void:
 	_tower_container.queue_free()
 
 func test_grid_to_world_conversion() -> void:
+	# grid(0,0) → 左上角格子中心 = (-MAP_HALF_WIDTH + 8, -MAP_HALF_HEIGHT + 8)
+	var world_origin: Vector2 = _drag_manager._grid_to_world(Vector2i(0, 0))
+	var half_w: float = GameConfig.MAP_HALF_WIDTH
+	var half_h: float = GameConfig.MAP_HALF_HEIGHT
+	assert_eq(world_origin, Vector2(-half_w + 8, -half_h + 8))
+	# grid(5,5) → (-half_w + 5*16+8, -half_h + 5*16+8)
 	var world: Vector2 = _drag_manager._grid_to_world(Vector2i(5, 5))
-	var expected := Vector2(5 * 16 + 8, 5 * 16 + 8)
-	assert_eq(world, expected)
+	assert_eq(world, Vector2(-half_w + 88, -half_h + 88))
 
 func test_world_to_grid_conversion() -> void:
-	var grid: Vector2i = _drag_manager._world_to_grid(Vector2(88, 88))
-	assert_eq(grid, Vector2i(5, 5))
+	var half_w: float = GameConfig.MAP_HALF_WIDTH
+	var half_h: float = GameConfig.MAP_HALF_HEIGHT
+	# 左上角世界坐标 → grid(0,0)
+	var grid: Vector2i = _drag_manager._world_to_grid(Vector2(-half_w + 8, -half_h + 8))
+	assert_eq(grid, Vector2i(0, 0))
+	# 地图中心 → grid(17,13)
+	var grid_center: Vector2i = _drag_manager._world_to_grid(Vector2(0, 0))
+	assert_eq(grid_center, Vector2i(17, 13))
 
 func test_is_valid_grid_pos() -> void:
 	assert_true(_drag_manager._is_valid_grid_pos(Vector2i(0, 0)))
