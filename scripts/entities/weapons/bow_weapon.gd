@@ -2,6 +2,8 @@
 class_name BowWeapon
 extends Weapon
 
+const ARROW_SPRITE_PATH := "res://assets/projectiles/arrow.png"
+
 func fire(target: Node2D) -> void:
 	if not owner_node:
 		return
@@ -15,4 +17,10 @@ func fire(target: Node2D) -> void:
 	bullet.speed = weapon_data.bullet_speed
 	scene_parent.add_child(bullet)
 	bullet.setup(base_damage, weapon_data.knockback_force, owner_node.global_position, direction)
+	# 添加箭矢精灵
+	if ResourceLoader.exists(ARROW_SPRITE_PATH):
+		var sprite := Sprite2D.new()
+		sprite.texture = load(ARROW_SPRITE_PATH)
+		sprite.rotation = direction.angle()
+		bullet.add_child(sprite)
 	AudioManager.play("shoot")

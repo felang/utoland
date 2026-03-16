@@ -37,7 +37,7 @@ func _add_weapon(data: WeaponData) -> Weapon:
 	add_child(weapon)
 	_weapons.append(weapon)
 	# 创建漂浮精灵
-	var sprite := _create_weapon_sprite(data.weapon_type)
+	var sprite := _create_weapon_sprite(data)
 	add_child(sprite)
 	_weapon_sprites.append(sprite)
 	return weapon
@@ -101,20 +101,23 @@ func _create_weapon(weapon_type: String) -> Weapon:
 	push_error("WeaponManager: 未知 weapon_type: " + weapon_type)
 	return null
 
-func _create_weapon_sprite(weapon_type: String) -> Sprite2D:
+func _create_weapon_sprite(data: WeaponData) -> Sprite2D:
 	var sprite := Sprite2D.new()
-	var color: Color = WEAPON_COLORS.get(weapon_type, Color.WHITE)
-	# 创建圆形纹理
-	var img := Image.create(SPRITE_SIZE, SPRITE_SIZE, false, Image.FORMAT_RGBA8)
-	var center := Vector2(SPRITE_SIZE / 2.0, SPRITE_SIZE / 2.0)
-	var radius: float = SPRITE_SIZE / 2.0
-	for x in range(SPRITE_SIZE):
-		for y in range(SPRITE_SIZE):
-			var dist: float = Vector2(x + 0.5, y + 0.5).distance_to(center)
-			if dist <= radius:
-				img.set_pixel(x, y, color)
-			else:
-				img.set_pixel(x, y, Color.TRANSPARENT)
-	sprite.texture = ImageTexture.create_from_image(img)
 	sprite.z_index = 1
+	# 优先加载 icon_path 图片，无则用彩色圆形占位
+	if data.icon_path != "" and ResourceLoader.exists(data.icon_path):
+		sprite.texture = load(data.icon_path)
+	else:
+		var color: Color = WEAPON_COLORS.get(data.weapon_type, Color.WHITE)
+		var img := Image.create(SPRITE_SIZE, SPRITE_SIZE, false, Image.FORMAT_RGBA8)
+		var center := Vector2(SPRITE_SIZE / 2.0, SPRITE_SIZE / 2.0)
+		var radius: float = SPRITE_SIZE / 2.0
+		for x in range(SPRITE_SIZE):
+			for y in range(SPRITE_SIZE):
+				var dist: float = Vector2(x + 0.5, y + 0.5).distance_to(center)
+				if dist <= radius:
+					img.set_pixel(x, y, color)
+				else:
+					img.set_pixel(x, y, Color.TRANSPARENT)
+		sprite.texture = ImageTexture.create_from_image(img)
 	return sprite
