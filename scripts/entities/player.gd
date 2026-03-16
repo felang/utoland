@@ -45,10 +45,6 @@ func _ready() -> void:
 	# 新被动技能初始化
 	_init_passives()
 
-	# 嗜血狂战：击杀敌人回复 5% 最大 HP
-	if GameData.active_pair_synergies.has("bloodthirst"):
-		EventBus.enemy_killed.connect(_on_bloodthirst_kill)
-
 func _process(delta: float) -> void:
 	if invincible_timer > 0:
 		invincible_timer -= delta
@@ -183,17 +179,9 @@ func update_combo_target(target: Node2D) -> void:
 		_combo_target = target
 		_combo_stacks = 0
 
-## 统计 fortify 标签的上场单位数
+## 统计上场塔数量
 func _count_fortify_units() -> int:
-	var count: int = 0
-	for tower in get_tree().get_nodes_in_group(Enums.Group.TOWERS):
-		if tower is Tower and tower.data and tower.data.tag == Enums.Tag.FORTIFY:
-			count += 1
-	return count
-
-## 嗜血狂战：击杀回复 5% 最大 HP
-func _on_bloodthirst_kill(_enemy_type: String, _position: Vector2, _is_elite: bool) -> void:
-	health.heal(health.max_hp * 0.05)
+	return get_tree().get_nodes_in_group(Enums.Group.TOWERS).size()
 
 ## 获取血怒伤害倍率（Gorg）— 供武器/塔查询 AOE 伤害加成
 func get_blood_rage_mult() -> float:

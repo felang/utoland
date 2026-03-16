@@ -4,7 +4,6 @@ enum Phase { SHOP, BATTLE }
 
 var current_phase: Phase = Phase.SHOP
 var _tower_container: Node2D = null
-var _synergy_processor: SynergyEffectProcessor = null
 var _shop_overlay: CanvasLayer = null
 var _drag_manager: Node = null
 
@@ -23,11 +22,6 @@ func _ready() -> void:
 	_drag_manager = $DragManager
 	_drag_manager.initialize(_tower_container, $Player, _shop_overlay)
 	_shop_overlay.drag_manager = _drag_manager
-
-	# 羁绊效果处理器
-	_synergy_processor = SynergyEffectProcessor.new()
-	_synergy_processor.name = "SynergyEffectProcessor"
-	add_child(_synergy_processor)
 
 	# 暂停覆盖层
 	var pause_overlay = load("res://scripts/ui/pause_overlay.gd").new()
@@ -48,14 +42,12 @@ func _enter_shop_phase(is_first: bool = false) -> void:
 	_shop_overlay.refresh_shop(is_first)
 	if not is_first:
 		_shop_overlay.slide_in()
-	_synergy_processor.deactivate()
 	AudioManager.play_bgm("placement")
 	$HUD.set_battle_phase(false)
 
 func _enter_battle_phase() -> void:
 	current_phase = Phase.BATTLE
 	_shop_overlay.slide_out()
-	_synergy_processor.activate()
 	AudioManager.play_bgm("battle")
 	$HUD.set_battle_phase(true)
 	$WaveManager.start_next_wave()

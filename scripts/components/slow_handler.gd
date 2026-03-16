@@ -35,26 +35,6 @@ func apply_timed_slow(percent: float, duration: float, source_id: String) -> voi
 func _on_timed_slow_expired(source_id: String) -> void:
 	_timed_slow_timers.erase(source_id)
 	remove_slow(source_id)
-	# Control 5: 连锁控制 — 减速到期时触发 1 秒定身
-	if source_id == "synergy_chain_freeze":
-		return  # 连锁控制本身到期不再触发
-	_try_chain_freeze()
-
-## Control 5: 连锁控制 — 减速到期时自动定身 1 秒
-func _try_chain_freeze() -> void:
-	if not is_inside_tree():
-		return
-	var processors: Array[Node] = get_tree().get_nodes_in_group("synergy_processor")
-	if processors.is_empty():
-		return
-	var processor: SynergyEffectProcessor = processors[0] as SynergyEffectProcessor
-	if not processor or not processor.should_chain_freeze():
-		return
-	# 对宿主（敌人）施加 1 秒定身
-	var enemy: Node2D = get_parent() as Node2D
-	if enemy and enemy.has_method("apply_root"):
-		enemy.apply_root(1.0)
-
 
 func _recalc_speed() -> void:
 	if _active_slows.is_empty():

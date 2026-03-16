@@ -7,6 +7,9 @@ const PORTRAIT_BUTTON_SIZE := Vector2(56, 56)
 const PORTRAIT_BORDER_WIDTH := 2
 const PORTRAIT_BORDER_RADIUS := 4
 
+const CHARACTER_ORDER: Array[String] = ["dora", "kaze", "nemo", "merlin", "gorg"]
+const UNLOCKED_CHARACTERS: Array[String] = ["dora"]
+
 const STAT_BASELINES := {
 	"max_hp": 100.0,
 	"speed": 200.0,
@@ -43,10 +46,11 @@ func _ready() -> void:
 	_apply_styles()
 	_connect_buttons()
 	_generate_portrait_list()
-	# 默认选中第一个角色
-	if GameConfig.characters.size() > 0:
-		var first_id: String = GameConfig.characters.keys()[0]
-		_select_character(first_id)
+	# 默认选中 dora
+	if GameConfig.characters.has("dora"):
+		_select_character("dora")
+	elif GameConfig.characters.size() > 0:
+		_select_character(GameConfig.characters.keys()[0])
 
 
 func _init_portrait_styles() -> void:
@@ -122,13 +126,27 @@ func _connect_buttons() -> void:
 	UIUtils.setup_button_hover(_back_button)
 
 
+func _get_sorted_character_ids() -> Array[String]:
+	var sorted: Array[String] = []
+	# 按预定义顺序添加
+	for cid in CHARACTER_ORDER:
+		if GameConfig.characters.has(cid):
+			sorted.append(cid)
+	# 添加不在预定义列表中的角色（兜底）
+	for cid in GameConfig.characters:
+		if cid not in sorted:
+			sorted.append(cid)
+	return sorted
+
+
 func _generate_portrait_list() -> void:
 	for child in _portrait_list.get_children():
 		child.queue_free()
 	_portrait_buttons.clear()
 
-	for character_id in GameConfig.characters:
+	for character_id in _get_sorted_character_ids():
 		var char_data: CharacterData = GameConfig.characters[character_id]
+		var is_locked: bool = character_id not in UNLOCKED_CHARACTERS
 
 		# 外层 PanelContainer 用于显示选中边框
 		var panel := PanelContainer.new()
@@ -151,7 +169,13 @@ func _generate_portrait_list() -> void:
 			placeholder.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 			btn.add_child(placeholder)
 
-		btn.pressed.connect(_select_character.bind(character_id))
+		if is_locked:
+			# 锁定角色：灰度 + 不可点击
+			btn.modulate = Color(0.4, 0.4, 0.4, 0.7)
+			btn.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		else:
+			btn.pressed.connect(_select_character.bind(character_id))
+
 		panel.add_child(btn)
 		_portrait_list.add_child(panel)
 		_portrait_buttons[character_id] = panel
