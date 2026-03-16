@@ -78,17 +78,21 @@ func _start_drag(source: DragSource) -> void:
 	if _player and _player.has_method("set_input_enabled"):
 		_player.set_input_enabled(false)
 
+func _viewport_to_world(viewport_pos: Vector2) -> Vector2:
+	var canvas_xform: Transform2D = get_viewport().get_canvas_transform()
+	return canvas_xform.affine_inverse() * viewport_pos
+
 func _input(event: InputEvent) -> void:
 	if not _is_dragging:
 		if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-			_check_tower_click(event.global_position)
+			_check_tower_click(_viewport_to_world(event.global_position))
 		return
 
 	if event is InputEventMouseMotion:
-		_update_preview(event.global_position)
+		_update_preview(_viewport_to_world(event.global_position))
 	elif event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT and not event.pressed:
-			_end_drag(event.global_position)
+			_end_drag(_viewport_to_world(event.global_position))
 		elif event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
 			_cancel_drag()
 
@@ -278,7 +282,7 @@ func _get_drag_refund() -> int:
 func _grid_to_world(grid_pos: Vector2i) -> Vector2:
 	return Vector2(
 		grid_pos.x * GameConfig.GRID_SIZE + GameConfig.GRID_SIZE / 2.0 - GameConfig.MAP_HALF_WIDTH,
-		grid_pos.y * GameConfig.GRID_SIZE + GameConfig.GRID_SIZE / 2.0 - GameConfig.MAP_HALF_HEIGHT
+		(grid_pos.y + 1) * GameConfig.GRID_SIZE - GameConfig.MAP_HALF_HEIGHT
 	)
 
 func _world_to_grid(world_pos: Vector2) -> Vector2i:

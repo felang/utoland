@@ -20,14 +20,14 @@ func after_each() -> void:
 	_tower_container.queue_free()
 
 func test_grid_to_world_conversion() -> void:
-	# grid(0,0) → 左上角格子中心 = (-MAP_HALF_WIDTH + 8, -MAP_HALF_HEIGHT + 8)
+	# X: 格子水平中心 = grid_x * 16 + 8 - MAP_HALF_WIDTH
+	# Y: 格子底部边缘 = (grid_y + 1) * 16 - MAP_HALF_HEIGHT（塔底部对齐网格底线）
 	var world_origin: Vector2 = _drag_manager._grid_to_world(Vector2i(0, 0))
 	var half_w: float = GameConfig.MAP_HALF_WIDTH
 	var half_h: float = GameConfig.MAP_HALF_HEIGHT
-	assert_eq(world_origin, Vector2(-half_w + 8, -half_h + 8))
-	# grid(5,5) → (-half_w + 5*16+8, -half_h + 5*16+8)
+	assert_eq(world_origin, Vector2(-half_w + 8, -half_h + 16))
 	var world: Vector2 = _drag_manager._grid_to_world(Vector2i(5, 5))
-	assert_eq(world, Vector2(-half_w + 88, -half_h + 88))
+	assert_eq(world, Vector2(-half_w + 88, -half_h + 96))
 
 func test_world_to_grid_conversion() -> void:
 	var half_w: float = GameConfig.MAP_HALF_WIDTH
