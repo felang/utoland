@@ -44,5 +44,13 @@ func _shoot_nearest_enemy() -> void:
 	if closest:
 		var bullet: BulletProjectile = SceneFactory.create_bullet_projectile()
 		var direction: Vector2 = global_position.direction_to(closest.global_position)
+		# 弹道精灵（附加到 bullet，跟随方向旋转）
+		if data.projectile_sprite_path != "" and ResourceLoader.exists(data.projectile_sprite_path):
+			var proj_sprite: Sprite2D = Sprite2D.new()
+			proj_sprite.texture = load(data.projectile_sprite_path)
+			proj_sprite.rotation = direction.angle()
+			bullet.add_child(proj_sprite)
 		get_parent().add_child(bullet)
 		bullet.setup(attack_damage, 0.0, global_position, direction)
+		# 攻击动画
+		play_attack_animation()

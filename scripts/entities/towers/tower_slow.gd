@@ -24,6 +24,9 @@ func _apply_level_stats() -> void:
 func _on_enemy_entered(body: Node2D) -> void:
 	if body.is_in_group(Enums.Group.ENEMIES) and body.has_method("apply_slow"):
 		body.apply_slow(slow_percent, str(get_instance_id()))
+		# 仅在未播放攻击动画时触发
+		if visual and visual.animation != "attack":
+			play_attack_animation()
 
 func _on_enemy_exited(body: Node2D) -> void:
 	if body.is_in_group(Enums.Group.ENEMIES) and body.has_method("remove_slow"):

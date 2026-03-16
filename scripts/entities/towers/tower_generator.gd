@@ -26,3 +26,4 @@ func _apply_level_stats() -> void:
 
 func _on_generate_timer_timeout() -> void:
 	EventBus.coins_generated.emit(generate_amount, global_position)
+	play_attack_animation()
