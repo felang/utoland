@@ -55,15 +55,8 @@ func _find_closest_enemy(range_limit: float = INF) -> Node2D:
 
 func _create_weapon(weapon_type: String) -> Weapon:
 	match weapon_type:
-		"bullet":    return BulletWeapon.new()
+		"bow":       return BowWeapon.new()
 		"boomerang": return BoomerangWeapon.new()
-		"laser":     return LaserWeapon.new()
-		"shotgun":   return ShotgunWeapon.new()
-		"minigun":   return BulletWeapon.new()
-		"ice_gun":   return IceGunWeapon.new()
-		"rocket":    return RocketWeapon.new()
-		"lightning": return LightningWeapon.new()
-		"blade":     return BladeWeapon.new()
-		"flamethrower": return FlamethrowerWeapon.new()
+		"sword":     return SwordWeapon.new()
 	push_error("WeaponManager: 未知 weapon_type: " + weapon_type)
 	return null

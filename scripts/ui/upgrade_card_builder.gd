@@ -4,21 +4,11 @@ extends RefCounted
 
 const CARD_WIDTH: int = 180
 const CARD_HEIGHT: int = 200
-const RARITY_COLORS: Dictionary = {
-	Enums.WeaponRarity.COMMON: Color("#4fc3f7"),
-	Enums.WeaponRarity.RARE: Color("#ab47bc"),
-	Enums.WeaponRarity.EPIC: Color("#ffa726"),
-}
+const DEFAULT_BORDER_COLOR: Color = Color("#4fc3f7")
 
 static func create_card(opt: Dictionary, on_selected: Callable) -> PanelContainer:
 	var is_weapon: bool = opt["type"] == "weapon"
-	var border_color: Color
-	if is_weapon:
-		var wd: WeaponData = GameConfig.weapons[opt["id"]]
-		border_color = RARITY_COLORS.get(wd.rarity, Color("#4fc3f7"))
-	else:
-		var td: TowerData = GameConfig.towers[opt["id"]]
-		border_color = RARITY_COLORS.get(td.rarity, Color("#4fc3f7"))
+	var border_color: Color = DEFAULT_BORDER_COLOR
 	var bg_color: Color = Color("#1a1a3a") if is_weapon else Color("#1a2a1a")
 
 	var panel := PanelContainer.new()

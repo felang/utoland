@@ -3,20 +3,8 @@ extends Node
 # Scene preloads - centralized
 var _tower_scenes: Dictionary = {
 	Enums.TowerId.PEA_SHOOTER: preload("res://scenes/entities/towers/tower_pea_shooter.tscn"),
-	Enums.TowerId.STUMP: preload("res://scenes/entities/towers/tower_stump.tscn"),
 	Enums.TowerId.ICE_FLOWER: preload("res://scenes/entities/towers/tower_ice_flower.tscn"),
-	Enums.TowerId.CACTUS: preload("res://scenes/entities/towers/tower_cactus.tscn"),
-	Enums.TowerId.ROSE: preload("res://scenes/entities/towers/tower_rose.tscn"),
-	Enums.TowerId.MUSHROOM: preload("res://scenes/entities/towers/tower_mushroom.tscn"),
-	Enums.TowerId.VINE: preload("res://scenes/entities/towers/tower_vine.tscn"),
-	Enums.TowerId.DANDELION: preload("res://scenes/entities/towers/tower_dandelion.tscn"),
-	Enums.TowerId.PITCHER: preload("res://scenes/entities/towers/tower_pitcher.tscn"),
-	Enums.TowerId.THORN: preload("res://scenes/entities/towers/tower_thorn.tscn"),
-	Enums.TowerId.OAK: preload("res://scenes/entities/towers/tower_oak.tscn"),
 	Enums.TowerId.SUNFLOWER: preload("res://scenes/entities/towers/tower_sunflower.tscn"),
-	Enums.TowerId.MINT: preload("res://scenes/entities/towers/tower_mint.tscn"),
-	Enums.TowerId.HEAL_FLOWER: preload("res://scenes/entities/towers/tower_heal_flower.tscn"),
-	Enums.TowerId.BAMBOO: preload("res://scenes/entities/towers/tower_bamboo.tscn"),
 }
 
 var _enemy_scenes: Dictionary = {
@@ -30,11 +18,6 @@ var _enemy_scenes: Dictionary = {
 
 var _bullet_projectile_scene: PackedScene = preload("res://scenes/entities/projectiles/bullet_projectile.tscn")
 var _boomerang_projectile_scene: PackedScene = preload("res://scenes/entities/projectiles/boomerang_projectile.tscn")
-var _laser_projectile_scene: PackedScene = preload("res://scenes/entities/projectiles/laser_projectile.tscn")
-var _rocket_projectile_scene: PackedScene = preload("res://scenes/entities/projectiles/rocket_projectile.tscn")
-var _chain_projectile_scene: PackedScene = preload("res://scenes/entities/projectiles/chain_projectile.tscn")
-var _melee_projectile_scene: PackedScene = preload("res://scenes/entities/projectiles/melee_projectile.tscn")
-var _flame_projectile_scene: PackedScene = preload("res://scenes/entities/projectiles/flame_projectile.tscn")
 var _coin_scene: PackedScene = preload("res://scenes/entities/coin.tscn")
 
 # Tower creation — 注入 TowerData Resource，level 直接注入
@@ -75,23 +58,3 @@ func create_bullet_projectile() -> BulletProjectile:
 # BoomerangProjectile creation — 新投射物系统
 func create_boomerang_projectile() -> BoomerangProjectile:
 	return _boomerang_projectile_scene.instantiate()
-
-# LaserProjectile creation — 新投射物系统
-func create_laser_projectile() -> LaserProjectile:
-	return _laser_projectile_scene.instantiate()
-
-# RocketProjectile creation
-func create_rocket_projectile() -> RocketProjectile:
-	return _rocket_projectile_scene.instantiate()
-
-# ChainProjectile creation
-func create_chain_projectile() -> ChainProjectile:
-	return _chain_projectile_scene.instantiate()
-
-# MeleeProjectile creation
-func create_melee_projectile() -> MeleeProjectile:
-	return _melee_projectile_scene.instantiate()
-
-# FlameProjectile creation
-func create_flame_projectile() -> FlameProjectile:
-	return _flame_projectile_scene.instantiate()

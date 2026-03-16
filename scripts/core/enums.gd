@@ -27,16 +27,9 @@ class Character:
 
 # 武器 ID
 class WeaponId:
-	const RIFLE = "rifle"
+	const BOW = "bow"
 	const BOOMERANG = "boomerang"
-	const LASER = "laser"
-	const SHOTGUN = "shotgun"
-	const MINIGUN = "minigun"
-	const ROCKET = "rocket"
-	const FLAMETHROWER = "flamethrower"
-	const LIGHTNING = "lightning"
-	const ICE_GUN = "ice_gun"
-	const BLADE = "blade"
+	const SWORD = "sword"
 
 # 敌人类型
 class Enemy:
@@ -50,30 +43,13 @@ class Enemy:
 # 塔类型
 class TowerId:
 	const PEA_SHOOTER = "pea_shooter"
-	const STUMP = "stump"
 	const ICE_FLOWER = "ice_flower"
-	const CACTUS = "cactus"
-	const ROSE = "rose"
-	const MUSHROOM = "mushroom"
-	const VINE = "vine"
-	const DANDELION = "dandelion"
-	const PITCHER = "pitcher"
-	const THORN = "thorn"
-	const OAK = "oak"
 	const SUNFLOWER = "sunflower"
-	const MINT = "mint"
-	const HEAL_FLOWER = "heal_flower"
-	const BAMBOO = "bamboo"
 
 # 投射物类型
 class ProjectileId:
 	const BULLET = "bullet"
 	const BOOMERANG = "boomerang"
-	const LASER = "laser"
-	const ROCKET = "rocket"
-	const FLAME = "flame"
-	const CHAIN = "chain"
-	const MELEE = "melee"
 
 # 地图 ID
 class Map:
@@ -87,28 +63,6 @@ class Stat:
 	const DAMAGE_MULT = "damage_mult"
 	const ATTACK_SPEED_MULT = "attack_speed_mult"
 	const TOWER_MULT = "tower_mult"
-
-# 协同标签
-class Tag:
-	const ASSAULT = "assault"
-	const CONTROL = "control"
-	const BLAST = "blast"
-	const FORTIFY = "fortify"
-	const BOOST = "boost"
-	const ALL = [ASSAULT, CONTROL, BLAST, FORTIFY, BOOST]
-
-# 武器稀有度
-class WeaponRarity:
-	const COMMON = 0
-	const RARE = 1
-	const EPIC = 2
-
-
-# 塔稀有度
-class TowerRarity:
-	const COMMON = 0
-	const RARE = 1
-	const EPIC = 2
 
 # 回旋镖状态
 enum BoomerangState { OUTBOUND, RETURNING }
