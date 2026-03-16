@@ -35,6 +35,38 @@ func initialize(weapon_entries: Array[Dictionary]) -> void:
 			weapon.set_level(entry.level)
 			_apply_passive_to_weapon(weapon)
 
+## 热更新：添加单个武器（商店购买后立即调用）
+func add_weapon(weapon_id: String, level: int) -> void:
+	if not GameConfig.weapons.has(weapon_id):
+		push_error("WeaponManager: 未知武器 id: " + weapon_id)
+		return
+	var data: WeaponData = GameConfig.weapons[weapon_id]
+	var weapon: Weapon = _add_weapon(data, weapon_id)
+	if weapon:
+		weapon.set_level(level)
+		_apply_passive_to_weapon(weapon)
+
+## 热更新：移除指定索引的武器（卖出时调用）
+func remove_weapon(index: int) -> void:
+	if index < 0 or index >= _weapons.size():
+		return
+	_weapons[index].queue_free()
+	_weapons.remove_at(index)
+	_weapon_sprites[index].queue_free()
+	_weapon_sprites.remove_at(index)
+	_sprite_rot_offsets.remove_at(index)
+
+## 完全重建：清除所有武器并从 deployed_weapons 重新初始化
+func refresh_weapons() -> void:
+	for w in _weapons:
+		w.queue_free()
+	_weapons.clear()
+	for s in _weapon_sprites:
+		s.queue_free()
+	_weapon_sprites.clear()
+	_sprite_rot_offsets.clear()
+	initialize(GameData.deployed_weapons)
+
 func _add_weapon(data: WeaponData, weapon_id: String) -> Weapon:
 	var weapon: Weapon = _create_weapon(weapon_id)
 	if not weapon:
