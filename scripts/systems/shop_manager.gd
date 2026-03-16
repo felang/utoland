@@ -2,9 +2,6 @@ class_name ShopManager
 extends RefCounted
 
 ## 商店管理器 — 负责商店刷新、物品购买
-##
-## 由商店场景实例化（非 Autoload）。
-## 直接读写 GameData 状态，通过 EventBus 发布事件。
 
 func refresh_shop(is_first: bool = false) -> void:
 	var config: ShopConfig = GameConfig.shop_config
@@ -35,25 +32,44 @@ func manual_refresh() -> bool:
 	refresh_shop()
 	return true
 
-func buy_item(slot_index: int) -> bool:
-	if slot_index < 0 or slot_index >= GameData.shop_slots.size():
+## 购买武器（直接装备）
+func buy_weapon(slot_index: int) -> bool:
+	var slot: Dictionary = _validate_slot(slot_index)
+	if slot.is_empty() or slot.type != "weapon":
 		return false
+	var success: bool = GameData.buy_and_equip_weapon(slot.id, slot.cost)
+	if success:
+		GameData.shop_slots[slot_index] = {}
+	return success
+
+## 获取塔购买信息（不扣款）
+func get_tower_slot(slot_index: int) -> Dictionary:
+	var slot: Dictionary = _validate_slot(slot_index)
+	if slot.is_empty() or slot.type != "tower":
+		return {}
+	return slot
+
+## 确认塔购买（放置成功后调用）
+func confirm_tower_purchase(slot_index: int, grid_pos: Vector2i) -> int:
+	var slot: Dictionary = _validate_slot(slot_index)
+	if slot.is_empty():
+		return 0
+	var deploy_id: int = GameData.buy_and_place_tower(slot.id, slot.cost, grid_pos)
+	if deploy_id > 0:
+		GameData.shop_slots[slot_index] = {}
+	return deploy_id
+
+func _validate_slot(slot_index: int) -> Dictionary:
+	if slot_index < 0 or slot_index >= GameData.shop_slots.size():
+		return {}
 	var slot: Dictionary = GameData.shop_slots[slot_index]
 	if slot.is_empty():
-		return false
+		return {}
 	if GameData.coins < slot.cost:
-		return false
-	if not GameData.can_buy():
-		return false
-	GameData.coins -= slot.cost
-	var item := {id = slot.id, type = slot.type, level = 1}
-	GameData.bag.append(item)
-	GameData.shop_slots[slot_index] = {}
-	EventBus.item_purchased.emit(item)
-	EventBus.coins_changed.emit(-slot.cost, GameData.coins)
-	# 触发合成检查
-	GameData._check_merge(slot.id, 1)
-	return true
+		return {}
+	if not GameData.can_deploy():
+		return {}
+	return slot
 
 func _generate_random_slot() -> Dictionary:
 	var config: ShopConfig = GameConfig.shop_config

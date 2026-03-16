@@ -26,9 +26,6 @@ var pending_heal: int = 0
 ## 种群等级（商店升级购买）
 var player_level: int = 1
 
-## 背包 [{id, type, level}]，最多 bag_capacity 个
-var bag: Array[Dictionary] = []
-
 ## 已上阵武器 [{id, level}]
 var deployed_weapons: Array[Dictionary] = []
 
@@ -70,7 +67,6 @@ const _DEFAULTS: Dictionary = {
 	"current_wave": 0,
 	"pending_heal": 0,
 	"player_level": 1,
-	"bag": [],
 	"deployed_weapons": [],
 	"deployed_towers": [],
 	"shop_slots": [],
@@ -146,15 +142,8 @@ func get_population_cap() -> int:
 func get_population_used() -> int:
 	return deployed_weapons.size() + deployed_towers.size()
 
-func get_bag_count() -> int:
-	return bag.size()
-
 func can_deploy() -> bool:
 	return get_population_used() < get_population_cap()
-
-func can_buy() -> bool:
-	var config: ShopConfig = GameConfig.shop_config
-	return bag.size() < config.bag_capacity
 
 # ===== 等级升级 =====
 
@@ -173,55 +162,35 @@ func buy_level_up() -> bool:
 
 # ===== 部署/撤回 =====
 
-func deploy_weapon(bag_index: int) -> bool:
+## 购买并直接装备武器
+func buy_and_equip_weapon(weapon_id: String, cost: int) -> bool:
 	if not can_deploy():
 		return false
-	if bag_index < 0 or bag_index >= bag.size():
+	if coins < cost:
 		return false
-	var item: Dictionary = bag[bag_index]
-	if item.type != "weapon":
-		return false
-	bag.remove_at(bag_index)
-	deployed_weapons.append({id = item.id, level = item.level})
-	EventBus.item_deployed.emit(item)
+	coins -= cost
+	deployed_weapons.append({id = weapon_id, level = 1})
+	var item := {id = weapon_id, type = "weapon", level = 1}
+	EventBus.item_purchased.emit(item)
+	EventBus.coins_changed.emit(-cost, coins)
+	_check_merge(weapon_id, 1)
 	return true
 
-func undeploy_weapon(deploy_index: int) -> void:
-	if deploy_index < 0 or deploy_index >= deployed_weapons.size():
-		return
-	var item: Dictionary = deployed_weapons[deploy_index]
-	deployed_weapons.remove_at(deploy_index)
-	bag.append({id = item.id, type = "weapon", level = item.level})
-	EventBus.item_undeployed.emit(item)
-
-func deploy_tower(bag_index: int, grid_pos: Vector2i) -> int:
+## 购买并直接布置塔
+func buy_and_place_tower(tower_id: String, cost: int, grid_pos: Vector2i) -> int:
 	if not can_deploy():
 		return 0
-	if bag_index < 0 or bag_index >= bag.size():
+	if coins < cost:
 		return 0
-	var item: Dictionary = bag[bag_index]
-	if item.type != "tower":
-		return 0
+	coins -= cost
 	var deploy_id: int = _next_deploy_id
 	_next_deploy_id += 1
-	bag.remove_at(bag_index)
-	deployed_towers.append({id = item.id, level = item.level, grid_pos = grid_pos, deploy_id = deploy_id})
-	EventBus.item_deployed.emit(item)
+	deployed_towers.append({id = tower_id, level = 1, grid_pos = grid_pos, deploy_id = deploy_id})
+	var item := {id = tower_id, type = "tower", level = 1}
+	EventBus.item_purchased.emit(item)
+	EventBus.coins_changed.emit(-cost, coins)
+	_check_merge(tower_id, 1)
 	return deploy_id
-
-func undeploy_tower(deploy_id: int) -> bool:
-	var tower_index := -1
-	for i in range(deployed_towers.size()):
-		if deployed_towers[i].deploy_id == deploy_id:
-			tower_index = i
-			break
-	if tower_index == -1:
-		return false
-	var item: Dictionary = deployed_towers[tower_index]
-	deployed_towers.remove_at(tower_index)
-	bag.append({id = item.id, type = "tower", level = item.level})
-	EventBus.item_undeployed.emit(item)
-	return true
 
 func move_tower(deploy_id: int, new_grid_pos: Vector2i) -> bool:
 	if new_grid_pos.x < 0 or new_grid_pos.x >= GameConfig.MAP_GRID_WIDTH:
@@ -244,13 +213,6 @@ func move_tower(deploy_id: int, new_grid_pos: Vector2i) -> bool:
 	return true
 
 # ===== 出售 =====
-
-func sell_from_bag(bag_index: int) -> int:
-	if bag_index < 0 or bag_index >= bag.size():
-		return 0
-	var item: Dictionary = bag[bag_index]
-	bag.remove_at(bag_index)
-	return _apply_sell(item)
 
 func sell_from_deployed_weapon(deploy_index: int) -> int:
 	if deploy_index < 0 or deploy_index >= deployed_weapons.size():
@@ -293,19 +255,12 @@ func _check_merge(item_id: String, item_level: int) -> void:
 	var all_items: Array[Dictionary] = _collect_items_by_id_level(item_id, item_level)
 	if all_items.size() < 3:
 		return
-	# 回收 3 个物品（优先从 bag 取，再从 deployed 取）
 	var consumed: int = 0
 	var item_type: String = ""
-	# 从 bag 回收
-	var i: int = bag.size() - 1
-	while i >= 0 and consumed < 3:
-		if bag[i].id == item_id and bag[i].level == item_level:
-			item_type = bag[i].type
-			bag.remove_at(i)
-			consumed += 1
-		i -= 1
+	var kept_tower_pos: Vector2i = Vector2i.ZERO
+	var kept_tower_deploy_id: int = 0
 	# 从 deployed_weapons 回收
-	i = deployed_weapons.size() - 1
+	var i: int = deployed_weapons.size() - 1
 	while i >= 0 and consumed < 3:
 		if deployed_weapons[i].id == item_id and deployed_weapons[i].level == item_level:
 			item_type = "weapon"
@@ -317,21 +272,23 @@ func _check_merge(item_id: String, item_level: int) -> void:
 	while i >= 0 and consumed < 3:
 		if deployed_towers[i].id == item_id and deployed_towers[i].level == item_level:
 			item_type = "tower"
+			if kept_tower_deploy_id == 0:
+				kept_tower_pos = deployed_towers[i].grid_pos
+				kept_tower_deploy_id = deployed_towers[i].deploy_id
 			deployed_towers.remove_at(i)
 			consumed += 1
 		i -= 1
-	# 生成合成品
+	# 合成品留在 deployed 中
 	var new_level: int = item_level + 1
-	bag.append({id = item_id, type = item_type, level = new_level})
+	if item_type == "weapon":
+		deployed_weapons.append({id = item_id, level = new_level})
+	elif item_type == "tower":
+		deployed_towers.append({id = item_id, level = new_level, grid_pos = kept_tower_pos, deploy_id = kept_tower_deploy_id})
 	EventBus.item_merged.emit(item_id, new_level)
-	# 递归检查
 	_check_merge(item_id, new_level)
 
 func _collect_items_by_id_level(item_id: String, item_level: int) -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
-	for item in bag:
-		if item.id == item_id and item.level == item_level:
-			result.append(item)
 	for item in deployed_weapons:
 		if item.id == item_id and item.level == item_level:
 			result.append(item)

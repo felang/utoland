@@ -20,7 +20,7 @@ func _ready() -> void:
 
 	# DragManager（预先在 main.tscn 中添加）
 	_drag_manager = $DragManager
-	_drag_manager.initialize(_tower_container, $Player, _shop_overlay)
+	_drag_manager.initialize(_tower_container, $Player)
 	_shop_overlay.drag_manager = _drag_manager
 
 	# 暂停覆盖层

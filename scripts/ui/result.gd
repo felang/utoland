@@ -37,10 +37,8 @@ func _ready() -> void:
 	items_panel.add_theme_stylebox_override("panel", UIConstants.create_panel_stylebox())
 	var items_flow: HFlowContainer = vbox.get_node("ItemsPanel/ItemsFlow")
 	var has_items := false
-	# 显示背包 + 已上阵武器
+	# 显示已上阵武器和塔
 	var all_items: Array[Dictionary] = []
-	for item in GameData.bag:
-		all_items.append(item)
 	for item in GameData.deployed_weapons:
 		all_items.append({id = item.id, type = "weapon", level = item.level})
 	for item in GameData.deployed_towers:

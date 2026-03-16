@@ -1,13 +1,10 @@
 extends Node
-## 统一拖拽管理器 — 管理背包物品部署和地图上塔的移动
+## 统一拖拽管理器 — 管理塔放置和地图上塔的移动
 
-enum DragSource { NONE, BAG_TOWER, BAG_WEAPON, MAP_TOWER }
-
-const WEAPON_EQUIP_RADIUS := 48.0
+enum DragSource { NONE, PLACE_TOWER, MAP_TOWER }
 
 var _tower_container: Node2D
 var _player: Node2D
-var _shop_overlay: CanvasLayer
 
 var _is_dragging := false
 var _drag_source: DragSource = DragSource.NONE
@@ -20,20 +17,20 @@ var _range_circle: Node2D = null
 var _drag_original_grid_pos: Vector2i
 var _drag_original_deploy_id: int = -1
 
-func initialize(tower_container: Node2D, player: Node2D, shop_overlay: CanvasLayer) -> void:
+var _on_placed_callback: Callable
+var _on_cancelled_callback: Callable
+
+func initialize(tower_container: Node2D, player: Node2D) -> void:
 	_tower_container = tower_container
 	_player = player
-	_shop_overlay = shop_overlay
-	shop_overlay.bag_item_drag_started.connect(_on_bag_item_drag_started)
 
-func _on_bag_item_drag_started(bag_index: int, item: Dictionary) -> void:
+func start_tower_placement(tower_id: String, on_placed: Callable, on_cancelled: Callable) -> void:
 	if _is_dragging:
 		return
-	_drag_data = {bag_index = bag_index, item = item}
-	if item.type == "tower":
-		_start_drag(DragSource.BAG_TOWER)
-	elif item.type == "weapon":
-		_start_drag(DragSource.BAG_WEAPON)
+	_on_placed_callback = on_placed
+	_on_cancelled_callback = on_cancelled
+	_drag_data = {tower_id = tower_id}
+	_start_drag(DragSource.PLACE_TOWER)
 
 func start_map_tower_drag(deploy_id: int) -> void:
 	if _is_dragging:
@@ -79,61 +76,23 @@ func _check_tower_click(global_pos: Vector2) -> void:
 
 func _end_drag(global_pos: Vector2) -> void:
 	match _drag_source:
-		DragSource.BAG_TOWER:
-			_try_deploy_tower(global_pos)
-		DragSource.BAG_WEAPON:
-			_try_equip_weapon(global_pos)
+		DragSource.PLACE_TOWER:
+			_try_place_new_tower(global_pos)
 		DragSource.MAP_TOWER:
-			_try_move_or_undeploy_tower(global_pos)
+			_try_move_tower(global_pos)
 	_cleanup_drag()
 
-func _cancel_drag() -> void:
-	if _drag_source == DragSource.MAP_TOWER and _drag_original_deploy_id >= 0:
-		if _drag_original_deploy_id in _tower_nodes:
-			_tower_nodes[_drag_original_deploy_id].modulate.a = 1.0
-	_cleanup_drag()
-
-func _cleanup_drag() -> void:
-	_is_dragging = false
-	_drag_source = DragSource.NONE
-	_drag_data = {}
-	_drag_original_deploy_id = -1
-	if _preview_node:
-		_preview_node.queue_free()
-		_preview_node = null
-	if _range_circle:
-		_range_circle.queue_free()
-		_range_circle = null
-	if _player and _player.has_method("set_input_enabled"):
-		_player.set_input_enabled(true)
-
-func _try_deploy_tower(global_pos: Vector2) -> void:
+func _try_place_new_tower(global_pos: Vector2) -> void:
 	var grid_pos := _world_to_grid(global_pos)
-	if not _is_valid_grid_pos(grid_pos) or not _is_grid_available(grid_pos):
+	if _is_valid_grid_pos(grid_pos) and _is_grid_available(grid_pos):
+		if _on_placed_callback.is_valid():
+			_on_placed_callback.call(grid_pos)
 		return
-	var bag_index: int = _drag_data.bag_index
-	var item: Dictionary = _drag_data.item
-	var deploy_id: int = GameData.deploy_tower(bag_index, grid_pos)
-	if deploy_id > 0:
-		_spawn_tower_node(deploy_id, item.id, item.level, grid_pos)
-		_shop_overlay._update_ui()
+	if _on_cancelled_callback.is_valid():
+		_on_cancelled_callback.call()
 
-func _try_equip_weapon(global_pos: Vector2) -> void:
-	if _player == null:
-		return
-	var distance := global_pos.distance_to(_player.global_position)
-	if distance <= WEAPON_EQUIP_RADIUS:
-		var bag_index: int = _drag_data.bag_index
-		GameData.deploy_weapon(bag_index)
-		_shop_overlay._update_ui()
-
-func _try_move_or_undeploy_tower(global_pos: Vector2) -> void:
+func _try_move_tower(global_pos: Vector2) -> void:
 	var deploy_id: int = _drag_data.deploy_id
-	if _is_over_panel(global_pos):
-		if GameData.undeploy_tower(deploy_id):
-			_remove_tower_node(deploy_id)
-			_shop_overlay._update_ui()
-			return
 	var grid_pos := _world_to_grid(global_pos)
 	if _is_valid_grid_pos(grid_pos) and _is_grid_available(grid_pos):
 		if GameData.move_tower(deploy_id, grid_pos):
@@ -143,7 +102,32 @@ func _try_move_or_undeploy_tower(global_pos: Vector2) -> void:
 	if deploy_id in _tower_nodes:
 		_tower_nodes[deploy_id].modulate.a = 1.0
 
-func _spawn_tower_node(deploy_id: int, tower_id: String, level: int, grid_pos: Vector2i) -> void:
+func _cancel_drag() -> void:
+	if _drag_source == DragSource.MAP_TOWER and _drag_original_deploy_id >= 0:
+		if _drag_original_deploy_id in _tower_nodes:
+			_tower_nodes[_drag_original_deploy_id].modulate.a = 1.0
+	elif _drag_source == DragSource.PLACE_TOWER:
+		if _on_cancelled_callback.is_valid():
+			_on_cancelled_callback.call()
+	_cleanup_drag()
+
+func _cleanup_drag() -> void:
+	_is_dragging = false
+	_drag_source = DragSource.NONE
+	_drag_data = {}
+	_drag_original_deploy_id = -1
+	_on_placed_callback = Callable()
+	_on_cancelled_callback = Callable()
+	if _preview_node:
+		_preview_node.queue_free()
+		_preview_node = null
+	if _range_circle:
+		_range_circle.queue_free()
+		_range_circle = null
+	if _player and _player.has_method("set_input_enabled"):
+		_player.set_input_enabled(true)
+
+func spawn_tower_node(deploy_id: int, tower_id: String, level: int, grid_pos: Vector2i) -> void:
 	var tower: Node2D = SceneFactory.create_tower(tower_id, level)
 	tower.position = _grid_to_world(grid_pos)
 	_tower_container.add_child(tower)
@@ -163,7 +147,7 @@ func _create_preview() -> void:
 	var sprite := Sprite2D.new()
 	sprite.modulate = Color(1, 1, 1, 0.5)
 	_preview_node.add_child(sprite)
-	if _drag_source in [DragSource.BAG_TOWER, DragSource.MAP_TOWER]:
+	if _drag_source in [DragSource.PLACE_TOWER, DragSource.MAP_TOWER]:
 		_range_circle = Node2D.new()
 		_preview_node.add_child(_range_circle)
 	_tower_container.get_parent().add_child(_preview_node)
@@ -171,7 +155,7 @@ func _create_preview() -> void:
 func _update_preview(global_pos: Vector2) -> void:
 	if _preview_node == null:
 		return
-	if _drag_source in [DragSource.BAG_TOWER, DragSource.MAP_TOWER]:
+	if _drag_source in [DragSource.PLACE_TOWER, DragSource.MAP_TOWER]:
 		var grid_pos := _world_to_grid(global_pos)
 		_preview_node.global_position = _grid_to_world(grid_pos)
 		var is_valid := _is_valid_grid_pos(grid_pos) and _is_grid_available(grid_pos)
@@ -203,8 +187,3 @@ func _is_grid_available(grid_pos: Vector2i) -> bool:
 				continue
 			return false
 	return true
-
-func _is_over_panel(global_pos: Vector2) -> bool:
-	var panel: PanelContainer = _shop_overlay._panel
-	var panel_rect: Rect2 = panel.get_global_rect()
-	return panel_rect.has_point(global_pos)
