@@ -250,3 +250,34 @@ func test_slot_cost_matches_item_cost() -> void:
 		if not slot.is_empty():
 			assert_eq(slot.cost, config.item_cost,
 				"槽位费用应与 item_cost 一致")
+
+# ===== 人口满时合成可购买 =====
+
+func test_buy_weapon_succeeds_when_pop_full_but_merge_possible() -> void:
+	GameData.player_level = 1  # 人口上限 2
+	GameData.deployed_weapons.append({id = "bow", level = 1})
+	GameData.deployed_weapons.append({id = "bow", level = 1})
+	GameData.coins = 9999
+	GameData.shop_slots = [
+		{id = "bow", type = "weapon", cost = 3},
+		{}, {}, {}
+	]
+	var result: bool = _shop.buy_weapon(0)
+	assert_true(result, "人口满但可合成时应允许购买")
+	# 合成后应只剩 1 个 Lv2
+	assert_eq(GameData.deployed_weapons.size(), 1)
+	assert_eq(GameData.deployed_weapons[0].level, 2)
+
+func test_confirm_tower_purchase_succeeds_when_pop_full_but_merge_possible() -> void:
+	GameData.player_level = 1  # 人口上限 2
+	GameData.deployed_towers.append({id = "pea_shooter", level = 1, grid_pos = Vector2i(0, 0), deploy_id = 1})
+	GameData.deployed_towers.append({id = "pea_shooter", level = 1, grid_pos = Vector2i(1, 0), deploy_id = 2})
+	GameData.coins = 9999
+	GameData.shop_slots = [
+		{id = "pea_shooter", type = "tower", cost = 3},
+		{}, {}, {}
+	]
+	var deploy_id: int = _shop.confirm_tower_purchase(0, Vector2i(2, 0))
+	assert_gt(deploy_id, 0, "人口满但可合成时应允许购买塔")
+	assert_eq(GameData.deployed_towers.size(), 1)
+	assert_eq(GameData.deployed_towers[0].level, 2)

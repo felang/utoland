@@ -67,7 +67,7 @@ func _validate_slot(slot_index: int) -> Dictionary:
 		return {}
 	if GameData.coins < slot.cost:
 		return {}
-	if not GameData.can_deploy():
+	if not GameData.can_buy_item(slot.id, 1):
 		return {}
 	return slot
 

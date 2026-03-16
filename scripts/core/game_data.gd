@@ -182,7 +182,7 @@ func buy_level_up() -> bool:
 
 ## 购买并直接装备武器
 func buy_and_equip_weapon(weapon_id: String, cost: int) -> bool:
-	if not can_deploy():
+	if not can_buy_item(weapon_id, 1):
 		return false
 	if coins < cost:
 		return false
@@ -196,7 +196,7 @@ func buy_and_equip_weapon(weapon_id: String, cost: int) -> bool:
 
 ## 购买并直接布置塔
 func buy_and_place_tower(tower_id: String, cost: int, grid_pos: Vector2i) -> int:
-	if not can_deploy():
+	if not can_buy_item(tower_id, 1):
 		return 0
 	if coins < cost:
 		return 0
