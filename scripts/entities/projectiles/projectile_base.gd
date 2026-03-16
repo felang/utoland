@@ -5,7 +5,7 @@ extends Node2D
 
 signal hit(position: Vector2, direction: Vector2)
 
-@onready var hitbox: Hitbox = $Hitbox
+var hitbox: Hitbox = null
 
 var data: ProjectileData = null
 var _direction: Vector2 = Vector2.RIGHT
@@ -35,6 +35,7 @@ func setup_legacy(damage: float, knockback_force: float, from: Vector2, directio
 	_direction = direction
 	_elapsed = 0.0
 	_hit_count = 0
+	hitbox = get_node_or_null("Hitbox") as Hitbox
 	assert(hitbox != null, "ProjectileBase.setup_legacy: 缺少 Hitbox 子节点")
 	hitbox.damage = damage
 	hitbox.knockback_force = knockback_force
@@ -72,6 +73,7 @@ func setup(p_data: ProjectileData, damage: float, from: Vector2, direction: Vect
 	_pierce_count = data.base_pierce_count + extra_pierce
 	_hit_count = 0
 	_elapsed = 0.0
+	hitbox = get_node_or_null("Hitbox") as Hitbox
 	assert(hitbox != null, "ProjectileBase.setup: 缺少 Hitbox 子节点")
 	hitbox.damage = damage
 	hitbox.knockback_force = data.knockback_force

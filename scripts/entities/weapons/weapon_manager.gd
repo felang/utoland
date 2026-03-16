@@ -87,8 +87,26 @@ func _apply_passive_to_weapon(weapon: Weapon) -> void:
 	weapon.attacker.speed_multiplier = spd_mult
 
 func _on_weapon_projectile_created(proj: ProjectileBase) -> void:
-	# 分裂系统占位（Task 18 实现）
-	pass
+	if GameData.split_count <= 0:
+		return
+	if proj.get_meta("is_split", false):
+		return
+	proj.hit.connect(_on_projectile_hit_for_split.bind(proj.data, proj.hitbox.damage))
+
+func _on_projectile_hit_for_split(pos: Vector2, dir: Vector2, proj_data: ProjectileData, original_damage: float) -> void:
+	var owner_nd: Node2D = get_parent() as Node2D
+	if not owner_nd:
+		return
+	var scene_parent: Node = owner_nd.get_parent()
+	if not scene_parent:
+		return
+	var split_damage: float = original_damage * GameData.split_damage_mult
+	for i in GameData.split_count:
+		var angle: float = randf_range(-PI / 2, PI / 2)
+		var split_dir: Vector2 = dir.rotated(angle)
+		var split_proj: ProjectileBase = SceneFactory.create_projectile(proj_data, split_damage, pos, split_dir)
+		split_proj.set_meta("is_split", true)
+		scene_parent.add_child(split_proj)
 
 func _create_weapon(weapon_id: String) -> Weapon:
 	match weapon_id:

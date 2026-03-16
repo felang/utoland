@@ -16,8 +16,6 @@ var _enemy_scenes: Dictionary = {
 	Enums.Enemy.BOSS_GUARDIAN: preload("res://scenes/entities/enemies/boss_guardian.tscn"),
 }
 
-var _bullet_projectile_scene: PackedScene = preload("res://scenes/entities/projectiles/bullet_projectile.tscn")
-var _shuriken_projectile_scene: PackedScene = preload("res://scenes/entities/projectiles/shuriken_projectile.tscn")
 var _coin_scene: PackedScene = preload("res://scenes/entities/coin.tscn")
 
 # Tower creation — 注入 TowerData Resource，level 直接注入
@@ -59,10 +57,3 @@ func create_projectile(p_data: ProjectileData, damage: float, from: Vector2, dir
 	proj.setup(p_data, damage, from, direction, extra_pierce)
 	return proj
 
-# [过渡兼容] BulletProjectile 创建 — 后续 Task 16 删除
-func create_bullet_projectile() -> ProjectileBase:
-	return _bullet_projectile_scene.instantiate()
-
-# [过渡兼容] ShurikenProjectile 创建 — 后续 Task 16 删除
-func create_shuriken_projectile() -> ShurikenProjectile:
-	return _shuriken_projectile_scene.instantiate()

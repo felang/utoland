@@ -31,7 +31,7 @@ func test_tower_shoots_at_enemy():
 
 	# Check if bullet was created (may have already hit and been destroyed)
 	# We verify the tower has the ability to shoot
-	assert_true(tower.has_method("_shoot_nearest_enemy"), "Tower should have _shoot_nearest_enemy method")
+	assert_not_null(tower.attacker, "Tower should have an AttackerComponent")
 
 func test_enemy_takes_damage():
 	# Test that enemy can take damage
@@ -138,8 +138,8 @@ func test_tower_damage_from_config():
 	await wait_frames(2)
 
 	var td: TowerData = GameConfig.towers[Enums.TowerId.PEA_SHOOTER]
-	var expected_damage = td.damage_per_level[0] * GameData.player_stats[Enums.Stat.TOWER_MULT]
-	assert_eq(tower.attack_damage, expected_damage, "Tower damage should match config")
+	var expected_damage = td.damage_per_level[0] * GameData.player_stats.get(Enums.Stat.TOWER_MULT, 1.0)
+	assert_almost_eq(tower.attacker.base_damage, expected_damage, 0.01, "Tower attacker damage should match config")
 
 func test_enemy_drops_correct_coin_count():
 	# Test that enemy drops coins within configured range

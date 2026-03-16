@@ -49,10 +49,5 @@ collision_mask = 2
 [node name="CollisionShape2D" type="CollisionShape2D" parent="DetectArea"]
 shape = SubResource("CircleShape2D_detect")
 
-[node name="ShootTimer" type="Timer" parent="."]
-wait_time = 1.0
-one_shot = false
-autostart = false
-
 [node name="HealthComponent" type="Node" parent="."]
 script = ExtResource("3_health")

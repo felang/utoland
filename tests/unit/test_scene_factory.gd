@@ -98,16 +98,22 @@ func test_create_tower_with_level():
 	assert_almost_eq(tower.health.max_hp, td.hp_per_level[1], 0.01,
 		"Lv2 tower HP should match hp_per_level[1]")
 
-# 新投射物工厂方法测试
-func test_create_bullet_projectile():
-	var bullet = SceneFactory.create_bullet_projectile()
-	assert_not_null(bullet, "ProjectileBase should be created")
-	bullet.queue_free()
+# 统一投射物工厂方法测试
+func test_create_projectile():
+	var pd := ProjectileData.new()
+	pd.speed = 800.0
+	pd.lifetime = 5.0
+	pd.projectile_scene = preload("res://scenes/entities/projectiles/bullet_projectile.tscn")
+	var proj: ProjectileBase = SceneFactory.create_projectile(pd, 10.0, Vector2.ZERO, Vector2.RIGHT)
+	assert_not_null(proj, "ProjectileBase should be created via create_projectile")
+	proj.queue_free()
 
-func test_create_shuriken_projectile():
-	var shuriken = SceneFactory.create_shuriken_projectile()
-	assert_not_null(shuriken, "ShurikenProjectile should be created")
-	shuriken.queue_free()
+func test_create_shuriken_via_projectile():
+	var wd: WeaponData = GameConfig.weapons[Enums.WeaponId.SHURIKEN]
+	assert_not_null(wd.projectile_data, "Shuriken weapon should have projectile_data")
+	var proj: ProjectileBase = SceneFactory.create_projectile(wd.projectile_data, 10.0, Vector2.ZERO, Vector2.RIGHT)
+	assert_not_null(proj, "ShurikenProjectile should be created via create_projectile")
+	proj.queue_free()
 
 func test_all_towers_can_be_created():
 	var all_ids: Array[String] = [

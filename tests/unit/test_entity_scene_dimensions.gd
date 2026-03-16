@@ -29,7 +29,11 @@ func test_tower_sizes_match_new_standard():
 	assert_eq(slow.get_node("CollisionShape2D").shape.size, Vector2(16, 16))
 
 func test_bullet_projectile_and_coin_sizes_match_new_standard():
-	var bullet: ProjectileBase = SceneFactory.create_bullet_projectile()
+	var pd := ProjectileData.new()
+	pd.speed = 800.0
+	pd.lifetime = 5.0
+	pd.projectile_scene = preload("res://scenes/entities/projectiles/bullet_projectile.tscn")
+	var bullet: ProjectileBase = SceneFactory.create_projectile(pd, 10.0, Vector2.ZERO, Vector2.RIGHT)
 	add_child_autofree(bullet)
 	var hitbox_shape: CollisionShape2D = bullet.get_node("Hitbox/CollisionShape2D")
 	assert_not_null(hitbox_shape, "ProjectileBase 应有 Hitbox/CollisionShape2D")
