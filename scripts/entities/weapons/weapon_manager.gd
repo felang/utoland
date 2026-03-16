@@ -40,6 +40,7 @@ func _add_weapon(data: WeaponData) -> Weapon:
 	var sprite := _create_weapon_sprite(data)
 	add_child(sprite)
 	_weapon_sprites.append(sprite)
+	weapon.sprite = sprite
 	return weapon
 
 func tick(delta: float) -> void:
@@ -75,6 +76,8 @@ func _update_sprites(delta: float) -> void:
 	for i in range(count):
 		var angle: float = _orbit_angle + angle_step * i
 		_weapon_sprites[i].position = Vector2(cos(angle), sin(angle)) * ORBIT_RADIUS
+		# 精灵朝向轨道角度（素材默认朝下=PI/2，补偿 -PI/2）
+		_weapon_sprites[i].rotation = angle - PI / 2.0
 
 func _find_closest_enemy(range_limit: float = INF) -> Node2D:
 	if not is_inside_tree():

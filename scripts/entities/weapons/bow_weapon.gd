@@ -12,11 +12,12 @@ func fire(target: Node2D) -> void:
 	if not scene_parent:
 		push_error("BowWeapon: owner has no parent scene")
 		return
-	var direction: Vector2 = owner_node.global_position.direction_to(target.global_position)
+	var fire_pos: Vector2 = get_fire_position()
+	var direction: Vector2 = fire_pos.direction_to(target.global_position)
 	var bullet: BulletProjectile = SceneFactory.create_bullet_projectile()
 	bullet.speed = weapon_data.bullet_speed
 	scene_parent.add_child(bullet)
-	bullet.setup(base_damage, weapon_data.knockback_force, owner_node.global_position, direction)
+	bullet.setup(base_damage, weapon_data.knockback_force, fire_pos, direction)
 	# 添加箭矢精灵
 	if ResourceLoader.exists(ARROW_SPRITE_PATH):
 		var sprite := Sprite2D.new()

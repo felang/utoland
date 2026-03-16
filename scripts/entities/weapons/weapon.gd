@@ -5,6 +5,7 @@ extends Node
 
 var weapon_data: WeaponData = null
 var owner_node: Node2D = null
+var sprite: Sprite2D = null  # 漂浮精灵引用，由 WeaponManager 注入
 var _cooldown: float = 0.0
 var _level: int = 1
 
@@ -40,6 +41,14 @@ func tick(delta: float, target: Node2D) -> void:
 		fire(target)
 		var speed_mult: float = GameData.player_stats.get(Enums.Stat.ATTACK_SPEED_MULT, 1.0)
 		_cooldown = get_fire_rate() / speed_mult
+
+## 获取发射位置（优先使用武器精灵位置，否则回退到角色位置）
+func get_fire_position() -> Vector2:
+	if sprite and is_instance_valid(sprite):
+		return sprite.global_position
+	if owner_node:
+		return owner_node.global_position
+	return Vector2.ZERO
 
 func fire(_target: Node2D) -> void:
 	pass  # 子类实现
