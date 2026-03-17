@@ -1,15 +1,31 @@
-[gd_resource type="Resource" script_class="WaveData" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="WaveData" format=3 uid="uid://bnb7qvmkt18dl"]
 
-[ext_resource type="Script" path="res://scripts/resources/wave_data.gd" id="1"]
+[ext_resource type="Script" uid="uid://de56wiabkilte" path="res://scripts/resources/wave_data.gd" id="1_0o6dg"]
+[ext_resource type="Script" uid="uid://cd2uxnp0n2bb3" path="res://scripts/resources/spawn_phase_data.gd" id="2_2fbnd"]
+
+[sub_resource type="Resource" id="Resource_0o6dg"]
+script = ExtResource("2_2fbnd")
+duration_ratio = 0.6
+
+[sub_resource type="Resource" id="Resource_2fbnd"]
+script = ExtResource("2_2fbnd")
+duration_ratio = 0.4
+spawn_interval = 0.5
+enemy_weights = {
+"fast": 40,
+"tank": 60
+}
 
 [resource]
-script = ExtResource("1")
+script = ExtResource("1_0o6dg")
 wave_number = 10
-total_enemies = 35
-time_limit = 90.0
-spawn_interval = 0.6
-enemy_weights = { "normal": 30, "fast": 40, "tank": 30 }
+time_limit = 75.0
+spawn_phases = Array[ExtResource("2_2fbnd")]([SubResource("Resource_0o6dg"), SubResource("Resource_2fbnd")])
+enemy_weights = {
+"fast": 40,
+"normal": 30,
+"tank": 30
+}
 elite_chance = 0.1
 is_boss_wave = true
-boss_id = "boss_brute"
-boss_escort_count = 35
+boss_id = "boss_summoner"

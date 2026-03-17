@@ -1,11 +1,29 @@
-[gd_resource type="Resource" script_class="WaveData" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="WaveData" format=3 uid="uid://bbtydr7k8yhix"]
 
-[ext_resource type="Script" path="res://scripts/resources/wave_data.gd" id="1"]
+[ext_resource type="Script" uid="uid://de56wiabkilte" path="res://scripts/resources/wave_data.gd" id="1_vak3q"]
+[ext_resource type="Script" uid="uid://cd2uxnp0n2bb3" path="res://scripts/resources/spawn_phase_data.gd" id="2_lthtg"]
+
+[sub_resource type="Resource" id="Resource_vak3q"]
+script = ExtResource("2_lthtg")
+duration_ratio = 0.3
+spawn_interval = 2.0
+
+[sub_resource type="Resource" id="Resource_lthtg"]
+script = ExtResource("2_lthtg")
+spawn_interval = 1.2
+
+[sub_resource type="Resource" id="Resource_obxfd"]
+script = ExtResource("2_lthtg")
+duration_ratio = 0.2
+spawn_interval = 0.8
 
 [resource]
-script = ExtResource("1")
+script = ExtResource("1_vak3q")
 wave_number = 2
-total_enemies = 25
-time_limit = 60.0
-spawn_interval = 1.3
-enemy_weights = { "normal": 100 }
+time_limit = 42.0
+max_alive_enemies = 18
+spawn_phases = Array[ExtResource("2_lthtg")]([SubResource("Resource_vak3q"), SubResource("Resource_lthtg"), SubResource("Resource_obxfd")])
+enemy_weights = {
+"fast": 20,
+"normal": 80
+}
