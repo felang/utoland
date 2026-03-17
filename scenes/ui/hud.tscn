@@ -5,84 +5,80 @@
 [node name="HUD" type="CanvasLayer" unique_id=1731831904]
 script = ExtResource("1_0mwgc")
 
-[node name="LeftTop" type="MarginContainer" parent="."]
-anchors_preset = 0
+[node name="LeftTop" type="MarginContainer" parent="." unique_id=1394762826]
 offset_left = 8.0
 offset_top = 8.0
 offset_right = 200.0
 offset_bottom = 80.0
 
-[node name="VBox" type="VBoxContainer" parent="LeftTop"]
+[node name="VBox" type="VBoxContainer" parent="LeftTop" unique_id=369450864]
 layout_mode = 2
 theme_override_constants/separation = 2
 
-[node name="HPRow" type="HBoxContainer" parent="LeftTop/VBox"]
+[node name="HPRow" type="HBoxContainer" parent="LeftTop/VBox" unique_id=1226278716]
 layout_mode = 2
 theme_override_constants/separation = 3
 
-[node name="HPIcon" type="PanelContainer" parent="LeftTop/VBox/HPRow"]
+[node name="HPIcon" type="PanelContainer" parent="LeftTop/VBox/HPRow" unique_id=2130617550]
 custom_minimum_size = Vector2(14, 14)
 layout_mode = 2
 size_flags_vertical = 4
 
-[node name="Label" type="Label" parent="LeftTop/VBox/HPRow/HPIcon"]
+[node name="Label" type="Label" parent="LeftTop/VBox/HPRow/HPIcon" unique_id=2023150077]
 layout_mode = 2
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="HPProgress" type="ProgressBar" parent="LeftTop/VBox/HPRow"]
+[node name="HPProgress" type="ProgressBar" parent="LeftTop/VBox/HPRow" unique_id=1946059802]
 custom_minimum_size = Vector2(80, 10)
 layout_mode = 2
 size_flags_vertical = 4
-max_value = 100.0
 value = 100.0
 show_percentage = false
 
-[node name="XPRow" type="HBoxContainer" parent="LeftTop/VBox"]
+[node name="XPRow" type="HBoxContainer" parent="LeftTop/VBox" unique_id=1527626508]
 layout_mode = 2
 theme_override_constants/separation = 3
 
-[node name="XPIcon" type="PanelContainer" parent="LeftTop/VBox/XPRow"]
+[node name="XPIcon" type="PanelContainer" parent="LeftTop/VBox/XPRow" unique_id=2075638342]
 custom_minimum_size = Vector2(14, 14)
 layout_mode = 2
 size_flags_vertical = 4
 
-[node name="Label" type="Label" parent="LeftTop/VBox/XPRow/XPIcon"]
+[node name="Label" type="Label" parent="LeftTop/VBox/XPRow/XPIcon" unique_id=438441827]
 layout_mode = 2
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="XPProgress" type="ProgressBar" parent="LeftTop/VBox/XPRow"]
+[node name="XPProgress" type="ProgressBar" parent="LeftTop/VBox/XPRow" unique_id=56491440]
 custom_minimum_size = Vector2(80, 8)
 layout_mode = 2
 size_flags_vertical = 4
-max_value = 100.0
-value = 0.0
 show_percentage = false
 
-[node name="LevelLabel" type="Label" parent="LeftTop/VBox/XPRow"]
+[node name="LevelLabel" type="Label" parent="LeftTop/VBox/XPRow" unique_id=171168593]
 layout_mode = 2
 text = "Lv.1"
 
-[node name="CoinRow" type="HBoxContainer" parent="LeftTop/VBox"]
+[node name="CoinRow" type="HBoxContainer" parent="LeftTop/VBox" unique_id=1701077911]
 layout_mode = 2
 theme_override_constants/separation = 3
 
-[node name="CoinIcon" type="PanelContainer" parent="LeftTop/VBox/CoinRow"]
+[node name="CoinIcon" type="PanelContainer" parent="LeftTop/VBox/CoinRow" unique_id=1271375482]
 custom_minimum_size = Vector2(14, 14)
 layout_mode = 2
 size_flags_vertical = 4
 
-[node name="Label" type="Label" parent="LeftTop/VBox/CoinRow/CoinIcon"]
+[node name="Label" type="Label" parent="LeftTop/VBox/CoinRow/CoinIcon" unique_id=1961520367]
 layout_mode = 2
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="CoinText" type="Label" parent="LeftTop/VBox/CoinRow"]
+[node name="CoinText" type="Label" parent="LeftTop/VBox/CoinRow" unique_id=400952264]
 layout_mode = 2
 text = "0"
 
-[node name="WaveCenter" type="MarginContainer" parent="."]
+[node name="WaveCenter" type="MarginContainer" parent="." unique_id=1015045352]
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
@@ -92,10 +88,18 @@ offset_right = 50.0
 offset_bottom = 32.0
 grow_horizontal = 2
 
-[node name="WavePanel" type="PanelContainer" parent="WaveCenter"]
+[node name="WavePanel" type="PanelContainer" parent="WaveCenter" unique_id=696032966]
 layout_mode = 2
 
-[node name="WaveLabel" type="Label" parent="WaveCenter/WavePanel"]
+[node name="WaveVBox" type="VBoxContainer" parent="WaveCenter/WavePanel" unique_id=1114096316]
+layout_mode = 2
+alignment = 1
+
+[node name="WaveLabel" type="Label" parent="WaveCenter/WavePanel/WaveVBox" unique_id=725931182]
 layout_mode = 2
 text = "第 1 波"
+horizontal_alignment = 1
+
+[node name="CountdownLabel" type="Label" parent="WaveCenter/WavePanel/WaveVBox" unique_id=1452118375]
+layout_mode = 2
 horizontal_alignment = 1

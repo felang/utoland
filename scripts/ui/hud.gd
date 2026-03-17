@@ -15,10 +15,13 @@ const HP_COLOR_LOW_THRESHOLD: float = 0.3
 @onready var coin_text: Label = $LeftTop/VBox/CoinRow/CoinText
 # 节点引用 — 顶部居中
 @onready var wave_panel: PanelContainer = $WaveCenter/WavePanel
-@onready var wave_label: Label = $WaveCenter/WavePanel/WaveLabel
+@onready var wave_label: Label = $WaveCenter/WavePanel/WaveVBox/WaveLabel
+@onready var countdown_label: Label = $WaveCenter/WavePanel/WaveVBox/CountdownLabel
 
 var player: Node2D = null
 var _last_coins: int = -1
+var _wave_time_left: float = 0.0
+var _is_battle: bool = false
 
 func _ready() -> void:
 	player = get_tree().get_first_node_in_group(Enums.Group.PLAYER)
@@ -30,9 +33,10 @@ func _ready() -> void:
 	_style_ui()
 	_init_exp_bar()
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
 	_update_hp()
 	_update_coins()
+	_update_countdown(delta)
 
 # ===== HP 更新 =====
 
@@ -72,15 +76,26 @@ func _bounce_label(label: Control) -> void:
 	tween.tween_property(label, "scale", Vector2(1.3, 1.3), 0.1)
 	tween.tween_property(label, "scale", Vector2.ONE, 0.1)
 
+# ===== 倒计时更新 =====
+
+func _update_countdown(delta: float) -> void:
+	if not _is_battle:
+		return
+	_wave_time_left = maxf(_wave_time_left - delta, 0.0)
+	var seconds: int = ceili(_wave_time_left)
+	countdown_label.text = "%d:%02d" % [seconds / 60, seconds % 60]
+
 # ===== 阶段切换 =====
 
 func set_battle_phase(is_battle: bool) -> void:
+	_is_battle = is_battle
 	wave_panel.visible = is_battle
 
 # ===== 信号回调 =====
 
-func _on_wave_started(wave_number: int, _wave_data: WaveData) -> void:
+func _on_wave_started(wave_number: int, wave_data: WaveData) -> void:
 	wave_label.text = "第 %d 波" % wave_number
+	_wave_time_left = wave_data.time_limit
 
 func _on_player_level_changed(new_level: int) -> void:
 	level_label.text = "Lv.%d" % new_level
@@ -142,6 +157,11 @@ func _style_ui() -> void:
 	wave_label.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_SMALL)
 	wave_label.add_theme_color_override("font_color", UIConstants.COLOR_TEXT_PRIMARY)
 	wave_label.text = "第 %d 波" % max(GameData.current_wave, 1)
+
+	# 倒计时标签
+	countdown_label.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_SMALL)
+	countdown_label.add_theme_color_override("font_color", UIConstants.COLOR_TEXT_SECONDARY)
+	countdown_label.text = ""
 
 func _style_icon(panel: PanelContainer, symbol: String, bg_color: Color, border_color: Color) -> void:
 	var style := StyleBoxFlat.new()
