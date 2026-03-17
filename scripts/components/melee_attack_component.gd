@@ -55,9 +55,10 @@ func _execute_melee(target: Node2D) -> void:
 	if not melee_config:
 		return
 	_is_attacking = true
-	var direction: Vector2 = get_parent().global_position.direction_to(target.global_position)
+	var weapon_pos: Vector2 = get_parent().global_position
+	var direction: Vector2 = weapon_pos.direction_to(target.global_position)
 
-	# 创建临时 Hitbox（Hitbox 继承 Area2D）
+	# 创建临时 Hitbox（加到场景根，不受 WeaponOffset tween 影响）
 	var hitbox := Hitbox.new()
 	hitbox.damage = get_final_damage()
 	hitbox.knockback_force = melee_config.knockback_force
@@ -68,15 +69,17 @@ func _execute_melee(target: Node2D) -> void:
 	circle.radius = melee_config.hit_radius
 	shape.shape = circle
 	hitbox.add_child(shape)
-	get_parent().add_child(hitbox)
-	hitbox.global_position = get_parent().global_position + direction * melee_config.thrust_distance
+	# 加到场景根（不跟随武器移动）
+	get_tree().current_scene.add_child(hitbox)
+	hitbox.global_position = weapon_pos + direction * melee_config.thrust_distance
 
-	# Tween 前刺动画（parent 就是 WeaponOffset）
+	# Tween 前刺动画（沿局部 X 轴向前推，不用世界方向）
 	var offset_node: Node2D = get_parent() as Node2D
 	if offset_node and offset_node.name == "WeaponOffset":
 		var tween := create_tween()
 		var original_pos: Vector2 = offset_node.position
-		var thrust_pos: Vector2 = original_pos + direction * melee_config.thrust_distance
+		# 局部空间沿 X 轴前推
+		var thrust_pos: Vector2 = original_pos + Vector2(melee_config.thrust_distance, 0)
 		tween.tween_property(offset_node, "position", thrust_pos, 0.1)
 		tween.tween_property(offset_node, "position", original_pos, 0.1)
 		tween.tween_callback(func() -> void:
