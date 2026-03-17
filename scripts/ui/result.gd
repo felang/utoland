@@ -4,7 +4,7 @@ func _ready() -> void:
 	$Background.color = Color(0, 0, 0, 0.85)
 	var vbox := $CenterContainer/VBoxContainer
 	var total_waves := GameConfig.waves.size()
-	var is_victory := GameData.current_wave > total_waves
+	var is_victory := PlayerState.current_wave > total_waves
 
 	# 标题
 	var title: Label = vbox.get_node("TitleLabel")
@@ -15,23 +15,23 @@ func _ready() -> void:
 	# 波次进度条
 	var wave_label: Label = vbox.get_node("WaveProgress/WaveLabel")
 	var wave_bar: ProgressBar = vbox.get_node("WaveProgress/WaveBar")
-	wave_label.text = "存活波次: %d/%d" % [mini(GameData.current_wave, total_waves), total_waves]
+	wave_label.text = "存活波次: %d/%d" % [mini(PlayerState.current_wave, total_waves), total_waves]
 	wave_label.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_BODY)
 	wave_label.add_theme_color_override("font_color", UIConstants.COLOR_TEXT_PRIMARY)
 	wave_bar.max_value = total_waves
-	wave_bar.value = mini(GameData.current_wave, total_waves)
+	wave_bar.value = mini(PlayerState.current_wave, total_waves)
 
 	# 统计面板
 	var stats_panel: PanelContainer = vbox.get_node("StatsPanel")
 	stats_panel.add_theme_stylebox_override("panel", UIConstants.create_panel_stylebox())
 	var stats_grid: GridContainer = vbox.get_node("StatsPanel/StatsGrid")
-	_add_stat_row(stats_grid, "击杀总数", str(GameData.total_kills))
-	_add_stat_row(stats_grid, "获取金币", str(GameData.total_coins_earned))
-	_add_stat_row(stats_grid, "获取经验", str(GameData.total_exp_earned))
-	_add_stat_row(stats_grid, "拥有武器", str(GameData.deployed_weapons.size()))
-	_add_stat_row(stats_grid, "拥有塔", str(GameData.deployed_towers.size()))
-	_add_stat_row(stats_grid, "受到伤害", str(int(GameData.total_damage_taken)))
-	_add_stat_row(stats_grid, "最高连杀", str(GameData.max_kill_streak))
+	_add_stat_row(stats_grid, "击杀总数", str(StatsTracker.total_kills))
+	_add_stat_row(stats_grid, "获取金币", str(StatsTracker.total_coins_earned))
+	_add_stat_row(stats_grid, "获取经验", str(PlayerProgression.total_exp_earned))
+	_add_stat_row(stats_grid, "拥有武器", str(InventoryManager.deployed_weapons.size()))
+	_add_stat_row(stats_grid, "拥有塔", str(InventoryManager.deployed_towers.size()))
+	_add_stat_row(stats_grid, "受到伤害", str(int(StatsTracker.total_damage_taken)))
+	_add_stat_row(stats_grid, "最高连杀", str(StatsTracker.max_kill_streak))
 
 	# 拥有的武器和塔
 	var items_panel: PanelContainer = vbox.get_node("ItemsPanel")
@@ -40,9 +40,9 @@ func _ready() -> void:
 	var has_items := false
 	# 显示已上阵武器和塔
 	var all_items: Array[Dictionary] = []
-	for item in GameData.deployed_weapons:
+	for item in InventoryManager.deployed_weapons:
 		all_items.append({id = item.id, type = "weapon", level = item.level})
-	for item in GameData.deployed_towers:
+	for item in InventoryManager.deployed_towers:
 		all_items.append({id = item.id, type = "tower", level = item.level})
 	for item in all_items:
 		has_items = true
@@ -105,10 +105,16 @@ func _add_stat_row(grid: GridContainer, label_text: String, value_text: String) 
 
 
 func _on_restart() -> void:
-	GameData.reset()
+	PlayerState.reset()
+	PlayerProgression.reset()
+	InventoryManager.reset()
+	StatsTracker.reset()
 	SceneManager.go_to(Enums.Scene.CHARACTER_SELECTION)
 
 
 func _on_menu() -> void:
-	GameData.reset()
+	PlayerState.reset()
+	PlayerProgression.reset()
+	InventoryManager.reset()
+	StatsTracker.reset()
 	SceneManager.go_to(Enums.Scene.START_MENU)

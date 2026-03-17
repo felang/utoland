@@ -23,7 +23,7 @@ func _apply_level_stats() -> void:
 
 func _apply_attacker_stats() -> void:
 	var idx: int = current_level - 1
-	var damage: float = data.damage_per_level[idx] * GameData.player_stats.get(Enums.Stat.TOWER_MULT, 1.0)
+	var damage: float = data.damage_per_level[idx] * PlayerState.player_stats.get(Enums.Stat.TOWER_MULT, 1.0)
 	var cooldown: float = data.fire_rate_per_level[idx]
 	var attack_range: float = data.attack_range_per_level[idx]
 	attacker.update_stats(damage, attack_range, cooldown)

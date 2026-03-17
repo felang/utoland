@@ -15,12 +15,12 @@ func _ready() -> void:
 	add_to_group(Enums.Group.WAVE_MANAGER)
 	EventBus.player_died.connect(_on_player_died)
 	EventBus.boss_killed.connect(_on_boss_killed)
-	var map_waves: Array = GameConfig.get_waves_for_map(GameData.selected_map)
+	var map_waves: Array = GameConfig.get_waves_for_map(PlayerState.selected_map)
 	if map_waves.size() > 0:
 		GameConfig.waves = map_waves
 	total_waves = GameConfig.waves.size()
-	if GameData.current_wave > 0:
-		current_wave = GameData.current_wave
+	if PlayerState.current_wave > 0:
+		current_wave = PlayerState.current_wave
 
 func _process(delta: float) -> void:
 	if not is_wave_active:
@@ -31,7 +31,7 @@ func _process(delta: float) -> void:
 
 func start_next_wave() -> void:
 	current_wave += 1
-	GameData.current_wave = current_wave
+	PlayerState.current_wave = current_wave
 	if current_wave > total_waves:
 		EventBus.game_won.emit()
 		await get_tree().create_timer(VICTORY_DELAY).timeout

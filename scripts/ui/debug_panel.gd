@@ -24,7 +24,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		_skip_wave()
 		get_viewport().set_input_as_handled()
 	elif event.is_action_pressed("debug_add_coins"):
-		GameData.coins += 100
+		InventoryManager.coins += 100
 		get_viewport().set_input_as_handled()
 	elif event.is_action_pressed("debug_godmode"):
 		_toggle_godmode()
@@ -72,7 +72,7 @@ func _update_info() -> void:
 	var dmg_text: String = "N/A"
 	if player and player.has_node("HealthComponent"):
 		hp_text = "%d/%d" % [int(player.health.current_hp), int(player.health.max_hp)]
-	dmg_text = "x%.1f" % GameData.player_stats.get(Enums.Stat.DAMAGE_MULT, 1.0)
+	dmg_text = "x%.1f" % PlayerState.player_stats.get(Enums.Stat.DAMAGE_MULT, 1.0)
 
 	# 摄像机 zoom 信息
 	var zoom_text: String = "N/A"
@@ -87,7 +87,7 @@ func _update_info() -> void:
 	_label.text = "Wave: %s/%s | Enemies: %d\nHP: %s | DMG: %s\nCoins: %d | FPS: %d%s\nZoom: %s | Map: %dx%d" % [
 		wave_info, total_info, enemies.size(),
 		hp_text, dmg_text,
-		GameData.coins, Engine.get_frames_per_second(),
+		InventoryManager.coins, Engine.get_frames_per_second(),
 		godmode_text,
 		zoom_text, int(GameConfig.MAP_PIXEL_WIDTH), int(GameConfig.MAP_PIXEL_HEIGHT)
 	]

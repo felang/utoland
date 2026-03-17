@@ -43,7 +43,7 @@ func start_map_tower_drag(deploy_id: int) -> void:
 		return
 	if deploy_id not in _tower_nodes:
 		return
-	for entry in GameData.deployed_towers:
+	for entry in InventoryManager.deployed_towers:
 		if entry.deploy_id == deploy_id:
 			_drag_data = {deploy_id = deploy_id, item = entry}
 			_drag_original_deploy_id = deploy_id
@@ -125,13 +125,13 @@ func _try_move_tower(world_pos: Vector2, viewport_pos: Vector2 = Vector2.ZERO) -
 	var deploy_id: int = _drag_data.deploy_id
 	# 回收区检测（用视口坐标，因为回收区在 CanvasLayer 中）
 	if is_over_recycle_area(viewport_pos):
-		var refund: int = GameData.sell_from_deployed_tower(deploy_id)
+		var refund: int = InventoryManager.sell_from_deployed_tower(deploy_id)
 		if refund > 0:
 			_remove_tower_node(deploy_id)
 			return
 	var grid_pos := _world_to_grid(world_pos)
 	if _is_valid_grid_pos(grid_pos) and _is_grid_available(grid_pos):
-		if GameData.move_tower(deploy_id, grid_pos):
+		if InventoryManager.move_tower(deploy_id, grid_pos):
 			_tower_nodes[deploy_id].position = _grid_to_world(grid_pos)
 			_tower_nodes[deploy_id].modulate.a = 1.0
 			return
@@ -216,7 +216,7 @@ func _create_preview() -> void:
 	elif _drag_source == DragSource.MAP_TOWER:
 		# 移动已有塔：直接拖拽实际塔节点，只显示范围圆
 		var deploy_id: int = _drag_data.get("deploy_id", -1)
-		for entry in GameData.deployed_towers:
+		for entry in InventoryManager.deployed_towers:
 			if entry.deploy_id == deploy_id:
 				var tower_data: TowerData = GameConfig.towers.get(entry.id)
 				if tower_data and tower_data.attack_range_per_level.size() >= entry.level:
@@ -283,7 +283,7 @@ func _get_drag_refund() -> int:
 	match _drag_source:
 		DragSource.MAP_TOWER:
 			var deploy_id: int = _drag_data.get("deploy_id", -1)
-			for entry in GameData.deployed_towers:
+			for entry in InventoryManager.deployed_towers:
 				if entry.deploy_id == deploy_id:
 					var data: Resource = GameConfig.towers.get(entry.id)
 					if data:
@@ -291,8 +291,8 @@ func _get_drag_refund() -> int:
 			return 0
 		DragSource.WEAPON:
 			var weapon_index: int = _drag_data.get("weapon_index", -1)
-			if weapon_index >= 0 and weapon_index < GameData.deployed_weapons.size():
-				var entry: Dictionary = GameData.deployed_weapons[weapon_index]
+			if weapon_index >= 0 and weapon_index < InventoryManager.deployed_weapons.size():
+				var entry: Dictionary = InventoryManager.deployed_weapons[weapon_index]
 				var data: Resource = GameConfig.weapons.get(entry.id)
 				if data:
 					return data.sell_price_per_level[entry.level - 1]
@@ -317,7 +317,7 @@ func _is_valid_grid_pos(grid_pos: Vector2i) -> bool:
 		and grid_pos.y >= 0 and grid_pos.y < GameConfig.MAP_GRID_HEIGHT)
 
 func _is_grid_available(grid_pos: Vector2i) -> bool:
-	for entry in GameData.deployed_towers:
+	for entry in InventoryManager.deployed_towers:
 		if entry.grid_pos == grid_pos:
 			if _drag_source == DragSource.MAP_TOWER and entry.deploy_id == _drag_original_deploy_id:
 				continue

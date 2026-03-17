@@ -106,10 +106,10 @@ func _on_exp_changed(current_exp: int, exp_to_next: int) -> void:
 	xp_progress.value = current_exp
 
 func _init_exp_bar() -> void:
-	var next_threshold: int = GameData.exp_for_level(GameData.player_level + 1)
+	var next_threshold: int = PlayerProgression.exp_for_level(PlayerProgression.player_level + 1)
 	xp_progress.max_value = next_threshold
-	xp_progress.value = GameData.current_exp
-	level_label.text = "Lv.%d" % GameData.player_level
+	xp_progress.value = PlayerProgression.current_exp
+	level_label.text = "Lv.%d" % PlayerProgression.player_level
 
 # ===== 样式初始化 =====
 
@@ -129,7 +129,7 @@ func _style_ui() -> void:
 	# 等级标签
 	level_label.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_SMALL)
 	level_label.add_theme_color_override("font_color", UIConstants.COLOR_TEXT_SECONDARY)
-	level_label.text = "Lv.%d" % GameData.player_level
+	level_label.text = "Lv.%d" % PlayerProgression.player_level
 
 	# 金币文字
 	coin_text.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_SMALL)
@@ -156,7 +156,7 @@ func _style_ui() -> void:
 	# 波次标签
 	wave_label.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_SMALL)
 	wave_label.add_theme_color_override("font_color", UIConstants.COLOR_TEXT_PRIMARY)
-	wave_label.text = "第 %d 波" % max(GameData.current_wave, 1)
+	wave_label.text = "第 %d 波" % max(PlayerState.current_wave, 1)
 
 	# 倒计时标签
 	countdown_label.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_SMALL)

@@ -104,7 +104,7 @@ func _on_died() -> void:
 	# 屏幕震动
 	var fx: EffectConfigData = GameConfig.effects
 	EventBus.camera_shake_requested.emit(fx.camera_shake_enemy_kill_intensity, fx.camera_shake_enemy_kill_duration)
-	GameData.record_kill()
+	StatsTracker.record_kill()
 	EventBus.enemy_killed.emit(enemy_type, global_position, is_elite)
 	AudioManager.play("enemy_die")
 	_drop_exp_orbs()

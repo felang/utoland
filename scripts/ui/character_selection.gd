@@ -250,6 +250,9 @@ func _color_stat(label: Label, value: float, baseline: float) -> void:
 func _on_select_pressed() -> void:
 	if _selected_id == "":
 		return
-	GameData.current_character = _selected_id
-	GameData.reset()
+	PlayerState.current_character = _selected_id
+	PlayerState.reset()
+	PlayerProgression.reset()
+	InventoryManager.reset()
+	StatsTracker.reset()
 	SceneManager.go_to(Enums.Scene.MAP_SELECT)

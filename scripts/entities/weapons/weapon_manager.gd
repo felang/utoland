@@ -69,7 +69,7 @@ func refresh_weapons() -> void:
 		s.queue_free()
 	_weapon_sprites.clear()
 	_sprite_rot_offsets.clear()
-	initialize(GameData.deployed_weapons)
+	initialize(InventoryManager.deployed_weapons)
 
 func _add_weapon(data: WeaponData, weapon_id: String) -> Weapon:
 	var weapon: Weapon = _create_weapon(weapon_id)
@@ -99,8 +99,6 @@ func _add_weapon(data: WeaponData, weapon_id: String) -> Weapon:
 	click_area.add_child(shape)
 	spr.add_child(click_area)
 	click_area.input_event.connect(_on_weapon_click.bind(_weapons.size() - 1))
-	# 监听投射物创建（分裂系统，Task 18）
-	weapon.projectile_created.connect(_on_weapon_projectile_created)
 	return weapon
 
 func tick(delta: float) -> void:
@@ -130,8 +128,8 @@ func _find_closest_enemy_unlimited() -> Node2D:
 	return _find_nearest_enemy_from(owner_nd.global_position, INF)
 
 func _apply_passive_to_weapon(weapon: Weapon) -> void:
-	var dmg_mult: float = GameData.player_stats.get(Enums.Stat.DAMAGE_MULT, 1.0)
-	var spd_mult: float = GameData.player_stats.get(Enums.Stat.ATTACK_SPEED_MULT, 1.0)
+	var dmg_mult: float = PlayerState.player_stats.get(Enums.Stat.DAMAGE_MULT, 1.0)
+	var spd_mult: float = PlayerState.player_stats.get(Enums.Stat.ATTACK_SPEED_MULT, 1.0)
 	weapon.attacker.damage_multiplier = dmg_mult
 	weapon.attacker.speed_multiplier = spd_mult
 
@@ -139,28 +137,6 @@ func _on_weapon_click(_viewport: Node, event: InputEvent, _shape_idx: int, weapo
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 		if _on_weapon_drag_callback.is_valid():
 			_on_weapon_drag_callback.call(weapon_index)
-
-func _on_weapon_projectile_created(proj: ProjectileBase) -> void:
-	if GameData.split_count <= 0:
-		return
-	if proj.get_meta("is_split", false):
-		return
-	proj.hit.connect(_on_projectile_hit_for_split.bind(proj.data, proj.hitbox.damage))
-
-func _on_projectile_hit_for_split(pos: Vector2, dir: Vector2, proj_data: ProjectileData, original_damage: float) -> void:
-	var owner_nd: Node2D = get_parent() as Node2D
-	if not owner_nd:
-		return
-	var scene_parent: Node = owner_nd.get_parent()
-	if not scene_parent:
-		return
-	var split_damage: float = original_damage * GameData.split_damage_mult
-	for i in GameData.split_count:
-		var angle: float = randf_range(-PI / 2, PI / 2)
-		var split_dir: Vector2 = dir.rotated(angle)
-		var split_proj: ProjectileBase = SceneFactory.create_projectile(proj_data, split_damage, pos, split_dir)
-		split_proj.set_meta("is_split", true)
-		scene_parent.add_child(split_proj)
 
 func _create_weapon(weapon_id: String) -> Weapon:
 	match weapon_id:

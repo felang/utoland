@@ -114,5 +114,5 @@ func _on_map_selected(map_id: String) -> void:
 	if not GameConfig.maps.has(map_id):
 		push_error("未知地图: " + map_id)
 		return
-	GameData.selected_map = map_id
+	PlayerState.selected_map = map_id
 	SceneManager.go_to(Enums.Scene.MAIN)

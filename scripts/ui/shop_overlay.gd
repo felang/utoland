@@ -170,18 +170,18 @@ func _update_ui() -> void:
 	_update_cards()
 
 func _update_info_bar() -> void:
-	_coins_label.text = "$%d" % GameData.coins
-	_level_label.text = "Lv.%d" % GameData.player_level
-	var pop_current: int = GameData.deployed_weapons.size() + GameData.deployed_towers.size()
-	var pop_max: int = GameData.get_population_cap()
+	_coins_label.text = "$%d" % InventoryManager.coins
+	_level_label.text = "Lv.%d" % PlayerProgression.player_level
+	var pop_current: int = InventoryManager.deployed_weapons.size() + InventoryManager.deployed_towers.size()
+	var pop_max: int = PlayerProgression.get_population_cap()
 	_pop_label.text = "人口 %d/%d" % [pop_current, pop_max]
-	_wave_label.text = "W%d" % GameData.current_wave
+	_wave_label.text = "W%d" % PlayerState.current_wave
 
 func _update_cards() -> void:
 	var is_placing: bool = _pending_tower_slot_index >= 0
 	for i in range(4):
-		if i < GameData.shop_slots.size() and not GameData.shop_slots[i].is_empty():
-			var slot_data: Dictionary = GameData.shop_slots[i]
+		if i < InventoryManager.shop_slots.size() and not InventoryManager.shop_slots[i].is_empty():
+			var slot_data: Dictionary = InventoryManager.shop_slots[i]
 			var item_data: Resource = _get_item_data(slot_data.id)
 
 			# 图标
@@ -197,7 +197,7 @@ func _update_cards() -> void:
 			_card_prices[i].text = "$%d" % slot_data.cost
 
 			# 禁用判断
-			var can_buy: bool = GameData.coins >= slot_data.cost and GameData.can_buy_item(slot_data.id, 1)
+			var can_buy: bool = InventoryManager.coins >= slot_data.cost and InventoryManager.can_buy_item(slot_data.id, 1)
 			_card_buttons[i].disabled = not can_buy or is_placing
 
 			# 放置中状态
@@ -215,7 +215,7 @@ func _update_cards() -> void:
 			_card_containers[i].modulate = Color(0.5, 0.5, 0.5)
 
 func _on_shop_slot_pressed(slot_index: int) -> void:
-	var slot: Dictionary = GameData.shop_slots[slot_index]
+	var slot: Dictionary = InventoryManager.shop_slots[slot_index]
 	if slot.is_empty():
 		return
 	if slot.type == "weapon":
@@ -238,9 +238,9 @@ func _on_shop_slot_pressed(slot_index: int) -> void:
 func _on_tower_placed(grid_pos: Vector2i) -> void:
 	if _pending_tower_slot_index < 0:
 		return
-	var slot: Dictionary = GameData.shop_slots[_pending_tower_slot_index]
+	var slot: Dictionary = InventoryManager.shop_slots[_pending_tower_slot_index]
 	var tower_id: String = slot.id if not slot.is_empty() else ""
-	var snapshot: Array = GameData.deployed_towers.duplicate(true)
+	var snapshot: Array = InventoryManager.deployed_towers.duplicate(true)
 	var deploy_id: int = _shop_manager.confirm_tower_purchase(_pending_tower_slot_index, grid_pos)
 	if deploy_id > 0:
 		drag_manager.spawn_tower_node(deploy_id, tower_id, 1, grid_pos)
@@ -283,7 +283,7 @@ func _handle_merge_tower_cleanup(snapshot: Array) -> void:
 		return
 	var current_ids: Array[int] = []
 	var current_map: Dictionary = {}
-	for entry in GameData.deployed_towers:
+	for entry in InventoryManager.deployed_towers:
 		current_ids.append(entry.deploy_id)
 		current_map[entry.deploy_id] = entry
 
@@ -296,14 +296,14 @@ func _handle_merge_tower_cleanup(snapshot: Array) -> void:
 		drag_manager.remove_tower_nodes(consumed_ids)
 
 	# 升级存活塔的视觉
-	for entry in GameData.deployed_towers:
+	for entry in InventoryManager.deployed_towers:
 		for old_entry in snapshot:
 			if old_entry.deploy_id == entry.deploy_id and old_entry.level != entry.level:
 				drag_manager.upgrade_tower_node(entry.deploy_id, entry.id, entry.level, entry.grid_pos)
 				break
 
 func _on_weapon_sold(weapon_index: int) -> void:
-	var refund: int = GameData.sell_from_deployed_weapon(weapon_index)
+	var refund: int = InventoryManager.sell_from_deployed_weapon(weapon_index)
 	if refund > 0 and weapon_manager:
 		weapon_manager.remove_weapon(weapon_index)
 	_update_ui()

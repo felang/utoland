@@ -90,13 +90,13 @@ func _enter_shop_phase(is_first: bool = false) -> void:
 	# 波次结束奖励金币（首次商店不发，首次用初始金币）
 	if not is_first:
 		var reward: int = GameConfig.shop_config.wave_reward
-		GameData.coins += reward
-		GameData.record_coins_earned(reward)
-		EventBus.coins_changed.emit(reward, GameData.coins)
+		InventoryManager.coins += reward
+		StatsTracker.record_coins_earned(reward)
+		EventBus.coins_changed.emit(reward, InventoryManager.coins)
 		# 同步 Player 金币
 		var player_node: Node2D = $Player
 		if player_node:
-			player_node.coins = GameData.coins
+			player_node.coins = InventoryManager.coins
 
 	_shop_overlay.refresh_shop(is_first)
 	AudioManager.play_bgm("placement")
@@ -159,9 +159,9 @@ func _on_wave_transition_ready() -> void:
 	_enter_shop_phase()
 
 func _load_map() -> void:
-	var map_data: MapData = GameConfig.maps.get(GameData.selected_map)
+	var map_data: MapData = GameConfig.maps.get(PlayerState.selected_map)
 	if map_data == null or map_data.map_scene.is_empty():
-		push_warning("地图场景未配置，跳过加载: " + GameData.selected_map)
+		push_warning("地图场景未配置，跳过加载: " + PlayerState.selected_map)
 		return
 	if not ResourceLoader.exists(map_data.map_scene):
 		push_warning("地图场景文件不存在: " + map_data.map_scene)
@@ -175,4 +175,4 @@ func _on_coins_generated(amount: int, _pos: Vector2) -> void:
 	if player and player.has_method("add_coins"):
 		player.add_coins(amount)
 	else:
-		GameData.coins += amount
+		InventoryManager.coins += amount
