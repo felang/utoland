@@ -73,10 +73,7 @@ func attract_all_exp_orbs() -> void:
 func clear_all_enemies() -> void:
 	var enemies: Array[Node] = get_tree().get_nodes_in_group(Enums.Group.ENEMIES)
 	for enemy in enemies:
-		if enemy.has_method("set_physics_process"):
-			enemy.set_physics_process(false)
-			enemy.set_process(false)
-		enemy.queue_free()
+		SceneFactory.release_enemy(enemy)
 
 func _start_wave_with_data(wave_num: int, wave_data: WaveData) -> void:
 	_current_wave_data = wave_data

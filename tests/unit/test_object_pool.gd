@@ -127,3 +127,60 @@ func test_projectile_pool_reuse():
 	assert_eq(proj1, proj2, "应复用同一投射物对象")
 	assert_eq(proj2._speed, 800.0, "复用后 speed 应来自 setup")
 	proj2.queue_free()
+
+func test_enemy_reset_for_pool():
+	var enemy: CharacterBody2D = SceneFactory.create_enemy(Enums.Enemy.NORMAL)
+	add_child(enemy)
+	enemy.is_elite = true
+	enemy._elite_coin_mult = 2.0
+	enemy._elite_exp_mult = 2.0
+	enemy.scale = Vector2(1.5, 1.5)
+	enemy.current_state = enemy.State.ATTACK_TOWER
+	enemy.velocity = Vector2(100, 0)
+	enemy.attack_timer = 0.5
+	enemy.visible = false
+	enemy.reset_for_pool()
+	assert_false(enemy.is_elite, "reset 后 is_elite 应为 false")
+	assert_eq(enemy._elite_coin_mult, 1.0, "reset 后 coin mult 应为 1.0")
+	assert_eq(enemy._elite_exp_mult, 1.0, "reset 后 exp mult 应为 1.0")
+	assert_eq(enemy.scale, Vector2.ONE, "reset 后 scale 应为 ONE")
+	assert_eq(enemy.current_state, enemy.State.CHASE_PLAYER, "reset 后应为 CHASE_PLAYER")
+	assert_null(enemy.target_tower, "reset 后 target_tower 应为 null")
+	assert_eq(enemy.velocity, Vector2.ZERO, "reset 后 velocity 应为 ZERO")
+	assert_eq(enemy.attack_timer, 0.0, "reset 后 attack_timer 应为 0")
+	assert_true(enemy.visible, "reset 后应可见")
+	enemy.queue_free()
+
+func test_enemy_pool_reuse_reinitializes():
+	# 确保敌人池已注册（可能被 test_clear_all_pools 清空）
+	if not SceneFactory._pools.has("enemy_normal"):
+		SceneFactory._register_pool("enemy_normal", preload("res://scenes/entities/enemies/enemy_normal.tscn"))
+	var enemy1: CharacterBody2D = SceneFactory.create_enemy(Enums.Enemy.NORMAL)
+	add_child(enemy1)
+	var original_speed: float = enemy1.speed
+	enemy1.speed = 999.0
+	enemy1.tower_attack_damage = 999.0
+	SceneFactory.release_enemy(enemy1)
+	await get_tree().process_frame
+	var enemy2: CharacterBody2D = SceneFactory.create_enemy(Enums.Enemy.NORMAL)
+	assert_eq(enemy1, enemy2, "应复用同一敌人对象")
+	assert_eq(enemy2.speed, original_speed, "复用后 speed 应从 data 重新初始化")
+	assert_false(enemy2.health.is_dead(), "复用后不应处于死亡状态")
+	enemy2.queue_free()
+
+func test_enemy_double_release_ignored():
+	# 确保敌人池已注册（可能被 test_clear_all_pools 清空）
+	if not SceneFactory._pools.has("enemy_normal"):
+		SceneFactory._register_pool("enemy_normal", preload("res://scenes/entities/enemies/enemy_normal.tscn"))
+	var enemy: CharacterBody2D = SceneFactory.create_enemy(Enums.Enemy.NORMAL)
+	add_child(enemy)
+	SceneFactory.release_enemy(enemy)
+	await get_tree().process_frame
+	var idle_count: int = SceneFactory._pools["enemy_normal"].idle_queue.size()
+	SceneFactory.release_enemy(enemy)
+	await get_tree().process_frame
+	assert_eq(SceneFactory._pools["enemy_normal"].idle_queue.size(), idle_count, "双重回收不应增加队列")
+	# 从池中取出再释放，保持池状态干净（不直接 queue_free 池内节点）
+	var acquired: CharacterBody2D = SceneFactory.create_enemy(Enums.Enemy.NORMAL)
+	SceneFactory.release_enemy(acquired)
+	await get_tree().process_frame

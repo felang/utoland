@@ -28,6 +28,8 @@ var _exp_orb_scene: PackedScene = preload("res://scenes/entities/exp_orb.tscn")
 func _ready() -> void:
 	_register_pool("coin", _coin_scene)
 	_register_pool("exp_orb", _exp_orb_scene)
+	for enemy_type in [Enums.Enemy.NORMAL, Enums.Enemy.FAST, Enums.Enemy.TANK]:
+		_register_pool("enemy_" + enemy_type, _enemy_scenes[enemy_type])
 
 # Tower creation — 注入 TowerData Resource，level 直接注入
 func create_tower(type: String, level: int = 1) -> Node2D:
@@ -43,18 +45,39 @@ func create_tower(type: String, level: int = 1) -> Node2D:
 		tower.data = GameConfig.towers[type]
 	return tower
 
-# Enemy creation — 注入 EnemyData Resource
+# Enemy creation — 注入 EnemyData Resource，poolable 类型走对象池
 func create_enemy(type: String) -> CharacterBody2D:
 	if not _enemy_scenes.has(type):
 		push_error("Unknown enemy type: " + type)
 		return null
 
-	var enemy = _enemy_scenes[type].instantiate()
+	var key: String = "enemy_" + type
+	var enemy: CharacterBody2D
+	if _pools.has(key):
+		enemy = _pool_acquire(key) as CharacterBody2D
+	else:
+		enemy = _enemy_scenes[type].instantiate()
+
 	enemy.enemy_type = type
-	# 注入 Resource 数据
 	if GameConfig.enemies.has(type):
 		enemy.data = GameConfig.enemies[type]
+	# 对象池复用时重新初始化数值（@onready 节点已存在）
+	# 新实例在 _ready() 中初始化，此处跳过以避免 @onready 未就绪
+	if _pools.has(key) and enemy.health != null and enemy.data:
+		enemy.health.initialize(enemy.data.hp)
+		enemy.speed = enemy.data.speed
+		enemy.tower_attack_damage = enemy.data.damage
+		enemy._hitbox.damage = enemy.data.damage
+		enemy.slow_handler.initialize(enemy.data.speed)
+	# 重新获取 player 引用（仅复用时需要，新实例在 _ready 中获取）
+	if enemy.health != null:
+		enemy.player = get_tree().get_first_node_in_group(Enums.Group.PLAYER)
 	return enemy
+
+func release_enemy(enemy: CharacterBody2D) -> void:
+	var key: String = "enemy_" + str(enemy.get("enemy_type"))
+	# 使用延迟回收，避免在物理回调中直接操作场景树
+	_deferred_pool_release.call_deferred(key, enemy)
 
 # Coin creation
 func create_coin() -> Area2D:
@@ -95,10 +118,10 @@ func release_projectile(proj: ProjectileBase) -> void:
 	else:
 		proj.queue_free()
 
-func _deferred_pool_release(key: String, obj: Node) -> void:
+func _deferred_pool_release(key: String, obj) -> void:
 	if not is_instance_valid(obj):
 		return
-	_pool_release(key, obj)
+	_pool_release(key, obj as Node)
 
 func _get_projectile_pool_key(p_data: ProjectileData) -> String:
 	return "projectile_" + p_data.projectile_scene.resource_path.get_file().get_basename()
@@ -115,9 +138,13 @@ func _register_pool(key: String, scene: PackedScene, warmup: int = 0) -> void:
 func _pool_acquire(key: String) -> Node:
 	var entry: PoolEntry = _pools[key]
 	var obj: Node
-	if entry.idle_queue.size() > 0:
-		obj = entry.idle_queue.pop_back()
-	else:
+	# 从队列中弹出有效节点，跳过已被外部释放的节点
+	while entry.idle_queue.size() > 0:
+		var candidate = entry.idle_queue.pop_back()  # 不使用类型，避免对已释放节点的赋值报错
+		if is_instance_valid(candidate):
+			obj = candidate as Node
+			break
+	if obj == null:
 		obj = entry.scene.instantiate()
 	obj.set("_is_pooled", false)
 	obj.set_process(true)

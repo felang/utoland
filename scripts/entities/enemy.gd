@@ -29,6 +29,9 @@ var is_rooted: bool = false
 var _pre_root_speed: float = 0.0
 var _root_source: String = ""  # 定身来源标记
 
+# 对象池标识（由 SceneFactory 管理）
+var _is_pooled: bool = false
+
 @onready var health: HealthComponent = $HealthComponent
 @onready var _knockback: KnockbackHandler = $KnockbackHandler
 @onready var slow_handler: SlowHandler = $SlowHandler
@@ -109,7 +112,7 @@ func _on_died() -> void:
 	AudioManager.play("enemy_die")
 	_drop_exp_orbs()
 	EffectsManager.spawn_enhanced_death(global_position, health.death_color)
-	queue_free()
+	SceneFactory.release_enemy(self)
 
 func _drop_coins() -> void:
 	var parent: Node = get_parent()
@@ -185,3 +188,25 @@ func _on_speed_changed(new_speed: float) -> void:
 		_pre_root_speed = new_speed  # 保存速度但不覆盖实际速度
 		return
 	speed = new_speed
+
+func reset_for_pool() -> void:
+	health.reset()
+	_knockback.kill_tween()
+	slow_handler.clear_all()
+	if is_rooted:
+		remove_root()
+	if is_in_group("elites"):
+		remove_from_group("elites")
+	is_elite = false
+	_elite_coin_mult = 1.0
+	_elite_exp_mult = 1.0
+	scale = Vector2.ONE
+	current_state = State.CHASE_PLAYER
+	target_tower = null
+	velocity = Vector2.ZERO
+	attack_timer = 0.0
+	if _sprite_animator._sprite:
+		_sprite_animator._sprite.play("walk_down")
+		_sprite_animator._current_anim = "walk_down"
+	visible = true
+	modulate = Color.WHITE
