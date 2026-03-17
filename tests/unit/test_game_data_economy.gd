@@ -1,6 +1,6 @@
 extends GutTest
 ## GameData 经济系统单元测试
-## 覆盖：初始状态、种群上限、部署/撤回、出售逻辑、buy_level_up、deploy_id、move_tower
+## 覆盖：初始状态、种群上限、部署/撤回、出售逻辑、经验系统、deploy_id、move_tower
 
 func before_each() -> void:
 	GameData.reset()
@@ -23,21 +23,18 @@ func test_initial_state_after_reset() -> void:
 
 func test_get_population_cap_level1() -> void:
 	GameData.player_level = 1
-	var cap: int = GameData.get_population_cap()
-	# ShopConfig.population_per_level[0] = 2
-	assert_eq(cap, 2)
+	# initial_population + (1-1) * 1 = 2
+	assert_eq(GameData.get_population_cap(), 2)
 
-func test_get_population_cap_level2() -> void:
-	GameData.player_level = 2
-	var cap: int = GameData.get_population_cap()
-	# ShopConfig.population_per_level[1] = 3
-	assert_eq(cap, 3)
+func test_get_population_cap_level5() -> void:
+	GameData.player_level = 5
+	# initial_population + (5-1) * 1 = 6
+	assert_eq(GameData.get_population_cap(), 6)
 
-func test_get_population_cap_level3() -> void:
-	GameData.player_level = 3
-	var cap: int = GameData.get_population_cap()
-	# ShopConfig.population_per_level[2] = 4
-	assert_eq(cap, 4)
+func test_get_population_cap_level10() -> void:
+	GameData.player_level = 10
+	# initial_population + (10-1) * 1 = 11
+	assert_eq(GameData.get_population_cap(), 11)
 
 # ===== 种群已用 =====
 
@@ -147,44 +144,61 @@ func test_reset_clears_deploy_id_counter() -> void:
 	var deploy_id: int = GameData.buy_and_place_tower("pea_shooter", 3, Vector2i(5, 5))
 	assert_eq(deploy_id, 1)
 
-# ===== buy_level_up =====
+# ===== 经验系统 =====
 
-func test_buy_level_up_success() -> void:
+func test_add_exp_accumulates() -> void:
+	GameData.current_exp = 0
+	GameData.add_exp(10)
+	assert_eq(GameData.current_exp, 10)
+	GameData.add_exp(5)
+	assert_eq(GameData.current_exp, 15)
+
+func test_add_exp_records_total() -> void:
+	GameData.total_exp_earned = 0
+	GameData.current_exp = 0
+	GameData.add_exp(10)
+	assert_eq(GameData.total_exp_earned, 10)
+
+func test_add_exp_auto_level_up() -> void:
 	GameData.player_level = 1
-	var config: ShopConfig = GameConfig.shop_config
-	var cost: int = config.level_up_costs[0]
-	GameData.coins = cost + 10
-	var result: bool = GameData.buy_level_up()
-	assert_true(result)
+	GameData.current_exp = 0
+	# exp_for_level(2) = floor(5 * 2^2) = 20
+	GameData.add_exp(20)
 	assert_eq(GameData.player_level, 2)
-	assert_eq(GameData.coins, 10)
 
-func test_buy_level_up_insufficient_coins() -> void:
+func test_add_exp_no_level_up_below_threshold() -> void:
 	GameData.player_level = 1
-	GameData.coins = 0
-	var result: bool = GameData.buy_level_up()
-	assert_false(result)
+	GameData.current_exp = 0
+	GameData.add_exp(19)
 	assert_eq(GameData.player_level, 1)
 
-func test_buy_level_up_at_max_level() -> void:
-	var config: ShopConfig = GameConfig.shop_config
-	# 设为最高等级（population_per_level 最后一项索引）
-	GameData.player_level = config.population_per_level.size()
-	GameData.coins = 9999
-	var result: bool = GameData.buy_level_up()
-	assert_false(result)
-
-func test_buy_level_up_emits_signal() -> void:
-	var config: ShopConfig = GameConfig.shop_config
-	var cost: int = config.level_up_costs[0]
-	GameData.coins = cost + 100
+func test_add_exp_multi_level_up() -> void:
 	GameData.player_level = 1
+	GameData.current_exp = 0
+	# exp_for_level(2) = 20, exp_for_level(3) = 45
+	GameData.add_exp(45)
+	assert_eq(GameData.player_level, 3)
+
+func test_add_exp_emits_level_changed() -> void:
+	GameData.player_level = 1
+	GameData.current_exp = 0
 	var level_changes: Array[int] = []
 	EventBus.player_level_changed.connect(func(lvl: int): level_changes.append(lvl))
-	GameData.buy_level_up()
+	GameData.add_exp(20)
 	assert_eq(level_changes, [2])
 	for conn in EventBus.player_level_changed.get_connections():
 		EventBus.player_level_changed.disconnect(conn["callable"])
+
+func test_add_exp_emits_exp_changed() -> void:
+	GameData.player_level = 1
+	GameData.current_exp = 0
+	var exp_events: Array[Array] = []
+	EventBus.exp_changed.connect(func(cur: int, to_next: int): exp_events.append([cur, to_next]))
+	GameData.add_exp(10)
+	assert_eq(exp_events.size(), 1)
+	assert_eq(exp_events[0][0], 10)
+	for conn in EventBus.exp_changed.get_connections():
+		EventBus.exp_changed.disconnect(conn["callable"])
 
 # ===== sell_from_deployed_weapon =====
 
@@ -263,3 +277,14 @@ func test_move_tower_same_position() -> void:
 	GameData.coins = 100
 	var deploy_id: int = GameData.buy_and_place_tower("pea_shooter", 3, Vector2i(5, 5))
 	assert_true(GameData.move_tower(deploy_id, Vector2i(5, 5)))
+
+# ===== reset 经验字段 =====
+
+func test_reset_clears_exp_fields() -> void:
+	GameData.current_exp = 999
+	GameData.total_exp_earned = 888
+	GameData.player_level = 5
+	GameData.reset()
+	assert_eq(GameData.current_exp, 0)
+	assert_eq(GameData.total_exp_earned, 0)
+	assert_eq(GameData.player_level, 1)
