@@ -61,23 +61,23 @@ func test_enemy_dies_at_zero_hp():
 	# Enemy should be queued for deletion
 	assert_false(is_instance_valid(enemy) and enemy.is_inside_tree(), "Enemy should be removed from tree")
 
-func test_enemy_drops_coins_on_death():
-	# Test that enemy drops coins when it dies
+func test_enemy_drops_exp_orbs_on_death():
+	# Test that enemy drops exp orbs when it dies
 	var enemy = SceneFactory.create_enemy(Enums.Enemy.NORMAL)
 	test_scene.add_child(enemy)
 
-	var initial_coin_count = test_scene.get_tree().get_nodes_in_group(Enums.Group.COINS).size()
+	var initial_orb_count = test_scene.get_tree().get_nodes_in_group(Enums.Group.EXP_ORBS).size()
 
 	# Kill enemy
 	enemy.die()
 
-	# Wait for coins to be added
+	# Wait for exp orbs to be added
 	await wait_frames(2)
 
-	var final_coin_count = test_scene.get_tree().get_nodes_in_group(Enums.Group.COINS).size()
+	var final_orb_count = test_scene.get_tree().get_nodes_in_group(Enums.Group.EXP_ORBS).size()
 
-	# Should have more coins than before
-	assert_gt(final_coin_count, initial_coin_count, "Coins should be dropped after enemy death")
+	# Should have more exp orbs than before
+	assert_gt(final_orb_count, initial_orb_count, "Exp orbs should be dropped after enemy death")
 
 func test_coin_drop_amount_from_config():
 	# Test that coin drop amount respects GameConfig
@@ -141,26 +141,26 @@ func test_tower_damage_from_config():
 	var expected_damage = td.damage_per_level[0] * GameData.player_stats.get(Enums.Stat.TOWER_MULT, 1.0)
 	assert_almost_eq(tower.attacker.base_damage, expected_damage, 0.01, "Tower attacker damage should match config")
 
-func test_enemy_drops_correct_coin_count():
-	# Test that enemy drops coins within configured range
+func test_enemy_drops_correct_exp_orb_count():
+	# Test that enemy drops exp orbs within configured range
 	var enemy = SceneFactory.create_enemy(Enums.Enemy.TANK)
 	test_scene.add_child(enemy)
 
 	var enemy_data: EnemyData = GameConfig.enemies[Enums.Enemy.TANK]
-	var min_coins = enemy_data.coin_drop_min
-	var max_coins = enemy_data.coin_drop_max
+	var min_orbs = enemy_data.exp_drop_min
+	var max_orbs = enemy_data.exp_drop_max
 
-	# Kill enemy and count coins
-	var initial_coins = test_scene.get_tree().get_nodes_in_group(Enums.Group.COINS).size()
+	# Kill enemy and count exp orbs
+	var initial_orbs = test_scene.get_tree().get_nodes_in_group(Enums.Group.EXP_ORBS).size()
 	enemy.die()
 
 	await wait_frames(2)
 
-	var final_coins = test_scene.get_tree().get_nodes_in_group(Enums.Group.COINS).size()
-	var dropped_coins = final_coins - initial_coins
+	var final_orbs = test_scene.get_tree().get_nodes_in_group(Enums.Group.EXP_ORBS).size()
+	var dropped_orbs = final_orbs - initial_orbs
 
-	assert_gte(dropped_coins, min_coins, "Should drop at least min coins")
-	assert_lte(dropped_coins, max_coins, "Should drop at most max coins")
+	assert_gte(dropped_orbs, min_orbs, "Should drop at least min exp orbs")
+	assert_lte(dropped_orbs, max_orbs, "Should drop at most max exp orbs")
 
 func test_tower_takes_damage_from_enemy():
 	# Test that tower can take damage
@@ -191,7 +191,7 @@ func test_tower_destroyed_at_zero_hp():
 	assert_false(is_instance_valid(tower) and tower.is_inside_tree(), "Tower should be removed from tree")
 
 func test_combat_full_cycle():
-	# Test a complete combat cycle: tower shoots, enemy takes damage, dies, drops coins
+	# Test a complete combat cycle: tower shoots, enemy takes damage, dies, drops exp orbs
 	var tower = SceneFactory.create_tower(Enums.TowerId.PEA_SHOOTER)
 	test_scene.add_child(tower)
 	tower.global_position = Vector2(200, 200)
@@ -207,9 +207,9 @@ func test_combat_full_cycle():
 	# Manually damage enemy to simulate combat
 	enemy.take_damage(initial_enemy_hp)
 
-	# Wait for death and coin drop
+	# Wait for death and exp orb drop
 	await wait_frames(2)
 
-	# Verify coins were dropped
-	var coins = test_scene.get_tree().get_nodes_in_group(Enums.Group.COINS)
-	assert_gt(coins.size(), 0, "Coins should be dropped after enemy death")
+	# Verify exp orbs were dropped
+	var orbs = test_scene.get_tree().get_nodes_in_group(Enums.Group.EXP_ORBS)
+	assert_gt(orbs.size(), 0, "Exp orbs should be dropped after enemy death")

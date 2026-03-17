@@ -26,7 +26,9 @@ func _ready() -> void:
 		push_warning("HUD: Player node not found in 'player' group")
 	EventBus.wave_started.connect(_on_wave_started)
 	EventBus.player_level_changed.connect(_on_player_level_changed)
+	EventBus.exp_changed.connect(_on_exp_changed)
 	_style_ui()
+	_init_exp_bar()
 
 func _process(_delta: float) -> void:
 	_update_hp()
@@ -82,6 +84,17 @@ func _on_wave_started(wave_number: int, _wave_data: WaveData) -> void:
 
 func _on_player_level_changed(new_level: int) -> void:
 	level_label.text = "Lv.%d" % new_level
+	_bounce_label(level_label)
+
+func _on_exp_changed(current_exp: int, exp_to_next: int) -> void:
+	xp_progress.max_value = exp_to_next
+	xp_progress.value = current_exp
+
+func _init_exp_bar() -> void:
+	var next_threshold: int = GameData.exp_for_level(GameData.player_level + 1)
+	xp_progress.max_value = next_threshold
+	xp_progress.value = GameData.current_exp
+	level_label.text = "Lv.%d" % GameData.player_level
 
 # ===== 样式初始化 =====
 
