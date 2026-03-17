@@ -88,10 +88,10 @@ func _input(event: InputEvent) -> void:
 		return
 
 	if event is InputEventMouseMotion:
-		_update_preview(_viewport_to_world(event.global_position))
+		_update_preview(_viewport_to_world(event.global_position), event.global_position)
 	elif event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT and not event.pressed:
-			_end_drag(_viewport_to_world(event.global_position))
+			_end_drag(_viewport_to_world(event.global_position), event.global_position)
 		elif event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
 			_cancel_drag()
 
@@ -102,14 +102,14 @@ func _check_tower_click(global_pos: Vector2) -> void:
 			start_map_tower_drag(deploy_id)
 			break
 
-func _end_drag(global_pos: Vector2) -> void:
+func _end_drag(world_pos: Vector2, viewport_pos: Vector2 = Vector2.ZERO) -> void:
 	match _drag_source:
 		DragSource.PLACE_TOWER:
-			_try_place_new_tower(global_pos)
+			_try_place_new_tower(world_pos)
 		DragSource.MAP_TOWER:
-			_try_move_tower(global_pos)
+			_try_move_tower(world_pos, viewport_pos)
 		DragSource.WEAPON:
-			_try_sell_weapon(global_pos)
+			_try_sell_weapon(viewport_pos)
 	_cleanup_drag()
 
 func _try_place_new_tower(global_pos: Vector2) -> void:
@@ -121,15 +121,15 @@ func _try_place_new_tower(global_pos: Vector2) -> void:
 	if _on_cancelled_callback.is_valid():
 		_on_cancelled_callback.call()
 
-func _try_move_tower(global_pos: Vector2) -> void:
+func _try_move_tower(world_pos: Vector2, viewport_pos: Vector2 = Vector2.ZERO) -> void:
 	var deploy_id: int = _drag_data.deploy_id
-	# 回收区检测
-	if is_over_recycle_area(global_pos):
+	# 回收区检测（用视口坐标，因为回收区在 CanvasLayer 中）
+	if is_over_recycle_area(viewport_pos):
 		var refund: int = GameData.sell_from_deployed_tower(deploy_id)
 		if refund > 0:
 			_remove_tower_node(deploy_id)
 			return
-	var grid_pos := _world_to_grid(global_pos)
+	var grid_pos := _world_to_grid(world_pos)
 	if _is_valid_grid_pos(grid_pos) and _is_grid_available(grid_pos):
 		if GameData.move_tower(deploy_id, grid_pos):
 			_tower_nodes[deploy_id].position = _grid_to_world(grid_pos)
@@ -140,8 +140,8 @@ func _try_move_tower(global_pos: Vector2) -> void:
 		_tower_nodes[deploy_id].position = _grid_to_world(_drag_original_grid_pos)
 		_tower_nodes[deploy_id].modulate.a = 1.0
 
-func _try_sell_weapon(global_pos: Vector2) -> void:
-	if is_over_recycle_area(global_pos) and _drag_weapon_index >= 0:
+func _try_sell_weapon(viewport_pos: Vector2) -> void:
+	if is_over_recycle_area(viewport_pos) and _drag_weapon_index >= 0:
 		if _on_weapon_sold_callback.is_valid():
 			_on_weapon_sold_callback.call(_drag_weapon_index)
 	_drag_weapon_index = -1
@@ -228,11 +228,11 @@ func _create_preview() -> void:
 	_preview_node.visible = false
 	_tower_container.get_parent().add_child(_preview_node)
 
-func _update_preview(global_pos: Vector2) -> void:
+func _update_preview(world_pos: Vector2, viewport_pos: Vector2 = Vector2.ZERO) -> void:
 	if _preview_node == null:
 		return
 	if _drag_source == DragSource.PLACE_TOWER:
-		var grid_pos := _world_to_grid(global_pos)
+		var grid_pos := _world_to_grid(world_pos)
 		_preview_node.global_position = _grid_to_world(grid_pos)
 		_preview_node.visible = true
 		var is_valid := _is_valid_grid_pos(grid_pos) and _is_grid_available(grid_pos)
@@ -240,26 +240,26 @@ func _update_preview(global_pos: Vector2) -> void:
 			_range_circle.modulate = Color(0.3, 1.0, 0.3, 1.0) if is_valid else Color(1.0, 0.3, 0.3, 1.0)
 	elif _drag_source == DragSource.MAP_TOWER:
 		# 直接移动实际塔节点
-		var grid_pos := _world_to_grid(global_pos)
-		var world_pos := _grid_to_world(grid_pos)
+		var grid_pos := _world_to_grid(world_pos)
+		var snapped_pos := _grid_to_world(grid_pos)
 		var deploy_id: int = _drag_data.deploy_id
 		if deploy_id in _tower_nodes:
-			_tower_nodes[deploy_id].position = world_pos
+			_tower_nodes[deploy_id].position = snapped_pos
 			_tower_nodes[deploy_id].modulate.a = 1.0
 		# 范围圆跟随
-		_preview_node.global_position = world_pos
+		_preview_node.global_position = snapped_pos
 		_preview_node.visible = true
 		var is_valid := _is_valid_grid_pos(grid_pos) and _is_grid_available(grid_pos)
 		if _range_circle:
 			_range_circle.modulate = Color(0.3, 1.0, 0.3, 1.0) if is_valid else Color(1.0, 0.3, 0.3, 1.0)
 	else:
-		_preview_node.global_position = global_pos
+		_preview_node.global_position = world_pos
 		_preview_node.visible = true
-	# 回收区反馈（对塔移动和武器拖拽生效）
+	# 回收区反馈（用视口坐标，回收区在 CanvasLayer 中）
 	if _recycle_area and _drag_source in [DragSource.MAP_TOWER, DragSource.WEAPON]:
-		if is_over_recycle_area(global_pos):
+		if is_over_recycle_area(viewport_pos):
 			_recycle_area.modulate = Color(1, 0.3, 0.3)
-			_update_recycle_hint(global_pos)
+			_update_recycle_hint(viewport_pos)
 		else:
 			_recycle_area.modulate = Color.WHITE
 			_hide_recycle_hint()
