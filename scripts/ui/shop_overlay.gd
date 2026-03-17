@@ -1,14 +1,14 @@
 extends CanvasLayer
-## 底部商店面板覆盖层 — 卡片式 UI
+## 左侧商店面板覆盖层 — 纵向卡片式 UI
 
 signal start_battle_pressed
 
 const SLIDE_DURATION := 0.3
-const CARD_ICON_SIZE := Vector2(32, 32)
+const CARD_ICON_SIZE := Vector2(16, 16)
 
 var _shop_manager: ShopManager
 var _panel: PanelContainer
-var _slide_original_y: float = 0.0
+var _slide_original_x: float = 0.0
 
 # 信息栏
 var _coins_label: Label
@@ -46,86 +46,112 @@ func _ready() -> void:
 
 func _setup_ui() -> void:
 	_panel = $ShopPanel
-	_slide_original_y = _panel.position.y
+	_slide_original_x = _panel.position.x
 
-	# 信息栏
-	_coins_label = $ShopPanel/VBoxContainer/TopRow/CoinsLabel
-	_level_label = $ShopPanel/VBoxContainer/TopRow/LevelLabel
-	_pop_label = $ShopPanel/VBoxContainer/TopRow/PopLabel
-	_wave_label = $ShopPanel/VBoxContainer/TopRow/WaveLabel
+	var vbox: VBoxContainer = $ShopPanel/VBoxContainer
 
-	# BottomRow
-	var bottom_row: HBoxContainer = $ShopPanel/VBoxContainer/BottomRow
+	# --- 信息栏（两行紧凑显示）---
+	var info_bar := VBoxContainer.new()
+	info_bar.name = "InfoBar"
+	vbox.add_child(info_bar)
 
-	# 动态创建 4 张卡片
-	var card_container := HBoxContainer.new()
-	card_container.name = "CardContainer"
-	card_container.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	card_container.add_theme_constant_override("separation", 4)
-	bottom_row.add_child(card_container)
+	# 第一行：金币 + 等级
+	var line1 := HBoxContainer.new()
+	line1.name = "Line1"
+	info_bar.add_child(line1)
+
+	_coins_label = Label.new()
+	_coins_label.text = "$0"
+	_coins_label.add_theme_font_size_override("font_size", 9)
+	line1.add_child(_coins_label)
+
+	_level_label = Label.new()
+	_level_label.text = "Lv.1"
+	_level_label.add_theme_font_size_override("font_size", 9)
+	line1.add_child(_level_label)
+
+	# 第二行：人口 + 波次
+	var line2 := HBoxContainer.new()
+	line2.name = "Line2"
+	info_bar.add_child(line2)
+
+	_pop_label = Label.new()
+	_pop_label.text = "人口 0/2"
+	_pop_label.add_theme_font_size_override("font_size", 9)
+	line2.add_child(_pop_label)
+
+	_wave_label = Label.new()
+	_wave_label.text = "W0"
+	_wave_label.add_theme_font_size_override("font_size", 9)
+	line2.add_child(_wave_label)
+
+	# --- 卡片列表（纵向排列）---
+	var card_list := VBoxContainer.new()
+	card_list.name = "CardList"
+	card_list.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	card_list.add_theme_constant_override("separation", 2)
+	vbox.add_child(card_list)
 
 	for i in range(4):
 		var card := _create_card(i)
-		card_container.add_child(card)
+		card_list.add_child(card)
 
-	# 按钮容器
-	var btn_container := VBoxContainer.new()
-	btn_container.name = "ButtonContainer"
-	bottom_row.add_child(btn_container)
-
+	# --- 刷新按钮 ---
 	_refresh_button = Button.new()
 	_refresh_button.text = "刷新 $2"
 	_refresh_button.pressed.connect(_on_refresh_pressed)
-	btn_container.add_child(_refresh_button)
+	vbox.add_child(_refresh_button)
 
+	# --- 升级按钮 ---
 	_level_up_button = Button.new()
 	_level_up_button.text = "Lv↑"
 	_level_up_button.pressed.connect(_on_level_up_pressed)
-	btn_container.add_child(_level_up_button)
+	vbox.add_child(_level_up_button)
 
-	# 回收区
+	# --- 回收区 ---
 	_recycle_area = PanelContainer.new()
 	_recycle_area.name = "RecycleArea"
-	_recycle_area.custom_minimum_size = Vector2(50, 50)
+	_recycle_area.custom_minimum_size = Vector2(0, 40)
 	var recycle_label := Label.new()
 	recycle_label.text = "回收"
 	recycle_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	recycle_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_recycle_area.add_child(recycle_label)
-	bottom_row.add_child(_recycle_area)
+	vbox.add_child(_recycle_area)
 
-	# 开战按钮
+	# --- 开战按钮 ---
 	_start_button = Button.new()
 	_start_button.text = "开战"
 	_start_button.pressed.connect(_on_start_pressed)
-	bottom_row.add_child(_start_button)
+	vbox.add_child(_start_button)
 
 func _create_card(index: int) -> PanelContainer:
+	# 横向小卡片：图标 + 名称 + 价格
 	var card := PanelContainer.new()
 	card.name = "ShopCard%d" % index
 	card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	card.custom_minimum_size = Vector2(60, 80)
+	card.custom_minimum_size = Vector2(0, 32)
 
-	var vbox := VBoxContainer.new()
-	vbox.alignment = BoxContainer.ALIGNMENT_CENTER
-	card.add_child(vbox)
+	var hbox := HBoxContainer.new()
+	hbox.add_theme_constant_override("separation", 4)
+	card.add_child(hbox)
 
 	var icon := TextureRect.new()
 	icon.custom_minimum_size = CARD_ICON_SIZE
 	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	vbox.add_child(icon)
+	hbox.add_child(icon)
 	_card_icons.append(icon)
 
 	var name_label := Label.new()
-	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	name_label.add_theme_font_size_override("font_size", 10)
-	vbox.add_child(name_label)
+	name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	name_label.add_theme_font_size_override("font_size", 9)
+	hbox.add_child(name_label)
 	_card_names.append(name_label)
 
 	var price_label := Label.new()
-	price_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	price_label.add_theme_font_size_override("font_size", 10)
-	vbox.add_child(price_label)
+	price_label.add_theme_font_size_override("font_size", 9)
+	price_label.add_theme_color_override("font_color", Color(1.0, 0.84, 0.0))
+	hbox.add_child(price_label)
 	_card_prices.append(price_label)
 
 	# 透明点击按钮覆盖整个卡片
@@ -155,7 +181,7 @@ func _update_info_bar() -> void:
 	var pop_current: int = GameData.deployed_weapons.size() + GameData.deployed_towers.size()
 	var pop_max: int = GameConfig.shop_config.population_per_level[GameData.player_level - 1]
 	_pop_label.text = "人口 %d/%d" % [pop_current, pop_max]
-	_wave_label.text = "Wave %d" % GameData.current_wave
+	_wave_label.text = "W%d" % GameData.current_wave
 
 func _update_cards() -> void:
 	var is_placing: bool = _pending_tower_slot_index >= 0
@@ -257,15 +283,15 @@ func _on_start_pressed() -> void:
 
 func slide_out() -> void:
 	var tween := create_tween()
-	var panel_height: float = _panel.size.y
-	tween.tween_property(_panel, "position:y", _slide_original_y + panel_height, SLIDE_DURATION)
+	var panel_width: float = _panel.size.x
+	tween.tween_property(_panel, "position:x", _slide_original_x - panel_width, SLIDE_DURATION)
 	tween.tween_callback(func(): _panel.mouse_filter = Control.MOUSE_FILTER_IGNORE)
 
 func slide_in() -> void:
 	_panel.mouse_filter = Control.MOUSE_FILTER_STOP
-	_panel.position.y = _slide_original_y + _panel.size.y
+	_panel.position.x = _slide_original_x - _panel.size.x
 	var tween := create_tween()
-	tween.tween_property(_panel, "position:y", _slide_original_y, SLIDE_DURATION)
+	tween.tween_property(_panel, "position:x", _slide_original_x, SLIDE_DURATION)
 	_update_ui()
 
 func _handle_merge_weapon_cleanup() -> void:
