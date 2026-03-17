@@ -17,6 +17,7 @@ func setup(p_data: ProjectileData, dmg: float, from: Vector2, dir: Vector2) -> v
 	var hitbox = get_node_or_null("Hitbox") as Hitbox
 	if hitbox:
 		hitbox.damage = dmg
+		hitbox.monitoring = true  # 池化复用时重新启用碰撞检测
 		if hitbox.area_entered.is_connected(_on_hitbox_area_entered):
 			hitbox.area_entered.disconnect(_on_hitbox_area_entered)
 		hitbox.area_entered.connect(_on_hitbox_area_entered)
@@ -37,6 +38,11 @@ func _on_hitbox_area_entered(area: Area2D) -> void:
 		on_hit(target)
 
 func on_hit(target: Node2D) -> void:
+	# 无穿透/弹射的投射物：命中后立即关闭碰撞，防止同帧多次命中
+	if not _has_lifecycle_component():
+		var hitbox = get_node_or_null("Hitbox") as Hitbox
+		if hitbox:
+			hitbox.set_deferred("monitoring", false)
 	for child in get_children():
 		if child.has_method("on_hit"):
 			child.on_hit(target, self)
