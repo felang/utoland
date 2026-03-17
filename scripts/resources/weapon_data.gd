@@ -17,5 +17,6 @@ extends Resource
 @export var pivot_offset: float = 15.0
 
 @export_group("视觉配置")
+@export var sprite_rotation_offset: float = 0.0  # 精灵初始旋转偏移（弧度）
 @export var hide_sprite_on_fire: bool = false
 @export var sprite_restore_ratio: float = 0.9
