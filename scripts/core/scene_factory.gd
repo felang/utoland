@@ -185,3 +185,56 @@ func clear_all_pools() -> void:
 		entry.idle_queue.clear()
 		entry.active_count = 0
 	_pools.clear()
+
+func warmup_initial() -> void:
+	# 投射物预热：遍历所有武器的 projectile_data
+	for weapon_id in GameConfig.weapons:
+		var wd: WeaponData = GameConfig.weapons[weapon_id]
+		if wd.projectile_data and wd.projectile_data.projectile_scene:
+			var key: String = _get_projectile_pool_key(wd.projectile_data)
+			if not _pools.has(key):
+				_register_pool(key, wd.projectile_data.projectile_scene)
+			_pool_warmup(key, 20)
+	# 敌人预热
+	if _pools.has("enemy_normal"):
+		_pool_warmup("enemy_normal", 10)
+	if _pools.has("enemy_fast"):
+		_pool_warmup("enemy_fast", 5)
+	if _pools.has("enemy_tank"):
+		_pool_warmup("enemy_tank", 3)
+	# 掉落物预热
+	if _pools.has("coin"):
+		_pool_warmup("coin", 15)
+	if _pools.has("exp_orb"):
+		_pool_warmup("exp_orb", 15)
+
+func warmup_for_wave(wave_data: WaveData) -> void:
+	var max_enemies: int = wave_data.max_alive_enemies
+	# 按 enemy_weights 比例补充敌人
+	var total_weight: float = 0.0
+	for w in wave_data.enemy_weights.values():
+		total_weight += w
+	if total_weight > 0:
+		for enemy_type in wave_data.enemy_weights:
+			var key: String = "enemy_" + enemy_type
+			if not _pools.has(key):
+				continue
+			var ratio: float = wave_data.enemy_weights[enemy_type] / total_weight
+			var target: int = int(ceil(max_enemies * ratio))
+			var current: int = _pools[key].idle_queue.size()
+			if target > current:
+				_pool_warmup(key, target - current)
+	# 投射物补充
+	for proj_key in _pools:
+		if proj_key.begins_with("projectile_"):
+			var target: int = max_enemies * 2
+			var current: int = _pools[proj_key].idle_queue.size()
+			if target > current:
+				_pool_warmup(proj_key, target - current)
+	# 掉落物补充
+	for drop_key in ["coin", "exp_orb"]:
+		if _pools.has(drop_key):
+			var target: int = max_enemies
+			var current: int = _pools[drop_key].idle_queue.size()
+			if target > current:
+				_pool_warmup(drop_key, target - current)

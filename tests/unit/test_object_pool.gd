@@ -184,3 +184,25 @@ func test_enemy_double_release_ignored():
 	var acquired: CharacterBody2D = SceneFactory.create_enemy(Enums.Enemy.NORMAL)
 	SceneFactory.release_enemy(acquired)
 	await get_tree().process_frame
+
+func test_warmup_initial():
+	SceneFactory.clear_all_pools()
+	SceneFactory._ready()
+	SceneFactory.warmup_initial()
+	assert_true(SceneFactory._pools.has("coin"), "应有 coin 池")
+	assert_true(SceneFactory._pools["coin"].idle_queue.size() >= 15, "coin 池应有 >= 15 个预热对象")
+	assert_true(SceneFactory._pools["exp_orb"].idle_queue.size() >= 15, "exp_orb 池应有 >= 15 个预热对象")
+	assert_true(SceneFactory._pools["enemy_normal"].idle_queue.size() >= 10, "enemy_normal 池应有 >= 10 个预热对象")
+	SceneFactory.clear_all_pools()
+	SceneFactory._ready()
+
+func test_warmup_for_wave_fills_gap():
+	SceneFactory.clear_all_pools()
+	SceneFactory._ready()
+	var wd := WaveData.new()
+	wd.max_alive_enemies = 20
+	wd.enemy_weights = {Enums.Enemy.NORMAL: 1.0}
+	SceneFactory.warmup_for_wave(wd)
+	assert_true(SceneFactory._pools["enemy_normal"].idle_queue.size() >= 20, "应按 max_alive_enemies 补充")
+	SceneFactory.clear_all_pools()
+	SceneFactory._ready()

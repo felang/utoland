@@ -51,12 +51,14 @@ func _ready() -> void:
 	# 信号连接
 	EventBus.wave_transition_ready.connect(_on_wave_transition_ready)
 	EventBus.coins_generated.connect(_on_coins_generated)
+	EventBus.wave_started.connect(_on_wave_started_warmup)
 
 	# 缓存相机引用
 	_camera = $Player.get_node("Camera")
 
 	# 进入首次 SHOP 阶段
 	_enter_shop_phase(true)
+	SceneFactory.warmup_initial()
 
 func _enter_shop_phase(is_first: bool = false) -> void:
 	current_phase = Phase.SHOP
@@ -176,3 +178,9 @@ func _on_coins_generated(amount: int, _pos: Vector2) -> void:
 		player.add_coins(amount)
 	else:
 		InventoryManager.coins += amount
+
+func _on_wave_started_warmup(_wave_num: int, wave_data: WaveData) -> void:
+	SceneFactory.warmup_for_wave(wave_data)
+
+func _exit_tree() -> void:
+	SceneFactory.clear_all_pools()
