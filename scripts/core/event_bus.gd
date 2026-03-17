@@ -21,6 +21,10 @@ signal coins_changed(amount: int, total: int)
 signal coin_collected(value: int, position: Vector2)
 signal coins_generated(amount: int, position: Vector2)
 
+# 经验事件
+signal exp_collected(value: int, position: Vector2)
+signal exp_changed(current_exp: int, exp_to_next: int)
+
 # 视觉反馈
 signal camera_shake_requested(intensity: float, duration: float)
 

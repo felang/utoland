@@ -8,6 +8,7 @@ class Group:
 	const COINS = "coins"
 	const DAMAGE_NUMBERS = "damage_numbers"
 	const WAVE_MANAGER = "wave_manager"
+	const EXP_ORBS = "exp_orbs"
 
 # 场景名
 class Scene:
