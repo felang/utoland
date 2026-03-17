@@ -53,7 +53,7 @@ func _ready() -> void:
 	EventBus.coins_generated.connect(_on_coins_generated)
 
 	# 缓存相机引用
-	_camera = $Player.get_node("Camera2D")
+	_camera = $Player.get_node("Camera")
 
 	# 进入首次 SHOP 阶段
 	_enter_shop_phase(true)
