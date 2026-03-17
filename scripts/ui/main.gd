@@ -95,10 +95,11 @@ func _enter_battle_phase() -> void:
 	current_phase = Phase.BATTLE
 	_shop_overlay.slide_out()
 
-	# 过渡回玩家位置
+	# 过渡回玩家位置（预先计算 limits 钳制后的目标，避免恢复 limits 时跳变）
 	var battle_zoom: float = GameConfig.effects.camera_zoom
+	var clamped_pos: Vector2 = _get_clamped_camera_pos($Player.global_position, battle_zoom)
 	var tween := create_tween().set_parallel(true)
-	tween.tween_property(_camera, "global_position", $Player.global_position, CAMERA_TRANSITION_DURATION)
+	tween.tween_property(_camera, "global_position", clamped_pos, CAMERA_TRANSITION_DURATION)
 	tween.tween_property(_camera, "zoom", Vector2(battle_zoom, battle_zoom), CAMERA_TRANSITION_DURATION)
 
 	# 过渡完成后恢复正常相机行为
@@ -107,6 +108,17 @@ func _enter_battle_phase() -> void:
 	AudioManager.play_bgm("battle")
 	$HUD.set_battle_phase(true)
 	$WaveManager.start_next_wave()
+
+## 计算相机在 limits 约束下的实际位置（避免过渡后跳变）
+func _get_clamped_camera_pos(target: Vector2, zoom_val: float) -> Vector2:
+	var view_half_w: float = 640.0 / (2.0 * zoom_val)
+	var view_half_h: float = 360.0 / (2.0 * zoom_val)
+	var map_hw: float = GameConfig.MAP_HALF_WIDTH
+	var map_hh: float = GameConfig.MAP_HALF_HEIGHT
+	return Vector2(
+		clampf(target.x, -map_hw + view_half_w, map_hw - view_half_w),
+		clampf(target.y, -map_hh + view_half_h, map_hh - view_half_h)
+	)
 
 func _restore_battle_camera() -> void:
 	# 关闭 top_level，相机重新跟随 Player
