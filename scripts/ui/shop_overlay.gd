@@ -43,6 +43,8 @@ func _ready() -> void:
 	_shop_manager = ShopManager.new()
 	_setup_ui()
 	_update_ui()
+	# 监听卖出事件刷新 UI（回收区卖出由 DragManager 触发）
+	EventBus.item_sold.connect(func(_item: Dictionary, _refund: int): _update_ui())
 
 func _setup_ui() -> void:
 	_panel = $ShopPanel
