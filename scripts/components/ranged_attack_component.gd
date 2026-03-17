@@ -18,13 +18,11 @@ var _target_finder: TargetFinderComponent = null
 var _fire_point: Marker2D = null
 
 func _ready() -> void:
-	_target_finder = get_parent().get_node_or_null("TargetFinderComponent")
-	# FirePoint 是兄弟节点（都在 WeaponOffset 下）或在子节点 WeaponOffset 下
+	# TargetFinder 在 Pivot 下（parent 的 parent），攻击组件在 Offset 下
+	var pivot = get_parent().get_parent() if get_parent() else null
+	_target_finder = pivot.get_node_or_null("TargetFinderComponent") if pivot else null
+	# FirePoint 是兄弟节点（都在 WeaponOffset 下）
 	_fire_point = get_parent().get_node_or_null("FirePoint")
-	if not _fire_point:
-		var offset = get_parent().get_node_or_null("WeaponOffset")
-		if offset:
-			_fire_point = offset.get_node_or_null("FirePoint")
 
 func set_level(level: int) -> void:
 	if not attack_config:

@@ -1,5 +1,6 @@
 # WeaponManager — Pivot+Offset 架构统一管理玩家所有武器
-# 每把武器由 WeaponPivot → TargetFinderComponent + 攻击组件 + WeaponOffset(Sprite+FirePoint) 组成
+# Pivot.position 在轨道圆上移动（无旋转），Offset.position=(0,0) 仅在近战突刺时变化
+# TargetFinder 挂在 Pivot 下（索敌中心=轨道位置），攻击组件挂在 Offset 下
 class_name WeaponManager
 extends Node2D
 
@@ -46,10 +47,10 @@ func add_weapon(weapon_id: String, level: int) -> void:
 	pivot.name = "WeaponPivot_%d" % _pivots.size()
 	add_child(pivot)
 
-	# 创建 WeaponOffset（固定距离）+ WeaponSprite + FirePoint
+	# 创建 WeaponOffset（初始位置 0,0，突刺时才改变）
 	var offset := Node2D.new()
 	offset.name = "WeaponOffset"
-	offset.position = Vector2(weapon_data.pivot_offset, 0)
+	offset.position = Vector2.ZERO
 	pivot.add_child(offset)
 
 	var sprite := Sprite2D.new()
@@ -62,10 +63,10 @@ func add_weapon(weapon_id: String, level: int) -> void:
 	fire_point.name = "FirePoint"
 	offset.add_child(fire_point)
 
-	# 索敌和攻击组件挂在 offset 下（以武器位置为中心索敌）
+	# 索敌挂在 Pivot 下（以轨道位置为中心，不受突刺偏移影响）
 	var finder := TargetFinderComponent.new()
 	finder.name = "TargetFinderComponent"
-	offset.add_child(finder)
+	pivot.add_child(finder)
 
 	if weapon_data.projectile_data:
 		var ranged := RangedAttackComponent.new()
@@ -124,26 +125,21 @@ func tick(delta: float) -> void:
 	var count: int = _pivots.size()
 	for i in count:
 		var pivot: Node2D = _pivots[i]
-		# 近战攻击中不覆盖 Pivot 旋转（MeleeAttackComponent 临时控制朝向）
-		var melee = _find_in_offset(pivot, "MeleeAttackComponent")
-		var melee_attacking: bool = melee and melee._is_attacking
-		if not melee_attacking:
-			var base_angle: float = _orbit_angle + (TAU / max(count, 1)) * i
-			pivot.rotation = base_angle
-		# 精灵朝向目标（仅旋转精灵，不影响 Pivot/Offset 位置）
-		var finder = _find_in_offset(pivot, "TargetFinderComponent")
+		var weapon_data: WeaponData = _weapon_data_list[i] if i < _weapon_data_list.size() else null
+		# Pivot 用 position 在轨道圆上移动（不旋转）
+		var base_angle: float = _orbit_angle + (TAU / max(count, 1)) * i
+		var poff: float = weapon_data.pivot_offset if weapon_data else 15.0
+		pivot.position = Vector2(poff, 0).rotated(base_angle)
+		# 精灵朝向目标（仅旋转精灵）
+		var finder = pivot.get_node_or_null("TargetFinderComponent")
 		var target: Node2D = finder.get_target() if finder else null
 		var sprite = pivot.get_node_or_null("WeaponOffset/WeaponSprite")
+		var rot_offset: float = weapon_data.sprite_rotation_offset if weapon_data else 0.0
 		if target and is_instance_valid(target) and sprite:
-			var offset_node = pivot.get_node_or_null("WeaponOffset")
-			var aim_angle: float = offset_node.global_position.angle_to_point(target.global_position)
-			# 精灵旋转 = 目标方向 - Offset 的全局旋转 + 初始偏移
-			var weapon_data: WeaponData = _weapon_data_list[i] if i < _weapon_data_list.size() else null
-			var rot_offset: float = weapon_data.sprite_rotation_offset if weapon_data else 0.0
-			sprite.rotation = aim_angle - offset_node.global_rotation + rot_offset
+			var aim_angle: float = pivot.global_position.angle_to_point(target.global_position)
+			sprite.rotation = aim_angle + rot_offset
 		elif sprite:
-			var weapon_data: WeaponData = _weapon_data_list[i] if i < _weapon_data_list.size() else null
-			sprite.rotation = weapon_data.sprite_rotation_offset if weapon_data else 0.0
+			sprite.rotation = rot_offset
 		# 驱动攻击组件，每帧刷新动态伤害倍率
 		var attack = _find_in_offset(pivot, "RangedAttackComponent")
 		if not attack:
@@ -178,9 +174,9 @@ func _on_attack_executed(pivot: Node2D, weapon_data: WeaponData, target: Node2D 
 	if not sprite:
 		return
 	sprite.visible = false
-	var attack = _find_in_offset(pivot, "RangedAttackComponent")
-	if attack:
-		var restore_time: float = attack.get_final_cooldown() * weapon_data.sprite_restore_ratio
+	var attack_comp = _find_in_offset(pivot, "RangedAttackComponent")
+	if attack_comp:
+		var restore_time: float = attack_comp.get_final_cooldown() * weapon_data.sprite_restore_ratio
 		get_tree().create_timer(restore_time).timeout.connect(func() -> void:
 			if is_instance_valid(sprite):
 				sprite.visible = true

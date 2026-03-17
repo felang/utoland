@@ -29,8 +29,8 @@ func test_pivot_has_target_finder_and_offset() -> void:
 	assert_not_null(pivot.get_node_or_null("WeaponOffset"))
 	assert_not_null(pivot.get_node_or_null("WeaponOffset/WeaponSprite"))
 	assert_not_null(pivot.get_node_or_null("WeaponOffset/FirePoint"))
-	# 索敌和攻击组件在 WeaponOffset 下（以武器为中心索敌）
-	assert_not_null(pivot.get_node_or_null("WeaponOffset/TargetFinderComponent"))
+	# 索敌在 Pivot 下（以轨道位置为中心），攻击组件在 Offset 下
+	assert_not_null(pivot.get_node_or_null("TargetFinderComponent"))
 
 func test_pivot_has_attack_component() -> void:
 	_wm.add_weapon("bow", 1)
