@@ -121,9 +121,10 @@ func _get_clamped_camera_pos(target: Vector2, zoom_val: float) -> Vector2:
 	)
 
 func _restore_battle_camera() -> void:
-	# 关闭 top_level，相机重新跟随 Player
+	# 记录当前全局位置，关闭 top_level 后用局部偏移保持同一位置
+	var final_global: Vector2 = _camera.global_position
 	_camera.top_level = false
-	_camera.position = Vector2.ZERO
+	_camera.position = final_global - $Player.global_position
 
 	# 恢复相机限制
 	_camera.limit_left = -int(GameConfig.MAP_HALF_WIDTH)
