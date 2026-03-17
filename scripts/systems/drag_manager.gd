@@ -211,10 +211,17 @@ func _create_preview() -> void:
 			_range_circle.set_range(tower_data.attack_range_per_level[0])
 			_preview_node.add_child(_range_circle)
 	elif _drag_source == DragSource.MAP_TOWER:
-		# 移动已有塔时也显示范围
+		# 移动已有塔时显示塔预览 + 范围
 		var deploy_id: int = _drag_data.get("deploy_id", -1)
 		for entry in GameData.deployed_towers:
 			if entry.deploy_id == deploy_id:
+				# 塔预览精灵
+				var tower_preview: Node2D = SceneFactory.create_tower(entry.id, entry.level)
+				tower_preview.modulate = Color(1, 1, 1, 0.5)
+				tower_preview.set_process(false)
+				tower_preview.set_physics_process(false)
+				_preview_node.add_child(tower_preview)
+				# 攻击范围指示圆
 				var tower_data: TowerData = GameConfig.towers.get(entry.id)
 				if tower_data and tower_data.attack_range_per_level.size() >= entry.level:
 					_range_circle = RangeIndicator.new()
