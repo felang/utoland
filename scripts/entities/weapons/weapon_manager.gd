@@ -3,6 +3,8 @@
 class_name WeaponManager
 extends Node2D
 
+signal weapon_attack_executed(target: Node2D)  # 任意武器命中时广播（用于 swift_combo 连击更新）
+
 const ORBIT_SPEED: float = TAU / 8.0
 const SPRITE_SCALE: float = 6.0
 
@@ -18,6 +20,8 @@ var _weapon_data_list: Array[WeaponData] = []
 var _orbit_angle: float = 0.0
 var _projectile_container: Node = null
 var _weapon_drag_callback: Callable
+## 动态伤害倍率回调（由 Player 注入，用于 swift_combo/blood_rage 等动态被动）
+var _dynamic_damage_mult_getter: Callable
 
 func _ready() -> void:
 	# 缓存投射物容器（Player 的父节点，通常是 main 场景）
@@ -54,8 +58,8 @@ func add_weapon(weapon_id: String, level: int) -> void:
 		ranged.attack_config = weapon_data.attack_config
 		ranged.projectile_data = weapon_data.projectile_data
 		ranged.projectile_spawned.connect(_on_projectile_spawned)
-		ranged.attack_executed.connect(func(_t: Node2D, _p: Node2D) -> void:
-			_on_attack_executed(pivot, weapon_data)
+		ranged.attack_executed.connect(func(t: Node2D, _p: Node2D) -> void:
+			_on_attack_executed(pivot, weapon_data, t)
 		)
 		pivot.add_child(ranged)
 		ranged.set_level(level)
@@ -64,8 +68,8 @@ func add_weapon(weapon_id: String, level: int) -> void:
 		melee.name = "MeleeAttackComponent"
 		melee.attack_config = weapon_data.attack_config
 		melee.melee_config = weapon_data.melee_config
-		melee.attack_executed.connect(func(_t: Node2D) -> void:
-			_on_attack_executed(pivot, weapon_data)
+		melee.attack_executed.connect(func(t: Node2D) -> void:
+			_on_attack_executed(pivot, weapon_data, t)
 		)
 		pivot.add_child(melee)
 		melee.set_level(level)
@@ -112,6 +116,11 @@ func refresh_weapons() -> void:
 ## 每帧驱动：推进轨道角度、旋转 Pivot 朝向目标或轨道、驱动攻击组件
 func tick(delta: float) -> void:
 	_orbit_angle += ORBIT_SPEED * delta
+	# 计算动态伤害倍率（swift_combo / blood_rage 等每帧变化的被动）
+	var dynamic_dmg_mult: float = 1.0
+	if _dynamic_damage_mult_getter.is_valid():
+		dynamic_dmg_mult = _dynamic_damage_mult_getter.call()
+	var base_dmg_mult: float = PlayerState.player_stats.get(Enums.Stat.DAMAGE_MULT, 1.0)
 	var count: int = _pivots.size()
 	for i in count:
 		var pivot: Node2D = _pivots[i]
@@ -123,16 +132,21 @@ func tick(delta: float) -> void:
 		else:
 			var base_angle: float = _orbit_angle + (TAU / max(count, 1)) * i
 			pivot.rotation = base_angle
-		# 驱动攻击组件
+		# 驱动攻击组件，每帧刷新动态伤害倍率
 		var attack = pivot.get_node_or_null("RangedAttackComponent")
 		if not attack:
 			attack = pivot.get_node_or_null("MeleeAttackComponent")
 		if attack:
+			attack.damage_multiplier = base_dmg_mult * dynamic_dmg_mult
 			attack.tick(delta)
 
 ## 设置商店阶段武器拖拽回调
 func set_weapon_drag_callback(callback: Callable) -> void:
 	_weapon_drag_callback = callback
+
+## 注入动态伤害倍率回调（Player 调用，用于 swift_combo/blood_rage 等每帧变化的被动）
+func set_dynamic_damage_mult_getter(getter: Callable) -> void:
+	_dynamic_damage_mult_getter = getter
 
 # — 内部方法 —
 
@@ -142,7 +156,10 @@ func _on_projectile_spawned(proj: Node2D) -> void:
 	elif get_parent():
 		get_parent().get_parent().add_child(proj)
 
-func _on_attack_executed(pivot: Node2D, weapon_data: WeaponData) -> void:
+func _on_attack_executed(pivot: Node2D, weapon_data: WeaponData, target: Node2D = null) -> void:
+	# 广播命中信号，供 Player 更新连击状态
+	if target and is_instance_valid(target):
+		weapon_attack_executed.emit(target)
 	if not weapon_data.hide_sprite_on_fire:
 		return
 	var sprite = pivot.get_node_or_null("WeaponOffset/WeaponSprite")
