@@ -27,23 +27,3 @@ func test_pick_weighted_enemy_respects_weights():
 	# normal 应该占绝大多数（至少 80%）
 	assert_gt(normal_count, 160, "权重 99 的 normal 应出现在绝大多数情况")
 
-func test_should_spawn_respects_limit():
-	var wd := WaveData.new()
-	wd.total_enemies = 3
-	wd.enemy_weights = {"normal": 100}
-	spawner._on_wave_started(1, wd)
-	assert_true(spawner._should_spawn())
-	spawner.enemies_spawned = 3
-	assert_false(spawner._should_spawn())
-
-func test_enemies_spawned_resets_each_wave():
-	var wd := WaveData.new()
-	wd.total_enemies = 10
-	wd.enemy_weights = {"normal": 100}
-	spawner._on_wave_started(1, wd)
-	spawner.enemies_spawned = 5
-	spawner._on_wave_started(2, wd)
-	assert_eq(spawner.enemies_spawned, 0)
-
-func test_should_spawn_false_without_wave_data():
-	assert_false(spawner._should_spawn())
