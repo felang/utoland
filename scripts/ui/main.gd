@@ -58,6 +58,10 @@ func _ready() -> void:
 	# 进入首次 SHOP 阶段
 	_enter_shop_phase(true)
 
+func _physics_process(_delta: float) -> void:
+	# 商店阶段持续补偿玩家移动，保持相机固定在全图视角
+	if current_phase == Phase.SHOP and _camera:
+		_camera.position = SHOP_CAMERA_POS - $Player.global_position
 
 func _enter_shop_phase(is_first: bool = false) -> void:
 	current_phase = Phase.SHOP
