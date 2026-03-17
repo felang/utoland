@@ -48,6 +48,7 @@
   - `damage_multiplier: float = 1.0` — 被动/buff 伤害乘数
   - `speed_multiplier: float = 1.0` — 被动/buff 攻速乘数
   - `projectile_data: ProjectileData` — 投射物配置
+  - `on_projectile_created: Callable` — 可选回调，投射物创建后、添加到场景树前调用（塔覆写命中效果参数用）
 - **API**：
   - `tick(delta: float)` — 每帧调用，管理冷却+触发攻击
   - `get_final_damage() -> float` — base_damage * damage_multiplier
@@ -357,9 +358,10 @@ func _ready() -> void:
         _attack_component.set_level(current_level)  # 内部同步 TargetFinder 范围
         _attack_component.attack_executed.connect(_on_attack_executed)
         _attack_component.projectile_spawned.connect(_on_projectile_spawned)
-        # 注入塔 multiplier
+        # 注入塔 multiplier（作为 buff source，与外部 buff 统一管理）
         var tower_mult: float = PlayerState.player_stats.get(Enums.Stat.TOWER_MULT, 1.0)
-        _attack_component.damage_multiplier = tower_mult
+        _buff_sources["_base_tower_mult"] = {dmg = tower_mult, spd = 1.0}
+        _recalc_buffs()
 
     # 自动检测并初始化生成组件
     var generator = get_node_or_null("GeneratorComponent")
@@ -443,11 +445,12 @@ func on_hit(target: Node2D) -> void:
         request_destroy()
 
 func _has_lifecycle_component() -> bool:
-    # 检查是否有管理生命周期的组件（Pierce/Bounce），若有则由它们决定何时销毁
+    # 检查是否有管理生命周期的组件（通过 duck typing 而非类型检查）
     for child in get_children():
-        if child is PierceComponent or child is BounceOnHitComponent:
+        if child.get("manages_lifecycle"):
             return true
     return false
+    # PierceComponent 和 BounceOnHitComponent 需声明 var manages_lifecycle: bool = true
 
 func reset_for_pool() -> void:
     _should_destroy = false
@@ -535,7 +538,7 @@ WeaponManager.tick(delta)
           → damage = get_final_damage()
           → proj = SceneFactory.create_projectile(data, damage, FirePoint.global_position, direction)
           → emit projectile_spawned(proj)
-          → WeaponManager 收到信号 → get_parent().get_parent().add_child(proj)
+          → WeaponManager 收到信号 → 添加到 _projectile_container（WeaponManager 初始化时缓存的场景节点引用）
           → 若 weapon_data.hide_sprite_on_fire → 隐藏精灵，定时恢复
           → emit attack_executed
           → AudioManager.play(sfx_id)
