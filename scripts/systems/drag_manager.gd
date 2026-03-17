@@ -49,7 +49,6 @@ func start_map_tower_drag(deploy_id: int) -> void:
 			_drag_original_deploy_id = deploy_id
 			_drag_original_grid_pos = entry.grid_pos
 			_start_drag(DragSource.MAP_TOWER)
-			_tower_nodes[deploy_id].modulate.a = 0.3
 			break
 
 func set_recycle_area(area: Control) -> void:
@@ -136,7 +135,9 @@ func _try_move_tower(global_pos: Vector2) -> void:
 			_tower_nodes[deploy_id].position = _grid_to_world(grid_pos)
 			_tower_nodes[deploy_id].modulate.a = 1.0
 			return
+	# 放置失败，恢复到原始位置
 	if deploy_id in _tower_nodes:
+		_tower_nodes[deploy_id].position = _grid_to_world(_drag_original_grid_pos)
 		_tower_nodes[deploy_id].modulate.a = 1.0
 
 func _try_sell_weapon(global_pos: Vector2) -> void:
@@ -149,6 +150,8 @@ func _try_sell_weapon(global_pos: Vector2) -> void:
 func _cancel_drag() -> void:
 	if _drag_source == DragSource.MAP_TOWER and _drag_original_deploy_id >= 0:
 		if _drag_original_deploy_id in _tower_nodes:
+			# 恢复到原始位置
+			_tower_nodes[_drag_original_deploy_id].position = _grid_to_world(_drag_original_grid_pos)
 			_tower_nodes[_drag_original_deploy_id].modulate.a = 1.0
 	elif _drag_source == DragSource.PLACE_TOWER:
 		if _on_cancelled_callback.is_valid():
@@ -211,36 +214,47 @@ func _create_preview() -> void:
 			_range_circle.set_range(tower_data.attack_range_per_level[0])
 			_preview_node.add_child(_range_circle)
 	elif _drag_source == DragSource.MAP_TOWER:
-		# 移动已有塔时显示塔预览 + 范围
+		# 移动已有塔：直接拖拽实际塔节点，只显示范围圆
 		var deploy_id: int = _drag_data.get("deploy_id", -1)
 		for entry in GameData.deployed_towers:
 			if entry.deploy_id == deploy_id:
-				# 塔预览精灵
-				var tower_preview: Node2D = SceneFactory.create_tower(entry.id, entry.level)
-				tower_preview.modulate = Color(1, 1, 1, 0.5)
-				tower_preview.set_process(false)
-				tower_preview.set_physics_process(false)
-				_preview_node.add_child(tower_preview)
-				# 攻击范围指示圆
 				var tower_data: TowerData = GameConfig.towers.get(entry.id)
 				if tower_data and tower_data.attack_range_per_level.size() >= entry.level:
 					_range_circle = RangeIndicator.new()
 					_range_circle.set_range(tower_data.attack_range_per_level[entry.level - 1])
 					_preview_node.add_child(_range_circle)
 				break
+	# 初始隐藏，等第一次 _update_preview 设置正确位置后才可见，避免闪烁
+	_preview_node.visible = false
 	_tower_container.get_parent().add_child(_preview_node)
 
 func _update_preview(global_pos: Vector2) -> void:
 	if _preview_node == null:
 		return
-	if _drag_source in [DragSource.PLACE_TOWER, DragSource.MAP_TOWER]:
+	if _drag_source == DragSource.PLACE_TOWER:
 		var grid_pos := _world_to_grid(global_pos)
 		_preview_node.global_position = _grid_to_world(grid_pos)
+		_preview_node.visible = true
+		var is_valid := _is_valid_grid_pos(grid_pos) and _is_grid_available(grid_pos)
+		if _range_circle:
+			_range_circle.modulate = Color(0.3, 1.0, 0.3, 1.0) if is_valid else Color(1.0, 0.3, 0.3, 1.0)
+	elif _drag_source == DragSource.MAP_TOWER:
+		# 直接移动实际塔节点
+		var grid_pos := _world_to_grid(global_pos)
+		var world_pos := _grid_to_world(grid_pos)
+		var deploy_id: int = _drag_data.deploy_id
+		if deploy_id in _tower_nodes:
+			_tower_nodes[deploy_id].position = world_pos
+			_tower_nodes[deploy_id].modulate.a = 1.0
+		# 范围圆跟随
+		_preview_node.global_position = world_pos
+		_preview_node.visible = true
 		var is_valid := _is_valid_grid_pos(grid_pos) and _is_grid_available(grid_pos)
 		if _range_circle:
 			_range_circle.modulate = Color(0.3, 1.0, 0.3, 1.0) if is_valid else Color(1.0, 0.3, 0.3, 1.0)
 	else:
 		_preview_node.global_position = global_pos
+		_preview_node.visible = true
 	# 回收区反馈（对塔移动和武器拖拽生效）
 	if _recycle_area and _drag_source in [DragSource.MAP_TOWER, DragSource.WEAPON]:
 		if is_over_recycle_area(global_pos):
