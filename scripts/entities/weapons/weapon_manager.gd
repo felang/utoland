@@ -124,9 +124,12 @@ func tick(delta: float) -> void:
 	var count: int = _pivots.size()
 	for i in count:
 		var pivot: Node2D = _pivots[i]
-		# Pivot 始终沿轨道匀速环绕，不因索敌改变位置
-		var base_angle: float = _orbit_angle + (TAU / max(count, 1)) * i
-		pivot.rotation = base_angle
+		# 近战攻击中不覆盖 Pivot 旋转（MeleeAttackComponent 临时控制朝向）
+		var melee = _find_in_offset(pivot, "MeleeAttackComponent")
+		var melee_attacking: bool = melee and melee._is_attacking
+		if not melee_attacking:
+			var base_angle: float = _orbit_angle + (TAU / max(count, 1)) * i
+			pivot.rotation = base_angle
 		# 精灵朝向目标（仅旋转精灵，不影响 Pivot/Offset 位置）
 		var finder = _find_in_offset(pivot, "TargetFinderComponent")
 		var target: Node2D = finder.get_target() if finder else null
