@@ -12,7 +12,7 @@
 | Boss 波次 | 同样受时间限制，Boss 没杀死算错过奖励 |
 | 生成节奏 | 分段式（每波 2-3 阶段，前慢后快） |
 | 敌人数量控制 | `max_alive_enemies` 场上同时存在上限 |
-| 难度缩放 | 保持现有逻辑（Wave 11+ 指数增长 HP/伤害）不变 |
+| 难度缩放 | 保持现有逻辑不变，`SCALING_START_WAVE` 保持 11（仅影响最后 5 波） |
 | 波次时长 | 逐波递增，在 `.tres` 中配置 |
 
 ## WaveData 资源改造
@@ -22,15 +22,30 @@
 - `total_enemies: int` — 不再需要固定敌人总数
 - `spawn_interval: float` — 由分段配置替代
 
-### 新增字段
+### 新增 SpawnPhaseData Resource
+
+新建 `scripts/resources/spawn_phase_data.gd`：
+
+```gdscript
+class_name SpawnPhaseData
+extends Resource
+
+## 该阶段占波次总时长的比例（所有阶段之和 = 1.0）
+@export var duration_ratio: float = 0.5
+## 该阶段的生成间隔（秒）
+@export var spawn_interval: float = 1.0
+## 该阶段的敌人权重（留空则继承波次级别的 enemy_weights）
+@export var enemy_weights: Dictionary = {}
+```
+
+### WaveData 新增字段
 
 ```gdscript
 ## 场上敌人同时存在上限
 @export var max_alive_enemies: int = 30
 
 ## 分段生成配置
-## 每段: {duration_ratio: float, spawn_interval: float, enemy_weights: Dictionary(可选)}
-@export var spawn_phases: Array[Dictionary] = []
+@export var spawn_phases: Array[SpawnPhaseData] = []
 ```
 
 ### 保留字段
@@ -48,23 +63,19 @@
 
 ### spawn_phases 示例
 
-```gdscript
-# 普通波次（3 阶段：热身 → 正常 → 高压）
-spawn_phases = [
-    {duration_ratio = 0.3, spawn_interval = 2.0},
-    {duration_ratio = 0.5, spawn_interval = 0.8},
-    {duration_ratio = 0.2, spawn_interval = 0.4}
-]
+普通波次（3 阶段：热身 → 正常 → 高压）：
+- Phase 0: duration_ratio=0.3, spawn_interval=2.0
+- Phase 1: duration_ratio=0.5, spawn_interval=0.8
+- Phase 2: duration_ratio=0.2, spawn_interval=0.4
 
-# Boss 波次（2 阶段：护卫 → Boss 登场）
-spawn_phases = [
-    {duration_ratio = 0.6, spawn_interval = 1.0, enemy_weights = {"normal": 50, "fast": 30, "tank": 20}},
-    {duration_ratio = 0.4, spawn_interval = 0.6, enemy_weights = {"fast": 40, "tank": 60}}
-]
-```
+Boss 波次（2 阶段：护卫 → Boss 登场）：
+- Phase 0: duration_ratio=0.6, spawn_interval=1.0, enemy_weights={"normal":50,"fast":30,"tank":20}
+- Phase 1: duration_ratio=0.4, spawn_interval=0.6, enemy_weights={"fast":40,"tank":60}
 
+规则：
 - 各段 `duration_ratio` 之和必须 = 1.0
-- 段内 `enemy_weights` 可选，省略时继承波次级别的 `enemy_weights`
+- 段内 `enemy_weights` 留空时继承波次级别的 `enemy_weights`
+- **最后阶段会持续到波次时间结束**（即使浮点误差导致 duration 提前耗尽，最后阶段不会越界切换，继续按该阶段参数生成）
 
 ## EnemySpawner 改造
 
@@ -83,10 +94,12 @@ var _current_enemy_weights: Dictionary = {}
 ```
 每帧 _process(delta):
   1. 如果 !_is_wave_active → 返回
-  2. 检查阶段切换：_phase_time_elapsed >= _phase_duration → 进入下一阶段
-  3. 检查 max_alive_enemies：场上敌人数 >= max_alive_enemies → 跳过生成
-  4. spawn_timer += delta，达到 _current_spawn_interval → 生成一个敌人
-  5. Boss 波次：进入最后阶段时生成 Boss（仅一次）
+  2. _phase_time_elapsed += delta
+  3. 检查阶段切换：_phase_time_elapsed >= _phase_duration 且不是最后阶段 → 进入下一阶段
+     （最后阶段不切换，持续生成直到波次时间结束）
+  4. 检查 max_alive_enemies：场上敌人数 >= max_alive_enemies → 跳过生成
+  5. spawn_timer += delta，达到 _current_spawn_interval → 生成一个敌人
+  6. Boss 波次：进入最后阶段时立即生成 Boss（仅一次），Boss 与普通敌人同时生成
 ```
 
 ### 阶段切换
@@ -98,7 +111,7 @@ func _enter_phase(index: int) -> void:
     _phase_duration = _current_wave_data.time_limit * phase.duration_ratio
     _phase_time_elapsed = 0.0
     _current_spawn_interval = phase.spawn_interval
-    _current_enemy_weights = phase.get("enemy_weights", _current_wave_data.enemy_weights)
+    _current_enemy_weights = phase.enemy_weights if not phase.enemy_weights.is_empty() else _current_wave_data.enemy_weights
 ```
 
 ### 场上敌人计数
@@ -131,7 +144,8 @@ func _process(delta: float) -> void:
 ### 信号调整
 
 - `enemy_killed` 信号保留（用于 HUD 显示、经验等），但不再用于波次完成判定
-- 新增可选：`boss_escaped` 信号（Boss 波次时间到但 Boss 未被击杀时触发，用于 UI 提示）
+- 新增：`boss_escaped(boss_id: String)` 信号（Boss 波次时间到但 Boss 未被击杀时触发，用于 UI 提示）
+- `boss_escaped` 在 `complete_wave()` 中 `wave_completed` 信号之后、`clear_all_enemies()` 之前触发
 
 ## 波次配置（15 波，forest 地图）
 
@@ -159,15 +173,17 @@ func _process(delta: float) -> void:
 
 | 文件 | 改动 |
 |------|------|
-| `scripts/resources/wave_data.gd` | 移除 `total_enemies`/`spawn_interval`/`boss_escort_count`，新增 `max_alive_enemies`/`spawn_phases` |
+| `scripts/resources/spawn_phase_data.gd` | 新建 `SpawnPhaseData` Resource 类 |
+| `scripts/resources/wave_data.gd` | 移除 `total_enemies`/`spawn_interval`/`boss_escort_count`，新增 `max_alive_enemies`/`spawn_phases: Array[SpawnPhaseData]` |
 | `scripts/systems/enemy_spawner.gd` | 分段生成逻辑、max_alive 检查、移除 BossPhase 状态机（简化为阶段切换） |
 | `scripts/systems/wave_manager.gd` | 移除击杀计数完成逻辑、Boss 击杀不再立即结束波次 |
 | `scripts/core/event_bus.gd` | 可选新增 `boss_escaped` 信号 |
-| `resources/waves/forest/*.tres` | 全部重写为 15 波配置 |
+| `resources/waves/forest/*.tres` | 重写 wave_01~15，**删除 wave_16~20** |
 | `resources/waves/desert/*.tres` | 同上（如果有） |
 | `tests/unit/test_wave_manager.gd` | 更新测试用例 |
 | `tests/unit/test_boss_wave_spawner.gd` | 更新 Boss 波次测试 |
 | `tests/unit/test_wave_scaling.gd` | 调整为 15 波 |
+| `tests/unit/test_wave_balance.gd` | 更新波次平衡测试（20→15 波） |
 | `tests/integration/test_wave_system.gd` | 更新集成测试 |
 
 ### 不需要修改的文件
