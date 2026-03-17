@@ -35,9 +35,9 @@ func test_pivot_has_target_finder_and_offset() -> void:
 func test_pivot_has_attack_component() -> void:
 	_wm.add_weapon("bow", 1)
 	var pivot: Node2D = _wm._pivots[0]
-	var ranged = pivot.get_node_or_null("WeaponOffset/RangedAttackComponent")
-	var melee = pivot.get_node_or_null("WeaponOffset/MeleeAttackComponent")
-	assert_true(ranged != null or melee != null, "WeaponOffset 应有攻击组件")
+	var ranged = pivot.get_node_or_null("RangedAttackComponent")
+	var melee = pivot.get_node_or_null("MeleeAttackComponent")
+	assert_true(ranged != null or melee != null, "Pivot 应有攻击组件")
 
 func test_remove_weapon_removes_pivot() -> void:
 	_wm.add_weapon("bow", 1)

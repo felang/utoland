@@ -16,9 +16,8 @@ var _target_finder: TargetFinderComponent = null
 var _is_attacking: bool = false
 
 func _ready() -> void:
-	# TargetFinder 在 Pivot 下（parent 的 parent）
-	var pivot = get_parent().get_parent() if get_parent() else null
-	_target_finder = pivot.get_node_or_null("TargetFinderComponent") if pivot else null
+	# TargetFinder 和攻击组件都在 Pivot 下（兄弟节点）
+	_target_finder = get_parent().get_node_or_null("TargetFinderComponent")
 
 func set_level(level: int) -> void:
 	if not attack_config:
@@ -57,8 +56,8 @@ func _execute_melee(target: Node2D) -> void:
 	if not melee_config:
 		return
 	_is_attacking = true
-	var offset_node: Node2D = get_parent() as Node2D
-	var weapon_pos: Vector2 = offset_node.global_position if offset_node else Vector2.ZERO
+	var offset_node: Node2D = get_parent().get_node_or_null("WeaponOffset") if get_parent() else null
+	var weapon_pos: Vector2 = offset_node.global_position if offset_node else get_parent().global_position
 	var direction: Vector2 = weapon_pos.direction_to(target.global_position)
 
 	# 创建临时 Hitbox（加到场景根，不受 tween 影响）

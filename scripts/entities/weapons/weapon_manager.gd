@@ -63,7 +63,7 @@ func add_weapon(weapon_id: String, level: int) -> void:
 	fire_point.name = "FirePoint"
 	offset.add_child(fire_point)
 
-	# 索敌挂在 Pivot 下（以轨道位置为中心，不受突刺偏移影响）
+	# 索敌和攻击组件挂在 Pivot 下（不受 Offset 突刺偏移影响）
 	var finder := TargetFinderComponent.new()
 	finder.name = "TargetFinderComponent"
 	pivot.add_child(finder)
@@ -77,7 +77,7 @@ func add_weapon(weapon_id: String, level: int) -> void:
 		ranged.attack_executed.connect(func(t: Node2D, _p: Node2D) -> void:
 			_on_attack_executed(pivot, weapon_data, t)
 		)
-		offset.add_child(ranged)
+		pivot.add_child(ranged)
 		ranged.set_level(level)
 	elif weapon_data.melee_config:
 		var melee := MeleeAttackComponent.new()
@@ -87,7 +87,7 @@ func add_weapon(weapon_id: String, level: int) -> void:
 		melee.attack_executed.connect(func(t: Node2D) -> void:
 			_on_attack_executed(pivot, weapon_data, t)
 		)
-		offset.add_child(melee)
+		pivot.add_child(melee)
 		melee.set_level(level)
 
 	# 点击区域（商店阶段拖拽卖出用）
@@ -140,10 +140,10 @@ func tick(delta: float) -> void:
 			sprite.rotation = aim_angle + rot_offset
 		elif sprite:
 			sprite.rotation = rot_offset
-		# 驱动攻击组件，每帧刷新动态伤害倍率
-		var attack = _find_in_offset(pivot, "RangedAttackComponent")
+		# 驱动攻击组件（在 Pivot 下）
+		var attack = pivot.get_node_or_null("RangedAttackComponent")
 		if not attack:
-			attack = _find_in_offset(pivot, "MeleeAttackComponent")
+			attack = pivot.get_node_or_null("MeleeAttackComponent")
 		if attack:
 			attack.damage_multiplier = base_dmg_mult * dynamic_dmg_mult
 			attack.tick(delta)
@@ -174,7 +174,7 @@ func _on_attack_executed(pivot: Node2D, weapon_data: WeaponData, target: Node2D 
 	if not sprite:
 		return
 	sprite.visible = false
-	var attack_comp = _find_in_offset(pivot, "RangedAttackComponent")
+	var attack_comp = pivot.get_node_or_null("RangedAttackComponent")
 	if attack_comp:
 		var restore_time: float = attack_comp.get_final_cooldown() * weapon_data.sprite_restore_ratio
 		get_tree().create_timer(restore_time).timeout.connect(func() -> void:
@@ -185,9 +185,9 @@ func _on_attack_executed(pivot: Node2D, weapon_data: WeaponData, target: Node2D 
 func _apply_passive_to_pivot(pivot: Node2D) -> void:
 	var dmg_mult: float = PlayerState.player_stats.get(Enums.Stat.DAMAGE_MULT, 1.0)
 	var spd_mult: float = PlayerState.player_stats.get(Enums.Stat.ATTACK_SPEED_MULT, 1.0)
-	var attack = _find_in_offset(pivot, "RangedAttackComponent")
+	var attack = pivot.get_node_or_null("RangedAttackComponent")
 	if not attack:
-		attack = _find_in_offset(pivot, "MeleeAttackComponent")
+		attack = pivot.get_node_or_null("MeleeAttackComponent")
 	if attack:
 		attack.damage_multiplier = dmg_mult
 		attack.speed_multiplier = spd_mult
