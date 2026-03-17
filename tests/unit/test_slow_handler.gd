@@ -64,3 +64,25 @@ func test_timed_slow_expires():
 	var params2 = get_signal_parameters(sh, "speed_changed")
 	assert_almost_eq(params2[0], 100.0, 0.01, "定时减速应已过期，速度恢复")
 	sh.queue_free()
+
+func test_clear_all_removes_all_slows():
+	var sh := SlowHandler.new()
+	add_child(sh)
+	sh.initialize(100.0)
+	sh.apply_slow(0.3, "source_a")
+	sh.apply_slow(0.5, "source_b")
+	sh.clear_all()
+	assert_true(sh._active_slows.is_empty(), "clear_all 后 _active_slows 应为空")
+	assert_true(sh._timed_slow_timers.is_empty(), "clear_all 后 _timed_slow_timers 应为空")
+	sh.queue_free()
+
+func test_clear_all_disconnects_timed_slow_timers():
+	var sh := SlowHandler.new()
+	add_child(sh)
+	sh.initialize(100.0)
+	sh.apply_timed_slow(0.5, 10.0, "timed_source")
+	assert_true(sh._timed_slow_timers.has("timed_source"), "应有定时减速")
+	sh.clear_all()
+	assert_true(sh._active_slows.is_empty(), "clear_all 后减速应清空")
+	assert_true(sh._timed_slow_timers.is_empty(), "clear_all 后 timer 应清空")
+	sh.queue_free()

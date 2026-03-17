@@ -36,6 +36,15 @@ func _on_timed_slow_expired(source_id: String) -> void:
 	_timed_slow_timers.erase(source_id)
 	remove_slow(source_id)
 
+func clear_all() -> void:
+	for source_id in _timed_slow_timers:
+		var timer = _timed_slow_timers[source_id]
+		if timer and is_instance_valid(timer):
+			if timer.timeout.is_connected(_on_timed_slow_expired.bind(source_id)):
+				timer.timeout.disconnect(_on_timed_slow_expired.bind(source_id))
+	_timed_slow_timers.clear()
+	_active_slows.clear()
+
 func _recalc_speed() -> void:
 	if _active_slows.is_empty():
 		speed_changed.emit(base_speed)
