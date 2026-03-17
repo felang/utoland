@@ -112,6 +112,10 @@ func add_coins(amount: int) -> void:
 	coins += amount
 	GameData.coins = coins  # 同步到 GameData
 
+func add_exp(amount: int) -> void:
+	GameData.add_exp(amount)
+	EventBus.exp_collected.emit(amount, global_position)
+
 ## 吸血回复：供投射物命中敌人后调用
 func heal_hp(amount: float) -> void:
 	if amount > 0.0:

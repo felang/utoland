@@ -93,7 +93,8 @@ func spawn_enemy() -> void:
 			_current_wave_data.elite_hp_mult,
 			_current_wave_data.elite_damage_mult,
 			_current_wave_data.elite_coin_mult,
-			_current_wave_data.elite_scale
+			_current_wave_data.elite_scale,
+			_current_wave_data.elite_exp_mult
 		)
 	# 波次缩放（仅非 Boss 敌人，在精英化之后叠加）
 	if not enemy.data.is_boss:
