@@ -23,8 +23,11 @@ utoland 是一个基于 **Godot 4.6** 的 2D 塔防 + 射击混合类游戏（�
 
 ### Autoload 单例 (全局可用，加载顺序有依赖)
 
-- **GameConfig** (`scripts/core/game_config.gd`) — 资源注册表，运行时从 `resources/` 目录加载 `.tres` 配置文件（武器、敌人、塔、波次、角色、地图、特效、精灵等）。必须最先加载（GameData 依赖它）。
-- **GameData** (`scripts/core/game_data.gd`) — 运行时游戏状态，存储角色属性、金币、经验（`current_exp`）、波次、已装备武器（`deployed_weapons`）、已布置塔（`deployed_towers`，含 `deploy_id` 稳定标识符）、商店栏位（`shop_slots`）、人口等级（`player_level`，无上限）。`reset()` 初始化新游戏状态。提供 `add_exp(amount)` → 累加经验自动升级、`exp_for_level(n)` → 经验公式、`get_population_cap()` → 公式化人口上限、`buy_and_equip_weapon()`/`buy_and_place_tower()` → 购买即部署、`can_buy_item(item_id, level)` → 智能人口判断（考虑合成释放人口）、`move_tower()`、`sell_from_deployed_weapon/deployed_tower()`、`_check_merge()` 等方法。跨场景传递数据。
+- **GameConfig** (`scripts/core/game_config.gd`) — 资源注册表，运行时从 `resources/` 目录加载 `.tres` 配置文件（武器、敌人、塔、波次、角色、地图、特效、精灵等）。必须最先加载（后续 Autoload 依赖它）。
+- **PlayerState** (`scripts/core/player_state.gd`) — 角色身份、属性、被动系统、player_stats、selected_map、current_wave、pending_heal。`init_character(id)` 从 CharacterData 初始化属性，`reset()` 重置。
+- **PlayerProgression** (`scripts/core/player_progression.gd`) — 经验/等级/人口上限。`add_exp(amount)` 累加经验自动升级，`exp_for_level(n)` 经验公式，`get_population_cap()` 公式化人口上限。
+- **InventoryManager** (`scripts/core/inventory_manager.gd`) — 金币、deployed_weapons/towers、shop_slots、buy/sell/merge、deploy_id。依赖 PlayerState 和 PlayerProgression。`buy_and_equip_weapon()`/`buy_and_place_tower()` 购买即部署，`can_buy_item()` 智能人口判断（考虑合成释放人口），`_check_merge()` 合成系统。
+- **StatsTracker** (`scripts/core/stats_tracker.gd`) — 战斗统计：击杀、金币、伤害、连杀。`record_kill()`/`reset_kill_streak()`/`record_damage_taken()`/`record_coins_earned()`。
 - **SceneFactory** (`scripts/core/scene_factory.gd`) — 集中管理场景实例化，提供 `create_tower()`, `create_enemy()`, `create_exp_orb()`, `create_coin()` 等工厂方法。创建实体必须通过此工厂。
 - **EffectsManager** (`scripts/systems/effects_manager.gd`) — 特效管理：伤害数字、击中火花、死亡爆炸、红闪（flash_hit）、击中抖动（sprite_shake）、增强死亡特效（spawn_enhanced_death）、Boss 击杀慢动作（hitstop）等视觉效果。
 - **AudioManager** (`scripts/systems/audio_manager.gd`) — 音效管理：SFX 通过 AudioStreamPlayer 池化播放 `play(sound_id)`，BGM 通过独立 AudioStreamPlayer 播放 `play_bgm(track_id)` / `stop_bgm()` / `fade_bgm(duration)`。SFX 放 `assets/sfx/`，BGM 放 `assets/bgm/`。
@@ -45,11 +48,11 @@ start_menu → character_selection → map_select → main（SHOP 阶段，首�
 >
 > **波次系统（纯时间制）**: 共 15 波，每 5 波一个 Boss（第 5 波 boss_brute、第 10 波 boss_summoner、第 15 波 boss_guardian）。波次仅以时间结束（时间到清场），击杀敌人不影响波次进度。每波分 2-3 个生成阶段（`SpawnPhaseData`），前慢后快。`max_alive_enemies` 控制场上同时存在的敌人上限。Boss 波次时间到但 Boss 未被击杀会触发 `boss_escaped` 信号。难度缩放从第 11 波开始（HP/伤害指数增长）。WaveData 配置：`time_limit`（逐波递增 40s→90s）、`spawn_phases`、`max_alive_enemies`、`enemy_weights`、`elite_chance`。
 >
-> **双轨经济**: 金币来源：初始金币 + 每波固定奖励（`ShopConfig.wave_reward`）+ 向日葵生成。经验来源：怪物掉落经验球（`ExpOrb`），玩家拾取后累计经验自动升级（`GameData.add_exp`），公式 `floor(base_exp * n^exp_exponent)` 控制升级曲线，等级/人口无上限。经验配置见 `ExpConfig`（`resources/exp_config.tres`）。
+> **双轨经济**: 金币来源：初始金币 + 每波固定奖励（`ShopConfig.wave_reward`）+ 向日葵生成。经验来源：怪物掉落经验球（`ExpOrb`），玩家拾取后累计经验自动升级（`PlayerProgression.add_exp`），公式 `floor(base_exp * n^exp_exponent)` 控制升级曲线，等级/人口无上限。经验配置见 `ExpConfig`（`resources/exp_config.tres`）。
 
 ### 代码组织
 
-- `scripts/core/` — 核心系统 (GameConfig, GameData, SceneFactory, EventBus, SpriteLoader)
+- `scripts/core/` — 核心系统 (GameConfig, PlayerState, PlayerProgression, InventoryManager, StatsTracker, SceneFactory, EventBus, SpriteLoader)
 - `scripts/components/` — 可复用组件 (HealthComponent, SpriteAnimator, Hitbox, Hurtbox, KnockbackHandler, SlowHandler)
 - `scripts/resources/` — 自定义 Resource 类定义 (WeaponData, EnemyData, TowerData, WaveData, SpawnPhaseData, CharacterData, ExpConfig, ShopConfig 等)
 - `scripts/entities/` — 游戏实体 (player, enemy, boss_base, boss_brute, coin, exp_orb, towers/, weapons/, projectiles/)
@@ -80,7 +83,7 @@ start_menu → character_selection → map_select → main（SHOP 阶段，首�
 - **配置驱动**: 游戏数值通过 Resource 类定义 (`scripts/resources/`)，以 `.tres` 文件存储 (`resources/`)，由 `GameConfig` 在运行时加载。修改数值编辑对应 `.tres` 文件即可。
 - **工厂 + Resource 注入**: `SceneFactory` 创建实体时注入对应的 Resource 数据（`EnemyData`、`TowerData`），实体不再直接依赖 `GameConfig` 字典
 - **组件化实体**: 共享行为提取为可复用组件（`HealthComponent`、`SpriteAnimator`），专用行为提取为独立组件（`WeaponManager`、`KnockbackHandler`、`SlowHandler`），伤害通过 `Hitbox`/`Hurtbox` Area2D 体系处理，通过场景树子节点挂载。`HealthComponent` 支持 `damage_reduction` 和带 `attacker` 参数的 `damaged` 信号。`SlowHandler` 为效果字典模式，支持多源减速叠加（取最大值）。塔支持 `apply_buff/remove_buff` 增益系统。敌人支持 `apply_root/remove_root` 定身系统
-- **角色被动**: 角色通过 `CharacterData.passive_id` 字段引用被动 ID（如 `kaze_swift`、`nemo_guardian`），GameData 在 `init_character()` 时解析并存入 `player_stats`，不再使用枚举类型的 `PassiveType`
+- **角色被动**: 角色通过 `CharacterData.passive_id` 字段引用被动 ID（如 `kaze_swift`、`nemo_guardian`），PlayerState 在 `init_character()` 时解析并存入 `player_stats`，不再使用枚举类型的 `PassiveType`
 - **事件总线**: 跨系统通信通过 `EventBus` 全局事件总线，避免系统间直接耦合
 - **信号通信**: 组件通过信号与宿主通信（如 `HealthComponent.died`）；跨系统事件通过 `EventBus`
 - **分组管理**: 实体通过 Godot 分组 (`towers`, `enemies`, `coins`, `exp_orbs`) 进行批量操作
