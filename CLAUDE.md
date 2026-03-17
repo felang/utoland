@@ -28,7 +28,7 @@ utoland 是一个基于 **Godot 4.6** 的 2D 塔防 + 射击混合类游戏（�
 - **SceneFactory** (`scripts/core/scene_factory.gd`) — 集中管理场景实例化，提供 `create_tower()`, `create_enemy()`, `create_exp_orb()`, `create_coin()` 等工厂方法。创建实体必须通过此工厂。
 - **EffectsManager** (`scripts/systems/effects_manager.gd`) — 特效管理：伤害数字、击中火花、死亡爆炸、红闪（flash_hit）、击中抖动（sprite_shake）、增强死亡特效（spawn_enhanced_death）、Boss 击杀慢动作（hitstop）等视觉效果。
 - **AudioManager** (`scripts/systems/audio_manager.gd`) — 音效管理：SFX 通过 AudioStreamPlayer 池化播放 `play(sound_id)`，BGM 通过独立 AudioStreamPlayer 播放 `play_bgm(track_id)` / `stop_bgm()` / `fade_bgm(duration)`。SFX 放 `assets/sfx/`，BGM 放 `assets/bgm/`。
-- **EventBus** (`scripts/core/event_bus.gd`) — 全局事件总线，用于跨系统解耦通信。商店信号：`item_purchased/item_sold/item_merged/player_level_changed/tower_moved`。战斗信号：`wave_started/wave_completed/wave_transition_ready/enemy_killed/boss_killed/coins_changed/coins_generated`。经验信号：`exp_collected/exp_changed`。
+- **EventBus** (`scripts/core/event_bus.gd`) — 全局事件总线，用于跨系统解耦通信。商店信号：`item_purchased/item_sold/item_merged/player_level_changed/tower_moved`。战斗信号：`wave_started/wave_completed/wave_transition_ready/enemy_killed/boss_killed/boss_escaped/coins_changed/coins_generated`。经验信号：`exp_collected/exp_changed`。
 - **SceneManager** (`scripts/core/scene_manager.gd`) — 集中管理场景切换，提供 `go_to(scene_name)` 方法（带淡入淡出过渡动画，async）。自动根据 SCENE_BGM 映射切换 BGM。所有场景路径在此统一维护，禁止直接调用 `get_tree().change_scene_to_file()`。
 
 ### 游戏流程 (场景切换)
@@ -43,13 +43,15 @@ start_menu → character_selection → map_select → main（SHOP 阶段，首�
 
 > **商店与战斗融合**: 不再有独立的商店场景。main 场景通过 `Phase` 状态机（SHOP/BATTLE）管理两个阶段。SHOP 阶段左侧面板（`ShopOverlay`，CanvasLayer layer=10）采用卡片式 UI：信息栏（金币/等级/人口/波次）+ 4 张物品卡片 + 刷新按钮 + 回收区 + 开战按钮。购买武器立即装备到角色，购买塔进入拖拽放置模式。拖拽已部署的塔或武器到回收区可卖出。人口满时能触发合成的物品仍可购买（`can_buy_item` 智能判断）。开战后面板滑出隐藏，波次结束后滑回。
 >
+> **波次系统（纯时间制）**: 共 15 波，每 5 波一个 Boss（第 5 波 boss_brute、第 10 波 boss_summoner、第 15 波 boss_guardian）。波次仅以时间结束（时间到清场），击杀敌人不影响波次进度。每波分 2-3 个生成阶段（`SpawnPhaseData`），前慢后快。`max_alive_enemies` 控制场上同时存在的敌人上限。Boss 波次时间到但 Boss 未被击杀会触发 `boss_escaped` 信号。难度缩放从第 11 波开始（HP/伤害指数增长）。WaveData 配置：`time_limit`（逐波递增 40s→90s）、`spawn_phases`、`max_alive_enemies`、`enemy_weights`、`elite_chance`。
+>
 > **双轨经济**: 金币来源：初始金币 + 每波固定奖励（`ShopConfig.wave_reward`）+ 向日葵生成。经验来源：怪物掉落经验球（`ExpOrb`），玩家拾取后累计经验自动升级（`GameData.add_exp`），公式 `floor(base_exp * n^exp_exponent)` 控制升级曲线，等级/人口无上限。经验配置见 `ExpConfig`（`resources/exp_config.tres`）。
 
 ### 代码组织
 
 - `scripts/core/` — 核心系统 (GameConfig, GameData, SceneFactory, EventBus, SpriteLoader)
 - `scripts/components/` — 可复用组件 (HealthComponent, SpriteAnimator, Hitbox, Hurtbox, KnockbackHandler, SlowHandler)
-- `scripts/resources/` — 自定义 Resource 类定义 (WeaponData, EnemyData, TowerData, WaveData, CharacterData, ExpConfig, ShopConfig 等)
+- `scripts/resources/` — 自定义 Resource 类定义 (WeaponData, EnemyData, TowerData, WaveData, SpawnPhaseData, CharacterData, ExpConfig, ShopConfig 等)
 - `scripts/entities/` — 游戏实体 (player, enemy, boss_base, boss_brute, coin, exp_orb, towers/, weapons/, projectiles/)
 - `scripts/systems/` — 游戏系统 (wave_manager, enemy_spawner, shop_manager, effects_manager, audio_manager, drag_manager)
 - `scripts/ui/` — UI 脚本 (hud, start_menu, result, 各选择界面, main 场景控制, shop_overlay 底部商店面板)
