@@ -88,3 +88,42 @@ func test_exp_orb_pool_acquire_and_release():
 	assert_eq(orb2.value, 1, "复用后 value 应已重置")
 	add_child(orb2)
 	SceneFactory.release_exp_orb(orb2)
+
+func test_projectile_reset_for_pool():
+	var pd := ProjectileData.new()
+	pd.speed = 800.0
+	pd.lifetime = 5.0
+	pd.base_pierce_count = 0
+	pd.knockback_force = 50.0
+	pd.trail_enabled = false
+	pd.sprite_path = ""
+	pd.projectile_scene = preload("res://scenes/entities/projectiles/bullet_projectile.tscn")
+	var proj: ProjectileBase = SceneFactory.create_projectile(pd, 10.0, Vector2(100, 100), Vector2.RIGHT)
+	add_child(proj)
+	proj._elapsed = 3.0
+	proj._hit_count = 2
+	proj.reset_for_pool()
+	assert_eq(proj._elapsed, 0.0, "reset 后 _elapsed 应为 0")
+	assert_eq(proj._hit_count, 0, "reset 后 _hit_count 应为 0")
+	assert_eq(proj._direction, Vector2.ZERO, "reset 后 _direction 应为 ZERO")
+	assert_true(proj.visible, "reset 后应可见")
+	proj.queue_free()
+
+func test_projectile_pool_reuse():
+	var pd := ProjectileData.new()
+	pd.speed = 800.0
+	pd.lifetime = 5.0
+	pd.base_pierce_count = 0
+	pd.knockback_force = 50.0
+	pd.trail_enabled = false
+	pd.sprite_path = ""
+	pd.projectile_scene = preload("res://scenes/entities/projectiles/bullet_projectile.tscn")
+	var proj1: ProjectileBase = SceneFactory.create_projectile(pd, 10.0, Vector2.ZERO, Vector2.RIGHT)
+	add_child(proj1)
+	SceneFactory.release_projectile(proj1)
+	# 投射物回收是异步延迟的（call_deferred），等待一帧让回收完成
+	await get_tree().process_frame
+	var proj2: ProjectileBase = SceneFactory.create_projectile(pd, 20.0, Vector2(50, 50), Vector2.LEFT)
+	assert_eq(proj1, proj2, "应复用同一投射物对象")
+	assert_eq(proj2._speed, 800.0, "复用后 speed 应来自 setup")
+	proj2.queue_free()

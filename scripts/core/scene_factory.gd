@@ -74,13 +74,34 @@ func create_exp_orb() -> Area2D:
 func release_exp_orb(orb: Area2D) -> void:
 	_pool_release("exp_orb", orb)
 
-# 统一投射物创建 — 从 ProjectileData 实例化
+# 统一投射物创建 — 从对象池获取并初始化
 func create_projectile(p_data: ProjectileData, damage: float, from: Vector2, direction: Vector2, extra_pierce: int = 0) -> ProjectileBase:
 	assert(p_data != null, "SceneFactory.create_projectile: data 不能为 null")
 	assert(p_data.projectile_scene != null, "SceneFactory.create_projectile: projectile_scene 未配置")
-	var proj: ProjectileBase = p_data.projectile_scene.instantiate()
+	var key: String = _get_projectile_pool_key(p_data)
+	if not _pools.has(key):
+		_register_pool(key, p_data.projectile_scene)
+	var proj: ProjectileBase = _pool_acquire(key) as ProjectileBase
 	proj.setup(p_data, damage, from, direction, extra_pierce)
 	return proj
+
+func release_projectile(proj: ProjectileBase) -> void:
+	if proj.data and proj.data.projectile_scene:
+		var key: String = _get_projectile_pool_key(proj.data)
+		if _pools.has(key):
+			_deferred_pool_release.call_deferred(key, proj)
+		else:
+			proj.queue_free()
+	else:
+		proj.queue_free()
+
+func _deferred_pool_release(key: String, obj: Node) -> void:
+	if not is_instance_valid(obj):
+		return
+	_pool_release(key, obj)
+
+func _get_projectile_pool_key(p_data: ProjectileData) -> String:
+	return "projectile_" + p_data.projectile_scene.resource_path.get_file().get_basename()
 
 # ---- 对象池核心 ----
 var _pools: Dictionary = {}

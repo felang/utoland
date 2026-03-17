@@ -60,6 +60,14 @@ func _on_shuriken_hit(area: Area2D) -> void:
 	elif _shuriken_hit_count >= 2:
 		_cleanup_and_free()
 
+func reset_for_pool() -> void:
+	super.reset_for_pool()
+	_bounce_target = null
+	_hit_enemies.clear()
+	_shuriken_hit_count = 0
+	if hitbox and hitbox.area_entered.is_connected(_on_shuriken_hit):
+		hitbox.area_entered.disconnect(_on_shuriken_hit)
+
 func _find_bounce_target(exclude: Node2D) -> Node2D:
 	if not is_inside_tree():
 		return null

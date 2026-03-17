@@ -18,6 +18,8 @@ var _trail: Line2D = null
 var _trail_positions: Array[Vector2] = []
 var _trail_max_points: int = 4
 var show_trail: bool = true
+var _is_pooled: bool = false
+var _pending_release: bool = false
 
 ## [过渡兼容] 旧代码直接设置 speed/slow_on_hit/slow_duration，后续 Task 11-18 删除
 var speed: float = 800.0:
@@ -77,24 +79,23 @@ func setup(p_data: ProjectileData, damage: float, from: Vector2, direction: Vect
 	assert(hitbox != null, "ProjectileBase.setup: 缺少 Hitbox 子节点")
 	hitbox.damage = damage
 	hitbox.knockback_force = data.knockback_force
-	# 精灵
+	# 精灵：先清理旧的，再按需创建
+	_cleanup_dynamic_sprite()
 	if data.sprite_path != "" and ResourceLoader.exists(data.sprite_path):
 		var sprite := Sprite2D.new()
+		sprite.name = "_PooledSprite"
 		sprite.texture = load(data.sprite_path)
 		sprite.rotation = direction.angle()
 		add_child(sprite)
-	# 拖尾
+	# 拖尾：先清理旧的，再按需创建
+	_cleanup_trail()
+	_trail_positions.clear()
 	show_trail = data.trail_enabled
 	if show_trail:
-		var fx: EffectConfigData = GameConfig.effects
-		_trail_max_points = fx.bullet_trail_max_points
-		_trail = Line2D.new()
-		_trail.width = fx.bullet_trail_width
-		_trail.default_color = fx.bullet_trail_color
-		_trail.z_index = -1
-		_trail.top_level = true
-		add_child(_trail)
-	# 碰撞信号
+		_create_trail()
+	# 信号：先断开再连接，防止重复
+	if hitbox.area_entered.is_connected(_on_hitbox_area_entered):
+		hitbox.area_entered.disconnect(_on_hitbox_area_entered)
 	hitbox.area_entered.connect(_on_hitbox_area_entered)
 
 func _physics_process(delta: float) -> void:
@@ -132,6 +133,45 @@ func _update_trail() -> void:
 		_trail.add_point(pos)
 
 func _cleanup_and_free() -> void:
+	if _is_pooled or _pending_release:
+		return
+	_pending_release = true
+	SceneFactory.release_projectile(self)
+
+func _cleanup_dynamic_sprite() -> void:
+	var old_sprite = get_node_or_null("_PooledSprite")
+	if old_sprite:
+		remove_child(old_sprite)
+		old_sprite.queue_free()
+
+func _cleanup_trail() -> void:
 	if _trail and is_instance_valid(_trail):
+		remove_child(_trail)
 		_trail.queue_free()
-	queue_free()
+		_trail = null
+
+func _create_trail() -> void:
+	var fx: EffectConfigData = GameConfig.effects
+	_trail_max_points = fx.bullet_trail_max_points
+	_trail = Line2D.new()
+	_trail.width = fx.bullet_trail_width
+	_trail.default_color = fx.bullet_trail_color
+	_trail.z_index = -1
+	_trail.top_level = true
+	add_child(_trail)
+
+func reset_for_pool() -> void:
+	_cleanup_dynamic_sprite()
+	_cleanup_trail()
+	_trail_positions.clear()
+	if hitbox and hitbox.area_entered.is_connected(_on_hitbox_area_entered):
+		hitbox.area_entered.disconnect(_on_hitbox_area_entered)
+	if hitbox and hitbox.area_entered.is_connected(_on_legacy_hitbox_area_entered):
+		hitbox.area_entered.disconnect(_on_legacy_hitbox_area_entered)
+	_elapsed = 0.0
+	_hit_count = 0
+	_pierce_count = 0
+	_direction = Vector2.ZERO
+	_speed = 0.0
+	_pending_release = false
+	visible = true
