@@ -28,7 +28,7 @@ utoland 是一个基于 **Godot 4.6** 的 2D 塔防 + 射击混合类游戏（�
 - **PlayerProgression** (`scripts/core/player_progression.gd`) — 经验/等级/人口上限。`add_exp(amount)` 累加经验自动升级，`exp_for_level(n)` 经验公式，`get_population_cap()` 公式化人口上限。
 - **InventoryManager** (`scripts/core/inventory_manager.gd`) — 金币、deployed_weapons/towers、shop_slots、buy/sell/merge、deploy_id。依赖 PlayerState 和 PlayerProgression。`buy_and_equip_weapon()`/`buy_and_place_tower()` 购买即部署，`can_buy_item()` 智能人口判断（考虑合成释放人口），`_check_merge()` 合成系统。
 - **StatsTracker** (`scripts/core/stats_tracker.gd`) — 战斗统计：击杀、金币、伤害、连杀。`record_kill()`/`reset_kill_streak()`/`record_damage_taken()`/`record_coins_earned()`。
-- **SceneFactory** (`scripts/core/scene_factory.gd`) — 集中管理场景实例化，提供 `create_tower()`, `create_enemy()`, `create_exp_orb()`, `create_coin()` 等工厂方法。创建实体必须通过此工厂。
+- **SceneFactory** (`scripts/core/scene_factory.gd`) — 集中管理场景实例化与对象池。提供 `create_tower()`, `create_enemy()`, `create_exp_orb()`, `create_coin()`, `create_projectile()` 等工厂方法。高频对象（投射物、普通敌人 normal/fast/tank、金币、经验球）内部走对象池复用，对外创建 API 不变。回收通过 `release_enemy()` / `release_coin()` / `release_exp_orb()` / `release_projectile()` 替代 `queue_free()`。预热：`warmup_initial()`（main 场景加载时）+ `warmup_for_wave(wave_data)`（每波开始前）。`clear_all_pools()` 在场景退出时清理。创建实体必须通过此工厂。
 - **EffectsManager** (`scripts/systems/effects_manager.gd`) — 特效管理：伤害数字、击中火花、死亡爆炸、红闪（flash_hit）、击中抖动（sprite_shake）、增强死亡特效（spawn_enhanced_death）、Boss 击杀慢动作（hitstop）等视觉效果。
 - **AudioManager** (`scripts/systems/audio_manager.gd`) — 音效管理：SFX 通过 AudioStreamPlayer 池化播放 `play(sound_id)`，BGM 通过独立 AudioStreamPlayer 播放 `play_bgm(track_id)` / `stop_bgm()` / `fade_bgm(duration)`。SFX 放 `assets/sfx/`，BGM 放 `assets/bgm/`。
 - **EventBus** (`scripts/core/event_bus.gd`) — 全局事件总线，用于跨系统解耦通信。商店信号：`item_purchased/item_sold/item_merged/player_level_changed/tower_moved`。战斗信号：`wave_started/wave_completed/wave_transition_ready/enemy_killed/boss_killed/boss_escaped/coins_changed/coins_generated`。经验信号：`exp_collected/exp_changed`。
@@ -87,6 +87,7 @@ start_menu → character_selection → map_select → main（SHOP 阶段，首�
 - **事件总线**: 跨系统通信通过 `EventBus` 全局事件总线，避免系统间直接耦合
 - **信号通信**: 组件通过信号与宿主通信（如 `HealthComponent.died`）；跨系统事件通过 `EventBus`
 - **分组管理**: 实体通过 Godot 分组 (`towers`, `enemies`, `coins`, `exp_orbs`) 进行批量操作
+- **对象池**: 高频实体（投射物、普通敌人、金币、经验球）通过 SceneFactory 内部对象池复用。可池化实体实现 `var _is_pooled: bool` 和 `reset_for_pool()` 方法。销毁时调用 `SceneFactory.release_*()` 而非 `queue_free()`。投射物和敌人的 release 使用 `call_deferred` 避免物理回调冲突。组件提供 `HealthComponent.reset()` 和 `SlowHandler.clear_all()` 支持池化重置
 
 ## 开发流程
 
