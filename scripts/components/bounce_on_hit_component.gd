@@ -11,8 +11,13 @@ var _bounce_count: int = 0
 var _hit_enemies: Array[Node2D] = []
 
 func on_hit(target: Node2D, projectile: Node2D) -> void:
+	# 防止同帧重叠敌人触发多次命中
+	if target in _hit_enemies:
+		return
 	_hit_enemies.append(target)
 	_bounce_count += 1
+	# 命中后暂停碰撞检测，弹射重定向后再启用
+	var hitbox = projectile.get_node_or_null("Hitbox") if projectile else null
 	if _bounce_count > max_bounces:
 		if projectile:
 			projectile._should_destroy = true
@@ -21,6 +26,13 @@ func on_hit(target: Node2D, projectile: Node2D) -> void:
 	var bounce_target: Node2D = _find_bounce_target(target.global_position)
 	if bounce_target and projectile:
 		projectile.direction = projectile.global_position.direction_to(bounce_target.global_position)
+		# 短暂禁用再启用，避免弹射瞬间碰到相邻敌人
+		if hitbox:
+			hitbox.set_deferred("monitoring", false)
+			projectile.get_tree().create_timer(0.05).timeout.connect(func() -> void:
+				if is_instance_valid(hitbox):
+					hitbox.monitoring = true
+			)
 	else:
 		if projectile:
 			projectile._should_destroy = true
