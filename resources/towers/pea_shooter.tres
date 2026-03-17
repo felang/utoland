@@ -1,7 +1,14 @@
-[gd_resource type="Resource" script_class="TowerData" load_steps=3 format=3]
+[gd_resource type="Resource" script_class="TowerData" load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://scripts/resources/tower_data.gd" id="1"]
-[ext_resource type="Resource" path="res://resources/projectiles/pea_bullet.tres" id="2"]
+[ext_resource type="Script" path="res://scripts/resources/attack_config_data.gd" id="2"]
+[ext_resource type="Resource" path="res://resources/projectiles/pea_bullet.tres" id="3"]
+
+[sub_resource type="Resource" id="AttackConfigData_pea_shooter"]
+script = ExtResource("2")
+damage_per_level = PackedFloat32Array(15, 30, 55)
+fire_rate_per_level = PackedFloat32Array(1.0, 0.8, 0.6)
+attack_range_per_level = PackedFloat32Array(150, 170, 200)
 
 [resource]
 script = ExtResource("1")
@@ -9,10 +16,7 @@ id = "pea_shooter"
 display_name = "射手塔"
 description = "稳定射击最近的敌人。虽然平凡，但从不缺席。"
 icon_path = "res://assets/towers/pea_shooter/sprite.png"
-max_level = 3
-hp_per_level = PackedFloat32Array(80, 150, 260)
-damage_per_level = PackedFloat32Array(15, 30, 55)
-fire_rate_per_level = PackedFloat32Array(1.0, 0.8, 0.6)
-attack_range_per_level = PackedFloat32Array(150, 170, 200)
 sell_price_per_level = PackedInt32Array(3, 7, 21)
-projectile_data = ExtResource("2")
+hp_per_level = PackedFloat32Array(80, 150, 260)
+attack_config = SubResource("AttackConfigData_pea_shooter")
+projectile_data = ExtResource("3")
