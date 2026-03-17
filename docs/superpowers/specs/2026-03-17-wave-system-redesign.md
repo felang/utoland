@@ -177,7 +177,7 @@ func _process(delta: float) -> void:
 | `scripts/resources/wave_data.gd` | 移除 `total_enemies`/`spawn_interval`/`boss_escort_count`，新增 `max_alive_enemies`/`spawn_phases: Array[SpawnPhaseData]` |
 | `scripts/systems/enemy_spawner.gd` | 分段生成逻辑、max_alive 检查、移除 BossPhase 状态机（简化为阶段切换） |
 | `scripts/systems/wave_manager.gd` | 移除击杀计数完成逻辑、Boss 击杀不再立即结束波次 |
-| `scripts/core/event_bus.gd` | 可选新增 `boss_escaped` 信号 |
+| `scripts/core/event_bus.gd` | 新增 `boss_escaped(boss_id)` 信号 |
 | `resources/waves/forest/*.tres` | 重写 wave_01~15，**删除 wave_16~20** |
 | `resources/waves/desert/*.tres` | 同上（如果有） |
 | `tests/unit/test_wave_manager.gd` | 更新测试用例 |
