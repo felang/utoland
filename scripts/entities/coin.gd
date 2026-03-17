@@ -8,6 +8,7 @@ const FORCE_ATTRACT_SPEED_MULT: float = 1.6  # 波次结束强制吸引时的速
 
 var player: Node2D = null
 var is_attracted: bool = false
+var _is_pooled: bool = false
 
 func _ready() -> void:
 	body_entered.connect(_on_body_entered)
@@ -42,7 +43,18 @@ func _play_pickup_effect() -> void:
 	tween.tween_property(self, "scale", Vector2(0.1, 0.1), shrink_dur)
 	tween.tween_property(self, "modulate:a", 0.0, shrink_dur)
 	tween.set_parallel(false)
-	tween.tween_callback(queue_free)
+	tween.tween_callback(func(): SceneFactory.release_coin(self))
+
+func reset_for_pool() -> void:
+	value = 1
+	is_attracted = false
+	attract_speed = 250.0
+	attract_range = 75.0
+	player = null
+	visible = true
+	modulate.a = 1.0
+	scale = Vector2.ONE
+	set_deferred("monitoring", true)
 
 func force_attract() -> void:
 	is_attracted = true
