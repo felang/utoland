@@ -5,7 +5,10 @@ var _wm: WeaponManager
 var _owner: Node2D
 
 func before_each() -> void:
-	GameData.reset()
+	PlayerState.reset()
+	PlayerProgression.reset()
+	InventoryManager.reset()
+	StatsTracker.reset()
 	_owner = Node2D.new()
 	add_child(_owner)
 	_wm = WeaponManager.new()
@@ -34,7 +37,7 @@ func test_remove_weapon_invalid_index_does_nothing() -> void:
 	assert_eq(_wm._weapons.size(), 1)
 
 func test_refresh_weapons_syncs_with_deployed() -> void:
-	GameData.deployed_weapons = [
+	InventoryManager.deployed_weapons = [
 		{id = "bow", level = 1},
 		{id = "shuriken", level = 1}
 	]

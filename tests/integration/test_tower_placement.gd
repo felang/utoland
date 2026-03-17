@@ -7,7 +7,7 @@ var test_scene: Node2D
 func before_each():
 	test_scene = Node2D.new()
 	add_child_autofree(test_scene)
-	GameData.coins = 100
+	InventoryManager.coins = 100
 
 func test_place_shooter_tower():
 	var tower = SceneFactory.create_tower(Enums.TowerId.PEA_SHOOTER)
@@ -56,9 +56,9 @@ func test_invalid_tower_placement():
 
 func test_tower_restoration_from_deployed_towers():
 	# 测试从 deployed_towers 恢复塔
-	GameData.deployed_towers = [{id = "pea_shooter", level = 1, grid_pos = Vector2i(2, 3)}]
+	InventoryManager.deployed_towers = [{id = "pea_shooter", level = 1, grid_pos = Vector2i(2, 3)}]
 
-	var tower_entry = GameData.deployed_towers[0]
+	var tower_entry = InventoryManager.deployed_towers[0]
 	var tower = SceneFactory.create_tower(tower_entry.id, tower_entry.level)
 
 	assert_not_null(tower, "Restored tower should be created")
@@ -67,7 +67,7 @@ func test_tower_restoration_from_deployed_towers():
 
 	test_scene.add_child(tower)
 	# 清理
-	GameData.deployed_towers.clear()
+	InventoryManager.deployed_towers.clear()
 
 func test_multiple_tower_placement():
 	var towers = []

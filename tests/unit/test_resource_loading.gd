@@ -199,7 +199,7 @@ func test_weapon_has_attack_mode():
 
 
 func test_player_const_unchanged() -> void:
-	# PLAYER 保持 const，确保 GameData 初始化不受影响
+	# PLAYER 保持 const，确保初始化不受影响
 	assert_eq(GameConfig.PLAYER["initial_coins"], 100)
 	assert_eq(GameConfig.PLAYER["initial_hp"], 100.0)
 	assert_eq(GameConfig.PLAYER["initial_speed"], 100.0)

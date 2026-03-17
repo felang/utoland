@@ -10,7 +10,7 @@ func before_each():
 	test_scene = Node2D.new()
 	add_child_autofree(test_scene)
 	# 重置被动系统
-	GameData.new_passive_id = ""
+	PlayerState.new_passive_id = ""
 
 func test_tower_shoots_at_enemy():
 	# Test that tower can shoot bullets
@@ -138,7 +138,7 @@ func test_tower_damage_from_config():
 	await wait_frames(2)
 
 	var td: TowerData = GameConfig.towers[Enums.TowerId.PEA_SHOOTER]
-	var expected_damage = td.damage_per_level[0] * GameData.player_stats.get(Enums.Stat.TOWER_MULT, 1.0)
+	var expected_damage = td.damage_per_level[0] * PlayerState.player_stats.get(Enums.Stat.TOWER_MULT, 1.0)
 	assert_almost_eq(tower.attacker.base_damage, expected_damage, 0.01, "Tower attacker damage should match config")
 
 func test_enemy_drops_correct_exp_orb_count():

@@ -18,7 +18,6 @@ config/icon="res://icon.svg"
 [autoload]
 
 GameConfig="*res://scripts/core/game_config.gd"
-GameData="*res://scripts/core/game_data.gd"
 PlayerState="*res://scripts/core/player_state.gd"
 PlayerProgression="*res://scripts/core/player_progression.gd"
 InventoryManager="*res://scripts/core/inventory_manager.gd"
