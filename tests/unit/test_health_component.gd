@@ -112,3 +112,30 @@ func test_damaged_signal_null_attacker():
 	var signal_params = get_signal_parameters(hc, "damaged")
 	assert_null(signal_params[2], "attacker 应为 null 时传 null")
 	hc.queue_free()
+
+func test_reset_restores_full_hp():
+	var hc := HealthComponent.new()
+	add_child(hc)
+	hc.initialize(100.0)
+	hc.current_hp = 30.0
+	hc.reset()
+	assert_eq(hc.current_hp, 100.0, "reset 后 HP 应恢复满血")
+	hc.queue_free()
+
+func test_reset_clears_invincible():
+	var hc := HealthComponent.new()
+	add_child(hc)
+	hc.initialize(100.0)
+	hc.invincible = true
+	hc.reset()
+	assert_false(hc.invincible, "reset 后 invincible 应为 false")
+	hc.queue_free()
+
+func test_reset_clears_damage_reduction():
+	var hc := HealthComponent.new()
+	add_child(hc)
+	hc.initialize(100.0)
+	hc.damage_reduction = 0.5
+	hc.reset()
+	assert_eq(hc.damage_reduction, 0.0, "reset 后 damage_reduction 应为 0")
+	hc.queue_free()

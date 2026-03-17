@@ -26,6 +26,11 @@ func initialize(hp: float) -> void:
 	max_hp = hp
 	current_hp = hp
 
+func reset() -> void:
+	current_hp = max_hp
+	invincible = false
+	damage_reduction = 0.0
+
 func take_damage(amount: float, attacker: Node2D = null) -> void:
 	if invincible:
 		return
