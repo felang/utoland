@@ -1,188 +1,208 @@
-# WeaponManager — 统一管理玩家所有武器
+# WeaponManager — Pivot+Offset 架构统一管理玩家所有武器
+# 每把武器由 WeaponPivot → TargetFinderComponent + 攻击组件 + WeaponOffset(Sprite+FirePoint) 组成
 class_name WeaponManager
 extends Node2D
 
-const ORBIT_RADIUS: float = 15.0
 const ORBIT_SPEED: float = TAU / 8.0
-const SPRITE_SIZE: int = 6
+const SPRITE_SCALE: float = 6.0
 
+# 武器精灵颜色映射（后备方案，无 icon 时使用）
 const WEAPON_COLORS: Dictionary = {
 	"bow": Color.GREEN,
 	"shuriken": Color.CORNFLOWER_BLUE,
 	"sword": Color.RED,
 }
 
-const SPRITE_ROTATION_OFFSET: Dictionary = {
-	"bow": -PI / 2.0,
-	"shuriken": 0.0,
-	"sword": PI / 2.0,
-}
-
-var _weapons: Array[Weapon] = []
-var _weapon_sprites: Array[Sprite2D] = []
-var _sprite_rot_offsets: Array[float] = []
+var _pivots: Array[Node2D] = []
+var _weapon_data_list: Array[WeaponData] = []
 var _orbit_angle: float = 0.0
-var _current_target: Node2D = null
-var _on_weapon_drag_callback: Callable
+var _projectile_container: Node = null
+var _weapon_drag_callback: Callable
 
-func set_weapon_drag_callback(callback: Callable) -> void:
-	_on_weapon_drag_callback = callback
+func _ready() -> void:
+	# 缓存投射物容器（Player 的父节点，通常是 main 场景）
+	_projectile_container = get_parent().get_parent() if get_parent() else null
 
+## 清除所有武器并从传入的 weapon_entries 创建
 func initialize(weapon_entries: Array[Dictionary]) -> void:
+	_clear_all()
 	for entry in weapon_entries:
-		if not GameConfig.weapons.has(entry.id):
-			push_error("WeaponManager: 未知武器 id: " + entry.id)
-			continue
-		var data: WeaponData = GameConfig.weapons[entry.id]
-		var weapon: Weapon = _add_weapon(data, entry.id)
-		if weapon:
-			weapon.set_level(entry.level)
-			_apply_passive_to_weapon(weapon)
+		add_weapon(entry.id, entry.level)
 
 ## 热更新：添加单个武器（商店购买后立即调用）
 func add_weapon(weapon_id: String, level: int) -> void:
 	if not GameConfig.weapons.has(weapon_id):
 		push_error("WeaponManager: 未知武器 id: " + weapon_id)
 		return
-	var data: WeaponData = GameConfig.weapons[weapon_id]
-	var weapon: Weapon = _add_weapon(data, weapon_id)
-	if weapon:
-		weapon.set_level(level)
-		_apply_passive_to_weapon(weapon)
+	var weapon_data: WeaponData = GameConfig.weapons[weapon_id]
+	_weapon_data_list.append(weapon_data)
+
+	# 创建 Pivot
+	var pivot := Node2D.new()
+	pivot.name = "WeaponPivot_%d" % _pivots.size()
+	add_child(pivot)
+
+	# 创建 TargetFinderComponent
+	var finder := TargetFinderComponent.new()
+	finder.name = "TargetFinderComponent"
+	pivot.add_child(finder)
+
+	# 根据武器类型创建攻击组件
+	if weapon_data.projectile_data:
+		var ranged := RangedAttackComponent.new()
+		ranged.name = "RangedAttackComponent"
+		ranged.attack_config = weapon_data.attack_config
+		ranged.projectile_data = weapon_data.projectile_data
+		ranged.projectile_spawned.connect(_on_projectile_spawned)
+		ranged.attack_executed.connect(func(_t: Node2D, _p: Node2D) -> void:
+			_on_attack_executed(pivot, weapon_data)
+		)
+		pivot.add_child(ranged)
+		ranged.set_level(level)
+	elif weapon_data.melee_config:
+		var melee := MeleeAttackComponent.new()
+		melee.name = "MeleeAttackComponent"
+		melee.attack_config = weapon_data.attack_config
+		melee.melee_config = weapon_data.melee_config
+		melee.attack_executed.connect(func(_t: Node2D) -> void:
+			_on_attack_executed(pivot, weapon_data)
+		)
+		pivot.add_child(melee)
+		melee.set_level(level)
+
+	# 创建 WeaponOffset（固定距离）+ WeaponSprite + FirePoint
+	var offset := Node2D.new()
+	offset.name = "WeaponOffset"
+	offset.position = Vector2(weapon_data.pivot_offset, 0)
+	pivot.add_child(offset)
+
+	var sprite := Sprite2D.new()
+	sprite.name = "WeaponSprite"
+	_setup_weapon_sprite(sprite, weapon_id)
+	offset.add_child(sprite)
+
+	var fire_point := Marker2D.new()
+	fire_point.name = "FirePoint"
+	offset.add_child(fire_point)
+
+	# 点击区域（商店阶段拖拽卖出用）
+	_setup_click_area(sprite, _pivots.size())
+
+	_pivots.append(pivot)
+	# 注入被动加成
+	_apply_passive_to_pivot(pivot)
+	_redistribute_angles()
 
 ## 热更新：移除指定索引的武器（卖出时调用）
 func remove_weapon(index: int) -> void:
-	if index < 0 or index >= _weapons.size():
+	if index < 0 or index >= _pivots.size():
 		return
-	_weapons[index].queue_free()
-	_weapons.remove_at(index)
-	_weapon_sprites[index].queue_free()
-	_weapon_sprites.remove_at(index)
-	_sprite_rot_offsets.remove_at(index)
+	var pivot: Node2D = _pivots[index]
+	_pivots.remove_at(index)
+	_weapon_data_list.remove_at(index)
+	pivot.queue_free()
+	_redistribute_angles()
 
-## 完全重建：清除所有武器并从 deployed_weapons 重新初始化
+## 完全重建：清除所有武器并从 InventoryManager.deployed_weapons 重新初始化
 func refresh_weapons() -> void:
-	for w in _weapons:
-		w.queue_free()
-	_weapons.clear()
-	for s in _weapon_sprites:
-		s.queue_free()
-	_weapon_sprites.clear()
-	_sprite_rot_offsets.clear()
-	initialize(InventoryManager.deployed_weapons)
+	_clear_all()
+	for entry in InventoryManager.deployed_weapons:
+		add_weapon(entry.id, entry.level)
 
-func _add_weapon(data: WeaponData, weapon_id: String) -> Weapon:
-	var weapon: Weapon = _create_weapon(weapon_id)
-	if not weapon:
-		return null
-	weapon.initialize(data)
-	weapon.owner_node = get_parent() as Node2D
-	weapon.attacker.target_finder = func(range_limit: float) -> Node2D:
-		var origin: Vector2 = weapon.get_fire_position()
-		return _find_nearest_enemy_from(origin, range_limit)
-	add_child(weapon)
-	_weapons.append(weapon)
-	# 创建漂浮精灵
-	var spr := _create_weapon_sprite(data, weapon_id)
-	add_child(spr)
-	_weapon_sprites.append(spr)
-	_sprite_rot_offsets.append(SPRITE_ROTATION_OFFSET.get(weapon_id, 0.0))
-	weapon.sprite = spr
-	# 添加点击区域（供商店阶段拖拽卖出用）
-	var click_area := Area2D.new()
-	click_area.name = "ClickArea"
-	click_area.input_pickable = true
-	var shape := CollisionShape2D.new()
-	var circle := CircleShape2D.new()
-	circle.radius = SPRITE_SIZE * 1.5
-	shape.shape = circle
-	click_area.add_child(shape)
-	spr.add_child(click_area)
-	click_area.input_event.connect(_on_weapon_click.bind(_weapons.size() - 1))
-	return weapon
-
+## 每帧驱动：推进轨道角度、旋转 Pivot 朝向目标或轨道、驱动攻击组件
 func tick(delta: float) -> void:
-	for weapon in _weapons:
-		weapon.attacker.tick(delta)
-	_current_target = _find_closest_enemy_unlimited()
-	_update_sprites(delta)
+	_orbit_angle += ORBIT_SPEED * delta
+	var count: int = _pivots.size()
+	for i in count:
+		var pivot: Node2D = _pivots[i]
+		# 旋转 Pivot 朝向当前目标（或无目标时沿轨道自转）
+		var finder = pivot.get_node_or_null("TargetFinderComponent")
+		var target: Node2D = finder.get_target() if finder else null
+		if target and is_instance_valid(target):
+			pivot.look_at(target.global_position)
+		else:
+			var base_angle: float = _orbit_angle + (TAU / max(count, 1)) * i
+			pivot.rotation = base_angle
+		# 驱动攻击组件
+		var attack = pivot.get_node_or_null("RangedAttackComponent")
+		if not attack:
+			attack = pivot.get_node_or_null("MeleeAttackComponent")
+		if attack:
+			attack.tick(delta)
 
-func _find_nearest_enemy_from(origin: Vector2, range_limit: float) -> Node2D:
-	if not is_inside_tree():
-		return null
-	var enemies: Array[Node] = get_tree().get_nodes_in_group(Enums.Group.ENEMIES)
-	var closest: Node2D = null
-	var min_dist: float = range_limit
-	for enemy in enemies:
-		if enemy is Node2D:
-			var dist: float = origin.distance_to(enemy.global_position)
-			if dist < min_dist:
-				min_dist = dist
-				closest = enemy
-	return closest
+## 设置商店阶段武器拖拽回调
+func set_weapon_drag_callback(callback: Callable) -> void:
+	_weapon_drag_callback = callback
 
-func _find_closest_enemy_unlimited() -> Node2D:
-	var owner_nd: Node2D = get_parent() as Node2D
-	if not owner_nd:
-		return null
-	return _find_nearest_enemy_from(owner_nd.global_position, INF)
+# — 内部方法 —
 
-func _apply_passive_to_weapon(weapon: Weapon) -> void:
+func _on_projectile_spawned(proj: Node2D) -> void:
+	if _projectile_container and is_instance_valid(_projectile_container):
+		_projectile_container.add_child(proj)
+	elif get_parent():
+		get_parent().get_parent().add_child(proj)
+
+func _on_attack_executed(pivot: Node2D, weapon_data: WeaponData) -> void:
+	if not weapon_data.hide_sprite_on_fire:
+		return
+	var sprite = pivot.get_node_or_null("WeaponOffset/WeaponSprite")
+	if not sprite:
+		return
+	sprite.visible = false
+	var attack = pivot.get_node_or_null("RangedAttackComponent")
+	if attack:
+		var restore_time: float = attack.get_final_cooldown() * weapon_data.sprite_restore_ratio
+		get_tree().create_timer(restore_time).timeout.connect(func() -> void:
+			if is_instance_valid(sprite):
+				sprite.visible = true
+		)
+
+func _apply_passive_to_pivot(pivot: Node2D) -> void:
 	var dmg_mult: float = PlayerState.player_stats.get(Enums.Stat.DAMAGE_MULT, 1.0)
 	var spd_mult: float = PlayerState.player_stats.get(Enums.Stat.ATTACK_SPEED_MULT, 1.0)
-	weapon.attacker.damage_multiplier = dmg_mult
-	weapon.attacker.speed_multiplier = spd_mult
+	var attack = pivot.get_node_or_null("RangedAttackComponent")
+	if not attack:
+		attack = pivot.get_node_or_null("MeleeAttackComponent")
+	if attack:
+		attack.damage_multiplier = dmg_mult
+		attack.speed_multiplier = spd_mult
 
-func _on_weapon_click(_viewport: Node, event: InputEvent, _shape_idx: int, weapon_index: int) -> void:
-	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-		if _on_weapon_drag_callback.is_valid():
-			_on_weapon_drag_callback.call(weapon_index)
+func _redistribute_angles() -> void:
+	# 均匀分布初始角度偏移；实际旋转由 tick() 控制
+	pass
 
-func _create_weapon(weapon_id: String) -> Weapon:
-	match weapon_id:
-		"shuriken":
-			return ShurikenWeapon.new()
-		_:
-			return Weapon.new()
+func _clear_all() -> void:
+	for pivot in _pivots:
+		pivot.queue_free()
+	_pivots.clear()
+	_weapon_data_list.clear()
 
-func _update_sprites(delta: float) -> void:
-	if _weapon_sprites.is_empty():
-		return
-	_orbit_angle += ORBIT_SPEED * delta
-	var count: int = _weapon_sprites.size()
-	var angle_step: float = TAU / count
-	var has_target: bool = _current_target != null and is_instance_valid(_current_target)
-	var target_angle: float = 0.0
-	if has_target:
-		var owner_nd: Node2D = get_parent() as Node2D
-		if owner_nd:
-			target_angle = owner_nd.global_position.direction_to(_current_target.global_position).angle()
-	for i in range(count):
-		var slot_angle: float = _orbit_angle + angle_step * i
-		_weapon_sprites[i].position = Vector2(cos(slot_angle), sin(slot_angle)) * ORBIT_RADIUS
-		var face_angle: float
-		if has_target:
-			face_angle = target_angle
-		else:
-			face_angle = slot_angle
-		_weapon_sprites[i].rotation = face_angle + _sprite_rot_offsets[i]
+func _setup_weapon_sprite(sprite: Sprite2D, weapon_id: String) -> void:
+	var weapon_data: WeaponData = GameConfig.weapons.get(weapon_id)
+	if weapon_data and not weapon_data.icon_path.is_empty():
+		if ResourceLoader.exists(weapon_data.icon_path):
+			var tex: Texture2D = load(weapon_data.icon_path)
+			if tex:
+				sprite.texture = tex
+				return
+	# 后备：彩色方块
+	var size: int = SPRITE_SCALE as int
+	var img := Image.create(size, size, false, Image.FORMAT_RGBA8)
+	var color: Color = WEAPON_COLORS.get(weapon_id, Color.WHITE)
+	img.fill(color)
+	sprite.texture = ImageTexture.create_from_image(img)
 
-func _create_weapon_sprite(data: WeaponData, weapon_id: String) -> Sprite2D:
-	var spr := Sprite2D.new()
-	spr.z_index = 1
-	if data.icon_path != "" and ResourceLoader.exists(data.icon_path):
-		spr.texture = load(data.icon_path)
-	else:
-		var color: Color = WEAPON_COLORS.get(weapon_id, Color.WHITE)
-		var img := Image.create(SPRITE_SIZE, SPRITE_SIZE, false, Image.FORMAT_RGBA8)
-		var center := Vector2(SPRITE_SIZE / 2.0, SPRITE_SIZE / 2.0)
-		var radius: float = SPRITE_SIZE / 2.0
-		for x in range(SPRITE_SIZE):
-			for y in range(SPRITE_SIZE):
-				var dist: float = Vector2(x + 0.5, y + 0.5).distance_to(center)
-				if dist <= radius:
-					img.set_pixel(x, y, color)
-				else:
-					img.set_pixel(x, y, Color.TRANSPARENT)
-		spr.texture = ImageTexture.create_from_image(img)
-	return spr
+func _setup_click_area(sprite: Sprite2D, index: int) -> void:
+	var click_area := Area2D.new()
+	click_area.name = "ClickArea"
+	var shape := CollisionShape2D.new()
+	var rect := RectangleShape2D.new()
+	rect.size = Vector2(12, 12)
+	shape.shape = rect
+	click_area.add_child(shape)
+	click_area.input_event.connect(func(_vp: Node, event: InputEvent, _idx: int) -> void:
+		if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+			if _weapon_drag_callback.is_valid():
+				_weapon_drag_callback.call(index)
+	)
+	sprite.add_child(click_area)

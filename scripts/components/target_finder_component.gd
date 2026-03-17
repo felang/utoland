@@ -61,7 +61,8 @@ func _update_target(new_target: Node2D) -> void:
 func _find_nearest(bodies: Array[Node2D]) -> Node2D:
 	var closest: Node2D = null
 	var min_dist: float = INF
-	var origin: Vector2 = global_position
+	var parent_nd := get_parent() as Node2D
+	var origin: Vector2 = parent_nd.global_position if parent_nd else Vector2.ZERO
 	for body in bodies:
 		if not is_instance_valid(body):
 			continue
