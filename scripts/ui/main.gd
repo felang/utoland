@@ -6,6 +6,11 @@ var current_phase: Phase = Phase.SHOP
 var _tower_container: Node2D = null
 var _shop_overlay: CanvasLayer = null
 var _drag_manager: Node = null
+var _camera: Camera2D = null
+
+const CAMERA_TRANSITION_DURATION := 0.5
+const SHOP_ZOOM := 0.865
+const SHOP_CAMERA_POS := Vector2(-98, 0)
 
 func _ready() -> void:
 	_tower_container = Node2D.new()
@@ -47,21 +52,84 @@ func _ready() -> void:
 	EventBus.wave_transition_ready.connect(_on_wave_transition_ready)
 	EventBus.coins_generated.connect(_on_coins_generated)
 
+	# 缓存相机引用
+	_camera = $Player.get_node("Camera2D")
+
 	# 进入首次 SHOP 阶段
 	_enter_shop_phase(true)
 
 
 func _enter_shop_phase(is_first: bool = false) -> void:
 	current_phase = Phase.SHOP
-	_shop_overlay.refresh_shop(is_first)
-	if not is_first:
+
+	# 禁用玩家输入，停止移动
+	$Player.set_input_enabled(false)
+	$Player.velocity = Vector2.ZERO
+
+	# 扩大相机限制，防止过渡时被裁剪
+	_camera.limit_left = -10000
+	_camera.limit_right = 10000
+	_camera.limit_top = -10000
+	_camera.limit_bottom = 10000
+
+	# 重置相机偏移，暂停相机自身处理（震动/前瞻）
+	_camera.offset = Vector2.ZERO
+	_camera.set_process(false)
+
+	# 关闭平滑和拖拽边距
+	_camera.position_smoothing_enabled = false
+	_camera.drag_horizontal_enabled = false
+	_camera.drag_vertical_enabled = false
+
+	# 计算相机本地目标位置（相机是 Player 子节点）
+	var target_local_pos: Vector2 = SHOP_CAMERA_POS - $Player.global_position
+	var shop_zoom := Vector2(SHOP_ZOOM, SHOP_ZOOM)
+
+	if is_first:
+		# 首次直接设置，无过渡
+		_camera.zoom = shop_zoom
+		_camera.position = target_local_pos
+	else:
+		# 缓动过渡到商店视角
+		var tween := create_tween().set_parallel(true)
+		tween.tween_property(_camera, "zoom", shop_zoom, CAMERA_TRANSITION_DURATION)
+		tween.tween_property(_camera, "position", target_local_pos, CAMERA_TRANSITION_DURATION)
 		_shop_overlay.slide_in()
+
+	_shop_overlay.refresh_shop(is_first)
 	AudioManager.play_bgm("placement")
 	$HUD.set_battle_phase(false)
 
 func _enter_battle_phase() -> void:
 	current_phase = Phase.BATTLE
 	_shop_overlay.slide_out()
+
+	# 缓动过渡回战斗视角
+	var battle_zoom: float = GameConfig.effects.camera_zoom
+	var tween := create_tween().set_parallel(true)
+	tween.tween_property(_camera, "zoom", Vector2(battle_zoom, battle_zoom), CAMERA_TRANSITION_DURATION)
+	tween.tween_property(_camera, "position", Vector2.ZERO, CAMERA_TRANSITION_DURATION)
+
+	# 过渡完成后恢复相机设置和玩家输入
+	tween.chain().tween_callback(func():
+		# 恢复相机限制
+		_camera.limit_left = -GameConfig.MAP_HALF_WIDTH
+		_camera.limit_right = GameConfig.MAP_HALF_WIDTH
+		_camera.limit_top = -GameConfig.MAP_HALF_HEIGHT
+		_camera.limit_bottom = GameConfig.MAP_HALF_HEIGHT
+
+		# 恢复平滑和拖拽边距
+		_camera.position_smoothing_enabled = true
+		_camera.drag_horizontal_enabled = true
+		_camera.drag_vertical_enabled = true
+
+		# 恢复相机处理（震动/前瞻）
+		_camera.set_process(true)
+
+		# 重新启用玩家输入
+		$Player.set_input_enabled(true)
+	)
+
 	AudioManager.play_bgm("battle")
 	$HUD.set_battle_phase(true)
 	$WaveManager.start_next_wave()
