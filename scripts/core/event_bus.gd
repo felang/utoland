@@ -9,6 +9,7 @@ signal wave_completed(wave_number: int)
 signal wave_transition_ready()
 signal game_won()
 signal game_lost()
+signal boss_escaped(boss_id: String)
 
 # 战斗事件
 signal enemy_killed(enemy_type: String, position: Vector2, is_elite: bool)
