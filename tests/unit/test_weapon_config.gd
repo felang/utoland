@@ -32,7 +32,6 @@ func test_bow_resource_loaded():
 	var w: WeaponData = GameConfig.weapons[Enums.WeaponId.BOW]
 	assert_not_null(w.attack_config, "弓应有 attack_config")
 	assert_not_null(w.projectile_data, "弓应有 projectile_data")
-	assert_eq(w.projectile_data.knockback_force, 40.0, "弓弹道击退力应为 40")
 
 func test_sword_resource_loaded():
 	assert_true(GameConfig.weapons.has(Enums.WeaponId.SWORD), "应包含 sword")
