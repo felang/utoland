@@ -40,7 +40,7 @@
 - `var current_exp: int = 0` — 累计总经验（升级不重置）
 - `var total_exp_earned: int = 0` — 统计用（结算页面显示）
 - `player_level` 保留，不再由金币驱动
-- `reset()` 中需重置 `current_exp` 和 `total_exp_earned`
+- `_DEFAULTS` 字典和 `reset()` 中需包含 `current_exp` 和 `total_exp_earned`
 
 ### 经验公式
 升到等级 N 所需总经验：
@@ -97,7 +97,8 @@ exp_for_level(n) = floor(base_exp * n ^ exp_exponent)
 ### enemy.gd 改动
 - 新增 `_drop_exp_orbs()` 方法（参考 `_drop_coins()` 实现）
 - `_on_died()` 调用 `_drop_exp_orbs()` 替代 `_drop_coins()`
-- 精英怪倍率：`apply_elite()` 新增 `exp_mult` 参数（或将 `coin_mult` 改为 `exp_mult`），存入 `_elite_exp_mult`。调用方（spawn 系统）同步更新
+- 精英怪倍率：`apply_elite()` 保留 `coin_mult` 参数，新增第 5 个参数 `exp_mult`，存入 `_elite_exp_mult`。调用方 `enemy_spawner.gd` 同步更新
+- `WaveData` 新增 `@export var elite_exp_mult: float = 2.0`，各波次 `.tres` 文件配置
 
 ### 经验球分组
 - `enums.gd` 新增 `EXP_ORBS` 分组常量
@@ -119,7 +120,8 @@ exp_for_level(n) = floor(base_exp * n ^ exp_exponent)
 ## 6. UI 改动
 
 ### ShopOverlay
-- 移除"升级"按钮（Lv↑）
+- 移除升级按钮相关：`_level_up_button` 变量及创建、`_update_level_up_button()` 方法及调用、`_on_level_up_pressed()` 方法
+- 人口上限显示改为调用 `GameData.get_population_cap()`（当前直接读 ShopConfig 数组）
 - 信息栏保留：金币 | 等级 Lv.N | 人口 used/max | 波次 WN
 
 ### HUD
@@ -185,5 +187,8 @@ exp_for_level(n) = floor(base_exp * n ^ exp_exponent)
 | 改动 | `scripts/ui/main.gd` — 波次结束给固定金币 |
 | 改动 | `scripts/ui/result.gd` — 新增经验统计 |
 | 改动 | 各敌人 `.tres` — 配置 `exp_drop_min/max` |
-| 改动 | spawn/elite 系统 — `apply_elite()` 调用方传入 exp_mult |
+| 改动 | `scripts/systems/enemy_spawner.gd` — `apply_elite()` 调用传入 exp_mult |
+| 改动 | `scripts/resources/wave_data.gd` — 新增 `elite_exp_mult` 字段 |
+| 改动 | 各波次 `.tres` — 配置 `elite_exp_mult` |
 | 改动 | `tests/unit/test_game_data_economy.gd` — 移除 buy_level_up 测试，新增 add_exp/升级/人口测试 |
+| 改动 | `tests/unit/test_elite_enemy.gd` — 更新 apply_elite 测试 |
