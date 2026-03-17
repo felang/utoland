@@ -215,8 +215,8 @@ func create_enemy(type: String) -> CharacterBody2D:
     enemy.tower_attack_damage = enemy.data.damage
     enemy._hitbox.damage = enemy.data.damage
     enemy.slow_handler.initialize(enemy.data.speed)
-    # 重新获取 player 引用
-    enemy.player = null  # _process 中会重新获取（如果需要立即获取也可在此处）
+    # 重新获取 player 引用（敌人 _physics_process 中没有自动重新获取逻辑）
+    enemy.player = get_tree().get_first_node_in_group(Enums.Group.PLAYER)
     return enemy
 ```
 
