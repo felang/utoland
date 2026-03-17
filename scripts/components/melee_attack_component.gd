@@ -71,9 +71,9 @@ func _execute_melee(target: Node2D) -> void:
 	get_parent().add_child(hitbox)
 	hitbox.global_position = get_parent().global_position + direction * melee_config.thrust_distance
 
-	# Tween 前刺动画
-	var offset_node: Node2D = get_parent().get_node_or_null("WeaponOffset")
-	if offset_node:
+	# Tween 前刺动画（parent 就是 WeaponOffset）
+	var offset_node: Node2D = get_parent() as Node2D
+	if offset_node and offset_node.name == "WeaponOffset":
 		var tween := create_tween()
 		var original_pos: Vector2 = offset_node.position
 		var thrust_pos: Vector2 = original_pos + direction * melee_config.thrust_distance
