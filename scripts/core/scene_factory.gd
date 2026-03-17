@@ -1,5 +1,11 @@
 extends Node
 
+class PoolEntry:
+	var scene: PackedScene
+	var idle_queue: Array[Node] = []
+	var active_count: int = 0
+	var warmup_count: int = 0
+
 # Scene preloads - centralized
 var _tower_scenes: Dictionary = {
 	Enums.TowerId.PEA_SHOOTER: preload("res://scenes/entities/towers/tower_pea_shooter.tscn"),
@@ -61,3 +67,59 @@ func create_projectile(p_data: ProjectileData, damage: float, from: Vector2, dir
 	var proj: ProjectileBase = p_data.projectile_scene.instantiate()
 	proj.setup(p_data, damage, from, direction, extra_pierce)
 	return proj
+
+# ---- 对象池核心 ----
+var _pools: Dictionary = {}
+
+func _register_pool(key: String, scene: PackedScene, warmup: int = 0) -> void:
+	var entry := PoolEntry.new()
+	entry.scene = scene
+	entry.warmup_count = warmup
+	_pools[key] = entry
+
+func _pool_acquire(key: String) -> Node:
+	var entry: PoolEntry = _pools[key]
+	var obj: Node
+	if entry.idle_queue.size() > 0:
+		obj = entry.idle_queue.pop_back()
+	else:
+		obj = entry.scene.instantiate()
+	obj.set("_is_pooled", false)
+	obj.set_process(true)
+	obj.set_physics_process(true)
+	entry.active_count += 1
+	return obj
+
+func _pool_release(key: String, obj: Node) -> void:
+	if not _pools.has(key):
+		obj.queue_free()
+		return
+	if obj.get("_is_pooled") == true:
+		return
+	obj.reset_for_pool()
+	obj.set("_is_pooled", true)
+	if obj.get_parent():
+		obj.get_parent().remove_child(obj)
+	obj.set_process(false)
+	obj.set_physics_process(false)
+	_pools[key].idle_queue.push_back(obj)
+	_pools[key].active_count -= 1
+
+func _pool_warmup(key: String, count: int) -> void:
+	var entry: PoolEntry = _pools[key]
+	for i in count:
+		var obj: Node = entry.scene.instantiate()
+		obj.set("_is_pooled", true)
+		obj.set_process(false)
+		obj.set_physics_process(false)
+		entry.idle_queue.push_back(obj)
+
+func clear_all_pools() -> void:
+	for key in _pools:
+		var entry: PoolEntry = _pools[key]
+		for obj in entry.idle_queue:
+			if is_instance_valid(obj):
+				obj.queue_free()
+		entry.idle_queue.clear()
+		entry.active_count = 0
+	_pools.clear()
