@@ -43,6 +43,9 @@ func _process(delta: float) -> void:
 		return
 	_phase_time_elapsed += delta
 	_check_phase_transition()
+	# Boss 波次：最后阶段时生成 Boss
+	if _should_spawn_boss():
+		_spawn_boss()
 	# max_alive 检查
 	var alive_count: int = get_tree().get_nodes_in_group(Enums.Group.ENEMIES).size()
 	if alive_count >= _current_wave_data.max_alive_enemies:
@@ -69,10 +72,6 @@ func _enter_phase(index: int) -> void:
 	_phase_time_elapsed = 0.0
 	_current_spawn_interval = phase.spawn_interval
 	_current_enemy_weights = phase.enemy_weights if not phase.enemy_weights.is_empty() else _current_wave_data.enemy_weights
-	# Boss 波次：进入最后阶段时生成 Boss
-	if _current_wave_data.is_boss_wave and index == _current_wave_data.spawn_phases.size() - 1:
-		if not _boss_spawned:
-			_spawn_boss()
 
 func _should_spawn_boss() -> bool:
 	if not _current_wave_data or not _current_wave_data.is_boss_wave:
