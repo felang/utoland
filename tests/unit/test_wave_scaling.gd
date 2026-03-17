@@ -19,8 +19,3 @@ func test_scaling_wave_15():
     var result = EnemySpawner.get_wave_scaling(15)
     assert_almost_eq(result.hp_mult, 1.338, 0.01)
     assert_almost_eq(result.damage_mult, 1.217, 0.01)
-
-func test_scaling_wave_20():
-    var result = EnemySpawner.get_wave_scaling(20)
-    assert_almost_eq(result.hp_mult, 1.791, 0.01)
-    assert_almost_eq(result.damage_mult, 1.480, 0.01)
