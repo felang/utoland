@@ -1,8 +1,9 @@
 [gd_scene format=3 uid="uid://tower_sunflower"]
 
-[ext_resource type="Script" path="res://scripts/entities/towers/tower_generator.gd" id="1_script"]
+[ext_resource type="Script" path="res://scripts/entities/towers/tower.gd" id="1_tower"]
 [ext_resource type="Texture2D" path="res://assets/towers/sunflower/sprite.png" id="2_sprite"]
 [ext_resource type="Script" path="res://scripts/components/health_component.gd" id="3_health"]
+[ext_resource type="Script" path="res://scripts/components/generator_component.gd" id="4_generator"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_body"]
 size = Vector2(16, 16)
@@ -29,7 +30,7 @@ animations = [{
 [node name="TowerSunflower" type="StaticBody2D"]
 collision_layer = 8
 collision_mask = 0
-script = ExtResource("1_script")
+script = ExtResource("1_tower")
 
 [node name="Visual" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_sun")
@@ -42,7 +43,5 @@ shape = SubResource("RectangleShape2D_body")
 [node name="HealthComponent" type="Node" parent="."]
 script = ExtResource("3_health")
 
-[node name="GenerateTimer" type="Timer" parent="."]
-wait_time = 10.0
-autostart = true
-one_shot = false
+[node name="GeneratorComponent" type="Node" parent="."]
+script = ExtResource("4_generator")
