@@ -52,6 +52,7 @@ func complete_wave() -> void:
 	if not is_inside_tree():
 		return
 	attract_all_coins()
+	attract_all_exp_orbs()
 	await get_tree().create_timer(WAVE_CLEANUP_DELAY).timeout
 	clear_all_enemies()
 	await get_tree().create_timer(SHOP_TRANSITION_DELAY).timeout
@@ -62,6 +63,12 @@ func attract_all_coins() -> void:
 	for coin in coins:
 		if coin.has_method("force_attract"):
 			coin.force_attract()
+
+func attract_all_exp_orbs() -> void:
+	var orbs: Array[Node] = get_tree().get_nodes_in_group(Enums.Group.EXP_ORBS)
+	for orb in orbs:
+		if orb.has_method("force_attract"):
+			orb.force_attract()
 
 func clear_all_enemies() -> void:
 	var enemies: Array[Node] = get_tree().get_nodes_in_group(Enums.Group.ENEMIES)

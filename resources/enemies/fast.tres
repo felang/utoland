@@ -11,3 +11,5 @@ speed = 90.0
 damage = 8.0
 coin_drop_min = 2
 coin_drop_max = 4
+exp_drop_min = 1
+exp_drop_max = 2

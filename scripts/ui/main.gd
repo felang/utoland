@@ -87,6 +87,17 @@ func _enter_shop_phase(is_first: bool = false) -> void:
 		tween.tween_property(_camera, "zoom", shop_zoom, CAMERA_TRANSITION_DURATION)
 		_shop_overlay.slide_in()
 
+	# 波次结束奖励金币（首次商店不发，首次用初始金币）
+	if not is_first:
+		var reward: int = GameConfig.shop_config.wave_reward
+		GameData.coins += reward
+		GameData.record_coins_earned(reward)
+		EventBus.coins_changed.emit(reward, GameData.coins)
+		# 同步 Player 金币
+		var player_node: Node2D = $Player
+		if player_node:
+			player_node.coins = GameData.coins
+
 	_shop_overlay.refresh_shop(is_first)
 	AudioManager.play_bgm("placement")
 	$HUD.set_battle_phase(false)

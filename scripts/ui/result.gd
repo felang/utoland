@@ -27,6 +27,7 @@ func _ready() -> void:
 	var stats_grid: GridContainer = vbox.get_node("StatsPanel/StatsGrid")
 	_add_stat_row(stats_grid, "击杀总数", str(GameData.total_kills))
 	_add_stat_row(stats_grid, "获取金币", str(GameData.total_coins_earned))
+	_add_stat_row(stats_grid, "获取经验", str(GameData.total_exp_earned))
 	_add_stat_row(stats_grid, "拥有武器", str(GameData.deployed_weapons.size()))
 	_add_stat_row(stats_grid, "拥有塔", str(GameData.deployed_towers.size()))
 	_add_stat_row(stats_grid, "受到伤害", str(int(GameData.total_damage_taken)))
