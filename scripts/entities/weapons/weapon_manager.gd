@@ -124,14 +124,23 @@ func tick(delta: float) -> void:
 	var count: int = _pivots.size()
 	for i in count:
 		var pivot: Node2D = _pivots[i]
-		# 旋转 Pivot 朝向当前目标（或无目标时沿轨道自转）
+		# Pivot 始终沿轨道匀速环绕，不因索敌改变位置
+		var base_angle: float = _orbit_angle + (TAU / max(count, 1)) * i
+		pivot.rotation = base_angle
+		# 精灵朝向目标（仅旋转精灵，不影响 Pivot/Offset 位置）
 		var finder = _find_in_offset(pivot, "TargetFinderComponent")
 		var target: Node2D = finder.get_target() if finder else null
-		if target and is_instance_valid(target):
-			pivot.look_at(target.global_position)
-		else:
-			var base_angle: float = _orbit_angle + (TAU / max(count, 1)) * i
-			pivot.rotation = base_angle
+		var sprite = pivot.get_node_or_null("WeaponOffset/WeaponSprite")
+		if target and is_instance_valid(target) and sprite:
+			var offset_node = pivot.get_node_or_null("WeaponOffset")
+			var aim_angle: float = offset_node.global_position.angle_to_point(target.global_position)
+			# 精灵旋转 = 目标方向 - Offset 的全局旋转 + 初始偏移
+			var weapon_data: WeaponData = _weapon_data_list[i] if i < _weapon_data_list.size() else null
+			var rot_offset: float = weapon_data.sprite_rotation_offset if weapon_data else 0.0
+			sprite.rotation = aim_angle - offset_node.global_rotation + rot_offset
+		elif sprite:
+			var weapon_data: WeaponData = _weapon_data_list[i] if i < _weapon_data_list.size() else null
+			sprite.rotation = weapon_data.sprite_rotation_offset if weapon_data else 0.0
 		# 驱动攻击组件，每帧刷新动态伤害倍率
 		var attack = _find_in_offset(pivot, "RangedAttackComponent")
 		if not attack:
