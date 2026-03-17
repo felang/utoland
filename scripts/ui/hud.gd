@@ -1,28 +1,23 @@
 extends CanvasLayer
 
-const HP_COLOR_HIGH_THRESHOLD: float = 0.6   # HP比例 > 此值显示绿色
-const HP_COLOR_LOW_THRESHOLD: float = 0.3    # HP比例 > 此值显示黄色，否则红色
-const TIMER_WARNING_SECONDS: int = 5         # 倒计时最后N秒变红
-const BUFF_CORNER_RADIUS: int = 6            # 增益标签圆角
-const BUFF_PADDING_H: int = 6               # 增益标签水平内边距
-const BUFF_PADDING_V: int = 2               # 增益标签垂直内边距
+## 精简战斗 HUD：左上角 HP/XP/金币，顶部居中波次显示
 
-@onready var hp_progress: ProgressBar = $TopBar/MarginContainer/HBoxContainer/HPBar/HPProgress
-@onready var hp_text: Label = $TopBar/MarginContainer/HBoxContainer/HPBar/HPText
-@onready var hp_icon: Label = $TopBar/MarginContainer/HBoxContainer/HPBar/HPIcon
-@onready var xp_icon: Label = $TopBar/MarginContainer/HBoxContainer/XPBar/XPIcon
-@onready var coin_icon: Label = $TopBar/MarginContainer/HBoxContainer/CoinDisplay/CoinIcon
-@onready var coin_text: Label = $TopBar/MarginContainer/HBoxContainer/CoinDisplay/CoinText
-@onready var wave_display: Label = $TopBar/MarginContainer/HBoxContainer/WaveDisplay
-@onready var timer_display: Label = $TopBar/MarginContainer/HBoxContainer/TimerDisplay
-@onready var kill_display: Label = $TopBar/MarginContainer/HBoxContainer/KillDisplay
-@onready var buff_container: HBoxContainer = $BottomBar/MarginContainer/BuffContainer
+const HP_COLOR_HIGH_THRESHOLD: float = 0.6
+const HP_COLOR_LOW_THRESHOLD: float = 0.3
+
+# 节点引用 — 左上角
+@onready var hp_icon: PanelContainer = $LeftTop/VBox/HPRow/HPIcon
+@onready var hp_progress: ProgressBar = $LeftTop/VBox/HPRow/HPProgress
+@onready var xp_icon: PanelContainer = $LeftTop/VBox/XPRow/XPIcon
+@onready var xp_progress: ProgressBar = $LeftTop/VBox/XPRow/XPProgress
+@onready var level_label: Label = $LeftTop/VBox/XPRow/LevelLabel
+@onready var coin_icon: PanelContainer = $LeftTop/VBox/CoinRow/CoinIcon
+@onready var coin_text: Label = $LeftTop/VBox/CoinRow/CoinText
+# 节点引用 — 顶部居中
+@onready var wave_panel: PanelContainer = $WaveCenter/WavePanel
+@onready var wave_label: Label = $WaveCenter/WavePanel/WaveLabel
 
 var player: Node2D = null
-var _wave_time_left: float = 0.0
-var _is_wave_active: bool = false
-var _is_battle_phase: bool = false
-var _wave_kills: int = 0
 var _last_coins: int = -1
 
 func _ready() -> void:
@@ -30,16 +25,14 @@ func _ready() -> void:
 	if not player:
 		push_warning("HUD: Player node not found in 'player' group")
 	EventBus.wave_started.connect(_on_wave_started)
-	EventBus.wave_completed.connect(_on_wave_completed)
 	EventBus.player_level_changed.connect(_on_player_level_changed)
 	_style_ui()
-	_update_buffs()
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	_update_hp()
 	_update_coins()
-	_update_timer(delta)
-	_update_kills()
+
+# ===== HP 更新 =====
 
 func _update_hp() -> void:
 	if not player or not is_instance_valid(player):
@@ -48,17 +41,20 @@ func _update_hp() -> void:
 	var max_hp: float = player.health.max_hp
 	hp_progress.max_value = max_hp
 	hp_progress.value = current
-	hp_text.text = "%d/%d" % [int(current), int(max_hp)]
-	# HP 颜色编码：绿 → 黄 → 红
+	# 进度条颜色编码：绿 → 黄 → 红
 	var ratio := current / max_hp if max_hp > 0 else 0.0
 	var color: Color
 	if ratio > HP_COLOR_HIGH_THRESHOLD:
 		color = UIConstants.COLOR_POSITIVE
 	elif ratio > HP_COLOR_LOW_THRESHOLD:
-		color = UIConstants.COLOR_GOLD
+		color = UIConstants.COLOR_HUD_HP_YELLOW
 	else:
 		color = UIConstants.COLOR_ACCENT_DANGER
-	hp_text.add_theme_color_override("font_color", color)
+	var fill_style := hp_progress.get_theme_stylebox("fill") as StyleBoxFlat
+	if fill_style:
+		fill_style.bg_color = color
+
+# ===== 金币更新 =====
 
 func _update_coins() -> void:
 	if player and is_instance_valid(player):
@@ -74,109 +70,116 @@ func _bounce_label(label: Control) -> void:
 	tween.tween_property(label, "scale", Vector2(1.3, 1.3), 0.1)
 	tween.tween_property(label, "scale", Vector2.ONE, 0.1)
 
+# ===== 阶段切换 =====
+
 func set_battle_phase(is_battle: bool) -> void:
-	_is_battle_phase = is_battle
-	if not is_battle:
-		timer_display.text = "准备中"
-		kill_display.visible = false
-	else:
-		kill_display.visible = true
+	wave_panel.visible = is_battle
 
-func _update_timer(delta: float) -> void:
-	if not _is_battle_phase:
-		return
-	if _is_wave_active:
-		_wave_time_left -= delta
-		if _wave_time_left < 0:
-			_wave_time_left = 0.0
-	var seconds := int(_wave_time_left)
-	timer_display.text = "%ds" % seconds
-	wave_display.text = "Wave %d/%d" % [GameData.current_wave, GameConfig.waves.size()]
-	# 最后 5 秒变红
-	if _is_wave_active and seconds <= TIMER_WARNING_SECONDS:
-		timer_display.add_theme_color_override("font_color", UIConstants.COLOR_ACCENT_DANGER)
-	else:
-		timer_display.add_theme_color_override("font_color", UIConstants.COLOR_TEXT_PRIMARY)
+# ===== 信号回调 =====
 
-func _update_kills() -> void:
-	kill_display.text = "Kill: %d" % _wave_kills
-
-func _style_ui() -> void:
-	# TopBar 半透明背景
-	var top_style := StyleBoxFlat.new()
-	top_style.bg_color = Color(0.0, 0.0, 0.0, 0.5)
-	top_style.content_margin_left = UIConstants.MARGIN_SCREEN
-	top_style.content_margin_right = UIConstants.MARGIN_SCREEN
-	top_style.content_margin_top = 4
-	top_style.content_margin_bottom = 4
-	$TopBar.add_theme_stylebox_override("panel", top_style)
-	# BottomBar 半透明背景
-	var bottom_style := StyleBoxFlat.new()
-	bottom_style.bg_color = Color(0.0, 0.0, 0.0, 0.3)
-	bottom_style.content_margin_left = UIConstants.MARGIN_SCREEN
-	bottom_style.content_margin_right = UIConstants.MARGIN_SCREEN
-	bottom_style.content_margin_top = 4
-	bottom_style.content_margin_bottom = 4
-	$BottomBar.add_theme_stylebox_override("panel", bottom_style)
-	# 字号和颜色
-	for label in [wave_display, timer_display, kill_display]:
-		label.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_BODY)
-		label.add_theme_color_override("font_color", UIConstants.COLOR_TEXT_PRIMARY)
-	hp_text.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_SMALL)
-	hp_icon.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_SMALL)
-	hp_icon.add_theme_color_override("font_color", UIConstants.COLOR_ACCENT_DANGER)
-	coin_text.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_BODY)
-	coin_text.add_theme_color_override("font_color", UIConstants.COLOR_GOLD)
-	coin_icon.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_BODY)
-	coin_icon.add_theme_color_override("font_color", UIConstants.COLOR_GOLD)
-	xp_icon.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_SMALL)
-	xp_icon.add_theme_color_override("font_color", Color("#bb86fc"))
-	xp_icon.text = "Lv.%d" % GameData.player_level
-
-func _update_buffs() -> void:
-	for child in buff_container.get_children():
-		child.queue_free()
-	var buffs: Array[String] = []
-	if GameData.pierce_count > 0:
-		buffs.append("穿甲x%d" % GameData.pierce_count)
-	if GameData.multishot_active:
-		buffs.append("弹幕")
-	if GameData.crit_chance > 0:
-		buffs.append("暴击%d%%" % int(GameData.crit_chance * 100))
-	if GameData.split_count > 0:
-		buffs.append("分裂x%d" % GameData.split_count)
-	if GameData.bullet_speed_mult > 1.0:
-		buffs.append("弹速+")
-	if GameData.weapon_range_mult > 1.0:
-		buffs.append("射程+")
-	for buff_text in buffs:
-		var label := Label.new()
-		label.text = buff_text
-		label.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_SMALL)
-		label.add_theme_color_override("font_color", UIConstants.COLOR_TEXT_PRIMARY)
-		var panel := PanelContainer.new()
-		var style := StyleBoxFlat.new()
-		style.bg_color = Color(0.0, 0.0, 0.0, 0.6)
-		style.corner_radius_top_left = BUFF_CORNER_RADIUS
-		style.corner_radius_top_right = BUFF_CORNER_RADIUS
-		style.corner_radius_bottom_left = BUFF_CORNER_RADIUS
-		style.corner_radius_bottom_right = BUFF_CORNER_RADIUS
-		style.content_margin_left = BUFF_PADDING_H
-		style.content_margin_right = BUFF_PADDING_H
-		style.content_margin_top = BUFF_PADDING_V
-		style.content_margin_bottom = BUFF_PADDING_V
-		panel.add_theme_stylebox_override("panel", style)
-		panel.add_child(label)
-		buff_container.add_child(panel)
-
-func _on_wave_started(_wave_number: int, wave_data: WaveData) -> void:
-	_is_wave_active = true
-	_wave_time_left = wave_data.time_limit
-	_wave_kills = 0
-	_update_buffs()
-
-func _on_wave_completed(_wave_number: int) -> void:
-	_is_wave_active = false
+func _on_wave_started(wave_number: int, _wave_data: WaveData) -> void:
+	wave_label.text = "第 %d 波" % wave_number
 
 func _on_player_level_changed(new_level: int) -> void:
-	xp_icon.text = "Lv.%d" % new_level
+	level_label.text = "Lv.%d" % new_level
+
+# ===== 样式初始化 =====
+
+func _style_ui() -> void:
+	# HP 图标 — 红底白框小方块
+	_style_icon(hp_icon, "♥", UIConstants.COLOR_ACCENT_DANGER, Color.WHITE)
+	# XP 图标 — 深蓝底蓝框小方块
+	_style_icon(xp_icon, "★", UIConstants.COLOR_HUD_XP_BG, UIConstants.COLOR_HUD_XP)
+	# 金币图标 — 深金底金框小方块
+	_style_icon(coin_icon, "$", UIConstants.COLOR_HUD_COIN_BG, UIConstants.COLOR_GOLD)
+
+	# HP 进度条样式
+	_style_progress_bar(hp_progress, UIConstants.COLOR_POSITIVE, UIConstants.HUD_HP_BAR_HEIGHT)
+	# XP 进度条样式
+	_style_progress_bar(xp_progress, UIConstants.COLOR_HUD_XP, UIConstants.HUD_XP_BAR_HEIGHT)
+
+	# 等级标签
+	level_label.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_SMALL)
+	level_label.add_theme_color_override("font_color", UIConstants.COLOR_TEXT_SECONDARY)
+	level_label.text = "Lv.%d" % GameData.player_level
+
+	# 金币文字
+	coin_text.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_SMALL)
+	coin_text.add_theme_color_override("font_color", UIConstants.COLOR_GOLD)
+
+	# 波次面板
+	var wave_style := StyleBoxFlat.new()
+	wave_style.bg_color = UIConstants.COLOR_HUD_BG
+	wave_style.border_color = UIConstants.COLOR_HUD_BORDER
+	wave_style.border_width_left = UIConstants.HUD_ICON_BORDER
+	wave_style.border_width_right = UIConstants.HUD_ICON_BORDER
+	wave_style.border_width_top = UIConstants.HUD_ICON_BORDER
+	wave_style.border_width_bottom = UIConstants.HUD_ICON_BORDER
+	wave_style.corner_radius_top_left = UIConstants.HUD_ICON_CORNER
+	wave_style.corner_radius_top_right = UIConstants.HUD_ICON_CORNER
+	wave_style.corner_radius_bottom_left = UIConstants.HUD_ICON_CORNER
+	wave_style.corner_radius_bottom_right = UIConstants.HUD_ICON_CORNER
+	wave_style.content_margin_left = 8
+	wave_style.content_margin_right = 8
+	wave_style.content_margin_top = 2
+	wave_style.content_margin_bottom = 2
+	wave_panel.add_theme_stylebox_override("panel", wave_style)
+
+	# 波次标签
+	wave_label.add_theme_font_size_override("font_size", UIConstants.FONT_SIZE_SMALL)
+	wave_label.add_theme_color_override("font_color", UIConstants.COLOR_TEXT_PRIMARY)
+	wave_label.text = "第 %d 波" % max(GameData.current_wave, 1)
+
+func _style_icon(panel: PanelContainer, symbol: String, bg_color: Color, border_color: Color) -> void:
+	var style := StyleBoxFlat.new()
+	style.bg_color = bg_color
+	style.border_color = border_color
+	style.border_width_left = UIConstants.HUD_ICON_BORDER
+	style.border_width_right = UIConstants.HUD_ICON_BORDER
+	style.border_width_top = UIConstants.HUD_ICON_BORDER
+	style.border_width_bottom = UIConstants.HUD_ICON_BORDER
+	style.corner_radius_top_left = UIConstants.HUD_ICON_CORNER
+	style.corner_radius_top_right = UIConstants.HUD_ICON_CORNER
+	style.corner_radius_bottom_left = UIConstants.HUD_ICON_CORNER
+	style.corner_radius_bottom_right = UIConstants.HUD_ICON_CORNER
+	style.content_margin_left = 0
+	style.content_margin_right = 0
+	style.content_margin_top = 0
+	style.content_margin_bottom = 0
+	panel.add_theme_stylebox_override("panel", style)
+	var label: Label = panel.get_child(0)
+	label.text = symbol
+	label.add_theme_font_size_override("font_size", 8)
+	label.add_theme_color_override("font_color", Color.WHITE)
+
+func _style_progress_bar(bar: ProgressBar, fill_color: Color, height: int) -> void:
+	# 背景样式
+	var bg_style := StyleBoxFlat.new()
+	bg_style.bg_color = UIConstants.COLOR_HUD_BG
+	bg_style.border_color = UIConstants.COLOR_HUD_BORDER
+	bg_style.border_width_left = UIConstants.HUD_ICON_BORDER
+	bg_style.border_width_right = UIConstants.HUD_ICON_BORDER
+	bg_style.border_width_top = UIConstants.HUD_ICON_BORDER
+	bg_style.border_width_bottom = UIConstants.HUD_ICON_BORDER
+	bg_style.corner_radius_top_left = UIConstants.HUD_BAR_CORNER
+	bg_style.corner_radius_top_right = UIConstants.HUD_BAR_CORNER
+	bg_style.corner_radius_bottom_left = UIConstants.HUD_BAR_CORNER
+	bg_style.corner_radius_bottom_right = UIConstants.HUD_BAR_CORNER
+	bg_style.content_margin_left = 0
+	bg_style.content_margin_right = 0
+	bg_style.content_margin_top = 0
+	bg_style.content_margin_bottom = 0
+	bar.add_theme_stylebox_override("background", bg_style)
+	# 填充样式
+	var fill_style := StyleBoxFlat.new()
+	fill_style.bg_color = fill_color
+	fill_style.corner_radius_top_left = UIConstants.HUD_BAR_CORNER
+	fill_style.corner_radius_top_right = UIConstants.HUD_BAR_CORNER
+	fill_style.corner_radius_bottom_left = UIConstants.HUD_BAR_CORNER
+	fill_style.corner_radius_bottom_right = UIConstants.HUD_BAR_CORNER
+	fill_style.content_margin_left = 0
+	fill_style.content_margin_right = 0
+	fill_style.content_margin_top = 0
+	fill_style.content_margin_bottom = 0
+	bar.add_theme_stylebox_override("fill", fill_style)
+	bar.custom_minimum_size = Vector2(UIConstants.HUD_BAR_WIDTH, height)
