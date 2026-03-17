@@ -5,96 +5,97 @@
 [node name="HUD" type="CanvasLayer" unique_id=1731831904]
 script = ExtResource("1_0mwgc")
 
-[node name="TopBar" type="PanelContainer" parent="."]
-anchors_preset = 10
-anchor_right = 1.0
-offset_bottom = 30.0
-grow_horizontal = 2
+[node name="LeftTop" type="MarginContainer" parent="."]
+anchors_preset = 0
+offset_left = 8.0
+offset_top = 8.0
+offset_right = 200.0
+offset_bottom = 80.0
 
-[node name="MarginContainer" type="MarginContainer" parent="TopBar"]
+[node name="VBox" type="VBoxContainer" parent="LeftTop"]
 layout_mode = 2
+theme_override_constants/separation = 2
 
-[node name="HBoxContainer" type="HBoxContainer" parent="TopBar/MarginContainer"]
+[node name="HPRow" type="HBoxContainer" parent="LeftTop/VBox"]
 layout_mode = 2
-theme_override_constants/separation = 16
+theme_override_constants/separation = 3
 
-[node name="HPBar" type="HBoxContainer" parent="TopBar/MarginContainer/HBoxContainer"]
+[node name="HPIcon" type="PanelContainer" parent="LeftTop/VBox/HPRow"]
+custom_minimum_size = Vector2(14, 14)
 layout_mode = 2
-theme_override_constants/separation = 4
+size_flags_vertical = 4
 
-[node name="HPIcon" type="Label" parent="TopBar/MarginContainer/HBoxContainer/HPBar"]
+[node name="Label" type="Label" parent="LeftTop/VBox/HPRow/HPIcon"]
 layout_mode = 2
-text = "HP"
+horizontal_alignment = 1
+vertical_alignment = 1
 
-[node name="HPProgress" type="ProgressBar" parent="TopBar/MarginContainer/HBoxContainer/HPBar"]
-custom_minimum_size = Vector2(100, 12)
+[node name="HPProgress" type="ProgressBar" parent="LeftTop/VBox/HPRow"]
+custom_minimum_size = Vector2(80, 10)
 layout_mode = 2
 size_flags_vertical = 4
 max_value = 100.0
 value = 100.0
 show_percentage = false
 
-[node name="HPText" type="Label" parent="TopBar/MarginContainer/HBoxContainer/HPBar"]
+[node name="XPRow" type="HBoxContainer" parent="LeftTop/VBox"]
 layout_mode = 2
-text = "100/100"
+theme_override_constants/separation = 3
 
-[node name="XPBar" type="HBoxContainer" parent="TopBar/MarginContainer/HBoxContainer"]
+[node name="XPIcon" type="PanelContainer" parent="LeftTop/VBox/XPRow"]
+custom_minimum_size = Vector2(14, 14)
 layout_mode = 2
-theme_override_constants/separation = 4
+size_flags_vertical = 4
 
-[node name="XPIcon" type="Label" parent="TopBar/MarginContainer/HBoxContainer/XPBar"]
+[node name="Label" type="Label" parent="LeftTop/VBox/XPRow/XPIcon"]
 layout_mode = 2
-text = "Lv.1"
+horizontal_alignment = 1
+vertical_alignment = 1
 
-[node name="XPProgress" type="ProgressBar" parent="TopBar/MarginContainer/HBoxContainer/XPBar"]
+[node name="XPProgress" type="ProgressBar" parent="LeftTop/VBox/XPRow"]
 custom_minimum_size = Vector2(80, 8)
 layout_mode = 2
 size_flags_vertical = 4
-max_value = 20.0
+max_value = 100.0
 value = 0.0
 show_percentage = false
 
-[node name="CoinDisplay" type="HBoxContainer" parent="TopBar/MarginContainer/HBoxContainer"]
+[node name="LevelLabel" type="Label" parent="LeftTop/VBox/XPRow"]
 layout_mode = 2
-theme_override_constants/separation = 4
+text = "Lv.1"
 
-[node name="CoinIcon" type="Label" parent="TopBar/MarginContainer/HBoxContainer/CoinDisplay"]
+[node name="CoinRow" type="HBoxContainer" parent="LeftTop/VBox"]
 layout_mode = 2
-text = "$"
+theme_override_constants/separation = 3
 
-[node name="CoinText" type="Label" parent="TopBar/MarginContainer/HBoxContainer/CoinDisplay"]
+[node name="CoinIcon" type="PanelContainer" parent="LeftTop/VBox/CoinRow"]
+custom_minimum_size = Vector2(14, 14)
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="Label" type="Label" parent="LeftTop/VBox/CoinRow/CoinIcon"]
+layout_mode = 2
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CoinText" type="Label" parent="LeftTop/VBox/CoinRow"]
 layout_mode = 2
 text = "0"
 
-[node name="Spacer" type="Control" parent="TopBar/MarginContainer/HBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="WaveDisplay" type="Label" parent="TopBar/MarginContainer/HBoxContainer"]
-layout_mode = 2
-text = "Wave 0/10"
-
-[node name="TimerDisplay" type="Label" parent="TopBar/MarginContainer/HBoxContainer"]
-layout_mode = 2
-text = "0s"
-
-[node name="KillDisplay" type="Label" parent="TopBar/MarginContainer/HBoxContainer"]
-layout_mode = 2
-text = "Kill: 0"
-
-[node name="BottomBar" type="PanelContainer" parent="."]
-anchors_preset = 12
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_top = -30.0
+[node name="WaveCenter" type="MarginContainer" parent="."]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -50.0
+offset_top = 8.0
+offset_right = 50.0
+offset_bottom = 32.0
 grow_horizontal = 2
-grow_vertical = 0
 
-[node name="MarginContainer" type="MarginContainer" parent="BottomBar"]
+[node name="WavePanel" type="PanelContainer" parent="WaveCenter"]
 layout_mode = 2
 
-[node name="BuffContainer" type="HBoxContainer" parent="BottomBar/MarginContainer"]
+[node name="WaveLabel" type="Label" parent="WaveCenter/WavePanel"]
 layout_mode = 2
-alignment = 1
-theme_override_constants/separation = 8
+text = "第 1 波"
+horizontal_alignment = 1
