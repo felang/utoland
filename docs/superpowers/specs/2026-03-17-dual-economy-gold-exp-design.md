@@ -23,7 +23,7 @@
 - `@export var value: int = 1` — 经验值
 - `@export var attract_range: float = 30.0` — 短距离吸引（金币为 75）
 - `@export var attract_speed: float = 200.0`
-- 碰到玩家后调用 `player.add_exp(value)`，播放拾取音效 + 缩放消失动画
+- 碰到玩家后调用 `player.add_exp(value)`，播放拾取音效（`"exp_pickup"` 占位，可复用已有音效）+ 缩放消失动画
 - 波次结束时通过 `force_attract()` 强制吸引全部收集
 
 ### 场景结构
@@ -37,8 +37,10 @@
 ## 2. 经验等级系统
 
 ### GameData 新增字段
-- `var current_exp: int = 0` — 当前累计经验
+- `var current_exp: int = 0` — 累计总经验（升级不重置）
+- `var total_exp_earned: int = 0` — 统计用（结算页面显示）
 - `player_level` 保留，不再由金币驱动
+- `reset()` 中需重置 `current_exp` 和 `total_exp_earned`
 
 ### 经验公式
 升到等级 N 所需总经验：
@@ -63,9 +65,14 @@ exp_for_level(n) = floor(base_exp * n ^ exp_exponent)
 - `GameConfig` 注册 `exp_config: ExpConfig`
 
 ### GameData 升级逻辑
-- `add_exp(amount: int)` — 累加经验，循环检查是否达到下一级阈值，自动升级
+- `add_exp(amount: int)` — 累加 `current_exp` 和 `total_exp_earned`，循环检查是否达到下一级阈值，自动升级
 - 升级时 emit `EventBus.player_level_changed`
+- `get_population_cap()` 改用公式：`initial_population + (player_level - 1) * population_per_level`（从 ExpConfig 读取），不再读 ShopConfig 数组
 - 移除 `buy_level_up()` 方法
+
+### ShopConfig 字段移除
+- 移除 `level_up_costs: PackedInt32Array`（升级不再花金币）
+- 移除 `population_per_level: PackedInt32Array`（人口上限改由 ExpConfig 公式计算）
 
 ## 3. 金币来源改动
 
@@ -90,10 +97,14 @@ exp_for_level(n) = floor(base_exp * n ^ exp_exponent)
 ### enemy.gd 改动
 - 新增 `_drop_exp_orbs()` 方法（参考 `_drop_coins()` 实现）
 - `_on_died()` 调用 `_drop_exp_orbs()` 替代 `_drop_coins()`
-- 精英怪倍率 `_elite_exp_mult`（对应 `_elite_coin_mult`）
+- 精英怪倍率：`apply_elite()` 新增 `exp_mult` 参数（或将 `coin_mult` 改为 `exp_mult`），存入 `_elite_exp_mult`。调用方（spawn 系统）同步更新
+
+### 经验球分组
+- `enums.gd` 新增 `EXP_ORBS` 分组常量
+- 经验球创建时加入该分组，用于波次结束时批量强制吸引
 
 ### 各敌人 .tres 配置
-需为每种敌人配置 `exp_drop_min/max`。
+需为每种敌人配置 `exp_drop_min/max`。Boss 敌人应配置较高数值。
 
 ## 5. Player 改动
 
@@ -160,15 +171,19 @@ exp_for_level(n) = floor(base_exp * n ^ exp_exponent)
 | 新建 | `scripts/entities/exp_orb.gd`, `scenes/entities/exp_orb.tscn` |
 | 新建 | `scripts/resources/exp_config.gd`, `resources/exp_config.tres` |
 | 新建 | 经验球精灵占位图 |
-| 改动 | `scripts/entities/enemy.gd` — 新增 `_drop_exp_orbs()` |
+| 改动 | `scripts/entities/enemy.gd` — 新增 `_drop_exp_orbs()`，`apply_elite()` 新增 exp_mult |
 | 改动 | `scripts/entities/player.gd` — 新增 `add_exp()` |
-| 改动 | `scripts/core/game_data.gd` — 新增 `current_exp`, `add_exp()`, 移除 `buy_level_up()` |
+| 改动 | `scripts/core/game_data.gd` — 新增 `current_exp`/`total_exp_earned`/`add_exp()`，改写 `get_population_cap()`，移除 `buy_level_up()`，`reset()` 重置新字段 |
 | 改动 | `scripts/core/game_config.gd` — 注册 `exp_config` |
 | 改动 | `scripts/core/scene_factory.gd` — 新增 `create_exp_orb()` |
 | 改动 | `scripts/core/event_bus.gd` — 新增经验信号 |
+| 改动 | `scripts/core/enums.gd` — 新增 `EXP_ORBS` 分组常量 |
 | 改动 | `scripts/resources/enemy_data.gd` — 新增 `exp_drop_min/max` |
-| 改动 | `scripts/resources/shop_config.gd` — 新增 `wave_reward` |
+| 改动 | `scripts/resources/shop_config.gd` — 新增 `wave_reward`，移除 `level_up_costs`/`population_per_level` |
+| 改动 | `scripts/systems/wave_manager.gd` — 新增 `attract_all_exp_orbs()` 或修改现有吸引逻辑 |
 | 改动 | `scripts/ui/shop_overlay.gd` — 移除升级按钮 |
-| 改动 | `scripts/ui/main.gd` — 波次结束给固定金币，经验球强制吸引 |
+| 改动 | `scripts/ui/main.gd` — 波次结束给固定金币 |
 | 改动 | `scripts/ui/result.gd` — 新增经验统计 |
 | 改动 | 各敌人 `.tres` — 配置 `exp_drop_min/max` |
+| 改动 | spawn/elite 系统 — `apply_elite()` 调用方传入 exp_mult |
+| 改动 | `tests/unit/test_game_data_economy.gd` — 移除 buy_level_up 测试，新增 add_exp/升级/人口测试 |
