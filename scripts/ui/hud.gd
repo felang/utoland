@@ -119,10 +119,10 @@ func _style_ui() -> void:
 	wave_style.corner_radius_top_right = UIConstants.HUD_ICON_CORNER
 	wave_style.corner_radius_bottom_left = UIConstants.HUD_ICON_CORNER
 	wave_style.corner_radius_bottom_right = UIConstants.HUD_ICON_CORNER
-	wave_style.content_margin_left = 8
-	wave_style.content_margin_right = 8
-	wave_style.content_margin_top = 2
-	wave_style.content_margin_bottom = 2
+	wave_style.content_margin_left = UIConstants.HUD_WAVE_PADDING_H
+	wave_style.content_margin_right = UIConstants.HUD_WAVE_PADDING_H
+	wave_style.content_margin_top = UIConstants.HUD_WAVE_PADDING_V
+	wave_style.content_margin_bottom = UIConstants.HUD_WAVE_PADDING_V
 	wave_panel.add_theme_stylebox_override("panel", wave_style)
 
 	# 波次标签
@@ -149,7 +149,7 @@ func _style_icon(panel: PanelContainer, symbol: String, bg_color: Color, border_
 	panel.add_theme_stylebox_override("panel", style)
 	var label: Label = panel.get_child(0)
 	label.text = symbol
-	label.add_theme_font_size_override("font_size", 8)
+	label.add_theme_font_size_override("font_size", UIConstants.HUD_ICON_FONT_SIZE)
 	label.add_theme_color_override("font_color", Color.WHITE)
 
 func _style_progress_bar(bar: ProgressBar, fill_color: Color, height: int) -> void:
