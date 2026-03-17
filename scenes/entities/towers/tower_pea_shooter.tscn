@@ -44,7 +44,7 @@ shape = SubResource("RectangleShape2D_dgv38")
 [node name="HealthComponent" type="Node" parent="."]
 script = ExtResource("3_health")
 
-[node name="TargetFinderComponent" type="Node" parent="."]
+[node name="TargetFinderComponent" type="Node2D" parent="."]
 script = ExtResource("4_target_finder")
 
 [node name="RangedAttackComponent" type="Node" parent="."]
