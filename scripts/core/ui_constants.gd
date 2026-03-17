@@ -18,6 +18,25 @@ const COLOR_BUTTON_DISABLED := Color("#333333")
 const COLOR_AFFINITY_SHOOTER := Color("#3388ff")
 const COLOR_AFFINITY_ENGINEER := Color("#33cc55")
 
+# HUD 像素风颜色
+const COLOR_HUD_BG := Color("#1a1a2e")          # 进度条/面板背景
+const COLOR_HUD_BORDER := Color("#444444")       # 进度条/面板边框
+const COLOR_HUD_XP := Color("#6c9bff")           # 经验条蓝色
+const COLOR_HUD_XP_BG := Color("#3a3a6e")        # 经验图标背景
+const COLOR_HUD_COIN_BG := Color("#8a6c00")      # 金币图标背景
+const COLOR_HUD_HP_YELLOW := Color("#e6c84b")    # HP 中等血量黄色
+
+# HUD 尺寸
+const HUD_ICON_SIZE := 14                        # 像素图标方块尺寸
+const HUD_ICON_BORDER := 1                       # 图标边框宽度
+const HUD_ICON_CORNER := 2                       # 图标圆角
+const HUD_BAR_WIDTH := 80                        # 进度条宽度
+const HUD_HP_BAR_HEIGHT := 10                    # HP 条高度
+const HUD_XP_BAR_HEIGHT := 8                     # XP 条高度
+const HUD_BAR_CORNER := 1                        # 进度条圆角
+const HUD_MARGIN := 8                            # 左上角边距
+const HUD_SPACING := 2                           # 元素间距
+
 # ===== 字号 =====
 const FONT_SIZE_TITLE := 32
 const FONT_SIZE_SUBTITLE := 24
