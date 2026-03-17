@@ -32,12 +32,12 @@ func test_bullet_projectile_and_coin_sizes_match_new_standard():
 	var pd := ProjectileData.new()
 	pd.speed = 800.0
 	pd.lifetime = 5.0
-	pd.projectile_scene = preload("res://scenes/entities/projectiles/bullet_projectile.tscn")
-	var bullet: ProjectileBase = SceneFactory.create_projectile(pd, 10.0, Vector2.ZERO, Vector2.RIGHT)
+	pd.projectile_scene = preload("res://scenes/entities/projectiles/arrow.tscn")
+	var bullet: Node2D = SceneFactory.create_projectile(pd, 10.0, Vector2.ZERO, Vector2.RIGHT)
 	add_child_autofree(bullet)
 	var hitbox_shape: CollisionShape2D = bullet.get_node("Hitbox/CollisionShape2D")
-	assert_not_null(hitbox_shape, "ProjectileBase 应有 Hitbox/CollisionShape2D")
-	assert_true(hitbox_shape.shape is CircleShape2D, "ProjectileBase 碰撞形状应为 CircleShape2D")
+	assert_not_null(hitbox_shape, "Projectile 应有 Hitbox/CollisionShape2D")
+	assert_true(hitbox_shape.shape is CircleShape2D, "Projectile 碰撞形状应为 CircleShape2D")
 
 	var coin = load("res://scenes/entities/coin.tscn").instantiate()
 	add_child_autofree(coin)

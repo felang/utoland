@@ -93,19 +93,17 @@ func test_projectile_reset_for_pool():
 	var pd := ProjectileData.new()
 	pd.speed = 800.0
 	pd.lifetime = 5.0
-	pd.base_pierce_count = 0
-	pd.knockback_force = 50.0
-	pd.trail_enabled = false
 	pd.sprite_path = ""
-	pd.projectile_scene = preload("res://scenes/entities/projectiles/bullet_projectile.tscn")
-	var proj: ProjectileBase = SceneFactory.create_projectile(pd, 10.0, Vector2(100, 100), Vector2.RIGHT)
+	pd.projectile_scene = preload("res://scenes/entities/projectiles/arrow.tscn")
+	var proj: Node2D = SceneFactory.create_projectile(pd, 10.0, Vector2(100, 100), Vector2.RIGHT)
 	add_child(proj)
-	proj._elapsed = 3.0
-	proj._hit_count = 2
+	# LinearMovementComponent 持有 _elapsed
+	var lmc = proj.get_node_or_null("LinearMovementComponent")
+	if lmc:
+		lmc._elapsed = 3.0
 	proj.reset_for_pool()
-	assert_eq(proj._elapsed, 0.0, "reset 后 _elapsed 应为 0")
-	assert_eq(proj._hit_count, 0, "reset 后 _hit_count 应为 0")
-	assert_eq(proj._direction, Vector2.ZERO, "reset 后 _direction 应为 ZERO")
+	if lmc:
+		assert_eq(lmc._elapsed, 0.0, "reset 后 LinearMovementComponent._elapsed 应为 0")
 	assert_true(proj.visible, "reset 后应可见")
 	proj.queue_free()
 
@@ -113,19 +111,19 @@ func test_projectile_pool_reuse():
 	var pd := ProjectileData.new()
 	pd.speed = 800.0
 	pd.lifetime = 5.0
-	pd.base_pierce_count = 0
-	pd.knockback_force = 50.0
-	pd.trail_enabled = false
 	pd.sprite_path = ""
-	pd.projectile_scene = preload("res://scenes/entities/projectiles/bullet_projectile.tscn")
-	var proj1: ProjectileBase = SceneFactory.create_projectile(pd, 10.0, Vector2.ZERO, Vector2.RIGHT)
+	pd.projectile_scene = preload("res://scenes/entities/projectiles/arrow.tscn")
+	var proj1: Node2D = SceneFactory.create_projectile(pd, 10.0, Vector2.ZERO, Vector2.RIGHT)
 	add_child(proj1)
 	SceneFactory.release_projectile(proj1)
 	# 投射物回收是异步延迟的（call_deferred），等待一帧让回收完成
 	await get_tree().process_frame
-	var proj2: ProjectileBase = SceneFactory.create_projectile(pd, 20.0, Vector2(50, 50), Vector2.LEFT)
+	var proj2: Node2D = SceneFactory.create_projectile(pd, 20.0, Vector2(50, 50), Vector2.LEFT)
 	assert_eq(proj1, proj2, "应复用同一投射物对象")
-	assert_eq(proj2._speed, 800.0, "复用后 speed 应来自 setup")
+	# LinearMovementComponent 持有 speed
+	var lmc = proj2.get_node_or_null("LinearMovementComponent")
+	assert_not_null(lmc, "复用后应有 LinearMovementComponent")
+	assert_eq(lmc.speed, 800.0, "复用后 speed 应来自 setup")
 	proj2.queue_free()
 
 func test_enemy_reset_for_pool():

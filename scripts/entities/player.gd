@@ -29,6 +29,10 @@ func _ready() -> void:
 
 	# 初始化武器系统（从 deployed_weapons 注入等级）
 	_weapon_manager.initialize(InventoryManager.deployed_weapons)
+	# 注入动态伤害倍率回调（swift_combo / blood_rage 等每帧变化的被动）
+	_weapon_manager.set_dynamic_damage_mult_getter(_get_dynamic_damage_mult)
+	# 连接武器命中信号，用于更新连击状态
+	_weapon_manager.weapon_attack_executed.connect(_on_weapon_attack_executed)
 
 	# 同步金币
 	coins = InventoryManager.coins
@@ -167,7 +171,22 @@ func _process_passives(delta: float) -> void:
 				heal_pct *= 2.0
 			health.heal(health.max_hp * heal_pct)
 
-## 获取连击伤害倍率（供武器查询）
+## 武器命中回调（由 WeaponManager.weapon_attack_executed 信号触发）
+func _on_weapon_attack_executed(target: Node2D) -> void:
+	update_combo_target(target)
+
+## 返回动态伤害倍率（注入 WeaponManager，每帧查询）
+## 合并 swift_combo 连击倍率与 blood_rage 血怒倍率
+func _get_dynamic_damage_mult() -> float:
+	var mult: float = 1.0
+	match PlayerState.new_passive_id:
+		"swift_combo":
+			mult *= get_combo_damage_mult()
+		"blood_rage":
+			mult *= get_blood_rage_mult()
+	return mult
+
+## 获取连击伤害倍率
 func get_combo_damage_mult() -> float:
 	if PlayerState.new_passive_id != "swift_combo":
 		return 1.0

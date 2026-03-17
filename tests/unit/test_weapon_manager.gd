@@ -17,24 +17,40 @@ func before_each() -> void:
 func after_each() -> void:
 	_owner.queue_free()
 
-func test_add_weapon_creates_weapon_node() -> void:
-	var count_before: int = _wm._weapons.size()
+func test_add_weapon_creates_pivot() -> void:
+	var count_before: int = _wm._pivots.size()
 	_wm.add_weapon("bow", 1)
-	assert_eq(_wm._weapons.size(), count_before + 1)
-	assert_eq(_wm._weapon_sprites.size(), count_before + 1)
+	assert_eq(_wm._pivots.size(), count_before + 1)
+	assert_eq(_wm._weapon_data_list.size(), count_before + 1)
 
-func test_remove_weapon_removes_weapon_node() -> void:
+func test_pivot_has_target_finder_and_offset() -> void:
+	_wm.add_weapon("bow", 1)
+	var pivot: Node2D = _wm._pivots[0]
+	assert_not_null(pivot.get_node_or_null("WeaponOffset"))
+	assert_not_null(pivot.get_node_or_null("WeaponOffset/WeaponSprite"))
+	assert_not_null(pivot.get_node_or_null("WeaponOffset/FirePoint"))
+	# 索敌和攻击组件在 WeaponOffset 下（以武器为中心索敌）
+	assert_not_null(pivot.get_node_or_null("WeaponOffset/TargetFinderComponent"))
+
+func test_pivot_has_attack_component() -> void:
+	_wm.add_weapon("bow", 1)
+	var pivot: Node2D = _wm._pivots[0]
+	var ranged = pivot.get_node_or_null("WeaponOffset/RangedAttackComponent")
+	var melee = pivot.get_node_or_null("WeaponOffset/MeleeAttackComponent")
+	assert_true(ranged != null or melee != null, "WeaponOffset 应有攻击组件")
+
+func test_remove_weapon_removes_pivot() -> void:
 	_wm.add_weapon("bow", 1)
 	_wm.add_weapon("shuriken", 1)
-	assert_eq(_wm._weapons.size(), 2)
+	assert_eq(_wm._pivots.size(), 2)
 	_wm.remove_weapon(0)
-	assert_eq(_wm._weapons.size(), 1)
-	assert_eq(_wm._weapon_sprites.size(), 1)
+	assert_eq(_wm._pivots.size(), 1)
+	assert_eq(_wm._weapon_data_list.size(), 1)
 
 func test_remove_weapon_invalid_index_does_nothing() -> void:
 	_wm.add_weapon("bow", 1)
 	_wm.remove_weapon(99)
-	assert_eq(_wm._weapons.size(), 1)
+	assert_eq(_wm._pivots.size(), 1)
 
 func test_refresh_weapons_syncs_with_deployed() -> void:
 	InventoryManager.deployed_weapons = [
@@ -42,4 +58,5 @@ func test_refresh_weapons_syncs_with_deployed() -> void:
 		{id = "shuriken", level = 1}
 	]
 	_wm.refresh_weapons()
-	assert_eq(_wm._weapons.size(), 2)
+	assert_eq(_wm._pivots.size(), 2)
+	assert_eq(_wm._weapon_data_list.size(), 2)

@@ -14,28 +14,29 @@ func test_weapon_bow_resource() -> void:
 	var w: WeaponData = GameConfig.weapons[Enums.WeaponId.BOW]
 	assert_eq(w.id, Enums.WeaponId.BOW)
 	assert_eq(w.display_name, "弓")
-	assert_eq(w.attack_mode, 0, "弓应为远程模式")
-	assert_almost_eq(w.fire_rate_per_level[0], 0.5, 0.001)
-	assert_almost_eq(w.damage_per_level[0], 8.0, 0.001)
-	assert_almost_eq(w.weapon_range_per_level[0], 150.0, 0.001)
-	assert_not_null(w.projectile_data, "弓应有 projectile_data")
+	assert_not_null(w.projectile_data, "弓应为远程模式（有 projectile_data）")
+	assert_not_null(w.attack_config, "弓应有 attack_config")
+	assert_almost_eq(w.attack_config.fire_rate_per_level[0], 0.5, 0.001)
+	assert_almost_eq(w.attack_config.damage_per_level[0], 8.0, 0.001)
+	assert_almost_eq(w.attack_config.attack_range_per_level[0], 150.0, 0.001)
 	assert_eq(w.projectile_data.speed, 300.0)
 
 func test_weapon_shuriken_resource() -> void:
 	assert_true(GameConfig.weapons.has(Enums.WeaponId.SHURIKEN), "应包含 shuriken")
 	var w: WeaponData = GameConfig.weapons[Enums.WeaponId.SHURIKEN]
-	assert_eq(w.attack_mode, 0, "手里剑应为远程模式")
-	assert_almost_eq(w.fire_rate_per_level[0], 0.8, 0.001)
-	assert_almost_eq(w.damage_per_level[0], 15.0, 0.001)
-	assert_not_null(w.projectile_data, "手里剑应有 projectile_data")
+	assert_not_null(w.projectile_data, "手里剑应为远程模式（有 projectile_data）")
+	assert_not_null(w.attack_config, "手里剑应有 attack_config")
+	assert_almost_eq(w.attack_config.fire_rate_per_level[0], 0.8, 0.001)
+	assert_almost_eq(w.attack_config.damage_per_level[0], 15.0, 0.001)
 	assert_eq(w.projectile_data.speed, 175.0)
 
 func test_weapon_sword_resource() -> void:
 	assert_true(GameConfig.weapons.has(Enums.WeaponId.SWORD), "应包含 sword")
 	var w: WeaponData = GameConfig.weapons[Enums.WeaponId.SWORD]
-	assert_eq(w.attack_mode, 1, "剑应为近战模式")
-	assert_not_null(w.melee_config, "剑应有 melee_config")
-	assert_almost_eq(w.damage_per_level[0], 20.0, 0.001)
+	assert_not_null(w.melee_config, "剑应为近战模式（有 melee_config）")
+	assert_null(w.projectile_data, "剑不应有 projectile_data")
+	assert_not_null(w.attack_config, "剑应有 attack_config")
+	assert_almost_eq(w.attack_config.damage_per_level[0], 20.0, 0.001)
 
 
 # ===== 敌人资源加载 =====
@@ -77,15 +78,17 @@ func test_tower_pea_shooter_resource() -> void:
 	var t: TowerData = GameConfig.towers[Enums.TowerId.PEA_SHOOTER]
 	assert_eq(t.display_name, "射手塔")
 	assert_almost_eq(t.hp_per_level[0], 80.0, 0.001)
-	assert_almost_eq(t.damage_per_level[0], 15.0, 0.001)
-	assert_almost_eq(t.fire_rate_per_level[0], 1.0, 0.001)
-	assert_almost_eq(t.attack_range_per_level[0], 150.0, 0.001)
+	assert_not_null(t.attack_config, "射手塔应有 attack_config")
+	assert_almost_eq(t.attack_config.damage_per_level[0], 15.0, 0.001)
+	assert_almost_eq(t.attack_config.fire_rate_per_level[0], 1.0, 0.001)
+	assert_almost_eq(t.attack_config.attack_range_per_level[0], 150.0, 0.001)
 
 func test_tower_ice_flower_resource() -> void:
 	var t: TowerData = GameConfig.towers[Enums.TowerId.ICE_FLOWER]
 	assert_almost_eq(t.hp_per_level[0], 70.0, 0.001)
 	assert_almost_eq(t.slow_ratio_per_level[0], 0.3, 0.001)
-	assert_almost_eq(t.attack_range_per_level[0], 100.0, 0.001)
+	assert_not_null(t.attack_config, "冰花塔应有 attack_config")
+	assert_almost_eq(t.attack_config.attack_range_per_level[0], 100.0, 0.001)
 
 
 # ===== 波次资源加载 =====
@@ -189,13 +192,16 @@ func test_normal_enemy_not_boss():
 	assert_false(ed.is_boss, "normal 不应标记为 is_boss")
 
 
-func test_weapon_has_attack_mode():
+func test_weapon_has_attack_config():
 	var bow: WeaponData = GameConfig.weapons[Enums.WeaponId.BOW]
-	assert_eq(bow.attack_mode, 0, "bow 应为远程模式")
+	assert_not_null(bow.attack_config, "bow 应有 attack_config")
+	assert_not_null(bow.projectile_data, "bow 应为远程（有 projectile_data）")
 	var shuriken: WeaponData = GameConfig.weapons[Enums.WeaponId.SHURIKEN]
-	assert_eq(shuriken.attack_mode, 0, "shuriken 应为远程模式")
+	assert_not_null(shuriken.attack_config, "shuriken 应有 attack_config")
+	assert_not_null(shuriken.projectile_data, "shuriken 应为远程（有 projectile_data）")
 	var sword: WeaponData = GameConfig.weapons[Enums.WeaponId.SWORD]
-	assert_eq(sword.attack_mode, 1, "sword 应为近战模式")
+	assert_not_null(sword.attack_config, "sword 应有 attack_config")
+	assert_not_null(sword.melee_config, "sword 应为近战（有 melee_config）")
 
 
 func test_player_const_unchanged() -> void:

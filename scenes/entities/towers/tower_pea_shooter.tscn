@@ -1,14 +1,13 @@
 [gd_scene format=3 uid="uid://5uhjfg5l2l8i"]
 
-[ext_resource type="Script" uid="uid://ckwxfmslcyshb" path="res://scripts/entities/towers/tower_shooter.gd" id="1_15q5k"]
+[ext_resource type="Script" path="res://scripts/entities/towers/tower.gd" id="1_tower"]
 [ext_resource type="Texture2D" path="res://assets/towers/pea_shooter/sprite.png" id="2_sprite"]
 [ext_resource type="Script" path="res://scripts/components/health_component.gd" id="3_health"]
+[ext_resource type="Script" path="res://scripts/components/target_finder_component.gd" id="4_target_finder"]
+[ext_resource type="Script" path="res://scripts/components/ranged_attack_component.gd" id="5_ranged_attack"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_dgv38"]
 size = Vector2(16, 16)
-
-[sub_resource type="CircleShape2D" id="CircleShape2D_detect"]
-radius = 300.0
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_pea"]
 animations = [{
@@ -29,10 +28,10 @@ animations = [{
 "speed": 5.0
 }]
 
-[node name="TowerShooter" type="StaticBody2D"]
+[node name="TowerPeaShooter" type="StaticBody2D"]
 collision_layer = 8
 collision_mask = 2
-script = ExtResource("1_15q5k")
+script = ExtResource("1_tower")
 
 [node name="Visual" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_pea")
@@ -42,12 +41,11 @@ autoplay = "idle"
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("RectangleShape2D_dgv38")
 
-[node name="DetectArea" type="Area2D" parent="."]
-collision_layer = 0
-collision_mask = 2
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="DetectArea"]
-shape = SubResource("CircleShape2D_detect")
-
 [node name="HealthComponent" type="Node" parent="."]
 script = ExtResource("3_health")
+
+[node name="TargetFinderComponent" type="Node" parent="."]
+script = ExtResource("4_target_finder")
+
+[node name="RangedAttackComponent" type="Node" parent="."]
+script = ExtResource("5_ranged_attack")
