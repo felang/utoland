@@ -30,8 +30,9 @@ func test_tower_shoots_at_enemy():
 	await wait_seconds(1.5)
 
 	# Check if bullet was created (may have already hit and been destroyed)
-	# We verify the tower has the ability to shoot
-	assert_not_null(tower.attacker, "Tower should have an AttackerComponent")
+	# We verify the tower has the ability to shoot via RangedAttackComponent
+	var ranged_comp = tower.get_node_or_null("RangedAttackComponent")
+	assert_not_null(ranged_comp, "Tower should have a RangedAttackComponent")
 
 func test_enemy_takes_damage():
 	# Test that enemy can take damage
@@ -138,8 +139,10 @@ func test_tower_damage_from_config():
 	await wait_frames(2)
 
 	var td: TowerData = GameConfig.towers[Enums.TowerId.PEA_SHOOTER]
-	var expected_damage = td.damage_per_level[0] * PlayerState.player_stats.get(Enums.Stat.TOWER_MULT, 1.0)
-	assert_almost_eq(tower.attacker.base_damage, expected_damage, 0.01, "Tower attacker damage should match config")
+	var expected_damage = td.attack_config.damage_per_level[0] * PlayerState.player_stats.get(Enums.Stat.TOWER_MULT, 1.0)
+	var ranged: RangedAttackComponent = tower.get_node_or_null("RangedAttackComponent")
+	assert_not_null(ranged, "Tower should have RangedAttackComponent")
+	assert_almost_eq(ranged._base_damage * tower.damage_mult, expected_damage, 0.01, "Tower damage should match config")
 
 func test_enemy_drops_correct_exp_orb_count():
 	# Test that enemy drops exp orbs within configured range
