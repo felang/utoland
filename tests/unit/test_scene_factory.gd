@@ -135,5 +135,6 @@ func test_all_weapons_loaded():
 	for id in all_ids:
 		assert_true(GameConfig.weapons.has(id), "应包含武器: " + id)
 		var w: WeaponData = GameConfig.weapons[id]
-		assert_true(w.attack_mode == 0 or w.attack_mode == 1, id + " attack_mode 应为 0 或 1")
-		assert_eq(w.damage_per_level.size(), w.max_level, id + " damage_per_level 数量应匹配 max_level")
+		assert_true(w.projectile_data != null or w.melee_config != null, id + " 应有 projectile_data 或 melee_config")
+		assert_not_null(w.attack_config, id + " 应有 attack_config")
+		assert_gt(w.attack_config.damage_per_level.size(), 0, id + " attack_config.damage_per_level 不应为空")

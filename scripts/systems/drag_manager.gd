@@ -209,9 +209,9 @@ func _create_preview() -> void:
 		_preview_node.add_child(tower_preview)
 		# 攻击范围指示圆
 		var tower_data: TowerData = GameConfig.towers.get(tower_id)
-		if tower_data and tower_data.attack_range_per_level.size() > 0:
+		if tower_data and tower_data.attack_config != null and tower_data.attack_config.attack_range_per_level.size() > 0:
 			_range_circle = RangeIndicator.new()
-			_range_circle.set_range(tower_data.attack_range_per_level[0])
+			_range_circle.set_range(tower_data.attack_config.attack_range_per_level[0])
 			_preview_node.add_child(_range_circle)
 	elif _drag_source == DragSource.MAP_TOWER:
 		# 移动已有塔：直接拖拽实际塔节点，只显示范围圆
@@ -219,9 +219,9 @@ func _create_preview() -> void:
 		for entry in InventoryManager.deployed_towers:
 			if entry.deploy_id == deploy_id:
 				var tower_data: TowerData = GameConfig.towers.get(entry.id)
-				if tower_data and tower_data.attack_range_per_level.size() >= entry.level:
+				if tower_data and tower_data.attack_config != null and tower_data.attack_config.attack_range_per_level.size() >= entry.level:
 					_range_circle = RangeIndicator.new()
-					_range_circle.set_range(tower_data.attack_range_per_level[entry.level - 1])
+					_range_circle.set_range(tower_data.attack_config.attack_range_per_level[entry.level - 1])
 					_preview_node.add_child(_range_circle)
 				break
 	# 初始隐藏，等第一次 _update_preview 设置正确位置后才可见，避免闪烁

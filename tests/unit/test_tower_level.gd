@@ -9,15 +9,16 @@ func test_scene_factory_create_tower_with_level():
 
 func test_tower_data_has_level_fields():
 	var td: TowerData = GameConfig.towers["pea_shooter"]
-	assert_eq(td.max_level, 3, "应有最大等级 3")
 	assert_eq(td.hp_per_level.size(), 3, "hp_per_level 应有 3 级")
-	assert_eq(td.damage_per_level.size(), 3, "damage_per_level 应有 3 级")
+	assert_not_null(td.attack_config, "射手塔应有 attack_config")
+	assert_eq(td.attack_config.damage_per_level.size(), 3, "attack_config.damage_per_level 应有 3 级")
 	assert_eq(td.sell_price_per_level.size(), 3, "sell_price_per_level 应有 3 级")
 
 func test_tower_ice_flower_has_level_fields():
 	var td: TowerData = GameConfig.towers["ice_flower"]
 	assert_eq(td.hp_per_level.size(), 3, "冰花塔应有 3 级 HP")
-	assert_eq(td.damage_per_level.size(), 3, "冰花塔应有 3 级伤害")
-	assert_eq(td.fire_rate_per_level.size(), 3, "冰花塔应有 3 级射速")
+	assert_not_null(td.attack_config, "冰花塔应有 attack_config")
+	assert_eq(td.attack_config.damage_per_level.size(), 3, "冰花塔应有 3 级伤害")
+	assert_eq(td.attack_config.fire_rate_per_level.size(), 3, "冰花塔应有 3 级射速")
 	assert_eq(td.slow_ratio_per_level.size(), 3, "冰花塔应有 3 级减速比例")
 	assert_eq(td.slow_duration_per_level.size(), 3, "冰花塔应有 3 级减速持续")

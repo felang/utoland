@@ -112,22 +112,24 @@ static func _get_stats_text(opt: Dictionary) -> String:
 	if opt["type"] == "weapon":
 		var wd: WeaponData = GameConfig.weapons[opt["id"]]
 		var lines: Array[String] = []
-		if wd.damage_per_level.size() > idx:
-			lines.append("伤害: %d" % int(wd.damage_per_level[idx]))
-		if wd.fire_rate_per_level.size() > idx:
-			lines.append("射速: %.1f" % wd.fire_rate_per_level[idx])
-		if wd.weapon_range_per_level.size() > idx:
-			lines.append("范围: %d" % int(wd.weapon_range_per_level[idx]))
+		if wd.attack_config != null:
+			if wd.attack_config.damage_per_level.size() > idx:
+				lines.append("伤害: %d" % int(wd.attack_config.damage_per_level[idx]))
+			if wd.attack_config.fire_rate_per_level.size() > idx:
+				lines.append("射速: %.1f" % wd.attack_config.fire_rate_per_level[idx])
+			if wd.attack_config.attack_range_per_level.size() > idx:
+				lines.append("范围: %d" % int(wd.attack_config.attack_range_per_level[idx]))
 		return "\n".join(lines)
 	else:
 		var td: TowerData = GameConfig.towers[opt["id"]]
 		var lines: Array[String] = []
-		if td.damage_per_level.size() > idx and td.damage_per_level[idx] > 0:
-			lines.append("伤害: %d" % int(td.damage_per_level[idx]))
-		if td.fire_rate_per_level.size() > idx and td.fire_rate_per_level[idx] > 0:
-			lines.append("射速: %.1f" % td.fire_rate_per_level[idx])
-		if td.attack_range_per_level.size() > idx and td.attack_range_per_level[idx] > 0:
-			lines.append("范围: %d" % int(td.attack_range_per_level[idx]))
+		if td.attack_config != null:
+			if td.attack_config.damage_per_level.size() > idx and td.attack_config.damage_per_level[idx] > 0:
+				lines.append("伤害: %d" % int(td.attack_config.damage_per_level[idx]))
+			if td.attack_config.fire_rate_per_level.size() > idx and td.attack_config.fire_rate_per_level[idx] > 0:
+				lines.append("射速: %.1f" % td.attack_config.fire_rate_per_level[idx])
+			if td.attack_config.attack_range_per_level.size() > idx and td.attack_config.attack_range_per_level[idx] > 0:
+				lines.append("范围: %d" % int(td.attack_config.attack_range_per_level[idx]))
 		if td.slow_ratio_per_level.size() > idx and td.slow_ratio_per_level[idx] > 0:
 			lines.append("减速: %d%%" % int(td.slow_ratio_per_level[idx] * 100))
 		if td.hp_per_level.size() > idx and td.hp_per_level[idx] > 0:
