@@ -9,7 +9,7 @@ var _drag_manager: Node = null
 var _camera: Camera2D = null
 
 const CAMERA_TRANSITION_DURATION := 0.5
-const SHOP_ZOOM := 0.865
+const SHOP_ZOOM := 0.82  # 稍小于 360/416=0.865，让地图边界也能露出
 const SHOP_CAMERA_POS := Vector2(-98, 0)
 
 func _ready() -> void:
@@ -62,9 +62,8 @@ func _ready() -> void:
 func _enter_shop_phase(is_first: bool = false) -> void:
 	current_phase = Phase.SHOP
 
-	# 禁用玩家输入，停止移动
-	$Player.set_input_enabled(false)
-	$Player.velocity = Vector2.ZERO
+	# 商店阶段角色可以自由移动，但相机不跟随
+	$Player.set_input_enabled(true)
 
 	# 扩大相机限制，防止过渡时被裁剪
 	_camera.limit_left = -10000
@@ -76,7 +75,7 @@ func _enter_shop_phase(is_first: bool = false) -> void:
 	_camera.offset = Vector2.ZERO
 	_camera.set_process(false)
 
-	# 关闭平滑和拖拽边距
+	# 关闭平滑和拖拽（相机不跟随玩家）
 	_camera.position_smoothing_enabled = false
 	_camera.drag_horizontal_enabled = false
 	_camera.drag_vertical_enabled = false
@@ -125,9 +124,6 @@ func _enter_battle_phase() -> void:
 
 		# 恢复相机处理（震动/前瞻）
 		_camera.set_process(true)
-
-		# 重新启用玩家输入
-		$Player.set_input_enabled(true)
 	)
 
 	AudioManager.play_bgm("battle")

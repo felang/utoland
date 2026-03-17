@@ -126,11 +126,11 @@ func _setup_ui() -> void:
 	vbox.add_child(_start_button)
 
 func _create_card(index: int) -> PanelContainer:
-	# 横向小卡片：图标 + 名称 + 价格
+	# 横向小卡片：图标 + 名称 + 价格（等高铺满卡片区域）
 	var card := PanelContainer.new()
 	card.name = "ShopCard%d" % index
 	card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	card.custom_minimum_size = Vector2(0, 32)
+	card.size_flags_vertical = Control.SIZE_EXPAND_FILL
 
 	var hbox := HBoxContainer.new()
 	hbox.add_theme_constant_override("separation", 4)
