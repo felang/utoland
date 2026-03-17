@@ -17,7 +17,6 @@ var _pop_label: Label
 var _wave_label: Label
 
 # 操作按钮
-var _level_up_button: Button
 var _refresh_button: Button
 var _start_button: Button
 
@@ -104,12 +103,6 @@ func _setup_ui() -> void:
 	_refresh_button.pressed.connect(_on_refresh_pressed)
 	vbox.add_child(_refresh_button)
 
-	# --- 升级按钮 ---
-	_level_up_button = Button.new()
-	_level_up_button.text = "Lv↑"
-	_level_up_button.pressed.connect(_on_level_up_pressed)
-	vbox.add_child(_level_up_button)
-
 	# --- 回收区 ---
 	_recycle_area = PanelContainer.new()
 	_recycle_area.name = "RecycleArea"
@@ -175,13 +168,12 @@ func refresh_shop(is_first: bool = false) -> void:
 func _update_ui() -> void:
 	_update_info_bar()
 	_update_cards()
-	_update_level_up_button()
 
 func _update_info_bar() -> void:
 	_coins_label.text = "$%d" % GameData.coins
 	_level_label.text = "Lv.%d" % GameData.player_level
 	var pop_current: int = GameData.deployed_weapons.size() + GameData.deployed_towers.size()
-	var pop_max: int = GameConfig.shop_config.population_per_level[GameData.player_level - 1]
+	var pop_max: int = GameData.get_population_cap()
 	_pop_label.text = "人口 %d/%d" % [pop_current, pop_max]
 	_wave_label.text = "W%d" % GameData.current_wave
 
@@ -221,16 +213,6 @@ func _update_cards() -> void:
 			_card_prices[i].text = ""
 			_card_buttons[i].disabled = true
 			_card_containers[i].modulate = Color(0.5, 0.5, 0.5)
-
-func _update_level_up_button() -> void:
-	var max_level: int = GameConfig.shop_config.level_up_costs.size() + 1
-	if GameData.player_level >= max_level:
-		_level_up_button.text = "满级"
-		_level_up_button.disabled = true
-	else:
-		var cost: int = GameConfig.shop_config.level_up_costs[GameData.player_level - 1]
-		_level_up_button.text = "Lv↑ $%d" % cost
-		_level_up_button.disabled = GameData.coins < cost
 
 func _on_shop_slot_pressed(slot_index: int) -> void:
 	var slot: Dictionary = GameData.shop_slots[slot_index]
@@ -274,10 +256,6 @@ func _on_tower_placement_cancelled() -> void:
 
 func _on_refresh_pressed() -> void:
 	_shop_manager.manual_refresh()
-	_update_ui()
-
-func _on_level_up_pressed() -> void:
-	GameData.buy_level_up()
 	_update_ui()
 
 func _on_start_pressed() -> void:

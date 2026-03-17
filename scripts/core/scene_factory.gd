@@ -17,6 +17,7 @@ var _enemy_scenes: Dictionary = {
 }
 
 var _coin_scene: PackedScene = preload("res://scenes/entities/coin.tscn")
+var _exp_orb_scene: PackedScene = preload("res://scenes/entities/exp_orb.tscn")
 
 # Tower creation — 注入 TowerData Resource，level 直接注入
 func create_tower(type: String, level: int = 1) -> Node2D:
@@ -48,6 +49,10 @@ func create_enemy(type: String) -> CharacterBody2D:
 # Coin creation
 func create_coin() -> Area2D:
 	return _coin_scene.instantiate()
+
+# 经验球创建
+func create_exp_orb() -> Area2D:
+	return _exp_orb_scene.instantiate()
 
 # 统一投射物创建 — 从 ProjectileData 实例化
 func create_projectile(p_data: ProjectileData, damage: float, from: Vector2, direction: Vector2, extra_pierce: int = 0) -> ProjectileBase:

@@ -23,8 +23,10 @@ var coins: int = GameConfig.PLAYER["initial_coins"]
 var current_wave: int = 0
 var pending_heal: int = 0
 
-## 种群等级（商店升级购买）
+## 种群等级（经验自动升级）
 var player_level: int = 1
+var current_exp: int = 0
+var total_exp_earned: int = 0
 
 ## 已上阵武器 [{id, level}]
 var deployed_weapons: Array[Dictionary] = []
@@ -67,6 +69,8 @@ const _DEFAULTS: Dictionary = {
 	"current_wave": 0,
 	"pending_heal": 0,
 	"player_level": 1,
+	"current_exp": 0,
+	"total_exp_earned": 0,
 	"deployed_weapons": [],
 	"deployed_towers": [],
 	"shop_slots": [],
@@ -140,8 +144,8 @@ func reset() -> void:
 # ===== 种群系统 =====
 
 func get_population_cap() -> int:
-	var config: ShopConfig = GameConfig.shop_config
-	return config.population_per_level[player_level - 1]
+	var config: ExpConfig = GameConfig.exp_config
+	return config.initial_population + (player_level - 1) * config.population_per_level
 
 func get_population_used() -> int:
 	return deployed_weapons.size() + deployed_towers.size()
@@ -163,20 +167,22 @@ func can_buy_item(item_id: String, item_level: int) -> bool:
 			count += 1
 	return count >= 2
 
-# ===== 等级升级 =====
+# ===== 经验系统 =====
 
-func buy_level_up() -> bool:
-	var config: ShopConfig = GameConfig.shop_config
-	if player_level >= config.population_per_level.size():
-		return false
-	var cost: int = config.level_up_costs[player_level - 1]
-	if coins < cost:
-		return false
-	coins -= cost
-	player_level += 1
-	EventBus.player_level_changed.emit(player_level)
-	EventBus.coins_changed.emit(-cost, coins)
-	return true
+func exp_for_level(level: int) -> int:
+	var config: ExpConfig = GameConfig.exp_config
+	return int(floor(config.base_exp * pow(level, config.exp_exponent)))
+
+func add_exp(amount: int) -> void:
+	current_exp += amount
+	total_exp_earned += amount
+	# 循环检查升级
+	while current_exp >= exp_for_level(player_level + 1):
+		player_level += 1
+		EventBus.player_level_changed.emit(player_level)
+	# 通知经验变化
+	var next_threshold: int = exp_for_level(player_level + 1)
+	EventBus.exp_changed.emit(current_exp, next_threshold)
 
 # ===== 部署/撤回 =====
 

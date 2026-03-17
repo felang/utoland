@@ -3,6 +3,7 @@ extends CharacterBody2D
 enum State { CHASE_PLAYER, ATTACK_TOWER }
 
 const COIN_SCATTER_RANGE: float = 20.0  # 金币掉落散布范围（像素）
+const EXP_SCATTER_RANGE: float = 20.0  # 经验球掉落散布范围（像素）
 
 # 由 SceneFactory 注入的 Resource 数据
 var data: EnemyData = null
@@ -12,6 +13,7 @@ var enemy_type: String = "normal"
 # 精英怪标识（由 SceneFactory 或生成逻辑设置）
 var is_elite: bool = false
 var _elite_coin_mult: float = 1.0
+var _elite_exp_mult: float = 1.0
 
 @export var tower_attack_rate: float = 1.0
 
@@ -105,7 +107,7 @@ func _on_died() -> void:
 	GameData.record_kill()
 	EventBus.enemy_killed.emit(enemy_type, global_position, is_elite)
 	AudioManager.play("enemy_die")
-	_drop_coins()
+	_drop_exp_orbs()
 	EffectsManager.spawn_enhanced_death(global_position, health.death_color)
 	queue_free()
 
@@ -121,9 +123,22 @@ func _drop_coins() -> void:
 		coin.global_position = global_position + Vector2(randf_range(-COIN_SCATTER_RANGE, COIN_SCATTER_RANGE), randf_range(-COIN_SCATTER_RANGE, COIN_SCATTER_RANGE))
 		parent.call_deferred("add_child", coin)
 
-func apply_elite(hp_mult: float, damage_mult: float, coin_mult: float, scale_mult: float) -> void:
+func _drop_exp_orbs() -> void:
+	var parent: Node = get_parent()
+	if not parent:
+		return
+
+	var orb_count: int = randi_range(data.exp_drop_min, data.exp_drop_max)
+	orb_count = int(orb_count * _elite_exp_mult)
+	for i in orb_count:
+		var orb = SceneFactory.create_exp_orb()
+		orb.global_position = global_position + Vector2(randf_range(-EXP_SCATTER_RANGE, EXP_SCATTER_RANGE), randf_range(-EXP_SCATTER_RANGE, EXP_SCATTER_RANGE))
+		parent.call_deferred("add_child", orb)
+
+func apply_elite(hp_mult: float, damage_mult: float, coin_mult: float, scale_mult: float, exp_mult: float = 1.0) -> void:
 	is_elite = true
 	_elite_coin_mult = coin_mult
+	_elite_exp_mult = exp_mult
 	health.max_hp *= hp_mult
 	health.current_hp = health.max_hp
 	tower_attack_damage *= damage_mult

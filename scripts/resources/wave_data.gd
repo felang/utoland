@@ -16,6 +16,7 @@ extends Resource
 @export var elite_damage_mult: float = 1.3
 @export var elite_coin_mult: float = 2.0
 @export var elite_scale: float = 1.2
+@export var elite_exp_mult: float = 2.0
 
 # Boss 波
 @export var is_boss_wave: bool = false

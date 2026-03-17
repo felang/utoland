@@ -1,0 +1,19 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/entities/exp_orb.gd" id="1_exp"]
+[ext_resource type="Texture2D" path="res://assets/items/gold_coin.png" id="2_exp"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_exp"]
+radius = 3.0
+
+[node name="ExpOrb" type="Area2D"]
+collision_layer = 16
+collision_mask = 1
+script = ExtResource("1_exp")
+
+[node name="Visual" type="Sprite2D" parent="."]
+texture = ExtResource("2_exp")
+modulate = Color(0.3, 1.0, 0.5, 1.0)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_exp")
