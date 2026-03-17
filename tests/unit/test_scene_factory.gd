@@ -103,16 +103,16 @@ func test_create_projectile():
 	var pd := ProjectileData.new()
 	pd.speed = 800.0
 	pd.lifetime = 5.0
-	pd.projectile_scene = preload("res://scenes/entities/projectiles/bullet_projectile.tscn")
-	var proj: ProjectileBase = SceneFactory.create_projectile(pd, 10.0, Vector2.ZERO, Vector2.RIGHT)
-	assert_not_null(proj, "ProjectileBase should be created via create_projectile")
+	pd.projectile_scene = preload("res://scenes/entities/projectiles/arrow.tscn")
+	var proj: Node2D = SceneFactory.create_projectile(pd, 10.0, Vector2.ZERO, Vector2.RIGHT)
+	assert_not_null(proj, "Projectile should be created via create_projectile")
 	proj.queue_free()
 
 func test_create_shuriken_via_projectile():
 	var wd: WeaponData = GameConfig.weapons[Enums.WeaponId.SHURIKEN]
 	assert_not_null(wd.projectile_data, "Shuriken weapon should have projectile_data")
-	var proj: ProjectileBase = SceneFactory.create_projectile(wd.projectile_data, 10.0, Vector2.ZERO, Vector2.RIGHT)
-	assert_not_null(proj, "ShurikenProjectile should be created via create_projectile")
+	var proj: Node2D = SceneFactory.create_projectile(wd.projectile_data, 10.0, Vector2.ZERO, Vector2.RIGHT)
+	assert_not_null(proj, "Shuriken projectile should be created via create_projectile")
 	proj.queue_free()
 
 func test_all_towers_can_be_created():

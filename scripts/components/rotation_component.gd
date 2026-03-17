@@ -13,4 +13,4 @@ func _process(delta: float) -> void:
 		_sprite.rotation += rotation_speed * delta
 
 func reset() -> void:
-	_sprite = nil
+	_sprite = null

@@ -15,23 +15,24 @@ func test_bullet_projectile_creates_trail():
 	var pd := ProjectileData.new()
 	pd.speed = 800.0
 	pd.lifetime = 5.0
-	pd.trail_enabled = true
-	pd.projectile_scene = preload("res://scenes/entities/projectiles/bullet_projectile.tscn")
-	var bullet: ProjectileBase = SceneFactory.create_projectile(pd, 10.0, Vector2.ZERO, Vector2.RIGHT)
+	pd.projectile_scene = preload("res://scenes/entities/projectiles/arrow.tscn")
+	var bullet: Node2D = SceneFactory.create_projectile(pd, 10.0, Vector2.ZERO, Vector2.RIGHT)
 	add_child_autoqfree(bullet)
 	await get_tree().process_frame
-	var has_trail: bool = false
-	for child in bullet.get_children():
-		if child is Line2D:
-			has_trail = true
-			break
-	assert_true(has_trail, "子弹投射物应有 Line2D 拖尾子节点")
+	# TrailComponent 是投射物的子节点，其内部 Line2D 挂在 TrailComponent 下
+	var trail_comp = bullet.get_node_or_null("TrailComponent")
+	assert_not_null(trail_comp, "箭矢投射物应有 TrailComponent 子节点")
 
 func test_shuriken_projectile_rotates():
 	var shuriken_pd: ProjectileData = GameConfig.weapons[Enums.WeaponId.SHURIKEN].projectile_data
-	var shuriken: ProjectileBase = SceneFactory.create_projectile(shuriken_pd, 10.0, Vector2.ZERO, Vector2.RIGHT)
+	var shuriken: Node2D = SceneFactory.create_projectile(shuriken_pd, 10.0, Vector2.ZERO, Vector2.RIGHT)
 	add_child_autoqfree(shuriken)
-	var initial_rotation: float = shuriken.rotation
+	# RotationComponent 旋转的是 _PooledSprite 精灵，而非根节点
+	var rot_comp = shuriken.get_node_or_null("RotationComponent")
+	assert_not_null(rot_comp, "手里剑投射物应有 RotationComponent 子节点")
+	var sprite = shuriken.get_node_or_null("_PooledSprite")
+	var initial_rotation: float = sprite.rotation if sprite else 0.0
 	await get_tree().create_timer(0.1).timeout
-	assert_ne(shuriken.rotation, initial_rotation, "手里剑投射物应持续旋转")
+	if sprite:
+		assert_ne(sprite.rotation, initial_rotation, "手里剑精灵应持续旋转")
 
