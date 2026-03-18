@@ -3,16 +3,11 @@ extends Camera2D
 # 摄像机控制 — 缩放、边界、平滑跟随、前瞻、屏幕震动
 # 附加到玩家的 Camera2D 节点
 
-const LOOK_AHEAD_MIN_VELOCITY: float = 10.0  # 启用前瞻偏移的最小速度
-
 # 震动状态
 var _trauma: float = 0.0
 var _shake_intensity: float = 0.0
 var _shake_duration: float = 0.0
 var _shake_elapsed: float = 0.0
-
-# 前瞻状态
-var _look_ahead_offset: Vector2 = Vector2.ZERO
 
 func _ready() -> void:
 	var fx: EffectConfigData = GameConfig.effects
@@ -43,13 +38,6 @@ func shake(intensity: float, duration: float) -> void:
 		_shake_elapsed = 0.0
 	_trauma = maxf(_trauma, intensity)
 
-func update_look_ahead(player_velocity: Vector2) -> void:
-	var fx: EffectConfigData = GameConfig.effects
-	var target_offset: Vector2 = Vector2.ZERO
-	if player_velocity.length() > LOOK_AHEAD_MIN_VELOCITY:
-		target_offset = player_velocity.normalized() * fx.camera_look_ahead_distance
-	_look_ahead_offset = _look_ahead_offset.lerp(target_offset, get_process_delta_time() * fx.camera_look_ahead_smoothing)
-
 func _process(delta: float) -> void:
 	var shake_offset: Vector2 = Vector2.ZERO
 
@@ -67,5 +55,4 @@ func _process(delta: float) -> void:
 				randf_range(-current_intensity, current_intensity)
 			)
 
-	# 合并震动 + 前瞻偏移
-	offset = shake_offset + _look_ahead_offset
+	offset = shake_offset

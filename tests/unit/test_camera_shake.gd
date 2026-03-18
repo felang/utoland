@@ -62,11 +62,3 @@ func test_camera_smoothing_enabled():
 	add_child_autoqfree(camera)
 	await get_tree().process_frame
 	assert_true(camera.position_smoothing_enabled, "平滑跟随应开启")
-
-func test_look_ahead_updates():
-	var camera = Camera2D.new()
-	camera.set_script(shake_script)
-	add_child_autoqfree(camera)
-	await get_tree().process_frame
-	camera.update_look_ahead(Vector2(200, 0))
-	assert_ne(camera._look_ahead_offset, Vector2.ZERO, "有速度时前瞻偏移应非零")

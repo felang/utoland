@@ -80,11 +80,6 @@ func _physics_process(_delta: float) -> void:
 	# 更新精灵动画
 	_sprite_animator.update_animation(velocity)
 
-	# 摄像机前瞻
-	var camera: Camera2D = $Camera
-	if camera and camera.has_method("update_look_ahead"):
-		camera.update_look_ahead(velocity)
-
 func _on_hurtbox_hit(damage: float, _knockback: Vector2) -> void:
 	if invincible_timer > 0:
 		return
