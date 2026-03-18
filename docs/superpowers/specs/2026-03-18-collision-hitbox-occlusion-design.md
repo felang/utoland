@@ -23,7 +23,7 @@
 |---|---|---|
 | 1 | Player | 玩家 CharacterBody2D |
 | 2 | Enemy | 敌人 CharacterBody2D |
-| 3 | Tower | 塔 StaticBody2D |
+| 3 | Solid | 塔 / 障碍物 StaticBody2D |
 | 4 | Pickup | Coin / ExpOrb（Area2D） |
 | 5 | PlayerAttack | 玩家侧攻击 Hitbox（投射物 + 近战） |
 | 6 | EnemyAttack | 敌人侧攻击 Hitbox（接触伤害） |
