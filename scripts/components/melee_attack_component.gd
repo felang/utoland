@@ -15,9 +15,9 @@ var _attack_range: float = 50.0
 var _cooldown_remaining: float = 0.0
 var _target_finder: TargetFinderComponent = null
 var _is_attacking: bool = false
+var _hit_enemies: Array[Node2D] = []
 
 func _ready() -> void:
-	# TargetFinder 和攻击组件都在 Pivot 下（兄弟节点）
 	_target_finder = get_parent().get_node_or_null("TargetFinderComponent")
 
 func set_level(level: int) -> void:
@@ -59,11 +59,14 @@ func _execute_melee(target: Node2D) -> void:
 	if not melee_config:
 		return
 	_is_attacking = true
+	_hit_enemies.clear()
 	var offset_node: Node2D = get_parent().get_node_or_null("WeaponOffset") if get_parent() else null
-	var weapon_pos: Vector2 = offset_node.global_position if offset_node else get_parent().global_position
-	var direction: Vector2 = weapon_pos.direction_to(target.global_position)
+	if not offset_node:
+		_is_attacking = false
+		return
+	var direction: Vector2 = offset_node.global_position.direction_to(target.global_position)
 
-	# 创建临时 Hitbox（加到场景根，不受 tween 影响）
+	# Hitbox 作为 Offset 子节点，跟随 tween 移动扫过敌人
 	var hitbox := Hitbox.new()
 	hitbox.damage = get_final_damage()
 	hitbox.knockback_force = melee_config.knockback_force
@@ -74,26 +77,32 @@ func _execute_melee(target: Node2D) -> void:
 	circle.radius = melee_config.hit_radius
 	shape.shape = circle
 	hitbox.add_child(shape)
-	get_tree().current_scene.add_child(hitbox)
-	hitbox.global_position = weapon_pos + direction * _attack_range
+	offset_node.add_child(hitbox)
+	hitbox.position = Vector2(melee_config.hit_radius, 0)
+	# 连接碰撞信号，防重复命中
+	hitbox.area_entered.connect(_on_melee_hitbox_entered)
 
-	# Tween 突刺动画（Pivot 无旋转，直接用世界方向推 Offset）
-	if offset_node and offset_node.name == "WeaponOffset":
-		var tween := create_tween()
-		var thrust_target: Vector2 = direction * _attack_range
-		tween.tween_property(offset_node, "position", thrust_target, 0.1)
-		tween.tween_property(offset_node, "position", Vector2.ZERO, 0.1)
-		tween.tween_callback(func() -> void:
-			if is_instance_valid(hitbox):
-				hitbox.queue_free()
-			_is_attacking = false
-		)
-	else:
-		get_tree().create_timer(0.2).timeout.connect(func() -> void:
-			if is_instance_valid(hitbox):
-				hitbox.queue_free()
-			_is_attacking = false
-		)
+	# Tween 突刺 — Offset 推出去再收回来，Hitbox 跟着扫
+	var tween := create_tween()
+	var thrust_target: Vector2 = direction * _attack_range
+	tween.tween_property(offset_node, "position", thrust_target, 0.1)
+	tween.tween_property(offset_node, "position", Vector2.ZERO, 0.1)
+	tween.tween_callback(func() -> void:
+		if is_instance_valid(hitbox):
+			hitbox.queue_free()
+		_is_attacking = false
+		_hit_enemies.clear()
+	)
 
 	attack_executed.emit(target)
 	AudioManager.play(sfx_id)
+
+func _on_melee_hitbox_entered(area: Area2D) -> void:
+	if not area is Hurtbox:
+		return
+	var enemy: Node2D = area.get_parent()
+	if not enemy or enemy in _hit_enemies:
+		return
+	_hit_enemies.append(enemy)
+	# 伤害由 Hurtbox 自动处理（读 Hitbox.damage → hit_taken 信号）
+	EffectsManager.spawn_hit_sparks(enemy.global_position)
