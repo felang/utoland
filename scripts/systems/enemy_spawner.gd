@@ -23,7 +23,7 @@ var map_min_x: float = 0.0
 var map_max_x: float = 0.0
 var map_min_y: float = 0.0
 var map_max_y: float = 0.0
-var min_distance_from_player: float = 100.0
+var min_distance_from_player: float = 200.0
 
 func _ready() -> void:
 	map_min_x = -GameConfig.MAP_HALF_WIDTH

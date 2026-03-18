@@ -4,3 +4,4 @@
 
 [resource]
 script = ExtResource("1")
+min_distance_from_player = 150.0

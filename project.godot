@@ -31,8 +31,8 @@ AudioManager="*res://scripts/systems/audio_manager.gd"
 
 [display]
 
-window/size/viewport_width=640
-window/size/viewport_height=360
+window/size/viewport_width=960
+window/size/viewport_height=540
 window/size/mode=2
 window/stretch/mode="viewport"
 

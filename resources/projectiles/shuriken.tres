@@ -5,7 +5,7 @@
 
 [resource]
 script = ExtResource("1")
-speed = 175.0
+speed = 350.0
 lifetime = 5.0
 sprite_path = "res://assets/projectiles/shuriken.png"
 projectile_scene = ExtResource("2")

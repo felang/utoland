@@ -5,5 +5,5 @@
 [resource]
 script = ExtResource("1")
 hit_angle = 90.0
-hit_radius = 14.0
-knockback_force = 80.0
+hit_radius = 28.0
+knockback_force = 160.0

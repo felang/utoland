@@ -8,7 +8,7 @@
 script = ExtResource("2")
 damage_per_level = PackedFloat32Array(20, 38, 65)
 fire_rate_per_level = PackedFloat32Array(0.4, 0.32, 0.24)
-attack_range_per_level = PackedFloat32Array(50, 60, 70)
+attack_range_per_level = PackedFloat32Array(100, 100, 100)
 
 [resource]
 script = ExtResource("1")
@@ -19,5 +19,5 @@ icon_path = "res://assets/weapons/sword/sprite.png"
 sell_price_per_level = PackedInt32Array(3, 7, 21)
 attack_config = SubResource("AttackConfigData_sword")
 melee_config = ExtResource("3")
-pivot_offset = 10.0
-sprite_rotation_offset = -1.5708
+pivot_offset = 20.0
+sprite_rotation_offset = 1.5708

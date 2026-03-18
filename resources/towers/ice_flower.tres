@@ -8,7 +8,7 @@
 script = ExtResource("2")
 damage_per_level = PackedFloat32Array(3, 5, 8)
 fire_rate_per_level = PackedFloat32Array(0.8, 0.7, 0.6)
-attack_range_per_level = PackedFloat32Array(100, 120, 150)
+attack_range_per_level = PackedFloat32Array(200, 240, 300)
 
 [resource]
 script = ExtResource("1")

@@ -9,14 +9,14 @@ extends Node
 const DEBUG_MODE = true
 
 # 全局尺寸标准
-const BASE_VIEWPORT_WIDTH = 640
-const BASE_VIEWPORT_HEIGHT = 360
-const PPU = 16
-const GRID_SIZE = 16
+const BASE_VIEWPORT_WIDTH = 960
+const BASE_VIEWPORT_HEIGHT = 540
+const PPU = 32
+const GRID_SIZE = 32
 
 # 地图网格数量（固定）
-const MAP_GRID_WIDTH = 34
-const MAP_GRID_HEIGHT = 26
+const MAP_GRID_WIDTH = 45
+const MAP_GRID_HEIGHT = 30
 
 # 地图尺寸（由网格数量计算）
 var MAP_PIXEL_WIDTH: float = 0.0
@@ -41,7 +41,7 @@ const UI_CARD_GAP = 20
 # ===== 玩家配置（保持 const 避免 Autoload 顺序问题） =====
 const PLAYER = {
 	"initial_hp": 100.0,
-	"initial_speed": 100.0,
+	"initial_speed": 200.0,
 	"initial_coins": 100,
 	"hp_regen_interval": 5.0,
 	"default_enemy_touch_damage": 10.0  # 敌人没有 touch_damage 属性时的默认伤害
