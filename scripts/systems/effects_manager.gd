@@ -5,8 +5,8 @@ extends Node
 
 const FLASH_WHITE_COLOR := Color(2, 2, 2, 1)         # 闪白叠加颜色
 const FLASH_HIT_COLOR := Color(1, 0.3, 0.3, 1)      # 受击红色叠加颜色
-const HIT_SPARK_SIZE := Vector2(2, 2)                  # 击中火花粒子尺寸
-const DEATH_PARTICLE_SIZE := Vector2(3, 3)             # 死亡粒子尺寸
+const HIT_SPARK_SIZE := Vector2(4, 4)                  # 击中火花粒子尺寸
+const DEATH_PARTICLE_SIZE := Vector2(6, 6)             # 死亡粒子尺寸
 const GRAVITY_FACTOR: float = 0.5                      # 重力位移公式的 1/2 系数
 
 func flash_white(node: Node2D) -> Tween:
@@ -23,7 +23,7 @@ func flash_hit(node: Node2D) -> Tween:
 	tween.tween_property(node, "modulate", original_modulate, GameConfig.effects.hit_flash_duration)
 	return tween
 
-func sprite_shake(node: Node2D, amount: float = 2.0) -> void:
+func sprite_shake(node: Node2D, amount: float = 4.0) -> void:
 	if not is_instance_valid(node):
 		return
 	var sprite: Node2D = null
@@ -133,7 +133,7 @@ func spawn_enhanced_death(pos: Vector2, _entity_color: Color) -> void:
 	# 白闪缩放弹跳效果（独立 ColorRect 节点）
 	# 注意：不调用 spawn_death_effect()，因为 HealthComponent.die() 已调用过
 	var flash_rect: ColorRect = ColorRect.new()
-	flash_rect.size = Vector2(12, 12)
+	flash_rect.size = Vector2(24, 24)
 	flash_rect.position = pos - flash_rect.size / 2
 	flash_rect.color = Color.WHITE
 	flash_rect.z_index = 50
