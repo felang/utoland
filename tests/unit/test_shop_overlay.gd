@@ -39,5 +39,8 @@ func test_card_disabled_when_insufficient_coins() -> void:
 		if i < InventoryManager.shop_slots.size() and not InventoryManager.shop_slots[i].is_empty():
 			assert_true(_overlay._card_buttons[i].disabled, "金币不足时卡片应禁用")
 
-func test_recycle_area_exists() -> void:
-	assert_not_null(_overlay.get_recycle_area())
+func test_weapon_grid_exists() -> void:
+	assert_not_null(_overlay._weapon_grid, "应有武器装备栏")
+
+func test_level_up_button_exists() -> void:
+	assert_not_null(_overlay._level_up_button, "应有升级按钮")
