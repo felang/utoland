@@ -145,21 +145,45 @@ SceneFactory 创建实体后，需要将实体添加到正确的父容器：
    - collision_mask = 6（EnemyAttack）
    - CollisionShape2D: CircleShape2D r=16
 
-2. tower.gd 的 `_ready()` 中检测 Hurtbox 并连接 `hit_taken` 信号到 HealthComponent
+2. tower.gd 的 `_ready()` 中检测 Hurtbox 并连接 `hit_taken` 信号
 
-3. enemy.gd 中移除直接调用塔 `health.take_damage()` 的逻辑，改为通过 Hitbox→Hurtbox 碰撞自动触发
+3. enemy.gd 中移除直接调用塔 `health.take_damage()` 的逻辑（`_attack_tower()` 方法），改为通过 Hitbox→Hurtbox 碰撞触发
+
+### 信号签名适配
+
+当前 `Hurtbox.hit_taken` 信号签名为 `(damage: float, knockback: Vector2)`，而 `HealthComponent.take_damage()` 期望 `(amount: float, attacker: Node2D = null)`。需要在 tower.gd 中添加包装方法：
+
+```gdscript
+func _on_hurtbox_hit_taken(damage: float, _knockback: Vector2) -> void:
+    health.take_damage(damage)
+```
+
+### 重复伤害机制
+
+**关键设计点**：当前敌人攻击塔通过 `_attack_tower()` + `attack_timer`（1秒间隔）实现持续伤害。Area2D 的 `area_entered` 仅在首次重叠时触发一次，不会持续触发。
+
+解决方案：敌人 Hitbox 保持持续伤害能力。在 Hurtbox 组件中增加 **重复伤害模式**：
+- Hurtbox 新增 `@export var repeat_damage: bool = false`
+- Hurtbox 新增 `@export var repeat_interval: float = 1.0`
+- 当 `repeat_damage = true` 时，Hurtbox 在 `area_entered` 后启动定时器，每 `repeat_interval` 秒对仍在重叠范围内的 Hitbox 重新触发 `hit_taken`
+- 在 `area_exited` 时清除该 Hitbox 的定时
+- **玩家 Hurtbox**：`repeat_damage = true, repeat_interval = 1.0`（与当前行为一致）
+- **塔 Hurtbox**：`repeat_damage = true, repeat_interval = 1.0`
+- **敌人 Hurtbox**：`repeat_damage = false`（投射物命中即消失，不需要重复）
 
 ### 敌人攻击塔的流程（改后）
 
 ```
 Enemy Hitbox (layer 6, EnemyAttack)
-  ↓ Area2D overlap
-Tower Hurtbox (layer 7, DefenderHurt, mask 6)
-  ↓ hit_taken signal
-Tower HealthComponent.take_damage()
+  ↓ Area2D overlap (area_entered)
+Tower Hurtbox (layer 7, DefenderHurt, mask 6, repeat_damage=true)
+  ↓ hit_taken signal (首次 + 每 1.0 秒重复)
+tower._on_hurtbox_hit_taken(damage, knockback)
+  ↓
+Tower HealthComponent.take_damage(damage)
 ```
 
-与敌人攻击玩家走完全相同的管线。
+与敌人攻击玩家走完全相同的管线（玩家 Hurtbox 同样 repeat_damage=true）。
 
 ## 五、受影响的文件清单
 
@@ -167,36 +191,70 @@ Tower HealthComponent.take_damage()
 - `project.godot` — 添加碰撞层命名
 
 ### 场景文件（碰撞层 + 形状修改）
-- `scenes/entities/player.tscn` — body Circle r=14, Hurtbox layer/mask/size
+- `scenes/entities/player.tscn` — body Circle r=14, Hurtbox layer/mask/size, repeat_damage=true
 - `scenes/entities/enemies/enemy_normal.tscn` — body Circle r=14, Hitbox/Hurtbox layer/mask/size
 - `scenes/entities/enemies/enemy_fast.tscn` — 同上
 - `scenes/entities/enemies/enemy_tank.tscn` — 同上
 - `scenes/entities/enemies/boss_brute.tscn` — body Circle r=22, Hitbox/Hurtbox layer/mask/size
 - `scenes/entities/enemies/boss_summoner.tscn` — 同上
 - `scenes/entities/enemies/boss_guardian.tscn` — 同上
-- `scenes/entities/towers/tower_pea_shooter.tscn` — 添加 Hurtbox, layer/mask
+- `scenes/entities/towers/tower_pea_shooter.tscn` — 添加 Hurtbox, layer/mask, repeat_damage=true
 - `scenes/entities/towers/tower_ice_flower.tscn` — 同上
 - `scenes/entities/towers/tower_sunflower.tscn` — 同上
 - `scenes/entities/projectiles/arrow.tscn` — Hitbox layer/mask/size
 - `scenes/entities/projectiles/shuriken.tscn` — 同上
 - `scenes/entities/projectiles/pea_bullet.tscn` — 同上
 - `scenes/entities/projectiles/ice_bullet.tscn` — 同上
+- `scenes/entities/projectiles/bullet_projectile.tscn` — Hitbox layer/mask/size（未追踪文件）
+- `scenes/entities/projectiles/shuriken_projectile.tscn` — 同上（未追踪文件）
 - `scenes/entities/coin.tscn` — layer/mask
 - `scenes/entities/exp_orb.tscn` — layer/mask
 - `scenes/levels/main.tscn` — 添加 EntityLayer (y_sort) 和 ProjectileLayer 容器
 
 ### 脚本文件
-- `scripts/components/melee_attack_component.gd` — 动态 Hitbox 的 layer/mask 改为新值
-- `scripts/components/target_finder_component.gd` — mask 确认为层2(Enemy)
-- `scripts/entities/tower.gd` — 添加 Hurtbox 信号连接
-- `scripts/entities/enemy.gd` — 移除直接调用塔 take_damage 的逻辑
-- `scripts/core/scene_factory.gd` — 可能需要调整实体添加到的父容器
-- `scripts/systems/effects_manager.gd` — 特效节点 z_index=3
+- `scripts/components/hurtbox.gd` — 添加 repeat_damage/repeat_interval 功能
+- `scripts/components/melee_attack_component.gd` — 动态 Hitbox 的 layer 从 4 改为 16（PlayerAttack 层5 = bitmask 16），mask 保持 128（EnemyHurt 层8 = bitmask 128）
+- `scripts/components/target_finder_component.gd` — mask 确认为层2(Enemy)，武器和塔共用
+- `scripts/entities/tower.gd` — 添加 Hurtbox 信号连接 + `_on_hurtbox_hit_taken()` 包装方法
+- `scripts/entities/enemy.gd` — 移除 `_attack_tower()` 逻辑及相关定时器。注：boss_base.gd 继承 enemy.gd，改动自动传播到所有 Boss
+- `scripts/systems/enemy_spawner.gd` — 敌人 add_child 目标改为 EntityLayer
+- `scripts/systems/drag_manager.gd` — 塔放置 add_child 目标改为 EntityLayer
+- `scripts/core/scene_factory.gd` — 持有 EntityLayer/ProjectileLayer/PickupLayer 容器引用，提供 `init_containers(entity_layer, projectile_layer, pickup_layer)` 方法，由 main.gd 在 `_ready()` 时调用。创建实体后自动 add_child 到对应容器
+- `scripts/systems/effects_manager.gd` — 特效节点 z_index=3（检查与现有 EffectConfigData z_index 字段的关系）
+- `scripts/ui/main.gd` — 创建 EntityLayer/ProjectileLayer 容器并初始化 SceneFactory
 
-## 六、风险与注意事项
+## 六、Y-Sort 技术细节
+
+Godot 4.4+ 提供 `CanvasItem.y_sort_origin` 属性（int 类型，像素偏移），无需手动偏移精灵位置。项目使用 Godot 4.6，可直接使用此属性。
+
+各实体 y_sort_origin 值（从 Node2D 原点到脚底的 Y 偏移）：
+- Player/Enemy（32×32 精灵）：`y_sort_origin = 16`
+- Boss（48×48 精灵，scale 2×）：`y_sort_origin = 24`
+- Tower（32×32 精灵）：`y_sort_origin = 16`
+
+## 七、add_child 调用点完整清单
+
+以下所有调用点需要改为添加到正确的容器：
+
+| 调用位置 | 当前目标 | 新目标 | 说明 |
+|---|---|---|---|
+| `enemy_spawner.gd` 生成敌人/Boss | `get_parent()` (main) | EntityLayer | 敌人实体 |
+| `enemy.gd` `_drop_exp_orbs()` | `get_parent()` (main) | PickupLayer | 经验球 |
+| `enemy.gd` `_drop_coins()` | `get_parent()` (main) | PickupLayer | 金币 |
+| `tower.gd` `_on_projectile_spawned()` | `get_parent()` (main) | ProjectileLayer | 塔投射物 |
+| `drag_manager.gd` 塔放置 | `_tower_container` | EntityLayer | 新塔 |
+| `drag_manager.gd` 预览节点 | `_tower_container.get_parent()` | EntityLayer | 拖拽预览 |
+| `effects_manager.gd` 特效生成 | `tree.current_scene` | 保持不变（z_index=3） | 特效不参与 y_sort |
+| `weapon_manager.gd` 投射物 | 需确认 | ProjectileLayer | 武器投射物 |
+
+推荐方案：SceneFactory 提供 `init_containers()` 方法持有容器引用，各系统通过 SceneFactory 获取正确容器，而非依赖 `get_parent()`。
+
+## 八、风险与注意事项
 
 1. **碰撞层迁移**：所有 .tscn 文件的 collision_layer/collision_mask 值都需要修改，必须全部改完后整体测试，不能只改一半
-2. **Y-Sort 父节点变更**：Enemy/Tower 改为 EntityLayer 子节点后，EnemySpawner 和 DragManager（塔放置）需要把实体添加到 EntityLayer 而非 main 根节点
-3. **对象池兼容**：SceneFactory 的对象池 release 时节点从树中移除、re-add 时需添加到正确的容器
-4. **Hurtbox 组件复用**：塔的 Hurtbox 使用与玩家相同的 Hurtbox 组件脚本，信号接口一致
-5. **碰撞尺寸需实际调试**：文档中的数值为初始推荐值，上线前需要通过实际游玩微调
+2. **add_child 目标迁移**：至少 8 个调用点需要修改（见第七节），遗漏任何一个都会导致实体出现在错误的渲染层
+3. **对象池兼容**：SceneFactory 的对象池 release 时节点从树中移除、re-add 时需添加到正确的容器。池化 acquire 流程需要包含 re-parenting 逻辑
+4. **Hurtbox 信号适配**：`hit_taken(damage, knockback)` 与 `take_damage(amount, attacker)` 签名不同，tower.gd 需要包装方法
+5. **重复伤害机制**：Hurtbox 新增 repeat_damage 模式，需确保与现有玩家受伤逻辑兼容（当前玩家可能已有独立的受伤计时器，需避免双重触发）
+6. **Boss 继承链**：boss_base.gd 继承 enemy.gd，`_attack_tower()` 移除后自动传播到所有 Boss，需确认 Boss 没有覆写此方法
+7. **碰撞尺寸需实际调试**：文档中的数值为初始推荐值，上线前需要通过实际游玩微调
