@@ -10,6 +10,15 @@ utoland 是一个基于 **Godot 4.6** 的 2D 塔防 + 射击混合类游戏（�
 
 **防御塔（3 种）**: 射手塔(pea_shooter)、冰花(ice_flower，射击型减速塔)、向日葵(sunflower)
 
+## 空间系统
+
+- **网格单位**: 32px（PPU = GRID_SIZE = 32）
+- **视口**: 960×540（1080p 的 2x 整数缩放，stretch mode = viewport）
+- **地图**: 1440×960 像素（45×30 格）
+- **精灵**: 当前素材为 16px，通过 `SpriteAnimator._apply_scale()` 自动 scale 2x 适配 32px 格子（`ENTITY_SIZE_STANDARD / frame_size`）
+- **实体尺寸**: 标准 32px（`ENTITY_SIZE_STANDARD`），坦克 64px（`ENTITY_SIZE_TANK`）
+- **空间值规范**: 所有距离、速度、范围等空间数值基于 32px 网格。新增空间值时参考现有数值比例
+
 ## 运行与测试
 
 - **运行项目**: 通过 Godot 编辑器运行，或使用 gdai-mcp 插件的 `run_project` 工具
