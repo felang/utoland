@@ -7,3 +7,8 @@ extends Resource
 @export var refresh_cost: int = 2
 @export var item_cost: int = 3
 @export var wave_reward: int = 10
+@export var level_up_base_cost: int = 4
+@export var level_up_cost_increment: int = 2
+
+func get_level_up_cost(current_level: int) -> int:
+	return level_up_base_cost + (current_level - 1) * level_up_cost_increment
