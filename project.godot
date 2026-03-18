@@ -36,6 +36,17 @@ window/size/viewport_height=540
 window/size/mode=2
 window/stretch/mode="viewport"
 
+[layer_names]
+
+2d_physics/layer_1="Player"
+2d_physics/layer_2="Enemy"
+2d_physics/layer_3="Tower"
+2d_physics/layer_4="Pickup"
+2d_physics/layer_5="PlayerAttack"
+2d_physics/layer_6="EnemyAttack"
+2d_physics/layer_7="DefenderHurt"
+2d_physics/layer_8="EnemyHurt"
+
 [editor_plugins]
 
 enabled=PackedStringArray("res://addons/AsepriteWizard/plugin.cfg", "res://addons/gdai-mcp-plugin-godot/plugin.cfg", "res://addons/gut/plugin.cfg")
