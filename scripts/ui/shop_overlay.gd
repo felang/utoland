@@ -1,14 +1,15 @@
 extends CanvasLayer
-## 左侧商店面板覆盖层 — 纵向卡片式 UI
+## 底部商店面板 — 横条双行 UI
 
 signal start_battle_pressed
 
 const SLIDE_DURATION := 0.3
 const CARD_ICON_SIZE := Vector2(24, 24)
+const WEAPON_ICON_SIZE := Vector2(28, 28)
 
 var _shop_manager: ShopManager
 var _panel: PanelContainer
-var _slide_original_x: float = 0.0
+var _slide_original_y: float = 0.0
 
 # 信息栏
 var _coins_label: Label
@@ -18,17 +19,20 @@ var _wave_label: Label
 
 # 操作按钮
 var _refresh_button: Button
+var _level_up_button: Button
 var _start_button: Button
 
-# 卡片
+# 商店卡片
 var _card_containers: Array[PanelContainer] = []
 var _card_icons: Array[TextureRect] = []
 var _card_names: Array[Label] = []
 var _card_prices: Array[Label] = []
 var _card_buttons: Array[Button] = []
 
-# 回收区
-var _recycle_area: PanelContainer
+# 武器装备栏
+var _weapon_grid: GridContainer
+var _weapon_menu: PopupMenu
+var _menu_weapon_index: int = -1
 
 # 放置状态
 var _pending_tower_slot_index: int = -1
@@ -42,114 +46,149 @@ func _ready() -> void:
 	_shop_manager = ShopManager.new()
 	_setup_ui()
 	_update_ui()
-	# 监听卖出事件刷新 UI（回收区卖出由 DragManager 触发）
 	EventBus.item_sold.connect(func(_item: Dictionary, _refund: int): _update_ui())
+	EventBus.item_merged.connect(func(_id: String, _level: int): _update_ui())
 
 func _setup_ui() -> void:
 	_panel = $ShopPanel
-	_slide_original_x = _panel.position.x
+	_slide_original_y = _panel.position.y
 
 	var vbox: VBoxContainer = $ShopPanel/VBoxContainer
 
-	# --- 信息栏（两行紧凑显示）---
-	var info_bar := VBoxContainer.new()
+	# === 信息栏（上行）===
+	var info_bar := HBoxContainer.new()
 	info_bar.name = "InfoBar"
+	info_bar.add_theme_constant_override("separation", 12)
 	vbox.add_child(info_bar)
 
-	# 第一行：金币 + 等级
-	var line1 := HBoxContainer.new()
-	line1.name = "Line1"
-	info_bar.add_child(line1)
-
 	_coins_label = Label.new()
-	_coins_label.text = "$0"
 	_coins_label.add_theme_font_size_override("font_size", 14)
-	line1.add_child(_coins_label)
+	info_bar.add_child(_coins_label)
 
 	_level_label = Label.new()
-	_level_label.text = "Lv.1"
 	_level_label.add_theme_font_size_override("font_size", 14)
-	line1.add_child(_level_label)
-
-	# 第二行：人口 + 波次
-	var line2 := HBoxContainer.new()
-	line2.name = "Line2"
-	info_bar.add_child(line2)
+	info_bar.add_child(_level_label)
 
 	_pop_label = Label.new()
-	_pop_label.text = "人口 0/2"
 	_pop_label.add_theme_font_size_override("font_size", 14)
-	line2.add_child(_pop_label)
+	info_bar.add_child(_pop_label)
 
 	_wave_label = Label.new()
-	_wave_label.text = "W0"
 	_wave_label.add_theme_font_size_override("font_size", 14)
-	line2.add_child(_wave_label)
+	info_bar.add_child(_wave_label)
 
-	# --- 卡片列表（纵向排列）---
-	var card_list := VBoxContainer.new()
-	card_list.name = "CardList"
-	card_list.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	card_list.add_theme_constant_override("separation", 2)
-	vbox.add_child(card_list)
+	# 弹性占位
+	var spacer := Control.new()
+	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	info_bar.add_child(spacer)
 
-	for i in range(4):
-		var card := _create_card(i)
-		card_list.add_child(card)
-
-	# --- 刷新按钮 ---
-	_refresh_button = Button.new()
-	_refresh_button.text = "刷新 $2"
-	_refresh_button.pressed.connect(_on_refresh_pressed)
-	vbox.add_child(_refresh_button)
-
-	# --- 回收区 ---
-	_recycle_area = PanelContainer.new()
-	_recycle_area.name = "RecycleArea"
-	_recycle_area.custom_minimum_size = Vector2(0, 60)
-	var recycle_label := Label.new()
-	recycle_label.text = "回收"
-	recycle_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	recycle_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	_recycle_area.add_child(recycle_label)
-	vbox.add_child(_recycle_area)
-
-	# --- 开战按钮 ---
 	_start_button = Button.new()
 	_start_button.text = "开战"
 	_start_button.pressed.connect(_on_start_pressed)
-	vbox.add_child(_start_button)
+	info_bar.add_child(_start_button)
+
+	# === 主行（下行）===
+	var main_row := HBoxContainer.new()
+	main_row.name = "MainRow"
+	main_row.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	main_row.add_theme_constant_override("separation", 8)
+	vbox.add_child(main_row)
+
+	# — 武器区 (~30%) —
+	var weapon_section := VBoxContainer.new()
+	weapon_section.name = "WeaponSection"
+	weapon_section.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	weapon_section.size_flags_stretch_ratio = 0.3
+	main_row.add_child(weapon_section)
+
+	var weapon_label := Label.new()
+	weapon_label.text = "武器"
+	weapon_label.add_theme_font_size_override("font_size", 10)
+	weapon_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	weapon_section.add_child(weapon_label)
+
+	_weapon_grid = GridContainer.new()
+	_weapon_grid.columns = 3
+	_weapon_grid.add_theme_constant_override("h_separation", 3)
+	_weapon_grid.add_theme_constant_override("v_separation", 3)
+	weapon_section.add_child(_weapon_grid)
+
+	# 分隔线
+	var sep1 := VSeparator.new()
+	main_row.add_child(sep1)
+
+	# — 商店卡片区 (~55%) —
+	var card_section := HBoxContainer.new()
+	card_section.name = "CardSection"
+	card_section.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	card_section.size_flags_stretch_ratio = 0.55
+	card_section.add_theme_constant_override("separation", 4)
+	main_row.add_child(card_section)
+
+	for i in range(4):
+		var card := _create_card(i)
+		card_section.add_child(card)
+
+	# 分隔线
+	var sep2 := VSeparator.new()
+	main_row.add_child(sep2)
+
+	# — 操作区 (~15%) —
+	var action_section := VBoxContainer.new()
+	action_section.name = "ActionSection"
+	action_section.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	action_section.size_flags_stretch_ratio = 0.15
+	action_section.add_theme_constant_override("separation", 4)
+	main_row.add_child(action_section)
+
+	_refresh_button = Button.new()
+	_refresh_button.text = "刷新 $2"
+	_refresh_button.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_refresh_button.pressed.connect(_on_refresh_pressed)
+	action_section.add_child(_refresh_button)
+
+	_level_up_button = Button.new()
+	_level_up_button.text = "升级 $4"
+	_level_up_button.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_level_up_button.pressed.connect(_on_level_up_pressed)
+	action_section.add_child(_level_up_button)
+
+	# 武器菜单
+	_weapon_menu = PopupMenu.new()
+	_weapon_menu.name = "WeaponMenu"
+	_weapon_menu.id_pressed.connect(_on_weapon_menu_pressed)
+	add_child(_weapon_menu)
 
 func _create_card(index: int) -> PanelContainer:
-	# 横向小卡片：图标 + 名称 + 价格（等高铺满卡片区域）
 	var card := PanelContainer.new()
 	card.name = "ShopCard%d" % index
 	card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	card.size_flags_vertical = Control.SIZE_EXPAND_FILL
 
-	var hbox := HBoxContainer.new()
-	hbox.add_theme_constant_override("separation", 4)
-	card.add_child(hbox)
+	var vbox := VBoxContainer.new()
+	vbox.alignment = BoxContainer.ALIGNMENT_CENTER
+	card.add_child(vbox)
 
 	var icon := TextureRect.new()
 	icon.custom_minimum_size = CARD_ICON_SIZE
 	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	hbox.add_child(icon)
+	icon.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	vbox.add_child(icon)
 	_card_icons.append(icon)
 
 	var name_label := Label.new()
-	name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	name_label.add_theme_font_size_override("font_size", 14)
-	hbox.add_child(name_label)
+	name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	name_label.add_theme_font_size_override("font_size", 10)
+	vbox.add_child(name_label)
 	_card_names.append(name_label)
 
 	var price_label := Label.new()
-	price_label.add_theme_font_size_override("font_size", 14)
+	price_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	price_label.add_theme_font_size_override("font_size", 10)
 	price_label.add_theme_color_override("font_color", Color(1.0, 0.84, 0.0))
-	hbox.add_child(price_label)
+	vbox.add_child(price_label)
 	_card_prices.append(price_label)
 
-	# 透明点击按钮覆盖整个卡片
 	var btn := Button.new()
 	btn.flat = true
 	btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
@@ -168,11 +207,13 @@ func refresh_shop(is_first: bool = false) -> void:
 func _update_ui() -> void:
 	_update_info_bar()
 	_update_cards()
+	_update_weapon_grid()
+	_update_action_buttons()
 
 func _update_info_bar() -> void:
 	_coins_label.text = "$%d" % InventoryManager.coins
 	_level_label.text = "Lv.%d" % PlayerProgression.player_level
-	var pop_current: int = InventoryManager.deployed_weapons.size() + InventoryManager.deployed_towers.size()
+	var pop_current: int = InventoryManager.get_population_used()
 	var pop_max: int = PlayerProgression.get_population_cap()
 	_pop_label.text = "人口 %d/%d" % [pop_current, pop_max]
 	_wave_label.text = "W%d" % PlayerState.current_wave
@@ -184,28 +225,21 @@ func _update_cards() -> void:
 			var slot_data: Dictionary = InventoryManager.shop_slots[i]
 			var item_data: Resource = _get_item_data(slot_data.id)
 
-			# 图标
 			if item_data and item_data.icon_path != "" and ResourceLoader.exists(item_data.icon_path):
 				_card_icons[i].texture = load(item_data.icon_path)
 			else:
 				_card_icons[i].texture = null
 
-			# 名称
 			_card_names[i].text = item_data.display_name if item_data else slot_data.id
-
-			# 价格
 			_card_prices[i].text = "$%d" % slot_data.cost
 
-			# 禁用判断
 			var can_buy: bool = InventoryManager.coins >= slot_data.cost and InventoryManager.can_buy_item(slot_data.id, 1)
 			_card_buttons[i].disabled = not can_buy or is_placing
 
-			# 放置中状态
 			if is_placing and i == _pending_tower_slot_index:
 				_card_names[i].text = "放置中"
 				_card_buttons[i].disabled = true
 
-			# 卡片视觉
 			_card_containers[i].modulate = Color.WHITE if (can_buy and not is_placing) else Color(0.5, 0.5, 0.5)
 		else:
 			_card_icons[i].texture = null
@@ -214,6 +248,84 @@ func _update_cards() -> void:
 			_card_buttons[i].disabled = true
 			_card_containers[i].modulate = Color(0.5, 0.5, 0.5)
 
+func _update_weapon_grid() -> void:
+	# 清除旧图标
+	for child in _weapon_grid.get_children():
+		child.queue_free()
+	# 创建已装备武器图标
+	for i in range(InventoryManager.deployed_weapons.size()):
+		var entry: Dictionary = InventoryManager.deployed_weapons[i]
+		var btn := Button.new()
+		btn.custom_minimum_size = WEAPON_ICON_SIZE
+		btn.flat = true
+		btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+		# 图标
+		var weapon_data: WeaponData = GameConfig.weapons.get(entry.id)
+		if weapon_data and not weapon_data.icon_path.is_empty() and ResourceLoader.exists(weapon_data.icon_path):
+			var icon := TextureRect.new()
+			icon.texture = load(weapon_data.icon_path)
+			icon.custom_minimum_size = WEAPON_ICON_SIZE
+			icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+			icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			btn.add_child(icon)
+		btn.pressed.connect(_show_weapon_menu.bind(i))
+		_weapon_grid.add_child(btn)
+	# 空槽（填到 6 个）
+	var empty_count: int = max(6 - InventoryManager.deployed_weapons.size(), 0)
+	for i in range(empty_count):
+		var empty := Panel.new()
+		empty.custom_minimum_size = WEAPON_ICON_SIZE
+		empty.modulate = Color(0.3, 0.3, 0.3)
+		_weapon_grid.add_child(empty)
+
+func _update_action_buttons() -> void:
+	_refresh_button.text = "刷新 $%d" % GameConfig.shop_config.refresh_cost
+	_refresh_button.disabled = InventoryManager.coins < GameConfig.shop_config.refresh_cost
+
+	var level_cost: int = GameConfig.shop_config.get_level_up_cost(PlayerProgression.player_level)
+	_level_up_button.text = "升级 $%d" % level_cost
+	_level_up_button.disabled = InventoryManager.coins < level_cost
+
+func _show_weapon_menu(weapon_index: int) -> void:
+	_menu_weapon_index = weapon_index
+	_weapon_menu.clear()
+
+	var entry: Dictionary = InventoryManager.deployed_weapons[weapon_index]
+
+	# 合成选项
+	var has_pair: bool = false
+	for i in range(InventoryManager.deployed_weapons.size()):
+		if i != weapon_index and InventoryManager.deployed_weapons[i].id == entry.id and InventoryManager.deployed_weapons[i].level == entry.level and entry.level < 3:
+			has_pair = true
+			break
+	if has_pair:
+		_weapon_menu.add_item("合成", 0)
+
+	# 卖出选项
+	var weapon_data: WeaponData = GameConfig.weapons.get(entry.id)
+	var refund: int = weapon_data.sell_price_per_level[entry.level - 1] if weapon_data else 0
+	_weapon_menu.add_item("卖出 $%d" % refund, 1)
+
+	# 显示菜单
+	var btn: Button = _weapon_grid.get_child(weapon_index)
+	var global_pos: Vector2 = btn.global_position
+	_weapon_menu.position = Vector2i(int(global_pos.x), int(global_pos.y) - 50)
+	_weapon_menu.popup()
+
+func _on_weapon_menu_pressed(id: int) -> void:
+	match id:
+		0:  # 合成
+			if InventoryManager.merge_weapon(_menu_weapon_index):
+				if weapon_manager:
+					weapon_manager.refresh_weapons()
+				_update_ui()
+		1:  # 卖出
+			var refund: int = InventoryManager.sell_from_deployed_weapon(_menu_weapon_index)
+			if refund > 0 and weapon_manager:
+				weapon_manager.remove_weapon(_menu_weapon_index)
+			_update_ui()
+	_menu_weapon_index = -1
+
 func _on_shop_slot_pressed(slot_index: int) -> void:
 	var slot: Dictionary = InventoryManager.shop_slots[slot_index]
 	if slot.is_empty():
@@ -221,7 +333,8 @@ func _on_shop_slot_pressed(slot_index: int) -> void:
 	if slot.type == "weapon":
 		var success: bool = _shop_manager.buy_weapon(slot_index)
 		if success:
-			_handle_merge_weapon_cleanup()
+			if weapon_manager:
+				weapon_manager.refresh_weapons()
 			_update_ui()
 	elif slot.type == "tower":
 		var tower_slot: Dictionary = _shop_manager.get_tower_slot(slot_index)
@@ -240,11 +353,9 @@ func _on_tower_placed(grid_pos: Vector2i) -> void:
 		return
 	var slot: Dictionary = InventoryManager.shop_slots[_pending_tower_slot_index]
 	var tower_id: String = slot.id if not slot.is_empty() else ""
-	var snapshot: Array = InventoryManager.deployed_towers.duplicate(true)
 	var deploy_id: int = _shop_manager.confirm_tower_purchase(_pending_tower_slot_index, grid_pos)
 	if deploy_id > 0:
 		drag_manager.spawn_tower_node(deploy_id, tower_id, 1, grid_pos)
-		_handle_merge_tower_cleanup(snapshot)
 	_pending_tower_slot_index = -1
 	_start_button.disabled = false
 	_update_ui()
@@ -258,58 +369,25 @@ func _on_refresh_pressed() -> void:
 	_shop_manager.manual_refresh()
 	_update_ui()
 
+func _on_level_up_pressed() -> void:
+	if _shop_manager.buy_level_up():
+		_update_ui()
+
 func _on_start_pressed() -> void:
 	start_battle_pressed.emit()
 
 func slide_out() -> void:
 	var tween := create_tween()
-	var panel_width: float = _panel.size.x
-	tween.tween_property(_panel, "position:x", _slide_original_x - panel_width, SLIDE_DURATION)
+	var panel_height: float = _panel.size.y
+	tween.tween_property(_panel, "position:y", _slide_original_y + panel_height, SLIDE_DURATION)
 	tween.tween_callback(func(): _panel.mouse_filter = Control.MOUSE_FILTER_IGNORE)
 
 func slide_in() -> void:
 	_panel.mouse_filter = Control.MOUSE_FILTER_STOP
-	_panel.position.x = _slide_original_x - _panel.size.x
+	_panel.position.y = _slide_original_y + _panel.size.y
 	var tween := create_tween()
-	tween.tween_property(_panel, "position:x", _slide_original_x, SLIDE_DURATION)
+	tween.tween_property(_panel, "position:y", _slide_original_y, SLIDE_DURATION)
 	_update_ui()
-
-func _handle_merge_weapon_cleanup() -> void:
-	if weapon_manager:
-		weapon_manager.refresh_weapons()
-
-func _handle_merge_tower_cleanup(snapshot: Array) -> void:
-	if drag_manager == null:
-		return
-	var current_ids: Array[int] = []
-	var current_map: Dictionary = {}
-	for entry in InventoryManager.deployed_towers:
-		current_ids.append(entry.deploy_id)
-		current_map[entry.deploy_id] = entry
-
-	# 移除被合成消耗的塔节点
-	var consumed_ids: Array[int] = []
-	for entry in snapshot:
-		if entry.deploy_id not in current_ids:
-			consumed_ids.append(entry.deploy_id)
-	if consumed_ids.size() > 0:
-		drag_manager.remove_tower_nodes(consumed_ids)
-
-	# 升级存活塔的视觉
-	for entry in InventoryManager.deployed_towers:
-		for old_entry in snapshot:
-			if old_entry.deploy_id == entry.deploy_id and old_entry.level != entry.level:
-				drag_manager.upgrade_tower_node(entry.deploy_id, entry.id, entry.level, entry.grid_pos)
-				break
-
-func _on_weapon_sold(weapon_index: int) -> void:
-	var refund: int = InventoryManager.sell_from_deployed_weapon(weapon_index)
-	if refund > 0 and weapon_manager:
-		weapon_manager.remove_weapon(weapon_index)
-	_update_ui()
-
-func get_recycle_area() -> Control:
-	return _recycle_area
 
 func _get_item_data(item_id: String) -> Resource:
 	if GameConfig.weapons.has(item_id):
