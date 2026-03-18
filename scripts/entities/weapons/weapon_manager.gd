@@ -20,7 +20,6 @@ var _pivots: Array[Node2D] = []
 var _weapon_data_list: Array[WeaponData] = []
 var _orbit_angle: float = 0.0
 var _projectile_container: Node = null
-var _weapon_drag_callback: Callable
 ## 动态伤害倍率回调（由 Player 注入，用于 swift_combo/blood_rage 等动态被动）
 var _dynamic_damage_mult_getter: Callable
 
@@ -91,9 +90,6 @@ func add_weapon(weapon_id: String, level: int) -> void:
 		pivot.add_child(melee)
 		melee.set_level(level)
 
-	# 点击区域（商店阶段拖拽卖出用）
-	_setup_click_area(sprite, _pivots.size())
-
 	_pivots.append(pivot)
 	# 注入被动加成
 	_apply_passive_to_pivot(pivot)
@@ -148,10 +144,6 @@ func tick(delta: float) -> void:
 		if attack:
 			attack.damage_multiplier = base_dmg_mult * dynamic_dmg_mult
 			attack.tick(delta)
-
-## 设置商店阶段武器拖拽回调
-func set_weapon_drag_callback(callback: Callable) -> void:
-	_weapon_drag_callback = callback
 
 ## 注入动态伤害倍率回调（Player 调用，用于 swift_combo/blood_rage 等每帧变化的被动）
 func set_dynamic_damage_mult_getter(getter: Callable) -> void:
@@ -225,17 +217,3 @@ func _setup_weapon_sprite(sprite: Sprite2D, weapon_id: String) -> void:
 	img.fill(color)
 	sprite.texture = ImageTexture.create_from_image(img)
 
-func _setup_click_area(sprite: Sprite2D, index: int) -> void:
-	var click_area := Area2D.new()
-	click_area.name = "ClickArea"
-	var shape := CollisionShape2D.new()
-	var rect := RectangleShape2D.new()
-	rect.size = Vector2(24, 24)
-	shape.shape = rect
-	click_area.add_child(shape)
-	click_area.input_event.connect(func(_vp: Node, event: InputEvent, _idx: int) -> void:
-		if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-			if _weapon_drag_callback.is_valid():
-				_weapon_drag_callback.call(index)
-	)
-	sprite.add_child(click_area)
