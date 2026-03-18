@@ -13,7 +13,6 @@ var _slide_original_y: float = 0.0
 
 # 信息栏
 var _coins_label: Label
-var _level_label: Label
 var _pop_label: Label
 var _wave_label: Label
 
@@ -55,103 +54,104 @@ func _setup_ui() -> void:
 
 	var vbox: VBoxContainer = $ShopPanel/VBoxContainer
 
-	# === 信息栏（上行）===
+	# === 整体用 HBoxContainer 左右分栏 ===
+	var main_hbox := HBoxContainer.new()
+	main_hbox.name = "MainHBox"
+	main_hbox.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	main_hbox.add_theme_constant_override("separation", 8)
+	vbox.add_child(main_hbox)
+
+	# ——— 左列：武器区（标签 + 3列网格，撑满高度）———
+	var weapon_col := VBoxContainer.new()
+	weapon_col.name = "WeaponCol"
+	weapon_col.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	weapon_col.add_theme_constant_override("separation", 2)
+	main_hbox.add_child(weapon_col)
+
+	var weapon_label := Label.new()
+	weapon_label.text = "武器"
+	weapon_label.add_theme_font_size_override("font_size", 18)
+	weapon_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	weapon_col.add_child(weapon_label)
+
+	_weapon_grid = GridContainer.new()
+	_weapon_grid.columns = 3
+	_weapon_grid.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_weapon_grid.add_theme_constant_override("h_separation", 3)
+	_weapon_grid.add_theme_constant_override("v_separation", 3)
+	weapon_col.add_child(_weapon_grid)
+
+	# 分隔线
+	var sep1 := VSeparator.new()
+	main_hbox.add_child(sep1)
+
+	# ——— 中列：信息栏 + 商店卡片 ———
+	var mid_col := VBoxContainer.new()
+	mid_col.name = "MidCol"
+	mid_col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	mid_col.add_theme_constant_override("separation", 2)
+	main_hbox.add_child(mid_col)
+
+	# 信息栏上行（左：金币/人口/波数，右：升级/刷新）
 	var info_bar := HBoxContainer.new()
 	info_bar.name = "InfoBar"
-	info_bar.add_theme_constant_override("separation", 12)
-	vbox.add_child(info_bar)
+	info_bar.add_theme_constant_override("separation", 8)
+	info_bar.alignment = BoxContainer.ALIGNMENT_CENTER
+	mid_col.add_child(info_bar)
 
 	_coins_label = Label.new()
-	_coins_label.add_theme_font_size_override("font_size", 14)
+	_coins_label.add_theme_font_size_override("font_size", 18)
 	info_bar.add_child(_coins_label)
 
-	_level_label = Label.new()
-	_level_label.add_theme_font_size_override("font_size", 14)
-	info_bar.add_child(_level_label)
-
 	_pop_label = Label.new()
-	_pop_label.add_theme_font_size_override("font_size", 14)
+	_pop_label.add_theme_font_size_override("font_size", 18)
 	info_bar.add_child(_pop_label)
 
 	_wave_label = Label.new()
-	_wave_label.add_theme_font_size_override("font_size", 14)
+	_wave_label.add_theme_font_size_override("font_size", 18)
 	info_bar.add_child(_wave_label)
 
-	# 弹性占位
 	var spacer := Control.new()
 	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	info_bar.add_child(spacer)
 
-	_start_button = Button.new()
-	_start_button.text = "开战"
-	_start_button.pressed.connect(_on_start_pressed)
-	info_bar.add_child(_start_button)
-
-	# === 主行（下行）===
-	var main_row := HBoxContainer.new()
-	main_row.name = "MainRow"
-	main_row.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	main_row.add_theme_constant_override("separation", 8)
-	vbox.add_child(main_row)
-
-	# — 武器区 (~30%) —
-	var weapon_section := VBoxContainer.new()
-	weapon_section.name = "WeaponSection"
-	weapon_section.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	weapon_section.size_flags_stretch_ratio = 0.3
-	main_row.add_child(weapon_section)
-
-	var weapon_label := Label.new()
-	weapon_label.text = "武器"
-	weapon_label.add_theme_font_size_override("font_size", 10)
-	weapon_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	weapon_section.add_child(weapon_label)
-
-	_weapon_grid = GridContainer.new()
-	_weapon_grid.columns = 3
-	_weapon_grid.add_theme_constant_override("h_separation", 3)
-	_weapon_grid.add_theme_constant_override("v_separation", 3)
-	weapon_section.add_child(_weapon_grid)
-
-	# 分隔线
-	var sep1 := VSeparator.new()
-	main_row.add_child(sep1)
-
-	# — 商店卡片区 (~55%) —
-	var card_section := HBoxContainer.new()
-	card_section.name = "CardSection"
-	card_section.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	card_section.size_flags_stretch_ratio = 0.55
-	card_section.add_theme_constant_override("separation", 4)
-	main_row.add_child(card_section)
-
-	for i in range(4):
-		var card := _create_card(i)
-		card_section.add_child(card)
-
-	# 分隔线
-	var sep2 := VSeparator.new()
-	main_row.add_child(sep2)
-
-	# — 操作区 (~15%) —
-	var action_section := VBoxContainer.new()
-	action_section.name = "ActionSection"
-	action_section.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	action_section.size_flags_stretch_ratio = 0.15
-	action_section.add_theme_constant_override("separation", 4)
-	main_row.add_child(action_section)
+	_level_up_button = Button.new()
+	_level_up_button.text = "升级 $4"
+	_level_up_button.add_theme_font_size_override("font_size", 14)
+	_level_up_button.custom_minimum_size = Vector2(72, 28)
+	_level_up_button.pressed.connect(_on_level_up_pressed)
+	info_bar.add_child(_level_up_button)
 
 	_refresh_button = Button.new()
 	_refresh_button.text = "刷新 $2"
-	_refresh_button.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_refresh_button.add_theme_font_size_override("font_size", 14)
+	_refresh_button.custom_minimum_size = Vector2(72, 28)
 	_refresh_button.pressed.connect(_on_refresh_pressed)
-	action_section.add_child(_refresh_button)
+	info_bar.add_child(_refresh_button)
 
-	_level_up_button = Button.new()
-	_level_up_button.text = "升级 $4"
-	_level_up_button.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	_level_up_button.pressed.connect(_on_level_up_pressed)
-	action_section.add_child(_level_up_button)
+	# 商店卡片行
+	var shop_row := HBoxContainer.new()
+	shop_row.name = "ShopRow"
+	shop_row.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	shop_row.add_theme_constant_override("separation", 4)
+	mid_col.add_child(shop_row)
+
+	for i in range(4):
+		var card := _create_card(i)
+		shop_row.add_child(card)
+
+	# 分隔线
+	var sep2 := VSeparator.new()
+	main_hbox.add_child(sep2)
+
+	# ——— 右列：开战按钮（填满区域，垂直排字）———
+	_start_button = Button.new()
+	_start_button.text = "开\n战"
+	_start_button.add_theme_font_size_override("font_size", 24)
+	_start_button.custom_minimum_size = Vector2(48, 0)
+	_start_button.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_start_button.pressed.connect(_on_start_pressed)
+	main_hbox.add_child(_start_button)
 
 	# 武器菜单
 	_weapon_menu = PopupMenu.new()
@@ -212,11 +212,10 @@ func _update_ui() -> void:
 
 func _update_info_bar() -> void:
 	_coins_label.text = "$%d" % InventoryManager.coins
-	_level_label.text = "Lv.%d" % PlayerProgression.player_level
 	var pop_current: int = InventoryManager.get_population_used()
 	var pop_max: int = PlayerProgression.get_population_cap()
 	_pop_label.text = "人口 %d/%d" % [pop_current, pop_max]
-	_wave_label.text = "W%d" % PlayerState.current_wave
+	_wave_label.text = "第%d波" % PlayerState.current_wave
 
 func _update_cards() -> void:
 	var is_placing: bool = _pending_tower_slot_index >= 0
@@ -259,7 +258,6 @@ func _update_weapon_grid() -> void:
 		btn.custom_minimum_size = WEAPON_ICON_SIZE
 		btn.flat = true
 		btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-		# 图标
 		var weapon_data: WeaponData = GameConfig.weapons.get(entry.id)
 		if weapon_data and not weapon_data.icon_path.is_empty() and ResourceLoader.exists(weapon_data.icon_path):
 			var icon := TextureRect.new()
@@ -270,8 +268,11 @@ func _update_weapon_grid() -> void:
 			btn.add_child(icon)
 		btn.pressed.connect(_show_weapon_menu.bind(i))
 		_weapon_grid.add_child(btn)
-	# 空槽（填到 6 个）
-	var empty_count: int = max(6 - InventoryManager.deployed_weapons.size(), 0)
+	# 空槽（填到 9 个，3x3 撑满高度）
+	var total: int = max(9, InventoryManager.deployed_weapons.size())
+	if total % 3 != 0:
+		total = (total / 3 + 1) * 3
+	var empty_count: int = total - InventoryManager.deployed_weapons.size()
 	for i in range(empty_count):
 		var empty := Panel.new()
 		empty.custom_minimum_size = WEAPON_ICON_SIZE
