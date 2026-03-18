@@ -8,13 +8,13 @@
 [ext_resource type="Script" path="res://scripts/components/bounce_on_hit_component.gd" id="6_bounce"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_shuriken"]
-radius = 6.0
+radius = 8.0
 
 [node name="Shuriken" type="Node2D"]
 script = ExtResource("1_proj")
 
 [node name="Hitbox" type="Area2D" parent="." groups=["hitboxes"]]
-collision_layer = 4
+collision_layer = 16
 collision_mask = 128
 script = ExtResource("2_hitbox")
 

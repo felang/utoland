@@ -70,8 +70,8 @@ func _execute_melee(target: Node2D) -> void:
 	var hitbox := Hitbox.new()
 	hitbox.damage = get_final_damage()
 	hitbox.knockback_force = melee_config.knockback_force
-	hitbox.collision_layer = 4   # HITBOX layer
-	hitbox.collision_mask = 128  # HURTBOX layer
+	hitbox.collision_layer = 16  # PlayerAttack layer (层5)
+	hitbox.collision_mask = 128  # EnemyHurt layer (层8)
 	var shape := CollisionShape2D.new()
 	var circle := CircleShape2D.new()
 	circle.radius = melee_config.hit_radius

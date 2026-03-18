@@ -8,19 +8,19 @@
 [ext_resource type="Script" path="res://scripts/components/hitbox.gd" id="6_hitbox"]
 [ext_resource type="Script" path="res://scripts/components/hurtbox.gd" id="7_hurtbox"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_body"]
-size = Vector2(48, 48)
+[sub_resource type="CircleShape2D" id="CircleShape2D_body"]
+radius = 22.0
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_hitbox"]
-radius = 20.0
+radius = 16.0
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_hurtbox"]
-radius = 20.0
+radius = 24.0
 
 [node name="BossBrute" type="CharacterBody2D"]
 scale = Vector2(2, 2)
 collision_layer = 2
-collision_mask = 8
+collision_mask = 4
 script = ExtResource("1_script")
 
 [node name="Visual" type="ColorRect" parent="."]
@@ -31,7 +31,7 @@ offset_bottom = 24.0
 color = Color(0.8, 0.1, 0.1, 1)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-shape = SubResource("RectangleShape2D_body")
+shape = SubResource("CircleShape2D_body")
 
 [node name="HealthComponent" type="Node" parent="."]
 script = ExtResource("2_health")
@@ -55,7 +55,7 @@ shape = SubResource("CircleShape2D_hitbox")
 
 [node name="Hurtbox" type="Area2D" parent="."]
 collision_layer = 128
-collision_mask = 4
+collision_mask = 16
 script = ExtResource("7_hurtbox")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox"]

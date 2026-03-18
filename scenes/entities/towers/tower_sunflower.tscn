@@ -4,9 +4,13 @@
 [ext_resource type="Texture2D" path="res://assets/towers/sunflower/sprite.png" id="2_sprite"]
 [ext_resource type="Script" path="res://scripts/components/health_component.gd" id="3_health"]
 [ext_resource type="Script" path="res://scripts/components/generator_component.gd" id="4_generator"]
+[ext_resource type="Script" path="res://scripts/components/hurtbox.gd" id="5_hurtbox"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_body"]
 size = Vector2(32, 32)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_tower_hurtbox"]
+radius = 16.0
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_sun"]
 animations = [{
@@ -28,8 +32,8 @@ animations = [{
 }]
 
 [node name="TowerSunflower" type="StaticBody2D"]
-collision_layer = 8
-collision_mask = 0
+collision_layer = 4
+collision_mask = 3
 script = ExtResource("1_tower")
 
 [node name="Visual" type="AnimatedSprite2D" parent="."]
@@ -46,3 +50,13 @@ script = ExtResource("3_health")
 
 [node name="GeneratorComponent" type="Node" parent="."]
 script = ExtResource("4_generator")
+
+[node name="Hurtbox" type="Area2D" parent="."]
+collision_layer = 64
+collision_mask = 32
+script = ExtResource("5_hurtbox")
+repeat_damage = true
+repeat_interval = 1.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox"]
+shape = SubResource("CircleShape2D_tower_hurtbox")

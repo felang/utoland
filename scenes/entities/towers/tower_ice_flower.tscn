@@ -5,9 +5,13 @@
 [ext_resource type="Script" path="res://scripts/components/health_component.gd" id="3_health"]
 [ext_resource type="Script" path="res://scripts/components/target_finder_component.gd" id="4_target_finder"]
 [ext_resource type="Script" path="res://scripts/components/ranged_attack_component.gd" id="5_ranged_attack"]
+[ext_resource type="Script" path="res://scripts/components/hurtbox.gd" id="6_hurtbox"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_body"]
 size = Vector2(32, 32)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_tower_hurtbox"]
+radius = 16.0
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_ice"]
 animations = [{
@@ -29,8 +33,8 @@ animations = [{
 }]
 
 [node name="TowerIceFlower" type="StaticBody2D"]
-collision_layer = 8
-collision_mask = 2
+collision_layer = 4
+collision_mask = 3
 script = ExtResource("1_tower")
 
 [node name="Visual" type="AnimatedSprite2D" parent="."]
@@ -50,3 +54,13 @@ script = ExtResource("4_target_finder")
 
 [node name="RangedAttackComponent" type="Node" parent="."]
 script = ExtResource("5_ranged_attack")
+
+[node name="Hurtbox" type="Area2D" parent="."]
+collision_layer = 64
+collision_mask = 32
+script = ExtResource("6_hurtbox")
+repeat_damage = true
+repeat_interval = 1.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox"]
+shape = SubResource("CircleShape2D_tower_hurtbox")

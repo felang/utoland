@@ -1,20 +1,20 @@
 [gd_scene format=3 uid="uid://c45jgyl4kxvbv"]
 
 [ext_resource type="Script" uid="uid://bmd64dp53aq51" path="res://scripts/entities/player.gd" id="1_3vyb7"]
-[ext_resource type="Script" path="res://scripts/systems/camera_shake.gd" id="2_shake"]
-[ext_resource type="Script" path="res://scripts/components/health_component.gd" id="3_health"]
-[ext_resource type="Script" path="res://scripts/components/sprite_animator.gd" id="5_sprite"]
-[ext_resource type="Script" path="res://scripts/entities/weapons/weapon_manager.gd" id="6_wmanager"]
-[ext_resource type="Script" path="res://scripts/components/hurtbox.gd" id="7_hurtbox"]
+[ext_resource type="Script" uid="uid://el0rtsjwhuhc" path="res://scripts/systems/camera_shake.gd" id="2_shake"]
+[ext_resource type="Script" uid="uid://dhkti1lxuee1t" path="res://scripts/components/health_component.gd" id="3_health"]
+[ext_resource type="Script" uid="uid://ct4p4yj54jqds" path="res://scripts/components/sprite_animator.gd" id="5_sprite"]
+[ext_resource type="Script" uid="uid://bf70rjdekxu1k" path="res://scripts/entities/weapons/weapon_manager.gd" id="6_wmanager"]
+[ext_resource type="Script" uid="uid://ddn6hix1oc36n" path="res://scripts/components/hurtbox.gd" id="7_hurtbox"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_3vyb7"]
-size = Vector2(32, 32)
+[sub_resource type="CircleShape2D" id="CircleShape2D_body"]
+radius = 14.0
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_hurtbox"]
-radius = 13.0
+radius = 8.0
 
 [node name="Player" type="CharacterBody2D" unique_id=2056081713]
-collision_mask = 24
+collision_mask = 4
 script = ExtResource("1_3vyb7")
 
 [node name="Visual" type="ColorRect" parent="." unique_id=960031721]
@@ -25,24 +25,26 @@ offset_bottom = 16.0
 color = Color(0, 1, 0, 1)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=2001328548]
-shape = SubResource("RectangleShape2D_3vyb7")
+shape = SubResource("CircleShape2D_body")
 
 [node name="Camera" type="Camera2D" parent="." unique_id=1630942064]
 script = ExtResource("2_shake")
 
-[node name="HealthComponent" type="Node" parent="."]
+[node name="HealthComponent" type="Node" parent="." unique_id=523726489]
 script = ExtResource("3_health")
 
-[node name="SpriteAnimator" type="Node" parent="."]
+[node name="SpriteAnimator" type="Node" parent="." unique_id=1576584886]
 script = ExtResource("5_sprite")
 
-[node name="WeaponManager" type="Node2D" parent="."]
+[node name="WeaponManager" type="Node2D" parent="." unique_id=1672782666]
 script = ExtResource("6_wmanager")
 
-[node name="Hurtbox" type="Area2D" parent="."]
+[node name="Hurtbox" type="Area2D" parent="." unique_id=716001015]
 collision_layer = 64
 collision_mask = 32
 script = ExtResource("7_hurtbox")
+repeat_damage = true
+repeat_interval = 1.0
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox" unique_id=790979603]
 shape = SubResource("CircleShape2D_hurtbox")
