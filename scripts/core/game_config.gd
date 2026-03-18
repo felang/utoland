@@ -15,14 +15,22 @@ const PPU = 32
 const GRID_SIZE = 32
 
 # 地图网格数量（固定）
-const MAP_GRID_WIDTH = 41
-const MAP_GRID_HEIGHT = 28
+const MAP_GRID_WIDTH = 45
+const MAP_GRID_HEIGHT = 30
 
-# 地图尺寸（由网格数量计算）
+# 可活动区域（比地图小，左右缩 2 格，上下缩 1 格）
+const PLAY_AREA_GRID_WIDTH = 41
+const PLAY_AREA_GRID_HEIGHT = 28
+
+# 地图尺寸（由网格数量计算，相机边界用）
 var MAP_PIXEL_WIDTH: float = 0.0
 var MAP_PIXEL_HEIGHT: float = 0.0
 var MAP_HALF_WIDTH: float = 0.0
 var MAP_HALF_HEIGHT: float = 0.0
+
+# 可活动区域尺寸（碰撞墙用）
+var PLAY_HALF_WIDTH: float = 0.0
+var PLAY_HALF_HEIGHT: float = 0.0
 
 # 实体尺寸标准（像素）
 const ENTITY_SIZE_STANDARD = GRID_SIZE          # 32
@@ -143,6 +151,8 @@ func _compute_map_dimensions() -> void:
 	MAP_PIXEL_WIDTH = MAP_GRID_WIDTH * GRID_SIZE
 	MAP_PIXEL_HEIGHT = MAP_GRID_HEIGHT * GRID_SIZE
 	MAP_HALF_WIDTH = MAP_PIXEL_WIDTH / 2.0
+	PLAY_HALF_WIDTH = PLAY_AREA_GRID_WIDTH * GRID_SIZE / 2.0
+	PLAY_HALF_HEIGHT = PLAY_AREA_GRID_HEIGHT * GRID_SIZE / 2.0
 	MAP_HALF_HEIGHT = MAP_PIXEL_HEIGHT / 2.0
 
 
