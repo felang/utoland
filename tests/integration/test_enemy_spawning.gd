@@ -53,7 +53,7 @@ func test_enemy_config_from_gameconfig():
 	assert_eq(normal_enemy.health.max_hp, enemy_data.hp, "Normal enemy max HP should match config")
 	assert_eq(normal_enemy.health.current_hp, enemy_data.hp, "Normal enemy current HP should equal max HP")
 	assert_eq(normal_enemy.speed, enemy_data.speed, "Normal enemy speed should match config")
-	assert_eq(normal_enemy.tower_attack_damage, enemy_data.damage, "Normal enemy damage should match config")
+	assert_eq(normal_enemy._hitbox.damage, enemy_data.damage, "Normal enemy hitbox damage should match config")
 
 func test_fast_enemy_config():
 	# Test fast enemy configuration

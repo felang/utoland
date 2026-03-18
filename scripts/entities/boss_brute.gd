@@ -37,7 +37,6 @@ func _physics_process(delta: float) -> void:
 
 func _process_chase(delta: float) -> void:
 	# 正常追击（复用 enemy 逻辑）
-	attack_timer -= delta
 	_chase_player()
 
 	# 冲锋冷却计时

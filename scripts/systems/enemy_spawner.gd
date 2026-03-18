@@ -123,7 +123,6 @@ func _spawn_normal_enemy() -> void:
 			enemy.health.max_hp *= scaling.hp_mult
 			enemy.health.current_hp = enemy.health.max_hp
 			enemy._hitbox.damage *= scaling.damage_mult
-			enemy.tower_attack_damage *= scaling.damage_mult
 
 func _spawn_boss() -> void:
 	var boss: Node = SceneFactory.create_enemy(_current_wave_data.boss_id)

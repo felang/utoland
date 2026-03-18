@@ -1,7 +1,5 @@
 extends CharacterBody2D
 
-enum State { CHASE_PLAYER, ATTACK_TOWER }
-
 const COIN_SCATTER_RANGE: float = 40.0  # 金币掉落散布范围（像素）
 const EXP_SCATTER_RANGE: float = 40.0  # 经验球掉落散布范围（像素）
 
@@ -15,13 +13,7 @@ var is_elite: bool = false
 var _elite_coin_mult: float = 1.0
 var _elite_exp_mult: float = 1.0
 
-@export var tower_attack_rate: float = 1.0
-
 var speed: float
-var tower_attack_damage: float
-var current_state: int = State.CHASE_PLAYER
-var target_tower: Node2D = null
-var attack_timer: float = 0.0
 var player: Node2D = null
 
 # Root（定身）系统
@@ -43,7 +35,6 @@ func _ready() -> void:
 	health.initialize(data.hp)
 	_hitbox.damage = data.damage
 	speed = data.speed
-	tower_attack_damage = data.damage
 	slow_handler.initialize(data.speed)
 
 	add_to_group(Enums.Group.ENEMIES)
@@ -62,14 +53,8 @@ func _ready() -> void:
 	health.death_color = _sprite_animator.get_death_color_from_visual()
 	_sprite_animator.setup_enemy_sprite(sprite_config, target_size)
 
-func _physics_process(delta: float) -> void:
-	attack_timer -= delta
-
-	match current_state:
-		State.CHASE_PLAYER:
-			_chase_player()
-		State.ATTACK_TOWER:
-			_attack_tower(delta)
+func _physics_process(_delta: float) -> void:
+	_chase_player()
 
 func _chase_player() -> void:
 	if is_rooted:
@@ -78,23 +63,6 @@ func _chase_player() -> void:
 		velocity = position.direction_to(player.global_position) * speed
 		move_and_slide()
 		_sprite_animator.update_animation_no_idle(velocity)
-
-		for i in get_slide_collision_count():
-			var collision: KinematicCollision2D = get_slide_collision(i)
-			var collider: Object = collision.get_collider()
-			if collider and collider.is_in_group(Enums.Group.TOWERS):
-				current_state = State.ATTACK_TOWER
-				target_tower = collider
-				velocity = Vector2.ZERO
-
-func _attack_tower(_delta: float) -> void:
-	if not is_instance_valid(target_tower):
-		current_state = State.CHASE_PLAYER
-		return
-
-	if attack_timer <= 0:
-		target_tower.take_damage(tower_attack_damage, self)
-		attack_timer = tower_attack_rate
 
 func take_damage(amount: float) -> void:
 	health.take_damage(amount)
@@ -144,7 +112,6 @@ func apply_elite(hp_mult: float, damage_mult: float, coin_mult: float, scale_mul
 	_elite_exp_mult = exp_mult
 	health.max_hp *= hp_mult
 	health.current_hp = health.max_hp
-	tower_attack_damage *= damage_mult
 	_hitbox.damage *= damage_mult
 	scale *= scale_mult
 	add_to_group("elites")
@@ -201,10 +168,7 @@ func reset_for_pool() -> void:
 	_elite_coin_mult = 1.0
 	_elite_exp_mult = 1.0
 	scale = Vector2.ONE
-	current_state = State.CHASE_PLAYER
-	target_tower = null
 	velocity = Vector2.ZERO
-	attack_timer = 0.0
 	if _sprite_animator._sprite:
 		_sprite_animator._sprite.play("walk_down")
 		_sprite_animator._current_anim = "walk_down"

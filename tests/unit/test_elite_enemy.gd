@@ -30,9 +30,9 @@ func test_apply_elite_boosts_hp():
 func test_apply_elite_boosts_damage():
 	var enemy = SceneFactory.create_enemy(Enums.Enemy.NORMAL)
 	test_scene.add_child(enemy)
-	var base_damage: float = enemy.tower_attack_damage
+	var base_damage: float = enemy._hitbox.damage
 	enemy.apply_elite(1.5, 1.3, 2.0, 1.2, 3.0)
-	assert_almost_eq(enemy.tower_attack_damage, base_damage * 1.3, 0.01)
+	assert_almost_eq(enemy._hitbox.damage, base_damage * 1.3, 0.01)
 
 func test_apply_elite_sets_coin_mult():
 	var enemy = SceneFactory.create_enemy(Enums.Enemy.NORMAL)

@@ -66,7 +66,6 @@ func create_enemy(type: String) -> CharacterBody2D:
 	if _pools.has(key) and enemy.health != null and enemy.data:
 		enemy.health.initialize(enemy.data.hp)
 		enemy.speed = enemy.data.speed
-		enemy.tower_attack_damage = enemy.data.damage
 		enemy._hitbox.damage = enemy.data.damage
 		enemy.slow_handler.initialize(enemy.data.speed)
 	# 重新获取 player 引用（仅复用时需要，新实例在 _ready 中获取）

@@ -33,8 +33,8 @@ func test_coin_reset_for_pool():
 	coin.reset_for_pool()
 	assert_eq(coin.value, 1, "reset 后 value 应为 1")
 	assert_false(coin.is_attracted, "reset 后 is_attracted 应为 false")
-	assert_eq(coin.attract_speed, 250.0, "reset 后 attract_speed 应为默认值")
-	assert_eq(coin.attract_range, 75.0, "reset 后 attract_range 应为默认值")
+	assert_eq(coin.attract_speed, 500.0, "reset 后 attract_speed 应为默认值")
+	assert_eq(coin.attract_range, 150.0, "reset 后 attract_range 应为默认值")
 	assert_null(coin.player, "reset 后 player 应为 null")
 	assert_eq(coin.modulate.a, 1.0, "reset 后 modulate.a 应为 1.0")
 	assert_eq(coin.scale, Vector2.ONE, "reset 后 scale 应为 ONE")
@@ -73,8 +73,8 @@ func test_exp_orb_reset_for_pool():
 	orb.reset_for_pool()
 	assert_eq(orb.value, 1, "reset 后 value 应为 1")
 	assert_false(orb.is_attracted, "reset 后 is_attracted 应为 false")
-	assert_eq(orb.attract_speed, 200.0, "reset 后 attract_speed 应为默认值")
-	assert_eq(orb.attract_range, 30.0, "reset 后 attract_range 应为默认值")
+	assert_eq(orb.attract_speed, 400.0, "reset 后 attract_speed 应为默认值")
+	assert_eq(orb.attract_range, 60.0, "reset 后 attract_range 应为默认值")
 	assert_null(orb.player, "reset 后 player 应为 null")
 	orb.queue_free()
 
@@ -133,19 +133,14 @@ func test_enemy_reset_for_pool():
 	enemy._elite_coin_mult = 2.0
 	enemy._elite_exp_mult = 2.0
 	enemy.scale = Vector2(1.5, 1.5)
-	enemy.current_state = enemy.State.ATTACK_TOWER
 	enemy.velocity = Vector2(100, 0)
-	enemy.attack_timer = 0.5
 	enemy.visible = false
 	enemy.reset_for_pool()
 	assert_false(enemy.is_elite, "reset 后 is_elite 应为 false")
 	assert_eq(enemy._elite_coin_mult, 1.0, "reset 后 coin mult 应为 1.0")
 	assert_eq(enemy._elite_exp_mult, 1.0, "reset 后 exp mult 应为 1.0")
 	assert_eq(enemy.scale, Vector2.ONE, "reset 后 scale 应为 ONE")
-	assert_eq(enemy.current_state, enemy.State.CHASE_PLAYER, "reset 后应为 CHASE_PLAYER")
-	assert_null(enemy.target_tower, "reset 后 target_tower 应为 null")
 	assert_eq(enemy.velocity, Vector2.ZERO, "reset 后 velocity 应为 ZERO")
-	assert_eq(enemy.attack_timer, 0.0, "reset 后 attack_timer 应为 0")
 	assert_true(enemy.visible, "reset 后应可见")
 	enemy.queue_free()
 
@@ -157,7 +152,6 @@ func test_enemy_pool_reuse_reinitializes():
 	add_child(enemy1)
 	var original_speed: float = enemy1.speed
 	enemy1.speed = 999.0
-	enemy1.tower_attack_damage = 999.0
 	SceneFactory.release_enemy(enemy1)
 	await get_tree().process_frame
 	var enemy2: CharacterBody2D = SceneFactory.create_enemy(Enums.Enemy.NORMAL)
