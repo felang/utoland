@@ -7,7 +7,7 @@ extends Node2D
 signal weapon_attack_executed(target: Node2D)  # 任意武器命中时广播（用于 swift_combo 连击更新）
 
 const ORBIT_SPEED: float = TAU / 8.0
-const SPRITE_SCALE: float = 6.0
+const SPRITE_SCALE: float = 12.0
 
 # 武器精灵颜色映射（后备方案，无 icon 时使用）
 const WEAPON_COLORS: Dictionary = {
@@ -57,6 +57,7 @@ func add_weapon(weapon_id: String, level: int) -> void:
 	sprite.name = "WeaponSprite"
 	sprite.rotation = weapon_data.sprite_rotation_offset
 	_setup_weapon_sprite(sprite, weapon_id)
+	sprite.scale = Vector2(2, 2)
 	offset.add_child(sprite)
 
 	var fire_point := Marker2D.new()
@@ -229,7 +230,7 @@ func _setup_click_area(sprite: Sprite2D, index: int) -> void:
 	click_area.name = "ClickArea"
 	var shape := CollisionShape2D.new()
 	var rect := RectangleShape2D.new()
-	rect.size = Vector2(12, 12)
+	rect.size = Vector2(24, 24)
 	shape.shape = rect
 	click_area.add_child(shape)
 	click_area.input_event.connect(func(_vp: Node, event: InputEvent, _idx: int) -> void:
