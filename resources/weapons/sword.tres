@@ -20,3 +20,4 @@ sell_price_per_level = PackedInt32Array(3, 7, 21)
 attack_config = SubResource("AttackConfigData_sword")
 melee_config = ExtResource("3")
 pivot_offset = 10.0
+sprite_rotation_offset = -1.5708
