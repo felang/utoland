@@ -10,14 +10,33 @@ func init_containers(entity_layer: Node2D, projectile_layer: Node2D, pickup_laye
 	_projectile_layer = projectile_layer
 	_pickup_layer = pickup_layer
 
-func get_entity_layer() -> Node2D:
-	return _entity_layer
+func get_entity_layer() -> Node:
+	if _entity_layer:
+		return _entity_layer
+	# 测试环境未初始化容器时，回退到场景树根节点
+	if get_tree():
+		if get_tree().current_scene:
+			return get_tree().current_scene
+		return get_tree().root
+	return null
 
-func get_projectile_layer() -> Node2D:
-	return _projectile_layer
+func get_projectile_layer() -> Node:
+	if _projectile_layer:
+		return _projectile_layer
+	if get_tree():
+		if get_tree().current_scene:
+			return get_tree().current_scene
+		return get_tree().root
+	return null
 
-func get_pickup_layer() -> Node2D:
-	return _pickup_layer
+func get_pickup_layer() -> Node:
+	if _pickup_layer:
+		return _pickup_layer
+	if get_tree():
+		if get_tree().current_scene:
+			return get_tree().current_scene
+		return get_tree().root
+	return null
 
 class PoolEntry:
 	var scene: PackedScene

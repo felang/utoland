@@ -3,30 +3,33 @@ extends GutTest
 func test_player_size_matches_grid():
 	var scene = load("res://scenes/entities/player.tscn").instantiate()
 	add_child_autofree(scene)
-	var shape: RectangleShape2D = scene.get_node("CollisionShape2D").shape
-	assert_eq(shape.size, Vector2(16, 16))
+	var shape: CircleShape2D = scene.get_node("CollisionShape2D").shape
+	assert_eq(shape.radius, 14.0)
 
 func test_enemy_sizes_match_new_standard():
 	var normal = SceneFactory.create_enemy(Enums.Enemy.NORMAL)
 	add_child_autofree(normal)
-	assert_eq(normal.get_node("CollisionShape2D").shape.size, Vector2(16, 16))
+	assert_true(normal.get_node("CollisionShape2D").shape is CircleShape2D, "普通敌人碰撞形状应为 CircleShape2D")
+	assert_eq(normal.get_node("CollisionShape2D").shape.radius, 14.0)
 
 	var fast = SceneFactory.create_enemy(Enums.Enemy.FAST)
 	add_child_autofree(fast)
-	assert_eq(fast.get_node("CollisionShape2D").shape.size, Vector2(16, 16))
+	assert_true(fast.get_node("CollisionShape2D").shape is CircleShape2D, "快速敌人碰撞形状应为 CircleShape2D")
+	assert_eq(fast.get_node("CollisionShape2D").shape.radius, 14.0)
 
 	var tank = SceneFactory.create_enemy(Enums.Enemy.TANK)
 	add_child_autofree(tank)
-	assert_eq(tank.get_node("CollisionShape2D").shape.size, Vector2(32, 32))
+	assert_true(tank.get_node("CollisionShape2D").shape is CircleShape2D, "坦克敌人碰撞形状应为 CircleShape2D")
+	assert_eq(tank.get_node("CollisionShape2D").shape.radius, 14.0)
 
 func test_tower_sizes_match_new_standard():
 	var shooter = SceneFactory.create_tower(Enums.TowerId.PEA_SHOOTER)
 	add_child_autofree(shooter)
-	assert_eq(shooter.get_node("CollisionShape2D").shape.size, Vector2(16, 16))
+	assert_eq(shooter.get_node("CollisionShape2D").shape.size, Vector2(32, 32))
 
 	var slow = SceneFactory.create_tower(Enums.TowerId.ICE_FLOWER)
 	add_child_autofree(slow)
-	assert_eq(slow.get_node("CollisionShape2D").shape.size, Vector2(16, 16))
+	assert_eq(slow.get_node("CollisionShape2D").shape.size, Vector2(32, 32))
 
 func test_bullet_projectile_and_coin_sizes_match_new_standard():
 	var pd := ProjectileData.new()

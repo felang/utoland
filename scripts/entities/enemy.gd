@@ -83,7 +83,7 @@ func _on_died() -> void:
 	SceneFactory.release_enemy(self)
 
 func _drop_coins() -> void:
-	var pickup_layer: Node2D = SceneFactory.get_pickup_layer()
+	var pickup_layer: Node = SceneFactory.get_pickup_layer()
 	if not pickup_layer:
 		return
 
@@ -95,7 +95,7 @@ func _drop_coins() -> void:
 		pickup_layer.call_deferred("add_child", coin)
 
 func _drop_exp_orbs() -> void:
-	var pickup_layer: Node2D = SceneFactory.get_pickup_layer()
+	var pickup_layer: Node = SceneFactory.get_pickup_layer()
 	if not pickup_layer:
 		return
 

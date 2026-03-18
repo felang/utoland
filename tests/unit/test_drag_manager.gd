@@ -14,13 +14,16 @@ func before_each() -> void:
 	InventoryManager.deployed_towers = []
 	_tower_container = Node2D.new()
 	add_child(_tower_container)
+	# 初始化 SceneFactory 容器，让 spawn_tower_node 能正确添加到 entity_layer
+	SceneFactory.init_containers(_tower_container, _tower_container, _tower_container)
 	_drag_manager = load("res://scripts/systems/drag_manager.gd").new()
-	_drag_manager._tower_container = _tower_container
 	add_child(_drag_manager)
 
 func after_each() -> void:
 	_drag_manager.queue_free()
 	_tower_container.queue_free()
+	# 清理 SceneFactory 容器引用，避免影响其他测试
+	SceneFactory.init_containers(null, null, null)
 
 func test_grid_to_world_conversion() -> void:
 	# X: 格子水平中心 = grid_x * 32 + 16 - MAP_HALF_WIDTH
