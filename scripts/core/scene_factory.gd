@@ -1,5 +1,24 @@
 extends Node
 
+# 分层容器引用（由 main.gd 在 _ready() 中注入）
+var _entity_layer: Node2D
+var _projectile_layer: Node2D
+var _pickup_layer: Node2D
+
+func init_containers(entity_layer: Node2D, projectile_layer: Node2D, pickup_layer: Node2D) -> void:
+	_entity_layer = entity_layer
+	_projectile_layer = projectile_layer
+	_pickup_layer = pickup_layer
+
+func get_entity_layer() -> Node2D:
+	return _entity_layer
+
+func get_projectile_layer() -> Node2D:
+	return _projectile_layer
+
+func get_pickup_layer() -> Node2D:
+	return _pickup_layer
+
 class PoolEntry:
 	var scene: PackedScene
 	var idle_queue: Array[Node] = []

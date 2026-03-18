@@ -3,16 +3,18 @@ extends Node2D
 enum Phase { SHOP, BATTLE }
 
 var current_phase: Phase = Phase.SHOP
-var _tower_container: Node2D = null
 var _shop_overlay: CanvasLayer = null
 var _drag_manager: Node = null
 
-func _ready() -> void:
-	_tower_container = Node2D.new()
-	_tower_container.name = "TowerContainer"
-	add_child(_tower_container)
+@onready var _entity_layer: Node2D = $EntityLayer
+@onready var _projectile_layer: Node2D = $ProjectileLayer
+@onready var _pickup_layer: Node2D = $PickupLayer
 
+func _ready() -> void:
 	_load_map()
+
+	# 初始化分层容器（供 SceneFactory 全局使用）
+	SceneFactory.init_containers(_entity_layer, _projectile_layer, _pickup_layer)
 
 	# ShopOverlay（预先在 main.tscn 中实例化）
 	_shop_overlay = $ShopOverlay
@@ -20,11 +22,11 @@ func _ready() -> void:
 
 	# DragManager（预先在 main.tscn 中添加）
 	_drag_manager = $DragManager
-	_drag_manager.initialize(_tower_container, $Player)
+	_drag_manager.initialize(_entity_layer, $EntityLayer/Player)
 	_shop_overlay.drag_manager = _drag_manager
 
 	# WeaponManager 注入（Player 的子节点）
-	var player: Node2D = $Player
+	var player: Node2D = $EntityLayer/Player
 	if player.has_node("WeaponManager"):
 		var wm: WeaponManager = player.get_node("WeaponManager")
 		_shop_overlay.weapon_manager = wm
@@ -47,7 +49,7 @@ func _ready() -> void:
 
 func _enter_shop_phase(is_first: bool = false) -> void:
 	current_phase = Phase.SHOP
-	$Player.set_input_enabled(true)
+	$EntityLayer/Player.set_input_enabled(true)
 	_drag_manager.set_shop_mode(true)
 
 	# 波次结束奖励金币（首次不发）
@@ -57,7 +59,7 @@ func _enter_shop_phase(is_first: bool = false) -> void:
 		InventoryManager.coins += reward
 		StatsTracker.record_coins_earned(reward)
 		EventBus.coins_changed.emit(reward, InventoryManager.coins)
-		var player_node: Node2D = $Player
+		var player_node: Node2D = $EntityLayer/Player
 		if player_node:
 			player_node.coins = InventoryManager.coins
 
