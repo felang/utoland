@@ -25,8 +25,8 @@ var MAP_HALF_WIDTH: float = 0.0
 var MAP_HALF_HEIGHT: float = 0.0
 
 # 实体尺寸标准（像素）
-const ENTITY_SIZE_STANDARD = GRID_SIZE      # 30
-const ENTITY_SIZE_TANK = GRID_SIZE * 2          # 32
+const ENTITY_SIZE_STANDARD = GRID_SIZE          # 32
+const ENTITY_SIZE_TANK = GRID_SIZE * 2          # 64
 const BULLET_SIZE = int(GRID_SIZE * 0.2)    # 6
 const COIN_RADIUS = int(GRID_SIZE * 0.2)    # 6
 
