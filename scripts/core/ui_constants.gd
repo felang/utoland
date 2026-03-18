@@ -27,28 +27,28 @@ const COLOR_HUD_COIN_BG := Color("#8a6c00")      # 金币图标背景
 const COLOR_HUD_HP_YELLOW := Color("#e6c84b")    # HP 中等血量黄色
 
 # HUD 尺寸
-const HUD_ICON_FONT_SIZE := 8                    # 图标内符号字号
-const HUD_ICON_BORDER := 1                       # 图标边框宽度
-const HUD_ICON_CORNER := 2                       # 图标圆角
-const HUD_BAR_WIDTH := 80                        # 进度条宽度
-const HUD_HP_BAR_HEIGHT := 10                    # HP 条高度
-const HUD_XP_BAR_HEIGHT := 8                     # XP 条高度
-const HUD_BAR_CORNER := 1                        # 进度条圆角
-const HUD_WAVE_PADDING_H := 8                    # 波次面板水平内边距
-const HUD_WAVE_PADDING_V := 2                    # 波次面板垂直内边距
+const HUD_ICON_FONT_SIZE := 12                   # 图标内符号字号
+const HUD_ICON_BORDER := 2                       # 图标边框宽度
+const HUD_ICON_CORNER := 3                       # 图标圆角
+const HUD_BAR_WIDTH := 120                       # 进度条宽度
+const HUD_HP_BAR_HEIGHT := 15                    # HP 条高度
+const HUD_XP_BAR_HEIGHT := 12                    # XP 条高度
+const HUD_BAR_CORNER := 2                        # 进度条圆角
+const HUD_WAVE_PADDING_H := 12                   # 波次面板水平内边距
+const HUD_WAVE_PADDING_V := 3                    # 波次面板垂直内边距
 
 # ===== 字号 =====
-const FONT_SIZE_TITLE := 32
-const FONT_SIZE_SUBTITLE := 24
-const FONT_SIZE_BODY := 18
-const FONT_SIZE_SMALL := 14
-const FONT_SIZE_TINY := 12
+const FONT_SIZE_TITLE := 48
+const FONT_SIZE_SUBTITLE := 36
+const FONT_SIZE_BODY := 27
+const FONT_SIZE_SMALL := 21
+const FONT_SIZE_TINY := 18
 
 # ===== 间距 =====
-const MARGIN_SCREEN := 12
-const MARGIN_PANEL := 16
-const GAP_ITEMS := 12
-const GAP_SECTIONS := 20
+const MARGIN_SCREEN := 18
+const MARGIN_PANEL := 24
+const GAP_ITEMS := 18
+const GAP_SECTIONS := 30
 
 # ===== 圆角 =====
 const CORNER_RADIUS_BUTTON := 8

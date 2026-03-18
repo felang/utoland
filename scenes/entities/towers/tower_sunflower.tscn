@@ -6,7 +6,7 @@
 [ext_resource type="Script" path="res://scripts/components/generator_component.gd" id="4_generator"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_body"]
-size = Vector2(16, 16)
+size = Vector2(32, 32)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_sun"]
 animations = [{
@@ -33,6 +33,7 @@ collision_mask = 0
 script = ExtResource("1_tower")
 
 [node name="Visual" type="AnimatedSprite2D" parent="."]
+scale = Vector2(2, 2)
 sprite_frames = SubResource("SpriteFrames_sun")
 animation = &"idle"
 autoplay = "idle"

@@ -4,7 +4,7 @@ extends CanvasLayer
 signal start_battle_pressed
 
 const SLIDE_DURATION := 0.3
-const CARD_ICON_SIZE := Vector2(16, 16)
+const CARD_ICON_SIZE := Vector2(24, 24)
 
 var _shop_manager: ShopManager
 var _panel: PanelContainer
@@ -63,12 +63,12 @@ func _setup_ui() -> void:
 
 	_coins_label = Label.new()
 	_coins_label.text = "$0"
-	_coins_label.add_theme_font_size_override("font_size", 9)
+	_coins_label.add_theme_font_size_override("font_size", 14)
 	line1.add_child(_coins_label)
 
 	_level_label = Label.new()
 	_level_label.text = "Lv.1"
-	_level_label.add_theme_font_size_override("font_size", 9)
+	_level_label.add_theme_font_size_override("font_size", 14)
 	line1.add_child(_level_label)
 
 	# 第二行：人口 + 波次
@@ -78,12 +78,12 @@ func _setup_ui() -> void:
 
 	_pop_label = Label.new()
 	_pop_label.text = "人口 0/2"
-	_pop_label.add_theme_font_size_override("font_size", 9)
+	_pop_label.add_theme_font_size_override("font_size", 14)
 	line2.add_child(_pop_label)
 
 	_wave_label = Label.new()
 	_wave_label.text = "W0"
-	_wave_label.add_theme_font_size_override("font_size", 9)
+	_wave_label.add_theme_font_size_override("font_size", 14)
 	line2.add_child(_wave_label)
 
 	# --- 卡片列表（纵向排列）---
@@ -106,7 +106,7 @@ func _setup_ui() -> void:
 	# --- 回收区 ---
 	_recycle_area = PanelContainer.new()
 	_recycle_area.name = "RecycleArea"
-	_recycle_area.custom_minimum_size = Vector2(0, 40)
+	_recycle_area.custom_minimum_size = Vector2(0, 60)
 	var recycle_label := Label.new()
 	recycle_label.text = "回收"
 	recycle_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -139,12 +139,12 @@ func _create_card(index: int) -> PanelContainer:
 
 	var name_label := Label.new()
 	name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	name_label.add_theme_font_size_override("font_size", 9)
+	name_label.add_theme_font_size_override("font_size", 14)
 	hbox.add_child(name_label)
 	_card_names.append(name_label)
 
 	var price_label := Label.new()
-	price_label.add_theme_font_size_override("font_size", 9)
+	price_label.add_theme_font_size_override("font_size", 14)
 	price_label.add_theme_color_override("font_color", Color(1.0, 0.84, 0.0))
 	hbox.add_child(price_label)
 	_card_prices.append(price_label)

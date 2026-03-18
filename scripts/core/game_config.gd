@@ -30,13 +30,13 @@ const ENTITY_SIZE_TANK = GRID_SIZE * 2          # 64
 const BULLET_SIZE = int(GRID_SIZE * 0.2)    # 6
 const COIN_RADIUS = int(GRID_SIZE * 0.2)    # 6
 
-# UI 尺寸标准（640x360 逻辑分辨率）
-const UI_BUTTON_SIZE = Vector2(160, 36)
-const UI_BUTTON_SMALL_SIZE = Vector2(120, 32)
-const UI_MAP_CARD_SIZE = Vector2(240, 140)
-const UI_RESULT_PANEL_SIZE = Vector2(320, 220)
-const UI_SHOP_PANEL_SIZE = Vector2(560, 300)
-const UI_CARD_GAP = 20
+# UI 尺寸标准（960x540 逻辑分辨率）
+const UI_BUTTON_SIZE = Vector2(240, 54)
+const UI_BUTTON_SMALL_SIZE = Vector2(180, 48)
+const UI_MAP_CARD_SIZE = Vector2(360, 210)
+const UI_RESULT_PANEL_SIZE = Vector2(480, 330)
+const UI_SHOP_PANEL_SIZE = Vector2(840, 450)
+const UI_CARD_GAP = 30
 
 # ===== 玩家配置（保持 const 避免 Autoload 顺序问题） =====
 const PLAYER = {

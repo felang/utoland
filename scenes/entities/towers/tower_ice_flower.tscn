@@ -7,7 +7,7 @@
 [ext_resource type="Script" path="res://scripts/components/ranged_attack_component.gd" id="5_ranged_attack"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_body"]
-size = Vector2(16, 16)
+size = Vector2(32, 32)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_ice"]
 animations = [{
@@ -34,6 +34,7 @@ collision_mask = 2
 script = ExtResource("1_tower")
 
 [node name="Visual" type="AnimatedSprite2D" parent="."]
+scale = Vector2(2, 2)
 sprite_frames = SubResource("SpriteFrames_ice")
 animation = &"idle"
 autoplay = "idle"
