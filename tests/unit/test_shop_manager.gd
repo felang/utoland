@@ -153,10 +153,10 @@ func test_buy_weapon_returns_true_on_success() -> void:
 	var result: bool = _shop.buy_weapon(0)
 	assert_true(result, "购买成功应返回 true")
 
-# ===== buy_weapon 触发合成 =====
+# ===== buy_weapon 不再自动合成 =====
 
-func test_buy_weapon_triggers_merge_when_3_of_same() -> void:
-	# deployed 中已有同 ID Lv1 物品 x2，再购买第 3 个触发合成 -> 变成 Lv2
+func test_buy_weapon_no_auto_merge_when_same_exists() -> void:
+	# 合成改为手动触发，购买后不自动合成，武器直接加入 deployed
 	InventoryManager.coins = 9999
 	PlayerProgression.player_level = 4  # 人口上限 5，允许第 3 个装备
 	InventoryManager.deployed_weapons.append({id = "bow", level = 1})
@@ -166,12 +166,10 @@ func test_buy_weapon_triggers_merge_when_3_of_same() -> void:
 		{}, {}, {}
 	]
 	_shop.buy_weapon(0)
-	# 3 个 bow Lv1 -> 合成为 1 个 bow Lv2
-	var lv2_count: int = 0
+	# 购买后不自动合成，应有 3 个 Lv1
+	assert_eq(InventoryManager.deployed_weapons.size(), 3, "购买后不应自动合成，应有 3 个 Lv1 武器")
 	for item in InventoryManager.deployed_weapons:
-		if item.id == "bow" and item.level == 2:
-			lv2_count += 1
-	assert_eq(lv2_count, 1, "3 个同 ID Lv1 购买后应合成为 1 个 Lv2")
+		assert_eq(item.level, 1, "所有武器应保持 Lv1")
 
 # ===== confirm_tower_purchase =====
 
@@ -254,9 +252,9 @@ func test_slot_cost_matches_item_cost() -> void:
 			assert_eq(slot.cost, config.item_cost,
 				"槽位费用应与 item_cost 一致")
 
-# ===== 人口满时合成可购买 =====
+# ===== 人口满时不允许购买（合成已改为手动触发）=====
 
-func test_buy_weapon_succeeds_when_pop_full_but_merge_possible() -> void:
+func test_buy_weapon_fails_when_pop_full() -> void:
 	PlayerProgression.player_level = 1  # 人口上限 2
 	InventoryManager.deployed_weapons.append({id = "bow", level = 1})
 	InventoryManager.deployed_weapons.append({id = "bow", level = 1})
@@ -266,12 +264,11 @@ func test_buy_weapon_succeeds_when_pop_full_but_merge_possible() -> void:
 		{}, {}, {}
 	]
 	var result: bool = _shop.buy_weapon(0)
-	assert_true(result, "人口满但可合成时应允许购买")
-	# 合成后应只剩 1 个 Lv2
-	assert_eq(InventoryManager.deployed_weapons.size(), 1)
-	assert_eq(InventoryManager.deployed_weapons[0].level, 2)
+	assert_false(result, "人口满时不应允许购买（合成改为手动触发）")
+	# 人口满购买失败，武器数量不变
+	assert_eq(InventoryManager.deployed_weapons.size(), 2)
 
-func test_confirm_tower_purchase_succeeds_when_pop_full_but_merge_possible() -> void:
+func test_confirm_tower_purchase_fails_when_pop_full() -> void:
 	PlayerProgression.player_level = 1  # 人口上限 2
 	InventoryManager.deployed_towers.append({id = "pea_shooter", level = 1, grid_pos = Vector2i(0, 0), deploy_id = 1})
 	InventoryManager.deployed_towers.append({id = "pea_shooter", level = 1, grid_pos = Vector2i(1, 0), deploy_id = 2})
@@ -281,6 +278,5 @@ func test_confirm_tower_purchase_succeeds_when_pop_full_but_merge_possible() -> 
 		{}, {}, {}
 	]
 	var deploy_id: int = _shop.confirm_tower_purchase(0, Vector2i(2, 0))
-	assert_gt(deploy_id, 0, "人口满但可合成时应允许购买塔")
-	assert_eq(InventoryManager.deployed_towers.size(), 1)
-	assert_eq(InventoryManager.deployed_towers[0].level, 2)
+	assert_eq(deploy_id, 0, "人口满时不应允许购买塔（合成改为手动触发）")
+	assert_eq(InventoryManager.deployed_towers.size(), 2)

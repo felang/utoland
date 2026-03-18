@@ -17,18 +17,8 @@ func get_population_used() -> int:
 func can_deploy() -> bool:
 	return get_population_used() < PlayerProgression.get_population_cap()
 
-func can_buy_item(item_id: String, item_level: int) -> bool:
-	if can_deploy():
-		return true
-	# 人口满，检查是否能触发合成（已有 >= 2 个同 id 同 level）
-	var count: int = 0
-	for w in deployed_weapons:
-		if w.id == item_id and w.level == item_level:
-			count += 1
-	for t in deployed_towers:
-		if t.id == item_id and t.level == item_level:
-			count += 1
-	return count >= 2
+func can_buy_item(item_id: String, _item_level: int) -> bool:
+	return can_deploy()
 
 func buy_and_equip_weapon(weapon_id: String, cost: int) -> bool:
 	if not can_buy_item(weapon_id, 1):
@@ -40,7 +30,6 @@ func buy_and_equip_weapon(weapon_id: String, cost: int) -> bool:
 	var item := {id = weapon_id, type = "weapon", level = 1}
 	EventBus.item_purchased.emit(item)
 	EventBus.coins_changed.emit(-cost, coins)
-	_check_merge(weapon_id, 1)
 	return true
 
 func buy_and_place_tower(tower_id: String, cost: int, grid_pos: Vector2i) -> int:
@@ -55,7 +44,6 @@ func buy_and_place_tower(tower_id: String, cost: int, grid_pos: Vector2i) -> int
 	var item := {id = tower_id, type = "tower", level = 1}
 	EventBus.item_purchased.emit(item)
 	EventBus.coins_changed.emit(-cost, coins)
-	_check_merge(tower_id, 1)
 	return deploy_id
 
 func move_tower(deploy_id: int, new_grid_pos: Vector2i) -> bool:
@@ -115,7 +103,7 @@ func _check_merge(item_id: String, item_level: int) -> void:
 	if item_level >= 3:
 		return
 	var all_items: Array[Dictionary] = _collect_items_by_id_level(item_id, item_level)
-	if all_items.size() < 3:
+	if all_items.size() < 2:
 		return
 	var consumed: int = 0
 	var item_type: String = ""
@@ -123,7 +111,7 @@ func _check_merge(item_id: String, item_level: int) -> void:
 	var kept_tower_deploy_id: int = 0
 	# 从 deployed_weapons 回收
 	var i: int = deployed_weapons.size() - 1
-	while i >= 0 and consumed < 3:
+	while i >= 0 and consumed < 2:
 		if deployed_weapons[i].id == item_id and deployed_weapons[i].level == item_level:
 			item_type = "weapon"
 			deployed_weapons.remove_at(i)
@@ -131,7 +119,7 @@ func _check_merge(item_id: String, item_level: int) -> void:
 		i -= 1
 	# 从 deployed_towers 回收
 	i = deployed_towers.size() - 1
-	while i >= 0 and consumed < 3:
+	while i >= 0 and consumed < 2:
 		if deployed_towers[i].id == item_id and deployed_towers[i].level == item_level:
 			item_type = "tower"
 			if kept_tower_deploy_id == 0:
@@ -148,6 +136,61 @@ func _check_merge(item_id: String, item_level: int) -> void:
 		deployed_towers.append({id = item_id, level = new_level, grid_pos = kept_tower_pos, deploy_id = kept_tower_deploy_id})
 	EventBus.item_merged.emit(item_id, new_level)
 	_check_merge(item_id, new_level)
+
+## 手动合成武器：保留 weapon_index 位置原地升级，移除配对武器
+func merge_weapon(weapon_index: int) -> bool:
+	if weapon_index < 0 or weapon_index >= deployed_weapons.size():
+		return false
+	var entry: Dictionary = deployed_weapons[weapon_index]
+	var item_id: String = entry.id
+	var item_level: int = entry.level
+	if item_level >= 3:
+		return false
+	# 寻找另一个同 id 同 level 的武器
+	var pair_index: int = -1
+	for i in range(deployed_weapons.size()):
+		if i != weapon_index and deployed_weapons[i].id == item_id and deployed_weapons[i].level == item_level:
+			pair_index = i
+			break
+	if pair_index == -1:
+		return false
+	# 移除配对武器，保留 weapon_index 位置原地升级
+	deployed_weapons.remove_at(pair_index)
+	# pair_index 在前时，weapon_index 会偏移
+	var actual_index: int = weapon_index if pair_index > weapon_index else weapon_index - 1
+	deployed_weapons[actual_index].level = item_level + 1
+	EventBus.item_merged.emit(item_id, item_level + 1)
+	return true
+
+## 手动合成塔：deploy_id 为被点击的塔，保留其 grid_pos 和 deploy_id，移除另一个配对塔
+func merge_tower(deploy_id: int) -> bool:
+	# 找到被点击的塔索引
+	var clicked_index: int = -1
+	for i in range(deployed_towers.size()):
+		if deployed_towers[i].deploy_id == deploy_id:
+			clicked_index = i
+			break
+	if clicked_index == -1:
+		return false
+	var entry: Dictionary = deployed_towers[clicked_index]
+	var item_id: String = entry.id
+	var item_level: int = entry.level
+	if item_level >= 3:
+		return false
+	# 寻找另一个同 id 同 level 的塔
+	var pair_index: int = -1
+	for i in range(deployed_towers.size()):
+		if i != clicked_index and deployed_towers[i].id == item_id and deployed_towers[i].level == item_level:
+			pair_index = i
+			break
+	if pair_index == -1:
+		return false
+	# 移除配对塔，保留 clicked_index 位置升级（保留 grid_pos 和 deploy_id）
+	deployed_towers.remove_at(pair_index)
+	var actual_index: int = clicked_index if pair_index > clicked_index else clicked_index - 1
+	deployed_towers[actual_index].level = item_level + 1
+	EventBus.item_merged.emit(item_id, item_level + 1)
+	return true
 
 func _collect_items_by_id_level(item_id: String, item_level: int) -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
