@@ -62,6 +62,11 @@ func _ready() -> void:
 		generator.set_level(current_level)
 		generator.generated.connect(_on_generated)
 
+	# 自动检测受击组件（Hurtbox）
+	var hurtbox := get_node_or_null("Hurtbox") as Hurtbox
+	if hurtbox:
+		hurtbox.hit_taken.connect(_on_hurtbox_hit_taken)
+
 	_setup_level_glow()
 	add_to_group(Enums.Group.TOWERS)
 
@@ -112,6 +117,9 @@ func _on_projectile_spawned(proj: Node2D) -> void:
 func _on_generated(amount: int, pos: Vector2) -> void:
 	EventBus.coins_generated.emit(amount, pos)
 	play_attack_animation()
+
+func _on_hurtbox_hit_taken(damage: float, _knockback: Vector2) -> void:
+	health.take_damage(damage)
 
 func _on_died() -> void:
 	EventBus.tower_destroyed.emit(tower_type, global_position)
