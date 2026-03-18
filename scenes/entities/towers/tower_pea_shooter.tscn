@@ -33,6 +33,7 @@ animations = [{
 }]
 
 [node name="TowerPeaShooter" type="StaticBody2D"]
+y_sort_origin = 16
 collision_layer = 4
 collision_mask = 3
 script = ExtResource("1_tower")
