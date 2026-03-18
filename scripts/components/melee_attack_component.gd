@@ -11,6 +11,7 @@ var sfx_id: String = "melee"
 
 var _base_damage: float = 0.0
 var _base_cooldown: float = 1.0
+var _attack_range: float = 50.0
 var _cooldown_remaining: float = 0.0
 var _target_finder: TargetFinderComponent = null
 var _is_attacking: bool = false
@@ -27,8 +28,10 @@ func set_level(level: int) -> void:
 		_base_damage = attack_config.damage_per_level[idx]
 	if idx < attack_config.fire_rate_per_level.size():
 		_base_cooldown = attack_config.fire_rate_per_level[idx]
-	if _target_finder and idx < attack_config.attack_range_per_level.size():
-		_target_finder.set_range(attack_config.attack_range_per_level[idx])
+	if idx < attack_config.attack_range_per_level.size():
+		_attack_range = attack_config.attack_range_per_level[idx]
+		if _target_finder:
+			_target_finder.set_range(_attack_range)
 
 func tick(delta: float) -> void:
 	if _is_attacking:
@@ -72,12 +75,12 @@ func _execute_melee(target: Node2D) -> void:
 	shape.shape = circle
 	hitbox.add_child(shape)
 	get_tree().current_scene.add_child(hitbox)
-	hitbox.global_position = weapon_pos + direction * melee_config.thrust_distance
+	hitbox.global_position = weapon_pos + direction * _attack_range
 
 	# Tween 突刺动画（Pivot 无旋转，直接用世界方向推 Offset）
 	if offset_node and offset_node.name == "WeaponOffset":
 		var tween := create_tween()
-		var thrust_target: Vector2 = direction * melee_config.thrust_distance
+		var thrust_target: Vector2 = direction * _attack_range
 		tween.tween_property(offset_node, "position", thrust_target, 0.1)
 		tween.tween_property(offset_node, "position", Vector2.ZERO, 0.1)
 		tween.tween_callback(func() -> void:

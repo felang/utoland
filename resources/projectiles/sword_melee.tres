@@ -4,7 +4,6 @@
 
 [resource]
 script = ExtResource("1")
-thrust_distance = 15.0
 hit_angle = 90.0
 hit_radius = 8.0
 knockback_force = 80.0
