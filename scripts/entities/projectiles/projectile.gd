@@ -81,6 +81,7 @@ func _setup_sprite() -> void:
 	var sprite := Sprite2D.new()
 	sprite.name = "_PooledSprite"
 	sprite.texture = texture
+	sprite.scale = Vector2(2, 2)  # 16px 素材适配 32px 网格
 	add_child(sprite)
 
 func _cleanup_sprite() -> void:

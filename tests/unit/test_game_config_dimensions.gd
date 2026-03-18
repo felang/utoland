@@ -1,10 +1,10 @@
 extends GutTest
 
 func test_viewport_constants_unchanged():
-	assert_eq(GameConfig.BASE_VIEWPORT_WIDTH, 640)
-	assert_eq(GameConfig.BASE_VIEWPORT_HEIGHT, 360)
-	assert_eq(GameConfig.PPU, 16)
-	assert_eq(GameConfig.GRID_SIZE, 16)
+	assert_eq(GameConfig.BASE_VIEWPORT_WIDTH, 960)
+	assert_eq(GameConfig.BASE_VIEWPORT_HEIGHT, 540)
+	assert_eq(GameConfig.PPU, 32)
+	assert_eq(GameConfig.GRID_SIZE, 32)
 
 func test_map_dimensions_from_grid():
 	var expected_w: float = GameConfig.MAP_GRID_WIDTH * GameConfig.GRID_SIZE
@@ -17,20 +17,20 @@ func test_map_half_extents_are_half_of_full():
 	assert_almost_eq(GameConfig.MAP_HALF_HEIGHT, GameConfig.MAP_PIXEL_HEIGHT / 2.0, 0.01)
 
 func test_viewport_matches_project_settings():
-	assert_eq(ProjectSettings.get_setting("display/window/size/viewport_width"), 640)
-	assert_eq(ProjectSettings.get_setting("display/window/size/viewport_height"), 360)
+	assert_eq(ProjectSettings.get_setting("display/window/size/viewport_width"), 960)
+	assert_eq(ProjectSettings.get_setting("display/window/size/viewport_height"), 540)
 
 func test_entity_dimension_constants_are_stable():
-	assert_eq(GameConfig.ENTITY_SIZE_STANDARD, 16)
-	assert_eq(GameConfig.ENTITY_SIZE_TANK, 32)
-	assert_eq(GameConfig.BULLET_SIZE, 3)
-	assert_eq(GameConfig.COIN_RADIUS, 3)
+	assert_eq(GameConfig.ENTITY_SIZE_STANDARD, 32)
+	assert_eq(GameConfig.ENTITY_SIZE_TANK, 64)
+	assert_eq(GameConfig.BULLET_SIZE, 6)
+	assert_eq(GameConfig.COIN_RADIUS, 6)
 
 func test_entity_and_ui_size_tokens_are_grid_aligned():
 	assert_eq(GameConfig.ENTITY_SIZE_STANDARD, GameConfig.GRID_SIZE)
 	assert_eq(GameConfig.BULLET_SIZE, int(GameConfig.GRID_SIZE * 0.2))
-	assert_eq(GameConfig.UI_BUTTON_SIZE, Vector2(160, 36))
+	assert_eq(GameConfig.UI_BUTTON_SIZE, Vector2(240, 54))
 
 func test_map_grid_constants():
-	assert_eq(GameConfig.MAP_GRID_WIDTH, 34)
-	assert_eq(GameConfig.MAP_GRID_HEIGHT, 26)
+	assert_eq(GameConfig.MAP_GRID_WIDTH, 45)
+	assert_eq(GameConfig.MAP_GRID_HEIGHT, 30)

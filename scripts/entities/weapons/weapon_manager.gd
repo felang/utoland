@@ -219,4 +219,3 @@ func _setup_weapon_sprite(sprite: Sprite2D, weapon_id: String) -> void:
 	var color: Color = WEAPON_COLORS.get(weapon_id, Color.WHITE)
 	img.fill(color)
 	sprite.texture = ImageTexture.create_from_image(img)
-

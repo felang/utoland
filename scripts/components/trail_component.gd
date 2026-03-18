@@ -2,7 +2,7 @@ class_name TrailComponent
 extends Node
 
 @export var trail_color: Color = Color.WHITE
-@export var trail_width: float = 1.0
+@export var trail_width: float = 2.0
 @export var max_points: int = 4
 
 var _trail: Line2D = null

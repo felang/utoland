@@ -18,8 +18,8 @@ func test_weapon_bow_resource() -> void:
 	assert_not_null(w.attack_config, "弓应有 attack_config")
 	assert_almost_eq(w.attack_config.fire_rate_per_level[0], 0.5, 0.001)
 	assert_almost_eq(w.attack_config.damage_per_level[0], 8.0, 0.001)
-	assert_almost_eq(w.attack_config.attack_range_per_level[0], 150.0, 0.001)
-	assert_eq(w.projectile_data.speed, 300.0)
+	assert_almost_eq(w.attack_config.attack_range_per_level[0], 300.0, 0.001)
+	assert_eq(w.projectile_data.speed, 600.0)
 
 func test_weapon_shuriken_resource() -> void:
 	assert_true(GameConfig.weapons.has(Enums.WeaponId.SHURIKEN), "应包含 shuriken")
@@ -28,7 +28,7 @@ func test_weapon_shuriken_resource() -> void:
 	assert_not_null(w.attack_config, "手里剑应有 attack_config")
 	assert_almost_eq(w.attack_config.fire_rate_per_level[0], 0.8, 0.001)
 	assert_almost_eq(w.attack_config.damage_per_level[0], 15.0, 0.001)
-	assert_eq(w.projectile_data.speed, 175.0)
+	assert_eq(w.projectile_data.speed, 350.0)
 
 func test_weapon_sword_resource() -> void:
 	assert_true(GameConfig.weapons.has(Enums.WeaponId.SWORD), "应包含 sword")
@@ -48,7 +48,7 @@ func test_enemy_normal_resource() -> void:
 	var e: EnemyData = GameConfig.enemies[Enums.Enemy.NORMAL]
 	assert_eq(e.display_name, "普通敌人")
 	assert_eq(e.hp, 50.0)
-	assert_eq(e.speed, 50.0)
+	assert_eq(e.speed, 100.0)
 	assert_eq(e.damage, 10.0)
 	assert_eq(e.coin_drop_min, 1)
 	assert_eq(e.coin_drop_max, 3)
@@ -56,14 +56,14 @@ func test_enemy_normal_resource() -> void:
 func test_enemy_fast_resource() -> void:
 	var e: EnemyData = GameConfig.enemies[Enums.Enemy.FAST]
 	assert_eq(e.hp, 35.0)
-	assert_eq(e.speed, 90.0)
+	assert_eq(e.speed, 180.0)
 	assert_eq(e.coin_drop_min, 2)
 	assert_eq(e.coin_drop_max, 4)
 
 func test_enemy_tank_resource() -> void:
 	var e: EnemyData = GameConfig.enemies[Enums.Enemy.TANK]
 	assert_eq(e.hp, 200.0)
-	assert_eq(e.speed, 25.0)
+	assert_eq(e.speed, 50.0)
 	assert_eq(e.damage, 25.0)
 	assert_eq(e.coin_drop_min, 5)
 	assert_eq(e.coin_drop_max, 10)
@@ -81,14 +81,14 @@ func test_tower_pea_shooter_resource() -> void:
 	assert_not_null(t.attack_config, "射手塔应有 attack_config")
 	assert_almost_eq(t.attack_config.damage_per_level[0], 15.0, 0.001)
 	assert_almost_eq(t.attack_config.fire_rate_per_level[0], 1.0, 0.001)
-	assert_almost_eq(t.attack_config.attack_range_per_level[0], 150.0, 0.001)
+	assert_almost_eq(t.attack_config.attack_range_per_level[0], 300.0, 0.001)
 
 func test_tower_ice_flower_resource() -> void:
 	var t: TowerData = GameConfig.towers[Enums.TowerId.ICE_FLOWER]
 	assert_almost_eq(t.hp_per_level[0], 70.0, 0.001)
 	assert_almost_eq(t.slow_ratio_per_level[0], 0.3, 0.001)
 	assert_not_null(t.attack_config, "冰花塔应有 attack_config")
-	assert_almost_eq(t.attack_config.attack_range_per_level[0], 100.0, 0.001)
+	assert_almost_eq(t.attack_config.attack_range_per_level[0], 200.0, 0.001)
 
 
 # ===== 波次资源加载 =====
@@ -122,7 +122,7 @@ func test_character_dora_resource() -> void:
 	var c: CharacterData = GameConfig.characters[Enums.Character.DORA]
 	assert_eq(c.display_name, "朵拉")
 	assert_eq(c.max_hp, 100.0)
-	assert_eq(c.speed, 100.0)
+	assert_eq(c.speed, 200.0)
 	assert_eq(c.damage_mult, 1.0)
 	assert_eq(c.recommended_weapon, Enums.WeaponId.BOW)
 
@@ -208,7 +208,7 @@ func test_player_const_unchanged() -> void:
 	# PLAYER 保持 const，确保初始化不受影响
 	assert_eq(GameConfig.PLAYER["initial_coins"], 100)
 	assert_eq(GameConfig.PLAYER["initial_hp"], 100.0)
-	assert_eq(GameConfig.PLAYER["initial_speed"], 100.0)
+	assert_eq(GameConfig.PLAYER["initial_speed"], 200.0)
 
 func test_sprites_const_unchanged() -> void:
 	# SPRITES 保持 const（玩家精灵已迁移到 CharacterData）

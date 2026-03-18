@@ -19,5 +19,5 @@ icon_path = "res://assets/weapons/sword/sprite.png"
 sell_price_per_level = PackedInt32Array(3, 7, 21)
 attack_config = SubResource("AttackConfigData_sword")
 melee_config = ExtResource("3")
-pivot_offset = 20.0
+pivot_offset = 40.0
 sprite_rotation_offset = 1.5708

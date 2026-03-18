@@ -7,7 +7,7 @@ func test_dora_max_hp() -> void:
 
 func test_dora_speed() -> void:
 	var cd: CharacterData = GameConfig.characters[Enums.Character.DORA]
-	assert_eq(cd.speed, 100.0, "Dora speed 应为 100")
+	assert_eq(cd.speed, 200.0, "Dora speed 应为 200")
 
 func test_dora_starting_gold() -> void:
 	var cd: CharacterData = GameConfig.characters[Enums.Character.DORA]
@@ -32,7 +32,7 @@ func test_gorg_max_hp() -> void:
 
 func test_gorg_speed() -> void:
 	var cd: CharacterData = GameConfig.characters[Enums.Character.GORG]
-	assert_eq(cd.speed, 80.0, "Gorg speed 应为 80")
+	assert_eq(cd.speed, 160.0, "Gorg speed 应为 160")
 
 func test_gorg_damage_mult() -> void:
 	var cd: CharacterData = GameConfig.characters[Enums.Character.GORG]
@@ -65,7 +65,7 @@ func test_kaze_max_hp() -> void:
 
 func test_kaze_speed() -> void:
 	var cd: CharacterData = GameConfig.characters[Enums.Character.KAZE]
-	assert_eq(cd.speed, 130.0, "Kaze speed 应为 130")
+	assert_eq(cd.speed, 260.0, "Kaze speed 应为 260")
 
 func test_kaze_attack_speed_mult() -> void:
 	var cd: CharacterData = GameConfig.characters[Enums.Character.KAZE]
@@ -94,7 +94,7 @@ func test_merlin_max_hp() -> void:
 
 func test_merlin_speed() -> void:
 	var cd: CharacterData = GameConfig.characters[Enums.Character.MERLIN]
-	assert_eq(cd.speed, 95.0, "Merlin speed 应为 95")
+	assert_eq(cd.speed, 190.0, "Merlin speed 应为 190")
 
 func test_merlin_damage_mult() -> void:
 	var cd: CharacterData = GameConfig.characters[Enums.Character.MERLIN]
@@ -127,7 +127,7 @@ func test_nemo_max_hp() -> void:
 
 func test_nemo_speed() -> void:
 	var cd: CharacterData = GameConfig.characters[Enums.Character.NEMO]
-	assert_eq(cd.speed, 105.0, "Nemo speed 应为 105")
+	assert_eq(cd.speed, 210.0, "Nemo speed 应为 210")
 
 func test_nemo_damage_mult() -> void:
 	var cd: CharacterData = GameConfig.characters[Enums.Character.NEMO]

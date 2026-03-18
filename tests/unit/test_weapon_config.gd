@@ -8,12 +8,12 @@ func test_weapons_count():
 func test_bow_has_projectile_data():
 	var w: WeaponData = GameConfig.weapons[Enums.WeaponId.BOW]
 	assert_not_null(w.projectile_data, "弓应有 projectile_data")
-	assert_eq(w.projectile_data.speed, 300.0, "弓弹道速度应为 300")
+	assert_eq(w.projectile_data.speed, 600.0, "弓弹道速度应为 600")
 
 func test_shuriken_has_projectile_data():
 	var w: WeaponData = GameConfig.weapons[Enums.WeaponId.SHURIKEN]
 	assert_not_null(w.projectile_data, "手里剑应有 projectile_data")
-	assert_eq(w.projectile_data.speed, 175.0, "手里剑弹道速度应为 175")
+	assert_eq(w.projectile_data.speed, 350.0, "手里剑弹道速度应为 350")
 
 func test_all_weapons_have_range():
 	for weapon_id in GameConfig.weapons:
