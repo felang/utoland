@@ -53,8 +53,8 @@ func _process(delta: float) -> void:
 	if invincible_timer > 0:
 		invincible_timer -= delta
 
-	# 武器系统更新
-	_weapon_manager.tick(delta)
+	# 武器视觉更新（轨道旋转、精灵朝向）
+	_weapon_manager.tick_visual(delta)
 
 	# 被动技能更新
 	_process_passives(delta)
@@ -62,7 +62,10 @@ func _process(delta: float) -> void:
 func set_input_enabled(enabled: bool) -> void:
 	_input_enabled = enabled
 
-func _physics_process(_delta: float) -> void:
+func _physics_process(delta: float) -> void:
+	# 武器攻击判定（与物理检测同步，确保 get_overlapping_bodies 数据是当前帧的）
+	_weapon_manager.tick_combat(delta)
+
 	if not _input_enabled:
 		velocity = Vector2.ZERO
 		move_and_slide()

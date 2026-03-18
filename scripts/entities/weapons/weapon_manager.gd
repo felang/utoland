@@ -6,7 +6,7 @@ extends Node2D
 
 signal weapon_attack_executed(target: Node2D)  # 任意武器命中时广播（用于 swift_combo 连击更新）
 
-const ORBIT_SPEED: float = TAU / 8.0
+const ORBIT_SPEED: float = TAU / 12.0
 const SPRITE_SCALE: float = 12.0
 
 # 武器精灵颜色映射（后备方案，无 icon 时使用）
@@ -111,14 +111,9 @@ func refresh_weapons() -> void:
 	for entry in InventoryManager.deployed_weapons:
 		add_weapon(entry.id, entry.level)
 
-## 每帧驱动：推进轨道角度、旋转 Pivot 朝向目标或轨道、驱动攻击组件
-func tick(delta: float) -> void:
+## 每帧视觉更新（_process 调用）：推进轨道角度、旋转 Pivot、精灵朝向目标
+func tick_visual(delta: float) -> void:
 	_orbit_angle += ORBIT_SPEED * delta
-	# 计算动态伤害倍率（swift_combo / blood_rage 等每帧变化的被动）
-	var dynamic_dmg_mult: float = 1.0
-	if _dynamic_damage_mult_getter.is_valid():
-		dynamic_dmg_mult = _dynamic_damage_mult_getter.call()
-	var base_dmg_mult: float = PlayerState.player_stats.get(Enums.Stat.DAMAGE_MULT, 1.0)
 	var count: int = _pivots.size()
 	for i in count:
 		var pivot: Node2D = _pivots[i]
@@ -137,6 +132,17 @@ func tick(delta: float) -> void:
 			sprite.rotation = aim_angle + rot_offset
 		elif sprite:
 			sprite.rotation = rot_offset
+
+## 物理帧攻击判定（_physics_process 调用）：驱动攻击组件，确保与物理检测同步
+func tick_combat(delta: float) -> void:
+	# 计算动态伤害倍率（swift_combo / blood_rage 等每帧变化的被动）
+	var dynamic_dmg_mult: float = 1.0
+	if _dynamic_damage_mult_getter.is_valid():
+		dynamic_dmg_mult = _dynamic_damage_mult_getter.call()
+	var base_dmg_mult: float = PlayerState.player_stats.get(Enums.Stat.DAMAGE_MULT, 1.0)
+	var count: int = _pivots.size()
+	for i in count:
+		var pivot: Node2D = _pivots[i]
 		# 驱动攻击组件（在 Pivot 下）
 		var attack = pivot.get_node_or_null("RangedAttackComponent")
 		if not attack:

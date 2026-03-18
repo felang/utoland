@@ -53,14 +53,19 @@ func _ready() -> void:
 	health.death_color = _sprite_animator.get_death_color_from_visual()
 	_sprite_animator.setup_enemy_sprite(sprite_config, target_size)
 
-func _physics_process(_delta: float) -> void:
-	_chase_player()
+func _physics_process(delta: float) -> void:
+	_chase_player(delta)
 
-func _chase_player() -> void:
+func _chase_player(delta: float) -> void:
+	# 击退速度（始终处理，即使定身也要滑行）
+	var kb_vel: Vector2 = _knockback.tick(delta)
 	if is_rooted:
+		if kb_vel.length_squared() > 0:
+			velocity = kb_vel
+			move_and_slide()
 		return
 	if player and is_instance_valid(player):
-		velocity = position.direction_to(player.global_position) * speed
+		velocity = position.direction_to(player.global_position) * speed + kb_vel
 		move_and_slide()
 		_sprite_animator.update_animation_no_idle(velocity)
 
@@ -71,7 +76,7 @@ func die() -> void:
 	_on_died()
 
 func _on_died() -> void:
-	_knockback.kill_tween()
+	_knockback.reset()
 	# 屏幕震动
 	var fx: EffectConfigData = GameConfig.effects
 	EventBus.camera_shake_requested.emit(fx.camera_shake_enemy_kill_intensity, fx.camera_shake_enemy_kill_duration)
@@ -158,7 +163,7 @@ func _on_speed_changed(new_speed: float) -> void:
 
 func reset_for_pool() -> void:
 	health.reset()
-	_knockback.kill_tween()
+	_knockback.reset()
 	slow_handler.clear_all()
 	if is_rooted:
 		remove_root()
@@ -170,6 +175,7 @@ func reset_for_pool() -> void:
 	scale = Vector2.ONE
 	velocity = Vector2.ZERO
 	if _sprite_animator._sprite:
+		_sprite_animator._sprite.offset = Vector2.ZERO
 		_sprite_animator._sprite.play("walk_down")
 		_sprite_animator._current_anim = "walk_down"
 	visible = true

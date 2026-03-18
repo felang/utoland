@@ -70,7 +70,8 @@ func _ready() -> void:
 	_setup_level_glow()
 	add_to_group(Enums.Group.TOWERS)
 
-func _process(delta: float) -> void:
+func _physics_process(delta: float) -> void:
+	# 攻击判定在物理帧执行，确保 get_overlapping_bodies 数据是当前帧的
 	if _attack_component and _attack_component.has_method("tick"):
 		_attack_component.tick(delta)
 

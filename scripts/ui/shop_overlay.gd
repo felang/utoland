@@ -61,7 +61,7 @@ func _setup_ui() -> void:
 	main_hbox.add_theme_constant_override("separation", 8)
 	vbox.add_child(main_hbox)
 
-	# ——— 左列：武器区（标签 + 3列网格，撑满高度）———
+	# ——— 左列：武器区（标签 + 可滚动3列网格）———
 	var weapon_col := VBoxContainer.new()
 	weapon_col.name = "WeaponCol"
 	weapon_col.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -74,12 +74,18 @@ func _setup_ui() -> void:
 	weapon_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	weapon_col.add_child(weapon_label)
 
+	var weapon_scroll := ScrollContainer.new()
+	weapon_scroll.name = "WeaponScroll"
+	weapon_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	weapon_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	weapon_col.add_child(weapon_scroll)
+
 	_weapon_grid = GridContainer.new()
 	_weapon_grid.columns = 3
-	_weapon_grid.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_weapon_grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_weapon_grid.add_theme_constant_override("h_separation", 3)
 	_weapon_grid.add_theme_constant_override("v_separation", 3)
-	weapon_col.add_child(_weapon_grid)
+	weapon_scroll.add_child(_weapon_grid)
 
 	# 分隔线
 	var sep1 := VSeparator.new()

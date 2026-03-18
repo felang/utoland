@@ -44,6 +44,12 @@ func tick(delta: float) -> void:
 		return
 	var target: Node2D = _target_finder.get_target()
 	if not target or not is_instance_valid(target):
+		# 无目标时钳制冷却为 0，防止 SHOP 阶段积累深度负值导致开战瞬间齐射
+		_cooldown_remaining = 0.0
+		return
+	# 实际距离校验：get_overlapping_bodies 返回上一物理帧结果，目标可能已离开范围
+	if _target_finder.global_position.distance_to(target.global_position) > _target_finder.detect_range:
+		_cooldown_remaining = 0.0
 		return
 	_execute_attack(target)
 	_cooldown_remaining = get_final_cooldown()
