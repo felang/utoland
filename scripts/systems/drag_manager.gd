@@ -1,7 +1,7 @@
 extends Node
-## 统一拖拽管理器 — 管理塔放置、移动、回收和武器卖出
+## 统一拖拽管理器 — 管理塔放置和移动
 
-enum DragSource { NONE, PLACE_TOWER, MAP_TOWER, WEAPON }
+enum DragSource { NONE, PLACE_TOWER, MOVE_TOWER }
 
 var _tower_container: Node2D
 var _player: Node2D
@@ -20,15 +20,18 @@ var _drag_original_deploy_id: int = -1
 var _on_placed_callback: Callable
 var _on_cancelled_callback: Callable
 
-var _recycle_area: Control = null
-var _drag_weapon_index: int = -1
-var _on_weapon_sold_callback: Callable
-var _recycle_hint_label: Label = null
 var _grid_overlay: Node2D = null
+var _is_shop_mode: bool = false
+
+var _tower_menu: PopupMenu = null
+var _menu_deploy_id: int = -1
 
 func initialize(tower_container: Node2D, player: Node2D) -> void:
 	_tower_container = tower_container
 	_player = player
+
+func set_shop_mode(enabled: bool) -> void:
+	_is_shop_mode = enabled
 
 func start_tower_placement(tower_id: String, on_placed: Callable, on_cancelled: Callable) -> void:
 	if _is_dragging:
@@ -38,7 +41,7 @@ func start_tower_placement(tower_id: String, on_placed: Callable, on_cancelled: 
 	_drag_data = {tower_id = tower_id}
 	_start_drag(DragSource.PLACE_TOWER)
 
-func start_map_tower_drag(deploy_id: int) -> void:
+func start_move_tower(deploy_id: int) -> void:
 	if _is_dragging:
 		return
 	if deploy_id not in _tower_nodes:
@@ -48,31 +51,14 @@ func start_map_tower_drag(deploy_id: int) -> void:
 			_drag_data = {deploy_id = deploy_id, item = entry}
 			_drag_original_deploy_id = deploy_id
 			_drag_original_grid_pos = entry.grid_pos
-			_start_drag(DragSource.MAP_TOWER)
+			_start_drag(DragSource.MOVE_TOWER)
 			break
-
-func set_recycle_area(area: Control) -> void:
-	_recycle_area = area
-
-func is_over_recycle_area(global_pos: Vector2) -> bool:
-	if _recycle_area == null:
-		return false
-	var rect := Rect2(_recycle_area.global_position, _recycle_area.size)
-	return rect.has_point(global_pos)
-
-func start_weapon_drag(weapon_index: int, on_sold: Callable) -> void:
-	if _is_dragging:
-		return
-	_drag_weapon_index = weapon_index
-	_on_weapon_sold_callback = on_sold
-	_drag_data = {weapon_index = weapon_index}
-	_start_drag(DragSource.WEAPON)
 
 func _start_drag(source: DragSource) -> void:
 	_is_dragging = true
 	_drag_source = source
 	_create_preview()
-	if source in [DragSource.PLACE_TOWER, DragSource.MAP_TOWER]:
+	if source in [DragSource.PLACE_TOWER, DragSource.MOVE_TOWER]:
 		_show_grid_overlay()
 	if _player and _player.has_method("set_input_enabled"):
 		_player.set_input_enabled(false)
@@ -96,20 +82,81 @@ func _input(event: InputEvent) -> void:
 			_cancel_drag()
 
 func _check_tower_click(global_pos: Vector2) -> void:
+	if not _is_shop_mode:
+		return
 	for deploy_id in _tower_nodes:
 		var tower_node: Node2D = _tower_nodes[deploy_id]
 		if tower_node.global_position.distance_to(global_pos) < GameConfig.GRID_SIZE:
-			start_map_tower_drag(deploy_id)
+			_show_tower_menu(deploy_id)
 			break
 
-func _end_drag(world_pos: Vector2, viewport_pos: Vector2 = Vector2.ZERO) -> void:
+func _show_tower_menu(deploy_id: int) -> void:
+	_menu_deploy_id = deploy_id
+	if _tower_menu == null:
+		_tower_menu = PopupMenu.new()
+		_tower_menu.name = "TowerMenu"
+		_tower_menu.id_pressed.connect(_on_tower_menu_pressed)
+		add_child(_tower_menu)
+	_tower_menu.clear()
+	var entry: Dictionary = {}
+	for t in InventoryManager.deployed_towers:
+		if t.deploy_id == deploy_id:
+			entry = t
+			break
+	if entry.is_empty():
+		return
+	# 合成选项
+	var has_pair: bool = false
+	for t in InventoryManager.deployed_towers:
+		if t.deploy_id != deploy_id and t.id == entry.id and t.level == entry.level and entry.level < 3:
+			has_pair = true
+			break
+	if has_pair:
+		_tower_menu.add_item("合成", 0)
+	# 卖出选项
+	var tower_data: TowerData = GameConfig.towers.get(entry.id)
+	var refund: int = tower_data.sell_price_per_level[entry.level - 1] if tower_data else 0
+	_tower_menu.add_item("卖出 $%d" % refund, 1)
+	# 移动选项
+	_tower_menu.add_item("移动", 2)
+	var tower_node: Node2D = _tower_nodes[deploy_id]
+	var screen_pos: Vector2 = get_viewport().get_canvas_transform() * tower_node.global_position
+	_tower_menu.position = Vector2i(int(screen_pos.x), int(screen_pos.y) - 60)
+	_tower_menu.popup()
+
+func _on_tower_menu_pressed(id: int) -> void:
+	var deploy_id: int = _menu_deploy_id
+	match id:
+		0:  # 合成
+			var old_towers: Array = InventoryManager.deployed_towers.duplicate(true)
+			if InventoryManager.merge_tower(deploy_id):
+				_handle_tower_merge_visual(deploy_id, old_towers)
+		1:  # 卖出
+			var refund: int = InventoryManager.sell_from_deployed_tower(deploy_id)
+			if refund > 0:
+				_remove_tower_node(deploy_id)
+		2:  # 移动
+			start_move_tower(deploy_id)
+	_menu_deploy_id = -1
+
+func _handle_tower_merge_visual(kept_deploy_id: int, old_towers: Array) -> void:
+	var current_ids: Array[int] = []
+	for entry in InventoryManager.deployed_towers:
+		current_ids.append(entry.deploy_id)
+	for entry in old_towers:
+		if entry.deploy_id not in current_ids:
+			_remove_tower_node(entry.deploy_id)
+	for entry in InventoryManager.deployed_towers:
+		if entry.deploy_id == kept_deploy_id:
+			upgrade_tower_node(entry.deploy_id, entry.id, entry.level, entry.grid_pos)
+			break
+
+func _end_drag(world_pos: Vector2, _viewport_pos: Vector2 = Vector2.ZERO) -> void:
 	match _drag_source:
 		DragSource.PLACE_TOWER:
 			_try_place_new_tower(world_pos)
-		DragSource.MAP_TOWER:
-			_try_move_tower(world_pos, viewport_pos)
-		DragSource.WEAPON:
-			_try_sell_weapon(viewport_pos)
+		DragSource.MOVE_TOWER:
+			_try_move_tower(world_pos)
 	_cleanup_drag()
 
 func _try_place_new_tower(global_pos: Vector2) -> void:
@@ -121,14 +168,8 @@ func _try_place_new_tower(global_pos: Vector2) -> void:
 	if _on_cancelled_callback.is_valid():
 		_on_cancelled_callback.call()
 
-func _try_move_tower(world_pos: Vector2, viewport_pos: Vector2 = Vector2.ZERO) -> void:
+func _try_move_tower(world_pos: Vector2) -> void:
 	var deploy_id: int = _drag_data.deploy_id
-	# 回收区检测（用视口坐标，因为回收区在 CanvasLayer 中）
-	if is_over_recycle_area(viewport_pos):
-		var refund: int = InventoryManager.sell_from_deployed_tower(deploy_id)
-		if refund > 0:
-			_remove_tower_node(deploy_id)
-			return
 	var grid_pos := _world_to_grid(world_pos)
 	if _is_valid_grid_pos(grid_pos) and _is_grid_available(grid_pos):
 		if InventoryManager.move_tower(deploy_id, grid_pos):
@@ -140,15 +181,8 @@ func _try_move_tower(world_pos: Vector2, viewport_pos: Vector2 = Vector2.ZERO) -
 		_tower_nodes[deploy_id].position = _grid_to_world(_drag_original_grid_pos)
 		_tower_nodes[deploy_id].modulate.a = 1.0
 
-func _try_sell_weapon(viewport_pos: Vector2) -> void:
-	if is_over_recycle_area(viewport_pos) and _drag_weapon_index >= 0:
-		if _on_weapon_sold_callback.is_valid():
-			_on_weapon_sold_callback.call(_drag_weapon_index)
-	_drag_weapon_index = -1
-	_on_weapon_sold_callback = Callable()
-
 func _cancel_drag() -> void:
-	if _drag_source == DragSource.MAP_TOWER and _drag_original_deploy_id >= 0:
+	if _drag_source == DragSource.MOVE_TOWER and _drag_original_deploy_id >= 0:
 		if _drag_original_deploy_id in _tower_nodes:
 			# 恢复到原始位置
 			_tower_nodes[_drag_original_deploy_id].position = _grid_to_world(_drag_original_grid_pos)
@@ -170,11 +204,6 @@ func _cleanup_drag() -> void:
 		_preview_node = null
 	_range_circle = null  # _range_circle 是 _preview_node 的子节点，随父节点释放
 	_hide_grid_overlay()
-	if _recycle_area:
-		_recycle_area.modulate = Color.WHITE
-	_hide_recycle_hint()
-	_drag_weapon_index = -1
-	_on_weapon_sold_callback = Callable()
 	if _player and _player.has_method("set_input_enabled"):
 		_player.set_input_enabled(true)
 
@@ -213,7 +242,7 @@ func _create_preview() -> void:
 			_range_circle = RangeIndicator.new()
 			_range_circle.set_range(tower_data.attack_config.attack_range_per_level[0])
 			_preview_node.add_child(_range_circle)
-	elif _drag_source == DragSource.MAP_TOWER:
+	elif _drag_source == DragSource.MOVE_TOWER:
 		# 移动已有塔：直接拖拽实际塔节点，只显示范围圆
 		var deploy_id: int = _drag_data.get("deploy_id", -1)
 		for entry in InventoryManager.deployed_towers:
@@ -228,7 +257,7 @@ func _create_preview() -> void:
 	_preview_node.visible = false
 	_tower_container.get_parent().add_child(_preview_node)
 
-func _update_preview(world_pos: Vector2, viewport_pos: Vector2 = Vector2.ZERO) -> void:
+func _update_preview(world_pos: Vector2, _viewport_pos: Vector2 = Vector2.ZERO) -> void:
 	if _preview_node == null:
 		return
 	if _drag_source == DragSource.PLACE_TOWER:
@@ -238,7 +267,7 @@ func _update_preview(world_pos: Vector2, viewport_pos: Vector2 = Vector2.ZERO) -
 		var is_valid := _is_valid_grid_pos(grid_pos) and _is_grid_available(grid_pos)
 		if _range_circle:
 			_range_circle.modulate = Color(0.3, 1.0, 0.3, 1.0) if is_valid else Color(1.0, 0.3, 0.3, 1.0)
-	elif _drag_source == DragSource.MAP_TOWER:
+	elif _drag_source == DragSource.MOVE_TOWER:
 		# 直接移动实际塔节点
 		var grid_pos := _world_to_grid(world_pos)
 		var snapped_pos := _grid_to_world(grid_pos)
@@ -255,50 +284,6 @@ func _update_preview(world_pos: Vector2, viewport_pos: Vector2 = Vector2.ZERO) -
 	else:
 		_preview_node.global_position = world_pos
 		_preview_node.visible = true
-	# 回收区反馈（用视口坐标，回收区在 CanvasLayer 中）
-	if _recycle_area and _drag_source in [DragSource.MAP_TOWER, DragSource.WEAPON]:
-		if is_over_recycle_area(viewport_pos):
-			_recycle_area.modulate = Color(1, 0.3, 0.3)
-			_update_recycle_hint(viewport_pos)
-		else:
-			_recycle_area.modulate = Color.WHITE
-			_hide_recycle_hint()
-
-func _update_recycle_hint(_global_pos: Vector2) -> void:
-	var refund: int = _get_drag_refund()
-	if refund <= 0:
-		return
-	if _recycle_hint_label == null:
-		_recycle_hint_label = Label.new()
-		_recycle_hint_label.add_theme_font_size_override("font_size", 12)
-		_recycle_area.add_child(_recycle_hint_label)
-	_recycle_hint_label.text = "$%d" % refund
-	_recycle_hint_label.visible = true
-
-func _hide_recycle_hint() -> void:
-	if _recycle_hint_label:
-		_recycle_hint_label.visible = false
-
-func _get_drag_refund() -> int:
-	match _drag_source:
-		DragSource.MAP_TOWER:
-			var deploy_id: int = _drag_data.get("deploy_id", -1)
-			for entry in InventoryManager.deployed_towers:
-				if entry.deploy_id == deploy_id:
-					var data: Resource = GameConfig.towers.get(entry.id)
-					if data:
-						return data.sell_price_per_level[entry.level - 1]
-			return 0
-		DragSource.WEAPON:
-			var weapon_index: int = _drag_data.get("weapon_index", -1)
-			if weapon_index >= 0 and weapon_index < InventoryManager.deployed_weapons.size():
-				var entry: Dictionary = InventoryManager.deployed_weapons[weapon_index]
-				var data: Resource = GameConfig.weapons.get(entry.id)
-				if data:
-					return data.sell_price_per_level[entry.level - 1]
-			return 0
-		_:
-			return 0
 
 func _grid_to_world(grid_pos: Vector2i) -> Vector2:
 	return Vector2(
@@ -319,7 +304,7 @@ func _is_valid_grid_pos(grid_pos: Vector2i) -> bool:
 func _is_grid_available(grid_pos: Vector2i) -> bool:
 	for entry in InventoryManager.deployed_towers:
 		if entry.grid_pos == grid_pos:
-			if _drag_source == DragSource.MAP_TOWER and entry.deploy_id == _drag_original_deploy_id:
+			if _drag_source == DragSource.MOVE_TOWER and entry.deploy_id == _drag_original_deploy_id:
 				continue
 			return false
 	return true
