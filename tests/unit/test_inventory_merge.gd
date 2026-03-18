@@ -110,3 +110,17 @@ func test_buy_weapon_no_auto_merge() -> void:
 	assert_eq(InventoryManager.deployed_weapons.size(), 2)
 	assert_eq(InventoryManager.deployed_weapons[0].level, 1)
 	assert_eq(InventoryManager.deployed_weapons[1].level, 1)
+
+# ===== buy_level_up =====
+
+func test_buy_level_up() -> void:
+	PlayerProgression.player_level = 3
+	var old_cap: int = PlayerProgression.get_population_cap()
+	PlayerProgression.buy_level_up()
+	assert_eq(PlayerProgression.player_level, 4)
+	assert_gt(PlayerProgression.get_population_cap(), old_cap)
+
+func test_buy_level_up_does_not_change_exp() -> void:
+	PlayerProgression.current_exp = 50
+	PlayerProgression.buy_level_up()
+	assert_eq(PlayerProgression.current_exp, 50)
