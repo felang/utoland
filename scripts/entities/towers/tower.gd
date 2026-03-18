@@ -112,7 +112,7 @@ func _on_attack_executed(_target: Node2D, _proj: Node2D = null) -> void:
 	play_attack_animation()
 
 func _on_projectile_spawned(proj: Node2D) -> void:
-	get_parent().add_child(proj)
+	SceneFactory.get_projectile_layer().add_child(proj)
 
 func _on_generated(amount: int, pos: Vector2) -> void:
 	EventBus.coins_generated.emit(amount, pos)

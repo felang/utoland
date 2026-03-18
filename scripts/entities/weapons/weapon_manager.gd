@@ -24,8 +24,8 @@ var _projectile_container: Node = null
 var _dynamic_damage_mult_getter: Callable
 
 func _ready() -> void:
-	# 缓存投射物容器（Player 的父节点，通常是 main 场景）
-	_projectile_container = get_parent().get_parent() if get_parent() else null
+	# 使用 SceneFactory 分层容器
+	_projectile_container = SceneFactory.get_projectile_layer()
 
 ## 清除所有武器并从传入的 weapon_entries 创建
 func initialize(weapon_entries: Array[Dictionary]) -> void:
@@ -154,8 +154,11 @@ func set_dynamic_damage_mult_getter(getter: Callable) -> void:
 func _on_projectile_spawned(proj: Node2D) -> void:
 	if _projectile_container and is_instance_valid(_projectile_container):
 		_projectile_container.add_child(proj)
-	elif get_parent():
-		get_parent().get_parent().add_child(proj)
+	else:
+		# 后备：重新获取投射物容器
+		_projectile_container = SceneFactory.get_projectile_layer()
+		if _projectile_container:
+			_projectile_container.add_child(proj)
 
 func _on_attack_executed(pivot: Node2D, weapon_data: WeaponData, target: Node2D = null) -> void:
 	# 广播命中信号，供 Player 更新连击状态

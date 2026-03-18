@@ -106,7 +106,7 @@ func _spawn_normal_enemy() -> void:
 		return
 	var spawn_pos: Vector2 = get_random_spawn_position()
 	enemy.global_position = spawn_pos
-	get_parent().add_child(enemy)
+	SceneFactory.get_entity_layer().add_child(enemy)
 	# 精英怪检查
 	if _current_wave_data.elite_chance > 0.0 and randf() < _current_wave_data.elite_chance:
 		enemy.apply_elite(
@@ -132,7 +132,7 @@ func _spawn_boss() -> void:
 	var spawn_pos: Vector2 = get_random_spawn_position()
 	boss.global_position = spawn_pos
 	_boss_spawned = true
-	get_parent().add_child(boss)
+	SceneFactory.get_entity_layer().add_child(boss)
 	AudioManager.play("boss_appear")
 
 func get_random_spawn_position() -> Vector2:

@@ -83,8 +83,8 @@ func _on_died() -> void:
 	SceneFactory.release_enemy(self)
 
 func _drop_coins() -> void:
-	var parent: Node = get_parent()
-	if not parent:
+	var pickup_layer: Node2D = SceneFactory.get_pickup_layer()
+	if not pickup_layer:
 		return
 
 	var coin_count: int = randi_range(data.coin_drop_min, data.coin_drop_max)
@@ -92,11 +92,11 @@ func _drop_coins() -> void:
 	for i in coin_count:
 		var coin = SceneFactory.create_coin()
 		coin.global_position = global_position + Vector2(randf_range(-COIN_SCATTER_RANGE, COIN_SCATTER_RANGE), randf_range(-COIN_SCATTER_RANGE, COIN_SCATTER_RANGE))
-		parent.call_deferred("add_child", coin)
+		pickup_layer.call_deferred("add_child", coin)
 
 func _drop_exp_orbs() -> void:
-	var parent: Node = get_parent()
-	if not parent:
+	var pickup_layer: Node2D = SceneFactory.get_pickup_layer()
+	if not pickup_layer:
 		return
 
 	var orb_count: int = randi_range(data.exp_drop_min, data.exp_drop_max)
@@ -104,7 +104,7 @@ func _drop_exp_orbs() -> void:
 	for i in orb_count:
 		var orb = SceneFactory.create_exp_orb()
 		orb.global_position = global_position + Vector2(randf_range(-EXP_SCATTER_RANGE, EXP_SCATTER_RANGE), randf_range(-EXP_SCATTER_RANGE, EXP_SCATTER_RANGE))
-		parent.call_deferred("add_child", orb)
+		pickup_layer.call_deferred("add_child", orb)
 
 func apply_elite(hp_mult: float, damage_mult: float, coin_mult: float, scale_mult: float, exp_mult: float = 1.0) -> void:
 	is_elite = true

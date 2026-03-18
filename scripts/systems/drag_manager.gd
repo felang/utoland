@@ -3,7 +3,6 @@ extends Node
 
 enum DragSource { NONE, PLACE_TOWER, MOVE_TOWER }
 
-var _tower_container: Node2D
 var _player: Node2D
 
 var _is_dragging := false
@@ -26,8 +25,7 @@ var _is_shop_mode: bool = false
 var _tower_menu: PopupMenu = null
 var _menu_deploy_id: int = -1
 
-func initialize(tower_container: Node2D, player: Node2D) -> void:
-	_tower_container = tower_container
+func initialize(_entity_layer: Node2D, player: Node2D) -> void:
 	_player = player
 
 func set_shop_mode(enabled: bool) -> void:
@@ -210,7 +208,7 @@ func _cleanup_drag() -> void:
 func spawn_tower_node(deploy_id: int, tower_id: String, level: int, grid_pos: Vector2i) -> void:
 	var tower: Node2D = SceneFactory.create_tower(tower_id, level)
 	tower.position = _grid_to_world(grid_pos)
-	_tower_container.add_child(tower)
+	SceneFactory.get_entity_layer().add_child(tower)
 	_tower_nodes[deploy_id] = tower
 
 func upgrade_tower_node(deploy_id: int, tower_id: String, new_level: int, grid_pos: Vector2i) -> void:
@@ -255,7 +253,7 @@ func _create_preview() -> void:
 				break
 	# 初始隐藏，等第一次 _update_preview 设置正确位置后才可见，避免闪烁
 	_preview_node.visible = false
-	_tower_container.get_parent().add_child(_preview_node)
+	SceneFactory.get_entity_layer().add_child(_preview_node)
 
 func _update_preview(world_pos: Vector2, _viewport_pos: Vector2 = Vector2.ZERO) -> void:
 	if _preview_node == null:
@@ -313,7 +311,7 @@ func _show_grid_overlay() -> void:
 	if _grid_overlay == null:
 		_grid_overlay = GridOverlay.new()
 		_grid_overlay.z_index = 1
-		_tower_container.get_parent().add_child(_grid_overlay)
+		SceneFactory.get_entity_layer().get_parent().add_child(_grid_overlay)
 	_grid_overlay.visible = true
 
 func _hide_grid_overlay() -> void:
