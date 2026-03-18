@@ -41,8 +41,21 @@ viewport/height: 360 → 540
 | ENTITY_SIZE_TANK | 32 | 64 |
 | BULLET_SIZE | 3 | 6 |
 | COIN_RADIUS | 3 | 6 |
+| PLAYER.initial_speed | 100.0 | 200.0 |
 
-### 3. 武器资源 (`resources/weapons/*.tres`) — 空间值 ×2
+注意：`SPRITES` 字典中的 `frame_size`（如 `Vector2(16, 16)`）是源素材像素尺寸，**不要改**。`SpriteAnimator._apply_scale()` 会用 `target_size / sprite_size` 自动计算缩放，`ENTITY_SIZE_STANDARD` 改为 32 后，16px 素材自动 scale 2x。
+
+### 3. 角色资源 (`resources/characters/*.tres`) — 速度 ×2
+
+| 角色 | 旧 speed | 新 speed |
+|------|---------|---------|
+| dora | 100.0 | 200.0 |
+| kaze | 130.0 | 260.0 |
+| gorg | (查实际值) | ×2 |
+| merlin | (查实际值) | ×2 |
+| nemo | (查实际值) | ×2 |
+
+### 4. 武器资源 (`resources/weapons/*.tres`) — 空间值 ×2
 
 **bow.tres:**
 | 字段 | 旧值 | 新值 |
@@ -62,7 +75,7 @@ viewport/height: 360 → 540
 | attack_range_per_level | [100, 120, 150] | [200, 240, 300] |
 | pivot_offset | 20.0 | 40.0 |
 
-### 4. 塔资源 (`resources/towers/*.tres`) — 射程 ×2
+### 5. 塔资源 (`resources/towers/*.tres`) — 射程 ×2
 
 **pea_shooter.tres:**
 | 字段 | 旧值 | 新值 |
@@ -76,7 +89,7 @@ viewport/height: 360 → 540
 
 **sunflower.tres:** 无空间值，不需要改。
 
-### 5. 敌人资源 (`resources/enemies/*.tres`) — 速度 ×2
+### 6. 敌人资源 (`resources/enemies/*.tres`) — 速度 ×2
 
 | 敌人 | 旧 speed | 新 speed |
 |------|---------|---------|
@@ -87,7 +100,7 @@ viewport/height: 360 → 540
 | boss_summoner | 25.0 | 50.0 |
 | boss_guardian | 20.0 | 40.0 |
 
-### 6. 投射物资源 (`resources/projectiles/*.tres`) — 速度 ×2
+### 7. 投射物资源 (`resources/projectiles/*.tres`) — 速度 ×2
 
 | 投射物 | 旧 speed | 新 speed |
 |--------|---------|---------|
@@ -96,7 +109,7 @@ viewport/height: 360 → 540
 | shuriken | 175.0 | 350.0 |
 | ice_bullet | 800.0 | 1600.0 |
 
-### 7. 近战配置 (`resources/projectiles/sword_melee.tres`) — 空间值 ×2
+### 8. 近战配置 (`resources/projectiles/sword_melee.tres`) — 空间值 ×2
 
 | 字段 | 旧值 | 新值 |
 |------|------|------|
@@ -104,19 +117,31 @@ viewport/height: 360 → 540
 | knockback_force | 80.0 | 160.0 |
 | hit_angle | 90.0 | 90.0 (不变) |
 
-### 8. 脚本硬编码空间值 — ×2
+### 9. 生成配置 (`resources/spawn/default_spawn.tres` / `spawn_config_data.gd`)
 
-**exp_orb.gd:**
-| 常量 | 旧值 | 新值 |
+| 字段 | 旧值 | 新值 |
 |------|------|------|
-| ATTRACT_RANGE | 30.0 | 60.0 |
-| ATTRACT_SPEED | 200.0 | 400.0 |
+| min_distance_from_player | 75.0 | 150.0 |
 
-**coin.gd:**
-| 常量 | 旧值 | 新值 |
+`enemy_spawner.gd` 中的 fallback 默认值 `100.0` → `200.0`。
+
+### 10. 脚本硬编码空间值 — ×2
+
+**exp_orb.gd** (注：实际为 @export var，非 const)：
+| 字段 | 旧值 | 新值 |
 |------|------|------|
-| ATTRACT_RANGE | 75.0 | 150.0 |
-| ATTRACT_SPEED | 250.0 | 500.0 |
+| attract_range | 30.0 | 60.0 |
+| attract_speed | 200.0 | 400.0 |
+
+`reset_for_pool()` 中的硬编码重置值也需同步更新。
+
+**coin.gd** (注：实际为 @export var，非 const)：
+| 字段 | 旧值 | 新值 |
+|------|------|------|
+| attract_range | 75.0 | 150.0 |
+| attract_speed | 250.0 | 500.0 |
+
+`reset_for_pool()` 中的硬编码重置值也需同步更新。
 
 **map_boundary.gd:**
 | 常量 | 旧值 | 新值 |
@@ -129,14 +154,58 @@ map_boundary.gd 中的墙体位置/尺寸从 GameConfig 计算得出，修改 Ga
 | 常量 | 旧值 | 新值 |
 |------|------|------|
 | SHOP_CAMERA_POS | Vector2(-98, 0) | Vector2(-196, 0) |
+| SHOP_ZOOM | 0.82 | ~0.56 |
 | Battle camera limits | ±272, ±208 | ±720, ±480 |
+| _get_clamped_camera_pos() 中硬编码 640.0/360.0 | 640.0, 360.0 | 改用 GameConfig.BASE_VIEWPORT_WIDTH/HEIGHT |
 
-SHOP_ZOOM 保持 0.82 不变（相对缩放比例）。
+SHOP_ZOOM 需重算：旧值 `0.82 < 360/416 = 0.865` 可显示全地图高度。新地图 `540/960 = 0.5625`，SHOP_ZOOM 应设为 ~0.56 以显示全地图高度。
+
+**enemy.gd:**
+| 常量 | 旧值 | 新值 |
+|------|------|------|
+| COIN_SCATTER_RANGE | 20.0 | 40.0 |
+| EXP_SCATTER_RANGE | 20.0 | 40.0 |
+
+**boss_brute.gd:**
+| 字段 | 旧值 | 新值 |
+|------|------|------|
+| _min_charge_distance | 40.0 | 80.0 |
 
 **drag_manager.gd:**
 网格转换公式使用 GameConfig.GRID_SIZE / MAP_HALF_WIDTH / MAP_HALF_HEIGHT，修改 GameConfig 后自动适配。确认没有硬编码数字即可。
 
-### 9. 场景文件 (.tscn) — 碰撞体 ×2
+### 11. 特效系统 — 空间值 ×2
+
+**EffectsManager (`scripts/systems/effects_manager.gd`):**
+| 常量 | 旧值 | 新值 |
+|------|------|------|
+| HIT_SPARK_SIZE | Vector2(2, 2) | Vector2(4, 4) |
+| DEATH_PARTICLE_SIZE | Vector2(3, 3) | Vector2(6, 6) |
+| spawn_enhanced_death flash_rect | Vector2(12, 12) | Vector2(24, 24) |
+| sprite_shake 默认 amount | 2.0 | 4.0 |
+
+**EffectConfigData (`scripts/resources/effect_config_data.gd`) — 空间默认值 ×2:**
+| 字段 | 旧值 | 新值 |
+|------|------|------|
+| knockback_distance | 7.5 | 15.0 |
+| damage_number_float_distance | 15.0 | 30.0 |
+| damage_number_random_offset_x | 5.0 | 10.0 |
+| death_particle_speed_min | 25.0 | 50.0 |
+| death_particle_speed_max | 60.0 | 120.0 |
+| hit_spark_spread_speed | 50.0 | 100.0 |
+| bullet_trail_length | 7.5 | 15.0 |
+| bullet_trail_width | 2.0 | 4.0 |
+| shuriken_return_distance | 7.5 | 15.0 |
+| shuriken_trail_width | 3.0 | 6.0 |
+| camera_look_ahead_distance | 20.0 | 40.0 |
+| muzzle_flash_size | Vector2(3, 3) | Vector2(6, 6) |
+| laser_beam_width | 3.0 | 6.0 |
+| laser_beam_hitbox_height | 8.0 | 16.0 |
+
+**enemy.gd 中 sprite_shake 调用：**
+硬编码 `2.0` → `4.0`。
+
+### 12. 场景文件 (.tscn) — 碰撞体 ×2
 
 **player.tscn:**
 | 组件 | 旧值 | 新值 |
@@ -146,10 +215,10 @@ SHOP_ZOOM 保持 0.82 不变（相对缩放比例）。
 | ColorRect (临时视觉) | 16×16 | 32×32 (或 scale 2x) |
 
 **map_boundary.tscn:**
-墙体位置和碰撞体尺寸需要重新计算（由 map_boundary.gd _ready() 动态设置的话不需要改 .tscn）。确认是脚本动态设置还是 .tscn 写死。
+墙体位置和碰撞体尺寸由 map_boundary.gd `_ready()` 动态设置（需确认）。若是 .tscn 写死则需更新。
 
 **敌人场景 (enemies/*.tscn):**
-碰撞体 ×2，精灵节点 scale = Vector2(2, 2)。
+碰撞体 ×2。精灵由 SpriteAnimator 动态创建，`ENTITY_SIZE_STANDARD` 改后自动 scale 2x。
 
 **塔场景 (towers/*.tscn):**
 碰撞体 ×2，精灵节点 scale = Vector2(2, 2)。
@@ -157,21 +226,9 @@ SHOP_ZOOM 保持 0.82 不变（相对缩放比例）。
 **投射物场景 (projectiles/*.tscn):**
 碰撞体 ×2，精灵节点 scale = Vector2(2, 2)。
 
-### 10. 精灵显示 — 16px 素材 scale 2x
+### 13. UI — 视口 1.5x 调整
 
-所有使用 16px 素材的实体需要在场景中设置 sprite scale = Vector2(2, 2)：
-- 角色精灵
-- 敌人精灵（通过 SpriteAnimator 创建，需检查是否支持 scale 参数）
-- 塔精灵
-- 武器精灵
-- 投射物精灵
-- 金币、经验球精灵
-
-如果 SpriteAnimator 或 SpriteLoader 中有基于 frame_size 的缩放逻辑，需要更新 `sprite_pixel_size` 或缩放因子。
-
-### 11. UI 常量 (`ui_constants.gd`) — 按 1.5x 调整
-
-视口从 640×360 → 960×540（1.5 倍），UI 元素按 1.5 倍等比放大：
+**ui_constants.gd** — 按 ×1.5 调整：
 
 | 常量 | 旧值 | 新值 |
 |------|------|------|
@@ -194,15 +251,21 @@ SHOP_ZOOM 保持 0.82 不变（相对缩放比例）。
 | GAP_ITEMS | 12 | 18 |
 | GAP_SECTIONS | 20 | 30 |
 
-注意：字体大小取整到合理值，像素风字体可能需要整数倍。
+**shop_overlay.gd 硬编码 UI 值：**
+| 字段 | 旧值 | 新值 |
+|------|------|------|
+| CARD_ICON_SIZE | Vector2(16, 16) | Vector2(24, 24) |
+| recycle_area minimum height | 40 | 60 |
+| 硬编码字体大小 9 | 9 | 14 |
 
-### 12. Boss 特有空间值
+### 14. Boss 特有空间值
 
 **boss_brute.tres:**
-- charge_speed_multiplier: 4.0 — 不变（倍率）
+- charge_speed_multiplier: 4.0 — 不变（倍率，speed 已 ×2，冲刺速度自动 ×2）
 - charge_damage_multiplier: 2.0 — 不变（倍率）
 
-Boss 的冲刺速度 = speed × charge_speed_multiplier，speed 已 ×2，冲刺速度自动 ×2。
+**boss_brute.gd:**
+- `_min_charge_distance`: 40.0 → 80.0（见第 10 节）
 
 ## 不需要修改的内容
 
@@ -214,12 +277,16 @@ Boss 的冲刺速度 = speed × charge_speed_multiplier，speed 已 ×2，冲刺
 - 动画帧率
 - 场景切换流程
 - FORCE_ATTRACT_SPEED_MULTIPLIER（倍率，不变）
+- `SPRITES` 字典中的 `frame_size`（源素材像素尺寸，不变）
+- 塔 sprite 的 tileset region_rect（源素材像素位置，不变）
 
 ## 验证要点
 
-1. 玩家在新地图上移动速度是否合理（需检查 player.gd 移动速度是否也需 ×2）
-2. 相机跟随在大地图上的表现
+1. 玩家移动速度在新地图上体感是否合理
+2. 相机跟随和 SHOP_ZOOM 在大地图上的表现
 3. 商店 UI 在 960×540 视口下的布局
-4. 塔放置网格对齐是否正确
-5. 敌人生成位置（EnemySpawner 的生成范围是否依赖地图尺寸）
-6. 特效尺寸（EffectsManager 中的伤害数字、击中火花等）
+4. 塔放置网格对齐是否正确（32px 格子）
+5. 敌人生成位置（边界外生成 + min_distance_from_player）
+6. 特效尺寸（伤害数字、击中火花、死亡粒子）
+7. 精灵缩放（16px 素材在 32px 格子中的显示）
+8. 碰撞体大小与视觉匹配
