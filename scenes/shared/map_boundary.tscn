@@ -19,8 +19,8 @@ script = ExtResource("Script_boundary")
 
 [node name="TopWall" type="StaticBody2D" parent="." unique_id=1675849148]
 position = Vector2(0, -136)
-collision_layer = 16
-collision_mask = 15
+collision_layer = 4
+collision_mask = 3
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="TopWall" unique_id=703741957]
 shape = SubResource("RectangleShape2D_iyhav")
@@ -35,8 +35,8 @@ color = Color(0.4, 0.3, 0.2, 1)
 
 [node name="BottomWall" type="StaticBody2D" parent="." unique_id=1375923321]
 position = Vector2(0, 136)
-collision_layer = 16
-collision_mask = 15
+collision_layer = 4
+collision_mask = 3
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="BottomWall" unique_id=287349087]
 shape = SubResource("RectangleShape2D_wiefh")
@@ -51,8 +51,8 @@ color = Color(0.4, 0.3, 0.2, 1)
 
 [node name="LeftWall" type="StaticBody2D" parent="." unique_id=1196996007]
 position = Vector2(-256, 0)
-collision_layer = 16
-collision_mask = 15
+collision_layer = 4
+collision_mask = 3
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="LeftWall" unique_id=1858613154]
 shape = SubResource("RectangleShape2D_6v7eo")
@@ -67,8 +67,8 @@ color = Color(0.4, 0.3, 0.2, 1)
 
 [node name="RightWall" type="StaticBody2D" parent="." unique_id=272618173]
 position = Vector2(256, 0)
-collision_layer = 16
-collision_mask = 15
+collision_layer = 4
+collision_mask = 3
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="RightWall" unique_id=1599945362]
 shape = SubResource("RectangleShape2D_ixxjf")
