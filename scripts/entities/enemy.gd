@@ -2,8 +2,8 @@ extends CharacterBody2D
 
 enum State { CHASE_PLAYER, ATTACK_TOWER }
 
-const COIN_SCATTER_RANGE: float = 20.0  # 金币掉落散布范围（像素）
-const EXP_SCATTER_RANGE: float = 20.0  # 经验球掉落散布范围（像素）
+const COIN_SCATTER_RANGE: float = 40.0  # 金币掉落散布范围（像素）
+const EXP_SCATTER_RANGE: float = 40.0  # 经验球掉落散布范围（像素）
 
 # 由 SceneFactory 注入的 Resource 数据
 var data: EnemyData = null
@@ -164,7 +164,7 @@ func remove_slow(source_id: String = "") -> void:
 func _on_hurtbox_hit(damage: float, knockback_dir: Vector2) -> void:
 	AudioManager.play("hit", -6.0)
 	health.take_damage(damage)
-	EffectsManager.sprite_shake(self, 2.0)
+	EffectsManager.sprite_shake(self, 4.0)
 	if knockback_dir.length() > 0:
 		_knockback.apply_knockback(knockback_dir.normalized())
 

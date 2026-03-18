@@ -2,7 +2,7 @@ extends Node2D
 
 # 根据 GameConfig 动态计算的地图尺寸设置碰撞墙位置和大小
 
-const WALL_THICKNESS: float = 16.0
+const WALL_THICKNESS: float = 32.0
 
 func _ready() -> void:
 	var half_w: float = GameConfig.MAP_HALF_WIDTH

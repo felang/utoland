@@ -3,8 +3,8 @@ extends Area2D
 const FORCE_ATTRACT_SPEED_MULT: float = 1.6  # 波次结束强制吸引时的速度倍率
 
 @export var value: int = 1
-@export var attract_speed: float = 250.0
-@export var attract_range: float = 75.0
+@export var attract_speed: float = 500.0
+@export var attract_range: float = 150.0
 
 var player: Node2D = null
 var is_attracted: bool = false
@@ -48,8 +48,8 @@ func _play_pickup_effect() -> void:
 func reset_for_pool() -> void:
 	value = 1
 	is_attracted = false
-	attract_speed = 250.0
-	attract_range = 75.0
+	attract_speed = 500.0
+	attract_range = 150.0
 	player = null
 	visible = true
 	modulate.a = 1.0

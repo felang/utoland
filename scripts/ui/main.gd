@@ -9,8 +9,8 @@ var _drag_manager: Node = null
 var _camera: Camera2D = null
 
 const CAMERA_TRANSITION_DURATION := 0.5
-const SHOP_ZOOM := 0.82  # 稍小于 360/416=0.865，让地图边界也能露出
-const SHOP_CAMERA_POS := Vector2(-98, 0)
+const SHOP_ZOOM := 0.56  # 稍小于 360/416=0.865，让地图边界也能露出
+const SHOP_CAMERA_POS := Vector2(-196, 0)
 
 func _ready() -> void:
 	_tower_container = Node2D.new()
@@ -124,8 +124,8 @@ func _enter_battle_phase() -> void:
 
 ## 计算相机在 limits 约束下的实际位置（避免过渡后跳变）
 func _get_clamped_camera_pos(target: Vector2, zoom_val: float) -> Vector2:
-	var view_half_w: float = 640.0 / (2.0 * zoom_val)
-	var view_half_h: float = 360.0 / (2.0 * zoom_val)
+	var view_half_w: float = float(GameConfig.BASE_VIEWPORT_WIDTH) / (2.0 * zoom_val)
+	var view_half_h: float = float(GameConfig.BASE_VIEWPORT_HEIGHT) / (2.0 * zoom_val)
 	var map_hw: float = GameConfig.MAP_HALF_WIDTH
 	var map_hh: float = GameConfig.MAP_HALF_HEIGHT
 	return Vector2(

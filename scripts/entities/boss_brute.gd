@@ -12,7 +12,7 @@ var _charge_duration: float = 0.6  # 冲锋持续时间
 var _stun_duration: float = 0.5    # 眩晕持续时间
 var _stun_timer: float = 0.0
 var _original_damage: float = 0.0
-var _min_charge_distance: float = 40.0  # 最小冲锋距离
+var _min_charge_distance: float = 80.0  # 最小冲锋距离
 
 func _ready() -> void:
 	super._ready()
