@@ -49,6 +49,16 @@ func get_tower_slot(slot_index: int) -> Dictionary:
 		return {}
 	return slot
 
+## 购买升级（花金币提升等级）
+func buy_level_up() -> bool:
+	var cost: int = GameConfig.shop_config.get_level_up_cost(PlayerProgression.player_level)
+	if InventoryManager.coins < cost:
+		return false
+	InventoryManager.coins -= cost
+	EventBus.coins_changed.emit(-cost, InventoryManager.coins)
+	PlayerProgression.buy_level_up()
+	return true
+
 ## 确认塔购买（放置成功后调用）
 func confirm_tower_purchase(slot_index: int, grid_pos: Vector2i) -> int:
 	var slot: Dictionary = _validate_slot(slot_index)
