@@ -15,8 +15,8 @@ const PPU = 32
 const GRID_SIZE = 32
 
 # 地图网格数量（固定）
-const MAP_GRID_WIDTH = 45
-const MAP_GRID_HEIGHT = 30
+const MAP_GRID_WIDTH = 41
+const MAP_GRID_HEIGHT = 28
 
 # 地图尺寸（由网格数量计算）
 var MAP_PIXEL_WIDTH: float = 0.0
