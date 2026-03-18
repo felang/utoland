@@ -37,7 +37,7 @@ utoland 是一个基于 **Godot 4.6** 的 2D 塔防 + 射击混合类游戏（�
 - **PlayerProgression** (`scripts/core/player_progression.gd`) — 经验/等级/人口上限。`add_exp(amount)` 累加经验自动升级，`exp_for_level(n)` 经验公式，`get_population_cap()` 公式化人口上限。
 - **InventoryManager** (`scripts/core/inventory_manager.gd`) — 金币、deployed_weapons/towers、shop_slots、buy/sell/merge、deploy_id。依赖 PlayerState 和 PlayerProgression。`buy_and_equip_weapon()`/`buy_and_place_tower()` 购买即部署，`can_buy_item()` 智能人口判断（考虑合成释放人口），`_check_merge()` 合成系统。
 - **StatsTracker** (`scripts/core/stats_tracker.gd`) — 战斗统计：击杀、金币、伤害、连杀。`record_kill()`/`reset_kill_streak()`/`record_damage_taken()`/`record_coins_earned()`。
-- **SceneFactory** (`scripts/core/scene_factory.gd`) — 集中管理场景实例化与对象池。提供 `create_tower()`, `create_enemy()`, `create_exp_orb()`, `create_coin()`, `create_projectile()` 等工厂方法。高频对象（投射物、普通敌人 normal/fast/tank、金币、经验球）内部走对象池复用，对外创建 API 不变。回收通过 `release_enemy()` / `release_coin()` / `release_exp_orb()` / `release_projectile()` 替代 `queue_free()`。预热：`warmup_initial()`（main 场景加载时）+ `warmup_for_wave(wave_data)`（每波开始前）。`clear_all_pools()` 在场景退出时清理。创建实体必须通过此工厂。
+- **SceneFactory** (`scripts/core/scene_factory.gd`) — 集中管理场景实例化与对象池。提供 `create_tower()`, `create_enemy()`, `create_exp_orb()`, `create_coin()`, `create_projectile()` 等工厂方法。高频对象（投射物、普通敌人 normal/fast/tank、金币、经验球）内部走对象池复用，对外创建 API 不变。回收通过 `release_enemy()` / `release_coin()` / `release_exp_orb()` / `release_projectile()` 替代 `queue_free()`。预热：`warmup_initial()`（main 场景加载时）+ `warmup_for_wave(wave_data)`（每波开始前）。`clear_all_pools()` 在场景退出时清理。创建实体必须通过此工厂。**容器管理**：`init_containers(entity_layer, projectile_layer, pickup_layer)` 由 main.gd 调用，之后通过 `get_entity_layer()/get_projectile_layer()/get_pickup_layer()` 获取对应容器。实体添加到场景树必须用正确的容器（测试环境自动 fallback 到 current_scene）。
 - **EffectsManager** (`scripts/systems/effects_manager.gd`) — 特效管理：伤害数字、击中火花、死亡爆炸、红闪（flash_hit）、击中抖动（sprite_shake）、增强死亡特效（spawn_enhanced_death）、Boss 击杀慢动作（hitstop）等视觉效果。
 - **AudioManager** (`scripts/systems/audio_manager.gd`) — 音效管理：SFX 通过 AudioStreamPlayer 池化播放 `play(sound_id)`，BGM 通过独立 AudioStreamPlayer 播放 `play_bgm(track_id)` / `stop_bgm()` / `fade_bgm(duration)`。SFX 放 `assets/sfx/`，BGM 放 `assets/bgm/`。
 - **EventBus** (`scripts/core/event_bus.gd`) — 全局事件总线，用于跨系统解耦通信。商店信号：`item_purchased/item_sold/item_merged/player_level_changed/tower_moved`。战斗信号：`wave_started/wave_completed/wave_transition_ready/enemy_killed/boss_killed/boss_escaped/coins_changed/coins_generated`。经验信号：`exp_collected/exp_changed`。
@@ -91,16 +91,60 @@ start_menu → character_selection → map_select → main（SHOP 阶段，首�
 
 - **配置驱动**: 游戏数值通过 Resource 类定义 (`scripts/resources/`)，以 `.tres` 文件存储 (`resources/`)，由 `GameConfig` 在运行时加载。修改数值编辑对应 `.tres` 文件即可。
 - **工厂 + Resource 注入**: `SceneFactory` 创建实体时注入对应的 Resource 数据（`EnemyData`、`TowerData`），实体不再直接依赖 `GameConfig` 字典
-- **组件化实体**: 行为通过子节点组件组合，不通过类继承。伤害通过 `Hitbox`/`Hurtbox` Area2D 体系处理。`HealthComponent` 支持 `damage_reduction` 和带 `attacker` 参数的 `damaged` 信号。`SlowHandler` 为效果字典模式，支持多源减速叠加（取最大值）。塔支持 `apply_buff/remove_buff` 增益系统。敌人支持 `apply_root/remove_root` 定身系统
+- **组件化实体**: 行为通过子节点组件组合，不通过类继承。伤害通过 `Hitbox`/`Hurtbox` Area2D 体系处理（所有伤害流统一走此管线，包括塔受伤）。`HealthComponent` 支持 `damage_reduction` 和带 `attacker` 参数的 `damaged` 信号。`SlowHandler` 为效果字典模式，支持多源减速叠加（取最大值）。塔支持 `apply_buff/remove_buff` 增益系统。敌人支持 `apply_root/remove_root` 定身系统
 - **武器 Pivot+Offset 架构**: WeaponManager 为每把武器创建 `WeaponPivot → WeaponOffset` 子树。Pivot 用 position 在轨道圆上移动（不旋转），承载索敌(TargetFinderComponent)和攻击组件(RangedAttackComponent/MeleeAttackComponent)。Offset position=(0,0) 承载视觉（WeaponSprite/FirePoint），近战突刺时 Tween 推 Offset 并携带 Hitbox 扫过路径命中敌人。无武器子类，差异通过组件组合和 WeaponData 配置实现
-- **塔组件化**: 统一 `tower.gd` 基座，通过 `_ready()` 中 `get_node_or_null()` 自动检测挂载的组件（RangedAttackComponent 或 GeneratorComponent）并初始化。无 TowerShooter/TowerGenerator 子类
+- **塔组件化**: 统一 `tower.gd` 基座，通过 `_ready()` 中 `get_node_or_null()` 自动检测挂载的组件（RangedAttackComponent/GeneratorComponent/Hurtbox）并初始化。Hurtbox 通过 `_on_hurtbox_hit_taken()` 包装方法连接到 HealthComponent。无 TowerShooter/TowerGenerator 子类
 - **投射物组件化**: 统一 `Projectile` 基座，飞行行为（LinearMovementComponent）、视觉效果（TrailComponent、RotationComponent）和命中效果（SlowOnHitComponent、KnockbackOnHitComponent、PierceComponent、BounceOnHitComponent）均为场景子节点组件。每种投射物一个 .tscn 场景（arrow/shuriken/pea_bullet/ice_bullet），预配好所需组件。命中时基座遍历子节点调用 `on_hit(target, projectile)`
 - **索敌组件**: `TargetFinderComponent` 使用 Area2D 物理检测，支持可插拔策略（NEAREST/LOWEST_HP/HIGHEST_HP/RANDOM）。武器和塔共用此组件
 - **角色被动**: 角色通过 `CharacterData.passive_id` 字段引用被动 ID（如 `kaze_swift`、`nemo_guardian`），PlayerState 在 `init_character()` 时解析并存入 `player_stats`，不再使用枚举类型的 `PassiveType`
 - **事件总线**: 跨系统通信通过 `EventBus` 全局事件总线，避免系统间直接耦合
 - **信号通信**: 组件通过信号与宿主通信（如 `HealthComponent.died`）；跨系统事件通过 `EventBus`
 - **分组管理**: 实体通过 Godot 分组 (`towers`, `enemies`, `coins`, `exp_orbs`) 进行批量操作
-- **对象池**: 高频实体（投射物、普通敌人、金币、经验球）通过 SceneFactory 内部对象池复用。可池化实体实现 `var _is_pooled: bool` 和 `reset_for_pool()` 方法。销毁时调用 `SceneFactory.release_*()` 而非 `queue_free()`。投射物和敌人的 release 使用 `call_deferred` 避免物理回调冲突。组件提供 `HealthComponent.reset()` 和 `SlowHandler.clear_all()` 支持池化重置
+- **对象池**: 高频实体（投射物、普通敌人、金币、经验球）通过 SceneFactory 内部对象池复用。可池化实体实现 `var _is_pooled: bool` 和 `reset_for_pool()` 方法。销毁时调用 `SceneFactory.release_*()` 而非 `queue_free()`。投射物和敌人的 release 使用 `call_deferred` 避免物理回调冲突。组件提供 `HealthComponent.reset()`、`SlowHandler.clear_all()`、`Hurtbox.reset_for_pool()` 支持池化重置
+
+### 碰撞系统
+
+**碰撞层定义**（project.godot 中命名，共 8 层）：
+
+| 层 | 名称 | bitmask | 用途 |
+|---|---|---|---|
+| 1 | Player | 1 | 玩家 CharacterBody2D |
+| 2 | Enemy | 2 | 敌人 CharacterBody2D |
+| 3 | Solid | 4 | 塔/障碍物 StaticBody2D |
+| 4 | Pickup | 8 | Coin/ExpOrb (Area2D) |
+| 5 | PlayerAttack | 16 | 玩家侧攻击 Hitbox（投射物 + 近战） |
+| 6 | EnemyAttack | 32 | 敌人侧攻击 Hitbox（接触伤害） |
+| 7 | DefenderHurt | 64 | 被敌人攻击的目标 Hurtbox（玩家 + 塔） |
+| 8 | EnemyHurt | 128 | 被玩家攻击的目标 Hurtbox（敌人） |
+
+**碰撞矩阵**：
+- PlayerAttack(5) → EnemyHurt(8)：玩家攻击命中敌人
+- EnemyAttack(6) → DefenderHurt(7)：敌人接触伤害玩家和塔
+- Pickup(4) → Player(1)：拾取检测
+- Enemy(2) / Player(1) → Solid(3)：被塔/障碍物阻挡
+
+**碰撞形状规范**：
+- 移动实体（Player/Enemy）：CircleShape2D（Player r=14, Enemy r=14, Boss r=22）
+- 静态实体（Tower/障碍物）：RectangleShape2D 32×32
+- Hitbox/Hurtbox 尺寸：玩家 Hurtbox 小于精灵（r=8），敌人 Hurtbox 大于精灵（r=15），投射物 Hitbox 略大（r=6~8）
+
+**Hurtbox repeat_damage 模式**：`@export var repeat_damage: bool`，启用后对每个重叠的 Hitbox 独立计时（Dictionary `_hitbox_timers`），每 `repeat_interval` 秒重复触发 `hit_taken`。玩家和塔的 Hurtbox 启用此模式（敌人接触持续伤害），敌人 Hurtbox 不启用（投射物命中即消失）。
+
+### 渲染深度分层
+
+main 场景通过容器节点管理渲染层级，结合 Y-Sort 实现实体间前后遮挡：
+
+```
+z_index -1 : TileMap 地面/装饰
+z_index  0 : PickupLayer（Coin、ExpOrb）
+z_index  1 : EntityLayer（Player、Enemy、Tower）— y_sort_enabled=true
+z_index  2 : ProjectileLayer（投射物）
+z_index  3+: 特效（伤害数字、击中火花等，由 EffectConfigData 配置）
+```
+
+- 实体通过 `y_sort_origin` 属性设置排序基准点到脚底（Player/Enemy/Tower=16, Boss=24）
+- 投射物不参与 Y-Sort（固定在实体上方）
+- SceneFactory 管理容器引用，各系统通过 `SceneFactory.get_*_layer()` 获取正确容器
 
 ## 开发流程
 
