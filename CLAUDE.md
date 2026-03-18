@@ -83,7 +83,7 @@ start_menu → character_selection → map_select → main（SHOP 阶段，首�
 - **配置驱动**: 游戏数值通过 Resource 类定义 (`scripts/resources/`)，以 `.tres` 文件存储 (`resources/`)，由 `GameConfig` 在运行时加载。修改数值编辑对应 `.tres` 文件即可。
 - **工厂 + Resource 注入**: `SceneFactory` 创建实体时注入对应的 Resource 数据（`EnemyData`、`TowerData`），实体不再直接依赖 `GameConfig` 字典
 - **组件化实体**: 行为通过子节点组件组合，不通过类继承。伤害通过 `Hitbox`/`Hurtbox` Area2D 体系处理。`HealthComponent` 支持 `damage_reduction` 和带 `attacker` 参数的 `damaged` 信号。`SlowHandler` 为效果字典模式，支持多源减速叠加（取最大值）。塔支持 `apply_buff/remove_buff` 增益系统。敌人支持 `apply_root/remove_root` 定身系统
-- **武器 Pivot+Offset 架构**: WeaponManager 为每把武器创建 `WeaponPivot → WeaponOffset` 子树。Pivot 控制旋转朝向，Offset 提供固定偏移距离。索敌(TargetFinderComponent)和攻击组件(RangedAttackComponent/MeleeAttackComponent)挂在 Offset 下，以武器位置为中心索敌。无武器子类，差异通过组件组合和 WeaponData 配置实现
+- **武器 Pivot+Offset 架构**: WeaponManager 为每把武器创建 `WeaponPivot → WeaponOffset` 子树。Pivot 用 position 在轨道圆上移动（不旋转），承载索敌(TargetFinderComponent)和攻击组件(RangedAttackComponent/MeleeAttackComponent)。Offset position=(0,0) 承载视觉（WeaponSprite/FirePoint），近战突刺时 Tween 推 Offset 并携带 Hitbox 扫过路径命中敌人。无武器子类，差异通过组件组合和 WeaponData 配置实现
 - **塔组件化**: 统一 `tower.gd` 基座，通过 `_ready()` 中 `get_node_or_null()` 自动检测挂载的组件（RangedAttackComponent 或 GeneratorComponent）并初始化。无 TowerShooter/TowerGenerator 子类
 - **投射物组件化**: 统一 `Projectile` 基座，飞行行为（LinearMovementComponent）、视觉效果（TrailComponent、RotationComponent）和命中效果（SlowOnHitComponent、KnockbackOnHitComponent、PierceComponent、BounceOnHitComponent）均为场景子节点组件。每种投射物一个 .tscn 场景（arrow/shuriken/pea_bullet/ice_bullet），预配好所需组件。命中时基座遍历子节点调用 `on_hit(target, projectile)`
 - **索敌组件**: `TargetFinderComponent` 使用 Area2D 物理检测，支持可插拔策略（NEAREST/LOWEST_HP/HIGHEST_HP/RANDOM）。武器和塔共用此组件
