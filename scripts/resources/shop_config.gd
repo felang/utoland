@@ -9,7 +9,7 @@ extends Resource
 
 # 分段波次奖励
 @export var wave_reward_per_tier: PackedInt32Array = [5, 8, 10]
-@export var wave_reward_tier_thresholds: PackedInt32Array = [1, 6, 11]
+@export var wave_reward_tier_thresholds: PackedInt32Array = [1, 5, 9]
 
 # Boss 赏金
 @export var boss_bounty: Dictionary = {
