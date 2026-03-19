@@ -34,6 +34,8 @@ func _ready() -> void:
 	_init_exp_bar()
 
 func _process(delta: float) -> void:
+	if player == null or not is_instance_valid(player):
+		player = get_tree().get_first_node_in_group(Enums.Group.PLAYER)
 	_update_hp()
 	_update_coins()
 	_update_countdown(delta)

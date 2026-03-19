@@ -132,19 +132,26 @@ start_menu → character_selection → map_select → main（SHOP 阶段，首�
 
 ### 渲染深度分层
 
-main 场景通过容器节点管理渲染层级，结合 Y-Sort 实现实体间前后遮挡：
+分层容器（PickupLayer/EntityLayer/ProjectileLayer）位于**地图场景内部**，main.gd 加载地图后动态获取引用。Player 也在运行时实例化并添加到地图的 EntityLayer。这样地图的 TileMap 物件层（Objects）可以和实体在同一个 y_sort 父节点下自然排序。
 
 ```
-z_index -1 : TileMap 地面/装饰
-z_index  0 : PickupLayer（Coin、ExpOrb）
-z_index  1 : EntityLayer（Player、Enemy、Tower）— y_sort_enabled=true
-z_index  2 : ProjectileLayer（投射物）
+地图场景结构：
+├── Background (Sprite2D, z=-1)
+├── Ground (TileMapLayer, z=-1)
+├── Decoration (TileMapLayer)
+├── PickupLayer (Node2D, z=0)          — Coin、ExpOrb
+├── EntityLayer (Node2D, z=1, y_sort)  — Player、Enemy、Tower
+│   └── Objects (TileMapLayer, y_sort) — 碰撞+遮挡物件（树、石头等）
+├── ProjectileLayer (Node2D, z=2)      — 投射物
+├── MapBoundary (instance)
 z_index  3+: 特效（伤害数字、击中火花等，由 EffectConfigData 配置）
 ```
 
 - 实体通过 `y_sort_origin` 属性设置排序基准点到脚底（Player/Enemy/Tower=16, Boss=24）
+- Objects TileMapLayer 的 tile 通过 TileSet 配置 y_sort_origin 和碰撞，与实体自然 y-sort
 - 投射物不参与 Y-Sort（固定在实体上方）
 - SceneFactory 管理容器引用，各系统通过 `SceneFactory.get_*_layer()` 获取正确容器
+- 新增地图必须包含 `PickupLayer`、`EntityLayer`、`ProjectileLayer` 三个约定命名的子节点
 
 ## 开发流程
 

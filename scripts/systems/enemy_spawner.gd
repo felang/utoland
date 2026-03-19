@@ -30,7 +30,6 @@ func _ready() -> void:
 	map_max_x = GameConfig.MAP_HALF_WIDTH
 	map_min_y = -GameConfig.MAP_HALF_HEIGHT
 	map_max_y = GameConfig.MAP_HALF_HEIGHT
-	player = get_tree().get_first_node_in_group(Enums.Group.PLAYER)
 	if GameConfig.spawn:
 		min_distance_from_player = GameConfig.spawn.min_distance_from_player
 	EventBus.wave_started.connect(_on_wave_started)
@@ -148,6 +147,8 @@ func get_random_spawn_position() -> Vector2:
 	return spawn_pos
 
 func _on_wave_started(_wave_number: int, wave_data: WaveData) -> void:
+	if player == null:
+		player = get_tree().get_first_node_in_group(Enums.Group.PLAYER)
 	_current_wave_data = wave_data
 	_is_wave_active = true
 	spawn_timer = 0.0

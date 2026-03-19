@@ -1,27 +1,14 @@
 [gd_scene format=3 uid="uid://8ybblxtktrdo"]
 
-[ext_resource type="PackedScene" uid="uid://c45jgyl4kxvbv" path="res://scenes/entities/player.tscn" id="1_0wfyh"]
 [ext_resource type="Script" uid="uid://b75i4uap6hmbf" path="res://scripts/ui/main.gd" id="1_main"]
 [ext_resource type="Script" uid="uid://b0j68ldejylty" path="res://scripts/systems/enemy_spawner.gd" id="2_0wfyh"]
 [ext_resource type="PackedScene" uid="uid://cw1ribon6hcfu" path="res://scenes/ui/hud.tscn" id="4_tbgi4"]
 [ext_resource type="Script" uid="uid://spn074bn5fw7" path="res://scripts/systems/wave_manager.gd" id="6_tefeu"]
-[ext_resource type="PackedScene" uid="uid://5u5tndodgthf" path="res://scenes/shared/map_boundary.tscn" id="7_o6xl0"]
 [ext_resource type="PackedScene" uid="uid://dkqv7xm2w3a8p" path="res://scenes/ui/shop_overlay.tscn" id="8_shop"]
 [ext_resource type="Script" path="res://scripts/systems/drag_manager.gd" id="9_drag"]
 
 [node name="Main" type="Node2D" unique_id=1198174103]
 script = ExtResource("1_main")
-
-[node name="PickupLayer" type="Node2D" parent="."]
-
-[node name="EntityLayer" type="Node2D" parent="."]
-z_index = 1
-y_sort_enabled = true
-
-[node name="Player" parent="EntityLayer" unique_id=2056081713 instance=ExtResource("1_0wfyh")]
-
-[node name="ProjectileLayer" type="Node2D" parent="."]
-z_index = 2
 
 [node name="EnemySpawner" type="Node" parent="." unique_id=1258091345]
 script = ExtResource("2_0wfyh")
@@ -30,8 +17,6 @@ script = ExtResource("2_0wfyh")
 
 [node name="WaveManager" type="Node" parent="." unique_id=1826046686]
 script = ExtResource("6_tefeu")
-
-[node name="MapBoundary" parent="." unique_id=1220843918 instance=ExtResource("7_o6xl0")]
 
 [node name="ShopOverlay" parent="." instance=ExtResource("8_shop")]
 

@@ -2,16 +2,22 @@ extends Node2D
 
 enum Phase { SHOP, BATTLE }
 
+const PLAYER_SCENE := preload("res://scenes/entities/player.tscn")
+
 var current_phase: Phase = Phase.SHOP
 var _shop_overlay: CanvasLayer = null
 var _drag_manager: Node = null
-
-@onready var _entity_layer: Node2D = $EntityLayer
-@onready var _projectile_layer: Node2D = $ProjectileLayer
-@onready var _pickup_layer: Node2D = $PickupLayer
+var _player: Node2D = null
+var _entity_layer: Node2D = null
+var _projectile_layer: Node2D = null
+var _pickup_layer: Node2D = null
 
 func _ready() -> void:
 	_load_map()
+
+	# 创建玩家并添加到地图的 EntityLayer
+	_player = PLAYER_SCENE.instantiate()
+	_entity_layer.add_child(_player)
 
 	# 初始化分层容器（供 SceneFactory 全局使用）
 	SceneFactory.init_containers(_entity_layer, _projectile_layer, _pickup_layer)
@@ -22,13 +28,12 @@ func _ready() -> void:
 
 	# DragManager（预先在 main.tscn 中添加）
 	_drag_manager = $DragManager
-	_drag_manager.initialize(_entity_layer, $EntityLayer/Player)
+	_drag_manager.initialize(_entity_layer, _player)
 	_shop_overlay.drag_manager = _drag_manager
 
 	# WeaponManager 注入（Player 的子节点）
-	var player: Node2D = $EntityLayer/Player
-	if player.has_node("WeaponManager"):
-		var wm: WeaponManager = player.get_node("WeaponManager")
+	if _player.has_node("WeaponManager"):
+		var wm: WeaponManager = _player.get_node("WeaponManager")
 		_shop_overlay.weapon_manager = wm
 
 	# 暂停覆盖层
@@ -49,7 +54,7 @@ func _ready() -> void:
 
 func _enter_shop_phase(is_first: bool = false) -> void:
 	current_phase = Phase.SHOP
-	$EntityLayer/Player.set_input_enabled(true)
+	_player.set_input_enabled(true)
 	_drag_manager.set_shop_mode(true)
 
 	# 波次结束奖励金币（首次不发）
@@ -59,7 +64,7 @@ func _enter_shop_phase(is_first: bool = false) -> void:
 		InventoryManager.coins += reward
 		StatsTracker.record_coins_earned(reward)
 		EventBus.coins_changed.emit(reward, InventoryManager.coins)
-		var player_node: Node2D = $EntityLayer/Player
+		var player_node: Node2D = _player
 		if player_node:
 			player_node.coins = InventoryManager.coins
 
@@ -94,6 +99,14 @@ func _load_map() -> void:
 	var map_instance = load(map_data.map_scene).instantiate()
 	add_child(map_instance)
 	move_child(map_instance, 0)
+
+	# 从地图场景中获取分层容器
+	_entity_layer = map_instance.get_node("EntityLayer")
+	_projectile_layer = map_instance.get_node("ProjectileLayer")
+	_pickup_layer = map_instance.get_node("PickupLayer")
+	assert(_entity_layer != null, "地图缺少 EntityLayer 节点")
+	assert(_projectile_layer != null, "地图缺少 ProjectileLayer 节点")
+	assert(_pickup_layer != null, "地图缺少 PickupLayer 节点")
 
 func _on_coins_generated(amount: int, _pos: Vector2) -> void:
 	var player: Node2D = get_tree().get_first_node_in_group(Enums.Group.PLAYER)
