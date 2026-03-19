@@ -47,6 +47,7 @@ func _ready() -> void:
 	EventBus.wave_transition_ready.connect(_on_wave_transition_ready)
 	EventBus.coins_generated.connect(_on_coins_generated)
 	EventBus.wave_started.connect(_on_wave_started_warmup)
+	EventBus.boss_killed.connect(_on_boss_killed)
 
 	# 进入首次 SHOP 阶段
 	_enter_shop_phase(true)
@@ -60,13 +61,8 @@ func _enter_shop_phase(is_first: bool = false) -> void:
 	# 波次结束奖励金币（首次不发）
 	if not is_first:
 		_shop_overlay.slide_in()
-		var reward: int = GameConfig.shop_config.wave_reward
-		InventoryManager.coins += reward
-		StatsTracker.record_coins_earned(reward)
-		EventBus.coins_changed.emit(reward, InventoryManager.coins)
-		var player_node: Node2D = _player
-		if player_node:
-			player_node.coins = InventoryManager.coins
+		var reward: int = GameConfig.shop_config.get_wave_reward(PlayerState.current_wave)
+		_add_coins(reward)
 
 	# 以下无条件执行（首次和非首次都需要）
 	_shop_overlay.refresh_shop(is_first)
@@ -108,12 +104,20 @@ func _load_map() -> void:
 	assert(_projectile_layer != null, "地图缺少 ProjectileLayer 节点")
 	assert(_pickup_layer != null, "地图缺少 PickupLayer 节点")
 
+func _add_coins(amount: int) -> void:
+	InventoryManager.coins += amount
+	StatsTracker.record_coins_earned(amount)
+	EventBus.coins_changed.emit(amount, InventoryManager.coins)
+	if _player:
+		_player.coins = InventoryManager.coins
+
 func _on_coins_generated(amount: int, _pos: Vector2) -> void:
-	var player: Node2D = get_tree().get_first_node_in_group(Enums.Group.PLAYER)
-	if player and player.has_method("add_coins"):
-		player.add_coins(amount)
-	else:
-		InventoryManager.coins += amount
+	_add_coins(amount)
+
+func _on_boss_killed(boss_id: String) -> void:
+	var bounty: int = GameConfig.shop_config.boss_bounty.get(boss_id, 0)
+	if bounty > 0:
+		_add_coins(bounty)
 
 func _on_wave_started_warmup(_wave_num: int, wave_data: WaveData) -> void:
 	SceneFactory.warmup_for_wave(wave_data)

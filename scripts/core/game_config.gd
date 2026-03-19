@@ -50,7 +50,7 @@ const UI_CARD_GAP = 30
 const PLAYER = {
 	"initial_hp": 100.0,
 	"initial_speed": 200.0,
-	"initial_coins": 100,
+	"initial_coins": 40,
 	"hp_regen_interval": 5.0,
 	"default_enemy_touch_damage": 10.0  # 敌人没有 touch_damage 属性时的默认伤害
 }
