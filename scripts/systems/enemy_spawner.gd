@@ -1,9 +1,9 @@
 extends Node
 class_name EnemySpawner
 
-const SCALING_START_WAVE := 11
-const HP_SCALING_PER_WAVE := 1.06
-const DAMAGE_SCALING_PER_WAVE := 1.04
+const HP_SCALING_PER_WAVE: float = 0.055
+const DAMAGE_SCALING_START_WAVE: int = 9
+const DAMAGE_SCALING_PER_WAVE: float = 0.0375
 
 var spawn_timer: float = 0.0
 var player: Node2D
@@ -78,13 +78,11 @@ func _should_spawn_boss() -> bool:
 	return _current_phase_index == _current_wave_data.spawn_phases.size() - 1 and not _boss_spawned
 
 static func get_wave_scaling(wave_number: int) -> Dictionary:
-	if wave_number < SCALING_START_WAVE:
-		return {"hp_mult": 1.0, "damage_mult": 1.0}
-	var waves_past: int = wave_number - SCALING_START_WAVE + 1
-	return {
-		"hp_mult": pow(HP_SCALING_PER_WAVE, waves_past),
-		"damage_mult": pow(DAMAGE_SCALING_PER_WAVE, waves_past)
-	}
+	var hp_mult: float = 1.0 + (wave_number - 1) * HP_SCALING_PER_WAVE
+	var damage_mult: float = 1.0
+	if wave_number >= DAMAGE_SCALING_START_WAVE:
+		damage_mult = 1.0 + (wave_number - DAMAGE_SCALING_START_WAVE) * DAMAGE_SCALING_PER_WAVE
+	return {"hp_mult": hp_mult, "damage_mult": damage_mult}
 
 func pick_weighted_enemy(weights: Dictionary) -> String:
 	var total_weight: int = 0
