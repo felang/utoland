@@ -10,4 +10,4 @@ hp = 35.0
 speed = 180.0
 damage = 8.0
 exp_drop_min = 1
-exp_drop_max = 2
+exp_drop_max = 1

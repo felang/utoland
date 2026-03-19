@@ -5,6 +5,6 @@
 [resource]
 script = ExtResource("1")
 base_exp = 5.0
-exp_exponent = 2.0
+exp_exponent = 1.6
 initial_population = 2
 population_per_level = 1

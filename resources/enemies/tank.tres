@@ -9,5 +9,5 @@ display_name = "坦克敌人"
 hp = 200.0
 speed = 50.0
 damage = 25.0
-exp_drop_min = 2
-exp_drop_max = 3
+exp_drop_min = 1
+exp_drop_max = 2

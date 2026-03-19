@@ -5,8 +5,8 @@
 
 [sub_resource type="Resource" id="GeneratorConfigData_sunflower"]
 script = ExtResource("2")
-generate_amount_per_level = PackedFloat32Array(5, 8, 12)
-generate_interval_per_level = PackedFloat32Array(10.0, 8.0, 6.0)
+generate_amount_per_level = PackedFloat32Array(3, 5, 8)
+generate_interval_per_level = PackedFloat32Array(12.0, 10.0, 8.0)
 
 [resource]
 script = ExtResource("1")

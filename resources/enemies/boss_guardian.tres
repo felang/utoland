@@ -9,6 +9,6 @@ display_name = "守护者"
 hp = 1500.0
 speed = 40.0
 damage = 40.0
-exp_drop_min = 10
+exp_drop_min = 12
 exp_drop_max = 15
 is_boss = true

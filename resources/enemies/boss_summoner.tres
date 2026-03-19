@@ -10,5 +10,5 @@ hp = 800.0
 speed = 50.0
 damage = 20.0
 exp_drop_min = 10
-exp_drop_max = 15
+exp_drop_max = 12
 is_boss = true
