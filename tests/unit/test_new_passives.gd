@@ -26,10 +26,10 @@ func test_gorg_passive_loaded() -> void:
 	assert_almost_eq(PlayerState.new_passive_value_2, 0.5, 0.001)
 
 func test_dora_passive_loaded() -> void:
-	PlayerState.init_character("dora")
-	assert_eq(PlayerState.new_passive_id, "fortify_regen")
-	assert_almost_eq(PlayerState.new_passive_value, 0.02, 0.001)
-	assert_almost_eq(PlayerState.new_passive_value_2, 3.0, 0.001)
+	var dora: CharacterData = GameConfig.characters["dora"]
+	assert_eq(dora.new_passive_id, "", "Dora 应使用新被动进化系统")
+	assert_not_null(dora.passive_evolution, "Dora 应有 passive_evolution 数据")
+	assert_eq(dora.passive_evolution.passive_id, "sword_saint")
 
 func test_merlin_passive_loaded() -> void:
 	PlayerState.init_character("merlin")
@@ -54,7 +54,8 @@ func test_switch_character_updates_passive() -> void:
 	PlayerState.init_character("kaze")
 	assert_eq(PlayerState.new_passive_id, "swift_combo")
 	PlayerState.init_character("dora")
-	assert_eq(PlayerState.new_passive_id, "fortify_regen")
+	# Dora 使用被动进化系统，new_passive_id 为空
+	assert_eq(PlayerState.new_passive_id, "", "Dora 使用 passive_evolution，new_passive_id 应为空")
 
 func test_reset_applies_starting_gold() -> void:
 	PlayerState.current_character = Enums.Character.DORA
