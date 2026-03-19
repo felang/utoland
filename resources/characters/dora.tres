@@ -1,6 +1,7 @@
-[gd_resource type="Resource" script_class="CharacterData" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="CharacterData" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scripts/resources/character_data.gd" id="1"]
+[ext_resource type="Resource" path="res://resources/passives/dora_sword_saint.tres" id="passive_evo"]
 
 [resource]
 script = ExtResource("1")
@@ -18,9 +19,10 @@ recommended_tower = "pea_shooter"
 passive_type = "coin_bonus"
 passive_value = 0.2
 passive_description = "金币掉落 +20%"
-new_passive_id = "fortify_regen"
-new_passive_value = 0.02
-new_passive_value_2 = 3.0
+new_passive_id = ""
+new_passive_value = 0.0
+new_passive_value_2 = 0.0
+passive_evolution = ExtResource("passive_evo")
 sprite_frames_path = "res://assets/characters/dora/sprite.res"
 portrait_path = "res://assets/characters/dora/portrait.png"
 sprite_pixel_size = 16.0

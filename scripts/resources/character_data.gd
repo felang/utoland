@@ -28,6 +28,8 @@ extends Resource
 @export var new_passive_value: float = 0.0
 ## 新被动技能数值 2
 @export var new_passive_value_2: float = 0.0
+## 被动进化数据（三阶进化系统，覆盖旧被动字段）
+@export var passive_evolution: PassiveEvolutionData = null
 ## 精灵 SpriteFrames 资源路径（Aseprite Wizard 导出的 .res）
 @export var sprite_frames_path: String = ""
 ## 头像 PNG 路径
