@@ -32,3 +32,32 @@ func test_reset_for_pool_clears_destroy_flag() -> void:
 	proj.reset_for_pool()
 	assert_false(proj._should_destroy)
 	proj.queue_free()
+
+func test_setup_stores_target() -> void:
+	var proj := Projectile.new()
+	add_child(proj)
+	var target := Node2D.new()
+	add_child(target)
+	proj.data = ProjectileData.new()
+	proj.setup(proj.data, 10.0, Vector2.ZERO, Vector2.RIGHT, target)
+	assert_eq(proj.target, target)
+	target.queue_free()
+	proj.queue_free()
+
+func test_setup_without_target_defaults_null() -> void:
+	var proj := Projectile.new()
+	add_child(proj)
+	proj.data = ProjectileData.new()
+	proj.setup(proj.data, 10.0, Vector2.ZERO, Vector2.RIGHT)
+	assert_null(proj.target)
+	proj.queue_free()
+
+func test_reset_for_pool_clears_target() -> void:
+	var proj := Projectile.new()
+	add_child(proj)
+	var t := Node2D.new()
+	proj.target = t
+	proj.reset_for_pool()
+	assert_null(proj.target)
+	t.free()
+	proj.queue_free()

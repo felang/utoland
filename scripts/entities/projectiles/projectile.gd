@@ -6,8 +6,10 @@ var damage: float = 0.0
 var direction: Vector2 = Vector2.RIGHT
 var _is_pooled: bool = false
 var _should_destroy: bool = false
+var target: Node2D = null
 
-func setup(p_data: ProjectileData, dmg: float, from: Vector2, dir: Vector2) -> void:
+func setup(p_data: ProjectileData, dmg: float, from: Vector2, dir: Vector2, p_target: Node2D = null) -> void:
+	target = p_target
 	data = p_data
 	damage = dmg
 	direction = dir
@@ -59,6 +61,7 @@ func _has_lifecycle_component() -> bool:
 	return false
 
 func reset_for_pool() -> void:
+	target = null
 	_should_destroy = false
 	var hitbox = get_node_or_null("Hitbox") as Hitbox
 	if hitbox and hitbox.area_entered.is_connected(_on_hitbox_area_entered):
