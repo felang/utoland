@@ -1,31 +1,27 @@
-[gd_resource type="Resource" script_class="WaveData" format=3 uid="uid://87ltfvkbtbun"]
+[gd_resource type="Resource" script_class="WaveData" format=3]
 
-[ext_resource type="Script" uid="uid://de56wiabkilte" path="res://scripts/resources/wave_data.gd" id="1_2atvb"]
-[ext_resource type="Script" uid="uid://cd2uxnp0n2bb3" path="res://scripts/resources/spawn_phase_data.gd" id="2_ru4no"]
+[ext_resource type="Script" uid="uid://de56wiabkilte" path="res://scripts/resources/wave_data.gd" id="1"]
+[ext_resource type="Script" uid="uid://cd2uxnp0n2bb3" path="res://scripts/resources/spawn_phase_data.gd" id="2"]
 
-[sub_resource type="Resource" id="Resource_2atvb"]
-script = ExtResource("2_ru4no")
-duration_ratio = 0.3
-spawn_interval = 1.5
-
-[sub_resource type="Resource" id="Resource_ru4no"]
-script = ExtResource("2_ru4no")
+[sub_resource type="Resource" id="phase_1"]
+script = ExtResource("2")
+duration_ratio = 0.4
 spawn_interval = 0.9
 
-[sub_resource type="Resource" id="Resource_hjj6r"]
-script = ExtResource("2_ru4no")
-duration_ratio = 0.2
-spawn_interval = 0.5
+[sub_resource type="Resource" id="phase_2"]
+script = ExtResource("2")
+duration_ratio = 0.6
+spawn_interval = 0.4
 
 [resource]
-script = ExtResource("1_2atvb")
+script = ExtResource("1")
 wave_number = 6
-time_limit = 50.0
-max_alive_enemies = 22
-spawn_phases = Array[ExtResource("2_ru4no")]([SubResource("Resource_2atvb"), SubResource("Resource_ru4no"), SubResource("Resource_hjj6r")])
+time_limit = 60.0
+max_alive_enemies = 65
+spawn_phases = Array[ExtResource("2")]([SubResource("phase_1"), SubResource("phase_2")])
 enemy_weights = {
-"fast": 50,
-"normal": 30,
+"fast": 45,
+"normal": 35,
 "tank": 20
 }
-elite_chance = 0.05
+elite_chance = 0.07

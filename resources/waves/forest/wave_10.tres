@@ -1,31 +1,27 @@
-[gd_resource type="Resource" script_class="WaveData" format=3 uid="uid://bnb7qvmkt18dl"]
+[gd_resource type="Resource" script_class="WaveData" format=3]
 
-[ext_resource type="Script" uid="uid://de56wiabkilte" path="res://scripts/resources/wave_data.gd" id="1_0o6dg"]
-[ext_resource type="Script" uid="uid://cd2uxnp0n2bb3" path="res://scripts/resources/spawn_phase_data.gd" id="2_2fbnd"]
+[ext_resource type="Script" uid="uid://de56wiabkilte" path="res://scripts/resources/wave_data.gd" id="1"]
+[ext_resource type="Script" uid="uid://cd2uxnp0n2bb3" path="res://scripts/resources/spawn_phase_data.gd" id="2"]
 
-[sub_resource type="Resource" id="Resource_0o6dg"]
-script = ExtResource("2_2fbnd")
-duration_ratio = 0.6
+[sub_resource type="Resource" id="phase_1"]
+script = ExtResource("2")
+duration_ratio = 0.3
+spawn_interval = 0.4
 
-[sub_resource type="Resource" id="Resource_2fbnd"]
-script = ExtResource("2_2fbnd")
-duration_ratio = 0.4
-spawn_interval = 0.5
-enemy_weights = {
-"fast": 40,
-"tank": 60
-}
+[sub_resource type="Resource" id="phase_2"]
+script = ExtResource("2")
+duration_ratio = 0.7
+spawn_interval = 0.15
 
 [resource]
-script = ExtResource("1_0o6dg")
+script = ExtResource("1")
 wave_number = 10
-time_limit = 75.0
-spawn_phases = Array[ExtResource("2_2fbnd")]([SubResource("Resource_0o6dg"), SubResource("Resource_2fbnd")])
+time_limit = 80.0
+max_alive_enemies = 160
+spawn_phases = Array[ExtResource("2")]([SubResource("phase_1"), SubResource("phase_2")])
 enemy_weights = {
-"fast": 40,
-"normal": 30,
-"tank": 30
+"fast": 50,
+"normal": 45,
+"tank": 5
 }
-elite_chance = 0.1
-is_boss_wave = true
-boss_id = "boss_summoner"
+elite_chance = 0.12
