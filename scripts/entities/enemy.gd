@@ -1,6 +1,5 @@
 extends CharacterBody2D
 
-const COIN_SCATTER_RANGE: float = 40.0  # 金币掉落散布范围（像素）
 const EXP_SCATTER_RANGE: float = 40.0  # 经验球掉落散布范围（像素）
 
 # 由 SceneFactory 注入的 Resource 数据
@@ -10,7 +9,6 @@ var data: EnemyData = null
 var enemy_type: String = "normal"
 # 精英怪标识（由 SceneFactory 或生成逻辑设置）
 var is_elite: bool = false
-var _elite_coin_mult: float = 1.0
 var _elite_exp_mult: float = 1.0
 
 var speed: float
@@ -87,18 +85,6 @@ func _on_died() -> void:
 	EffectsManager.spawn_enhanced_death(global_position, health.death_color)
 	SceneFactory.release_enemy(self)
 
-func _drop_coins() -> void:
-	var pickup_layer: Node = SceneFactory.get_pickup_layer()
-	if not pickup_layer:
-		return
-
-	var coin_count: int = randi_range(data.coin_drop_min, data.coin_drop_max)
-	coin_count = int(coin_count * _elite_coin_mult)
-	for i in coin_count:
-		var coin = SceneFactory.create_coin()
-		coin.global_position = global_position + Vector2(randf_range(-COIN_SCATTER_RANGE, COIN_SCATTER_RANGE), randf_range(-COIN_SCATTER_RANGE, COIN_SCATTER_RANGE))
-		pickup_layer.call_deferred("add_child", coin)
-
 func _drop_exp_orbs() -> void:
 	var pickup_layer: Node = SceneFactory.get_pickup_layer()
 	if not pickup_layer:
@@ -111,9 +97,8 @@ func _drop_exp_orbs() -> void:
 		orb.global_position = global_position + Vector2(randf_range(-EXP_SCATTER_RANGE, EXP_SCATTER_RANGE), randf_range(-EXP_SCATTER_RANGE, EXP_SCATTER_RANGE))
 		pickup_layer.call_deferred("add_child", orb)
 
-func apply_elite(hp_mult: float, damage_mult: float, coin_mult: float, scale_mult: float, exp_mult: float = 1.0) -> void:
+func apply_elite(hp_mult: float, damage_mult: float, scale_mult: float, exp_mult: float = 1.0) -> void:
 	is_elite = true
-	_elite_coin_mult = coin_mult
 	_elite_exp_mult = exp_mult
 	health.max_hp *= hp_mult
 	health.current_hp = health.max_hp
@@ -170,7 +155,6 @@ func reset_for_pool() -> void:
 	if is_in_group("elites"):
 		remove_from_group("elites")
 	is_elite = false
-	_elite_coin_mult = 1.0
 	_elite_exp_mult = 1.0
 	scale = Vector2.ONE
 	velocity = Vector2.ZERO

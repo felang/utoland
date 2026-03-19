@@ -9,7 +9,5 @@ display_name = "快速敌人"
 hp = 35.0
 speed = 180.0
 damage = 8.0
-coin_drop_min = 2
-coin_drop_max = 4
 exp_drop_min = 1
 exp_drop_max = 2

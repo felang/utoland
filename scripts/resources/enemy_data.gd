@@ -6,8 +6,6 @@ extends Resource
 @export var hp: float = 50.0
 @export var speed: float = 50.0
 @export var damage: float = 10.0
-@export var coin_drop_min: int = 1
-@export var coin_drop_max: int = 3
 @export var exp_drop_min: int = 1
 @export var exp_drop_max: int = 1
 

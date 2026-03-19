@@ -111,7 +111,6 @@ func _spawn_normal_enemy() -> void:
 		enemy.apply_elite(
 			_current_wave_data.elite_hp_mult,
 			_current_wave_data.elite_damage_mult,
-			_current_wave_data.elite_coin_mult,
 			_current_wave_data.elite_scale,
 			_current_wave_data.elite_exp_mult
 		)
