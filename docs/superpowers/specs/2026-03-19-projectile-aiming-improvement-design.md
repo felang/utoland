@@ -41,6 +41,7 @@ direction = fire_pos.direction_to(predicted_pos)
 - 单次迭代预判，精度足够，性能好
 - 若 `target.velocity` 为零或目标无 velocity 属性，fallback 到当前位置
 - 武器的 `RangedAttackComponent` 设 `use_lead_shot = true`，塔的不设
+- **配置位置**：`WeaponManager._add_weapon()` 中创建 `RangedAttackComponent` 时设置 `ranged.use_lead_shot = true`（第 72-76 行附近）
 
 ### 2. 追踪移动组件（塔侧）
 
@@ -72,11 +73,12 @@ func _physics_process(delta: float) -> void:
     var proj: Node2D = get_parent()
     if not proj:
         return
-    # 追踪：目标有效时持续调整方向
-    if _target and is_instance_valid(_target):
+    # 追踪：目标有效且在场景树中时持续调整方向
+    if _target and is_instance_valid(_target) and _target.is_inside_tree():
         var desired: Vector2 = proj.global_position.direction_to(_target.global_position)
-        proj.direction = proj.direction.slerp(desired, turn_speed * delta).normalized()
+        proj.direction = proj.direction.lerp(desired, turn_speed * delta).normalized()
         proj.rotation = proj.direction.angle()
+    # 目标失效时保持最后方向直线飞行（自然退化）
     # 移动
     proj.position += proj.direction * speed * delta
     # 生命周期
@@ -201,11 +203,11 @@ func _physics_process(delta: float) -> void:
         _stop_tracking()
         return
     var target: Node2D = _projectile_ref.target
-    if not target or not is_instance_valid(target):
-        _stop_tracking()
+    if not target or not is_instance_valid(target) or not target.is_inside_tree():
+        _stop_tracking()  # 目标失效，保持最后方向直线飞行
         return
     var desired: Vector2 = _projectile_ref.global_position.direction_to(target.global_position)
-    _projectile_ref.direction = _projectile_ref.direction.slerp(desired, bounce_turn_speed * delta).normalized()
+    _projectile_ref.direction = _projectile_ref.direction.lerp(desired, bounce_turn_speed * delta).normalized()
 
 func _stop_tracking() -> void:
     _is_bouncing = false
@@ -250,6 +252,13 @@ func reset() -> void:
 | `scenes/entities/projectiles/pea_bullet.tscn` | 修改 | LinearMovement → TrackingMovement |
 | `scenes/entities/projectiles/ice_bullet.tscn` | 修改 | LinearMovement → TrackingMovement |
 | `scenes/entities/projectiles/shuriken.tscn` | 修改 | BounceOnHit 设 bounce_tracking=true |
+| `scripts/entities/weapons/weapon_manager.gd` | 修改 | 创建 RangedAttackComponent 时设 `use_lead_shot = true` |
+
+## 边缘情况
+
+- **目标死亡/池化回收**：追踪组件检查 `is_instance_valid()` + `is_inside_tree()`。池化回收的敌人仍 valid 但不在场景树中，`is_inside_tree()` 为 false。目标失效后投射物保持最后方向直线飞行直到 lifetime 到期销毁
+- **方向插值**：使用 `lerp().normalized()` 而非 `slerp()`，避免方向接近 180° 反向时 slerp 产生退化结果
+- **shuriken 弹射一帧延迟**：`LinearMovementComponent._physics_process` 在 `BounceOnHitComponent._physics_process` 之前执行（子节点顺序），方向修正延迟一帧。弹射距离短（150px）、turn_speed 高（10.0），一帧延迟影响可忽略
 
 ## 对象池兼容
 
