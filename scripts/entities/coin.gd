@@ -21,7 +21,10 @@ func _process(delta: float) -> void:
 		if not player:
 			return
 
-	if global_position.distance_to(player.global_position) < attract_range:
+	var effective_range: float = attract_range
+	if player.get("pickup_range_mult") != null:
+		effective_range *= player.pickup_range_mult
+	if global_position.distance_to(player.global_position) < effective_range:
 		is_attracted = true
 
 	if is_attracted:

@@ -10,6 +10,14 @@ var _input_enabled: bool = true
 var invincible_timer: float = 0.0
 var _blink_tween: Tween = null
 
+# 通用属性成长（每级复利）
+const LEVEL_HP_GROWTH: float = 0.03       # +3% HP/级
+const LEVEL_SPEED_GROWTH: float = 0.02    # +2% 移速/级
+const LEVEL_PICKUP_GROWTH: float = 0.05   # +5% 拾取范围/级
+var pickup_range_mult: float = 1.0
+var _base_max_hp: float = 0.0
+var _base_speed: float = 0.0
+
 @onready var health: HealthComponent = $HealthComponent
 @onready var _weapon_manager: WeaponManager = $WeaponManager
 @onready var _sprite_animator: SpriteAnimator = $SpriteAnimator
@@ -21,6 +29,8 @@ func _ready() -> void:
 	var max_hp: float = PlayerState.player_stats[Enums.Stat.MAX_HP] * PlayerState.player_stats[Enums.Stat.HP_MULT]
 	health.initialize(max_hp)
 	speed = PlayerState.character_speed
+	_base_max_hp = max_hp
+	_base_speed = speed
 
 	# 应用待处理的治疗
 	if PlayerState.pending_heal > 0:
@@ -48,6 +58,10 @@ func _ready() -> void:
 
 	# 新被动技能初始化
 	_init_passives()
+
+	# 连接升级信号并应用当前等级成长
+	EventBus.player_level_changed.connect(_on_level_up)
+	_apply_level_growth(PlayerProgression.player_level)
 
 func _process(delta: float) -> void:
 	if invincible_timer > 0:
@@ -117,6 +131,26 @@ func add_coins(amount: int) -> void:
 func add_exp(amount: int) -> void:
 	PlayerProgression.add_exp(amount)
 	EventBus.exp_collected.emit(amount, global_position)
+
+func _on_level_up(new_level: int) -> void:
+	_apply_level_growth(new_level)
+
+func _apply_level_growth(level: int) -> void:
+	var levels_gained: int = level - 1  # Lv1 = 0 次成长
+	if levels_gained <= 0:
+		return
+	# HP 成长（复利）
+	var hp_mult: float = pow(1.0 + LEVEL_HP_GROWTH, levels_gained)
+	var new_max_hp: float = _base_max_hp * hp_mult
+	var hp_diff: float = new_max_hp - health.max_hp
+	health.max_hp = new_max_hp
+	if hp_diff > 0:
+		health.heal(hp_diff)
+	# 移速成长（复利）
+	var speed_mult: float = pow(1.0 + LEVEL_SPEED_GROWTH, levels_gained)
+	speed = _base_speed * speed_mult
+	# 拾取范围成长（复利）
+	pickup_range_mult = pow(1.0 + LEVEL_PICKUP_GROWTH, levels_gained)
 
 ## 吸血回复：供投射物命中敌人后调用
 func heal_hp(amount: float) -> void:
