@@ -31,7 +31,7 @@
 
 | 项目 | 当前 | 调整后 |
 |---|---|---|
-| 敌人掉金币 | 代码存在但未启用 | **删除**（敌人只掉经验球） |
+| 敌人掉金币 | `_drop_coins()` 存在但 `_on_died()` 中未调用（已是死代码） | **删除死代码**（敌人只掉经验球） |
 | 金币买升级 | 有（`buy_level_up`） | **删除**（人口只来自经验升级） |
 | 升级奖励 | 仅 +1 人口 | +1 人口 + 基础属性 + 被动进化 |
 | 初始金币 | 100 + 角色 bonus | **40** + 角色 bonus（缩小） |
@@ -52,7 +52,7 @@
 | 11-15 | 10 金 | 50 金 |
 | **合计** | | **115 金** |
 
-实现方式：`ShopConfig` 新增 `wave_reward_tiers: Array[Dictionary]`，或在 `main.gd` 中根据波次号分段计算。
+实现方式：`ShopConfig` 新增 `wave_reward_per_tier: PackedInt32Array = [5, 8, 10]` 和 `wave_reward_tier_thresholds: PackedInt32Array = [1, 6, 11]`，保持配置驱动原则（不硬编码在 `main.gd` 中）。
 
 #### Boss 赏金（唯一的击杀→金币通道）
 
@@ -75,7 +75,7 @@
 | Lv3 | 12金/6s | **8金/8s** | 1.0 金/s |
 
 设计意图：
-- Lv1 向日葵投入 3 金 + 1 人口，12s 产 3 金，**回本需 48s（约一整波）**
+- Lv1 向日葵投入 3 金 + 1 人口，12s 产 3 金，**纯金币回本只需 12s（1 个周期）**，但真实成本包含 1 人口的战斗力缺失。一个 Lv1 射手塔 15 DPS 的战斗价值大致需要 3-4 个产出周期（36-48s）才能用金币"补回来"
 - 投资有真实风险（前期少一个战斗单位），但长期回报可观
 - Lv3 向日葵 1金/s，90s 波次能产 90 金 — 依然强力，但需要投入 4 次购买(12金)+2次合成等待
 
@@ -135,18 +135,20 @@
 | `base_exp` | 5.0 | **5.0**（不变） |
 | `exp_exponent` | 2.0 | **1.6** |
 
-升级所需经验对比：
+升级所需**总经验**对比（当前系统使用累计经验，非消耗制：`current_exp >= exp_for_level(n)` 即达到 Lv n）：
 
-| 等级 | 当前 (n^2) | 调整后 (n^1.6) | 累计(调整后) |
+| 达到等级 | 当前 (n^2) | 调整后 (n^1.6) | 与上一级的差值 |
 |---|---|---|---|
 | Lv2 | 20 | 15 | 15 |
-| Lv3 | 45 | 27 | 42 |
-| Lv4 | 80 | 42 | 84 |
-| Lv5 | 125 | 60 | 144 |
-| Lv6 | 180 | 80 | 224 |
-| Lv7 | 245 | 103 | 327 |
-| Lv8 | 320 | 128 | 455 |
-| Lv9 | 405 | 155 | 610 |
+| Lv3 | 45 | 27 | 12 |
+| Lv4 | 80 | 42 | 15 |
+| Lv5 | 125 | 60 | 18 |
+| Lv6 | 180 | 80 | 20 |
+| Lv7 | 245 | 103 | 23 |
+| Lv8 | 320 | 128 | 25 |
+| Lv9 | 405 | 155 | 27 |
+
+> **注意**：经验是累计制，不是消耗制。`current_exp` 只增不减，达到阈值自动升级。例如总经验 42 即达到 Lv4。公式 `exp_for_level(n) = floor(5.0 * n^1.6)` 返回的是达到该等级的总经验阈值。
 
 ### 4.2 经验来源
 
@@ -263,6 +265,68 @@ tier_2 = { "melee_damage_mult": 1.2, "melee_attack_speed_mult": 1.1 }
 tier_3 = { "melee_damage_mult": 1.3, "melee_attack_speed_mult": 1.2, "kill_heal": 1.0 }
 ```
 
+#### 有效的 tier 键名约定
+
+| 键名 | 类型 | 说明 |
+|---|---|---|
+| `melee_damage_mult` | float | 近战武器伤害乘数（1.1 = +10%） |
+| `melee_attack_speed_mult` | float | 近战武器攻速乘数 |
+| `kill_heal` | float | 击杀回复 HP 量 |
+| `move_speed_mult` | float | 移速乘数（预留其他角色） |
+| `max_hp_mult` | float | 最大生命乘数（预留） |
+| `damage_reduction` | float | 伤害减免比例（预留） |
+| `dodge_chance` | float | 闪避概率（预留） |
+| `pickup_range_mult` | float | 拾取范围乘数（预留） |
+| `exp_mult` | float | 经验获取乘数（预留） |
+
+### 5.4 被动系统迁移方案
+
+**Dora**：完全使用新的 `PassiveEvolutionData` 系统，删除旧的 `fortify_regen` 逻辑。
+
+**其他角色（Kaze/Nemo/Gorg/Merlin）**：本期暂时保留旧被动系统（`new_passive_id` + `_init_passives()/_process_passives()` 中的 match 分支）。后续逐个迁移到 `PassiveEvolutionData`。
+
+`CharacterData` 新增字段：
+```gdscript
+@export var passive_evolution: PassiveEvolutionData = null  # 新系统，优先使用
+# 旧字段 new_passive_id/value/value_2 暂时保留，passive_evolution 为 null 时回退到旧系统
+```
+
+`player.gd` 判断逻辑：
+```gdscript
+func _init_passives() -> void:
+    var char_data: CharacterData = GameConfig.characters[PlayerState.character_id]
+    if char_data.passive_evolution:
+        _passive_evolution = char_data.passive_evolution
+        _apply_passive_tier(PlayerProgression.player_level)
+    else:
+        # 旧系统回退路径（Kaze/Nemo/Gorg/Merlin 暂用）
+        _init_legacy_passives()
+```
+
+### 5.5 近战乘数传递路径
+
+当前 `player_stats` 有 `DAMAGE_MULT` 和 `ATTACK_SPEED_MULT`（全局），但被动进化需要**近战专用**乘数。传递路径：
+
+1. `player.gd` 升级时从 `PassiveEvolutionData.get_tier_for_level()` 读取当前 tier
+2. 写入 `PlayerState.player_stats["MELEE_DAMAGE_MULT"]` 和 `PlayerState.player_stats["MELEE_ATTACK_SPEED_MULT"]`
+3. `WeaponManager` 在 `tick()` 中对每把武器判断类型：如果 `weapon_data.melee_config != null`（近战武器），额外乘以 `MELEE_DAMAGE_MULT/MELEE_ATTACK_SPEED_MULT`
+4. 具体应用点：`MeleeAttackComponent` 的 `_hitbox.damage` 和冷却间隔
+
+`kill_heal` 的实现：`player.gd` 监听 `EventBus.enemy_killed`，如果当前 tier 包含 `kill_heal` 键，调用 `health.heal(kill_heal_amount)`。
+
+### 5.6 拾取范围实现
+
+当前拾取范围由 `exp_orb.gd` 和 `coin.gd` 中的硬编码 `attract_distance` 控制（经验球 60px，金币 150px）。
+
+改为：`player.gd` 维护一个 `pickup_range_mult: float = 1.0`，每次升级时累计 +5%（通用成长）。经验球/金币在检测拾取距离时，查询玩家的 `pickup_range_mult` 属性来动态调整：
+
+```gdscript
+# exp_orb.gd 中
+var effective_range: float = attract_distance * player.pickup_range_mult
+```
+
+这避免修改碰撞形状，只需在距离判断时乘以系数。
+
 ## 6. 人口系统
 
 ### 不变的部分
@@ -282,29 +346,34 @@ tier_3 = { "melee_damage_mult": 1.3, "melee_attack_speed_mult": 1.2, "kill_heal"
 
 ## 7. 需要的代码改动
 
-### 7.1 删除/修改
+### 7.1 删除（死代码清理 + 功能移除）
 
 | 文件 | 改动 |
 |---|---|
-| `enemy.gd` | 删除 `_drop_coins()` 方法（确认不再需要） |
+| `enemy.gd` | 删除 `_drop_coins()` 方法（已是死代码，`_on_died()` 中未调用）；删除 `_elite_coin_mult` 字段 |
+| `enemy.gd` | `apply_elite()` 删除 `coin_mult` 参数；`reset_for_pool()` 删除 `_elite_coin_mult` 重置 |
 | `enemy_data.gd` | 删除 `coin_drop_min/max` 字段 |
 | `resources/enemies/*.tres` | 删除 coin_drop 相关行 |
+| `enemy_spawner.gd` | `_spawn_normal_enemy()` 调用 `apply_elite()` 时移除 `coin_mult` 参数 |
 | `player_progression.gd` | 删除 `buy_level_up()` 方法 |
 | `shop_manager.gd` | 删除 `buy_level_up()` 方法 |
-| `shop_config.gd` | 删除 `level_up_base_cost`、`level_up_cost_increment`、`get_level_up_cost()` |
-| `shop_overlay.gd` | 删除升级按钮及相关 UI |
-| `game_config.gd` | `initial_coins` 从 100 改为 40 |
-| `resources/shop/shop_config.tres` | `wave_reward` 改为基础值 5（分段逻辑在代码中） |
+| `shop_config.gd` | 删除 `level_up_base_cost`、`level_up_cost_increment`、`get_level_up_cost()`；新增 `wave_reward_per_tier`/`wave_reward_tier_thresholds` |
+| `shop_overlay.gd` | 删除升级按钮及相关 UI（信息栏布局需相应调整） |
 
 ### 7.2 修改
 
 | 文件 | 改动 |
 |---|---|
+| `game_config.gd` | `initial_coins` 从 100 改为 40 |
 | `exp_config.tres` | `exp_exponent` 从 2.0 改为 1.6 |
-| `resources/characters/dora.tres` | `starting_gold` 从 30 改为 10 |
-| `resources/towers/sunflower.tres` | GeneratorConfig 按新数值调整 |
-| `main.gd` | 波次奖励改为分段计算（Wave 1-5: 5金, 6-10: 8金, 11-15: 10金） |
-| `main.gd` | 新增监听 `EventBus.boss_killed` → 发放 Boss 赏金 |
+| `resources/characters/dora.tres` | `starting_gold` 从 30 改为 10；`new_passive_id` 清空（改用 `passive_evolution`） |
+| `resources/towers/sunflower.tres` | GeneratorConfig 按新数值调整（3金/12s, 5金/10s, 8金/8s） |
+| `resources/shop/shop_config.tres` | `wave_reward` 替换为分段配置 |
+| `main.gd` | 波次奖励从 `shop_config.wave_reward` 改为读取分段配置 |
+| `main.gd` | 新增监听 `EventBus.boss_killed` → 发放 Boss 赏金（使用与 `_on_coins_generated` 一致的加金路径，确保 `player.coins` 同步） |
+| `character_data.gd` | 新增 `@export var passive_evolution: PassiveEvolutionData = null` |
+| `player.gd` | 被动系统改造：支持 `PassiveEvolutionData`（新）+ 旧系统回退；新增通用属性成长、`pickup_range_mult`、`kill_heal` 逻辑 |
+| `exp_orb.gd` / `coin.gd` | 拾取距离判断乘以 `player.pickup_range_mult` |
 
 ### 7.3 新增
 
@@ -317,39 +386,66 @@ tier_3 = { "melee_damage_mult": 1.3, "melee_attack_speed_mult": 1.2, "kill_heal"
 
 ### 7.4 波次奖励实现
 
-在 `main.gd::_enter_shop_phase()` 中，将固定 `wave_reward` 替换为分段计算：
+`ShopConfig` 新增字段，`main.gd` 查询：
 
 ```gdscript
-func _get_wave_reward() -> int:
-    var wave: int = PlayerState.current_wave
-    if wave <= 5:
-        return 5
-    elif wave <= 10:
-        return 8
-    else:
-        return 10
+# shop_config.gd 新增
+@export var wave_reward_per_tier: PackedInt32Array = [5, 8, 10]
+@export var wave_reward_tier_thresholds: PackedInt32Array = [1, 6, 11]
+
+func get_wave_reward(wave_number: int) -> int:
+    for i in range(wave_reward_tier_thresholds.size() - 1, -1, -1):
+        if wave_number >= wave_reward_tier_thresholds[i]:
+            return wave_reward_per_tier[i]
+    return wave_reward_per_tier[0]
 ```
 
 ### 7.5 Boss 赏金实现
 
-在 `main.gd` 中监听 Boss 击杀信号：
+在 `main.gd` 中监听 Boss 击杀信号，使用与向日葵金币一致的加金路径（确保 `player.coins` 同步）：
 
 ```gdscript
-# Boss 赏金表
-const BOSS_BOUNTY: Dictionary = {
+# Boss 赏金配置放在 ShopConfig 中（不硬编码）
+# shop_config.gd 新增
+@export var boss_bounty: Dictionary = {
     "boss_brute": 15,
     "boss_summoner": 20,
     "boss_guardian": 30,
 }
 
+# main.gd 中
 func _on_boss_killed(boss_id: String) -> void:
-    var bounty: int = BOSS_BOUNTY.get(boss_id, 0)
+    var bounty: int = GameConfig.shop_config.boss_bounty.get(boss_id, 0)
     if bounty > 0:
-        InventoryManager.coins += bounty
-        EventBus.coins_changed.emit(bounty, InventoryManager.coins)
+        _add_coins(bounty)  # 复用与 _on_coins_generated 相同的加金逻辑
+
+func _add_coins(amount: int) -> void:
+    InventoryManager.coins += amount
+    StatsTracker.record_coins_earned(amount)
+    EventBus.coins_changed.emit(amount, InventoryManager.coins)
+    var p = get_tree().get_first_node_in_group(Enums.Group.PLAYER)
+    if p:
+        p.coins = InventoryManager.coins
 ```
 
-## 8. 调参杠杆
+## 8. 受影响的测试文件
+
+| 测试文件 | 影响原因 |
+|---|---|
+| `tests/unit/test_resource_loading.gd` | `initial_coins` 断言从 100 改为 40 |
+| `tests/unit/test_game_data_economy.gd` | 多处依赖当前金币值、`buy_level_up` 相关测试需删除 |
+| `tests/unit/test_new_passives.gd` | `initial_coins + starting_gold` 断言值变化；Dora 被动从 `fortify_regen` 改为进化系统 |
+| 调用 `ShopManager.buy_level_up()` 的测试 | 方法已删除 |
+| 调用 `PlayerProgression.buy_level_up()` 的测试 | 方法已删除 |
+
+需要新增的测试：
+- 被动进化系统：Tier 切换、`melee_damage_mult` 传递、`kill_heal` 触发
+- 波次奖励分段：验证 Wave 1/6/11 返回正确值
+- Boss 赏金：击杀发放、逃跑不发放
+- 通用属性成长：升级后 HP/移速/拾取范围正确增长
+- 拾取范围：`pickup_range_mult` 对经验球/金币吸引距离的影响
+
+## 9. 调参杠杆
 
 设计后如果测试中觉得太松或太紧，优先调以下参数：
 
@@ -363,7 +459,7 @@ func _on_boss_killed(boss_id: String) -> void:
 | 通用成长幅度 | 各项 +1% | 各项 -1% | 后期角色强度 |
 | 被动进化等级 | Tier2→Lv3 | Tier2→Lv5 | Power spike 节奏 |
 
-## 9. 不在本次范围内
+## 10. 不在本次范围内
 
 - 其他角色（Kaze/Nemo/Gorg/Merlin）的被动进化设计
 - 敌人数值和波次系统重设计（将基于本文档另行设计）
