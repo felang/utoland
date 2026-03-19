@@ -64,6 +64,8 @@ class Stat:
 	const DAMAGE_MULT = "damage_mult"
 	const ATTACK_SPEED_MULT = "attack_speed_mult"
 	const TOWER_MULT = "tower_mult"
+	const MELEE_DAMAGE_MULT = "MELEE_DAMAGE_MULT"
+	const MELEE_ATTACK_SPEED_MULT = "MELEE_ATTACK_SPEED_MULT"
 
 # 动画名
 class Anim:

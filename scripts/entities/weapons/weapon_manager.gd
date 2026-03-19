@@ -149,12 +149,21 @@ func tick_combat(delta: float) -> void:
 		if not attack:
 			attack = pivot.get_node_or_null("MeleeAttackComponent")
 		if attack:
-			attack.damage_multiplier = base_dmg_mult * dynamic_dmg_mult
+			var final_dmg: float = base_dmg_mult * dynamic_dmg_mult
+			if attack is MeleeAttackComponent:
+				final_dmg *= PlayerState.player_stats.get(Enums.Stat.MELEE_DAMAGE_MULT, 1.0)
+				attack.speed_multiplier = PlayerState.player_stats.get(Enums.Stat.MELEE_ATTACK_SPEED_MULT, 1.0)
+			attack.damage_multiplier = final_dmg
 			attack.tick(delta)
 
 ## 注入动态伤害倍率回调（Player 调用，用于 swift_combo/blood_rage 等每帧变化的被动）
 func set_dynamic_damage_mult_getter(getter: Callable) -> void:
 	_dynamic_damage_mult_getter = getter
+
+## 升级时刷新所有武器的被动乘数（被动进化系统调用）
+func refresh_passive_multipliers() -> void:
+	for pivot in _pivots:
+		_apply_passive_to_pivot(pivot)
 
 # — 内部方法 —
 
@@ -194,6 +203,9 @@ func _apply_passive_to_pivot(pivot: Node2D) -> void:
 	if attack:
 		attack.damage_multiplier = dmg_mult
 		attack.speed_multiplier = spd_mult
+		if attack is MeleeAttackComponent:
+			attack.damage_multiplier *= PlayerState.player_stats.get(Enums.Stat.MELEE_DAMAGE_MULT, 1.0)
+			attack.speed_multiplier *= PlayerState.player_stats.get(Enums.Stat.MELEE_ATTACK_SPEED_MULT, 1.0)
 
 func _redistribute_angles() -> void:
 	# 均匀分布初始角度偏移；实际旋转由 tick() 控制

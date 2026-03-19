@@ -134,6 +134,8 @@ func add_exp(amount: int) -> void:
 
 func _on_level_up(new_level: int) -> void:
 	_apply_level_growth(new_level)
+	_apply_passive_tier(new_level)
+	_weapon_manager.refresh_passive_multipliers()
 
 func _apply_level_growth(level: int) -> void:
 	var levels_gained: int = level - 1  # Lv1 = 0 次成长
@@ -183,13 +185,42 @@ const _COMBO_MAX_STACKS: int = 6  # max_mult = value_2 / value = 0.3/0.05 = 6
 var _fortify_regen_timer: float = 0.0
 const _FORTIFY_REGEN_INTERVAL: float = 5.0
 
+# 被动进化系统
+var _passive_evolution: PassiveEvolutionData = null
+var _current_passive_tier: Dictionary = {}
+var _kill_heal_amount: float = 0.0
+
 func _init_passives() -> void:
-	match PlayerState.new_passive_id:
-		"swift_combo":
-			_combo_target = null
-			_combo_stacks = 0
-		"fortify_regen":
-			_fortify_regen_timer = 0.0
+	var char_data: CharacterData = GameConfig.characters[PlayerState.current_character]
+	if char_data.passive_evolution:
+		_passive_evolution = char_data.passive_evolution
+		_apply_passive_tier(PlayerProgression.player_level)
+	else:
+		# 旧系统回退路径（Kaze/Nemo/Gorg/Merlin 暂用）
+		match PlayerState.new_passive_id:
+			"swift_combo":
+				_combo_target = null
+				_combo_stacks = 0
+			"fortify_regen":
+				_fortify_regen_timer = 0.0
+
+func _apply_passive_tier(level: int) -> void:
+	if not _passive_evolution:
+		return
+	_current_passive_tier = _passive_evolution.get_tier_for_level(level)
+	# 写入 player_stats 供 WeaponManager 读取
+	PlayerState.player_stats[Enums.Stat.MELEE_DAMAGE_MULT] = _current_passive_tier.get("melee_damage_mult", 1.0)
+	PlayerState.player_stats[Enums.Stat.MELEE_ATTACK_SPEED_MULT] = _current_passive_tier.get("melee_attack_speed_mult", 1.0)
+	# 击杀回血
+	_kill_heal_amount = _current_passive_tier.get("kill_heal", 0.0)
+	if _kill_heal_amount > 0.0 and not EventBus.enemy_killed.is_connected(_on_enemy_killed_heal):
+		EventBus.enemy_killed.connect(_on_enemy_killed_heal)
+	elif _kill_heal_amount <= 0.0 and EventBus.enemy_killed.is_connected(_on_enemy_killed_heal):
+		EventBus.enemy_killed.disconnect(_on_enemy_killed_heal)
+
+func _on_enemy_killed_heal(_enemy_type: String, _pos: Vector2, _is_elite: bool) -> void:
+	if _kill_heal_amount > 0.0:
+		health.heal(_kill_heal_amount)
 
 func _process_passives(delta: float) -> void:
 	if PlayerState.new_passive_id == "fortify_regen":
