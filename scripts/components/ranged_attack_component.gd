@@ -10,6 +10,7 @@ var damage_multiplier: float = 1.0
 var speed_multiplier: float = 1.0
 var on_projectile_created: Callable  # 可选回调
 var sfx_id: String = "shoot"
+var use_lead_shot: bool = false
 
 var _base_damage: float = 0.0
 var _base_cooldown: float = 1.0
@@ -62,6 +63,14 @@ func get_final_cooldown() -> float:
 		return _base_cooldown
 	return _base_cooldown / speed_multiplier
 
+func _calculate_direction(fire_pos: Vector2, target_pos: Vector2, target_velocity: Vector2, proj_speed: float) -> Vector2:
+	if use_lead_shot and target_velocity.length_squared() > 0.0:
+		var distance: float = fire_pos.distance_to(target_pos)
+		var flight_time: float = distance / proj_speed
+		var predicted_pos: Vector2 = target_pos + target_velocity * flight_time
+		return fire_pos.direction_to(predicted_pos)
+	return fire_pos.direction_to(target_pos)
+
 func _execute_attack(target: Node2D) -> void:
 	if not projectile_data:
 		return
@@ -70,9 +79,11 @@ func _execute_attack(target: Node2D) -> void:
 		fire_pos = _fire_point.global_position
 	else:
 		fire_pos = get_parent().global_position
-	var direction: Vector2 = fire_pos.direction_to(target.global_position)
+	var target_velocity: Vector2 = target.velocity if "velocity" in target else Vector2.ZERO
+	var direction: Vector2 = _calculate_direction(fire_pos, target.global_position, target_velocity, projectile_data.speed)
 	var damage: float = get_final_damage()
-	var proj: Node2D = SceneFactory.create_projectile(projectile_data, damage, fire_pos, direction)
+	var proj_target: Node2D = null if use_lead_shot else target
+	var proj: Node2D = SceneFactory.create_projectile(projectile_data, damage, fire_pos, direction, proj_target)
 	if on_projectile_created.is_valid():
 		on_projectile_created.call(proj)
 	projectile_spawned.emit(proj)

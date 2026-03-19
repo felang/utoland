@@ -36,3 +36,35 @@ func test_tick_decrements_cooldown() -> void:
 	comp._cooldown_remaining = 1.0
 	comp.tick(0.5)
 	assert_almost_eq(comp._cooldown_remaining, 0.5, 0.01)
+
+func test_use_lead_shot_defaults_false() -> void:
+	assert_false(comp.use_lead_shot)
+
+func test_calculate_lead_direction_static_target() -> void:
+	comp.use_lead_shot = true
+	var fire_pos := Vector2.ZERO
+	var target_pos := Vector2(100, 0)
+	var target_velocity := Vector2.ZERO
+	var speed := 500.0
+	var result: Vector2 = comp._calculate_direction(fire_pos, target_pos, target_velocity, speed)
+	assert_almost_eq(result.x, 1.0, 0.01)
+	assert_almost_eq(result.y, 0.0, 0.01)
+
+func test_calculate_lead_direction_moving_target() -> void:
+	comp.use_lead_shot = true
+	var fire_pos := Vector2.ZERO
+	var target_pos := Vector2(100, 0)
+	var target_velocity := Vector2(0, -200)
+	var speed := 500.0
+	var result: Vector2 = comp._calculate_direction(fire_pos, target_pos, target_velocity, speed)
+	assert_lt(result.y, 0.0, "预判方向应向上偏移")
+
+func test_calculate_direction_no_lead_shot() -> void:
+	comp.use_lead_shot = false
+	var fire_pos := Vector2.ZERO
+	var target_pos := Vector2(100, 0)
+	var target_velocity := Vector2(0, -200)
+	var speed := 500.0
+	var result: Vector2 = comp._calculate_direction(fire_pos, target_pos, target_velocity, speed)
+	assert_almost_eq(result.x, 1.0, 0.01)
+	assert_almost_eq(result.y, 0.0, 0.01)
