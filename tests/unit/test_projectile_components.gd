@@ -62,3 +62,28 @@ func test_knockback_on_hit_graceful_without_handler() -> void:
 	target.queue_free()
 	kb.queue_free()
 	fake_proj.free()
+
+func test_bounce_tracking_defaults_false() -> void:
+	var bounce := BounceOnHitComponent.new()
+	assert_false(bounce.bounce_tracking)
+	bounce.free()
+
+func test_bounce_reset_clears_tracking_state() -> void:
+	var bounce := BounceOnHitComponent.new()
+	add_child(bounce)
+	bounce._is_bouncing = true
+	bounce._projectile_ref = Node2D.new()
+	bounce.reset()
+	assert_false(bounce._is_bouncing)
+	assert_null(bounce._projectile_ref)
+	bounce.queue_free()
+
+func test_bounce_stop_tracking_clears_state() -> void:
+	var bounce := BounceOnHitComponent.new()
+	add_child(bounce)
+	bounce._is_bouncing = true
+	bounce._projectile_ref = Node2D.new()
+	bounce._stop_tracking()
+	assert_false(bounce._is_bouncing)
+	assert_null(bounce._projectile_ref)
+	bounce.queue_free()
