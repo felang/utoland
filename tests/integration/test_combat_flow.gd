@@ -80,16 +80,6 @@ func test_enemy_drops_exp_orbs_on_death():
 	# Should have more exp orbs than before
 	assert_gt(final_orb_count, initial_orb_count, "Exp orbs should be dropped after enemy death")
 
-func test_coin_drop_amount_from_config():
-	# Test that coin drop amount respects GameConfig
-	var enemy = SceneFactory.create_enemy(Enums.Enemy.NORMAL)
-	test_scene.add_child(enemy)
-
-	var enemy_data: EnemyData = GameConfig.enemies[Enums.Enemy.NORMAL]
-
-	assert_gte(enemy_data.coin_drop_min, 1, "Min coin drop should be at least 1")
-	assert_gte(enemy_data.coin_drop_max, enemy_data.coin_drop_min, "Max coin drop should be >= min")
-
 func test_bullet_projectile_damages_enemy():
 	# Test that bullet projectile can damage enemy via take_damage
 	var enemy = SceneFactory.create_enemy(Enums.Enemy.NORMAL)

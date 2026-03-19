@@ -140,13 +140,6 @@ func test_enemy_base_speed_initialization():
 	assert_eq(enemy.slow_handler.base_speed, enemy.speed, "Base speed should equal current speed initially")
 	assert_gt(enemy.slow_handler.base_speed, 0, "Base speed should be positive")
 
-func test_enemy_coin_drop_config():
-	# Test that coin drop values are in GameConfig
-	for type in [Enums.Enemy.NORMAL, Enums.Enemy.FAST, Enums.Enemy.TANK]:
-		var enemy_data: EnemyData = GameConfig.enemies[type]
-		assert_gt(enemy_data.coin_drop_min, 0, "Enemy config should have positive coin_drop_min")
-		assert_gte(enemy_data.coin_drop_max, enemy_data.coin_drop_min, "Max coin drop should be >= min")
-
 func test_spawner_uses_dynamic_map_bounds():
 	var spawner = preload("res://scripts/systems/enemy_spawner.gd").new()
 	add_child_autoqfree(spawner)

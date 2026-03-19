@@ -42,5 +42,3 @@ func test_card_disabled_when_insufficient_coins() -> void:
 func test_weapon_grid_exists() -> void:
 	assert_not_null(_overlay._weapon_grid, "应有武器装备栏")
 
-func test_level_up_button_exists() -> void:
-	assert_not_null(_overlay._level_up_button, "应有升级按钮")

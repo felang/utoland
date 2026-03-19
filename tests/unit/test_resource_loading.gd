@@ -18,7 +18,7 @@ func test_weapon_bow_resource() -> void:
 	assert_not_null(w.attack_config, "弓应有 attack_config")
 	assert_almost_eq(w.attack_config.fire_rate_per_level[0], 0.5, 0.001)
 	assert_almost_eq(w.attack_config.damage_per_level[0], 8.0, 0.001)
-	assert_almost_eq(w.attack_config.attack_range_per_level[0], 300.0, 0.001)
+	assert_almost_eq(w.attack_config.attack_range_per_level[0], 200.0, 0.001)
 	assert_eq(w.projectile_data.speed, 600.0)
 
 func test_weapon_shuriken_resource() -> void:
@@ -50,23 +50,17 @@ func test_enemy_normal_resource() -> void:
 	assert_eq(e.hp, 50.0)
 	assert_eq(e.speed, 100.0)
 	assert_eq(e.damage, 10.0)
-	assert_eq(e.coin_drop_min, 1)
-	assert_eq(e.coin_drop_max, 3)
 
 func test_enemy_fast_resource() -> void:
 	var e: EnemyData = GameConfig.enemies[Enums.Enemy.FAST]
 	assert_eq(e.hp, 35.0)
 	assert_eq(e.speed, 180.0)
-	assert_eq(e.coin_drop_min, 2)
-	assert_eq(e.coin_drop_max, 4)
 
 func test_enemy_tank_resource() -> void:
 	var e: EnemyData = GameConfig.enemies[Enums.Enemy.TANK]
 	assert_eq(e.hp, 200.0)
 	assert_eq(e.speed, 50.0)
 	assert_eq(e.damage, 25.0)
-	assert_eq(e.coin_drop_min, 5)
-	assert_eq(e.coin_drop_max, 10)
 
 
 # ===== 塔资源加载 =====
@@ -206,7 +200,7 @@ func test_weapon_has_attack_config():
 
 func test_player_const_unchanged() -> void:
 	# PLAYER 保持 const，确保初始化不受影响
-	assert_eq(GameConfig.PLAYER["initial_coins"], 100)
+	assert_eq(GameConfig.PLAYER["initial_coins"], 40)
 	assert_eq(GameConfig.PLAYER["initial_hp"], 100.0)
 	assert_eq(GameConfig.PLAYER["initial_speed"], 200.0)
 

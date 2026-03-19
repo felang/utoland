@@ -11,7 +11,7 @@ func test_dora_speed() -> void:
 
 func test_dora_starting_gold() -> void:
 	var cd: CharacterData = GameConfig.characters[Enums.Character.DORA]
-	assert_eq(cd.starting_gold, 30, "Dora starting_gold 应为 30")
+	assert_eq(cd.starting_gold, 10, "Dora starting_gold 应为 10")
 
 func test_dora_recommended_weapon() -> void:
 	var cd: CharacterData = GameConfig.characters[Enums.Character.DORA]

@@ -130,14 +130,12 @@ func test_enemy_reset_for_pool():
 	var enemy: CharacterBody2D = SceneFactory.create_enemy(Enums.Enemy.NORMAL)
 	add_child(enemy)
 	enemy.is_elite = true
-	enemy._elite_coin_mult = 2.0
 	enemy._elite_exp_mult = 2.0
 	enemy.scale = Vector2(1.5, 1.5)
 	enemy.velocity = Vector2(100, 0)
 	enemy.visible = false
 	enemy.reset_for_pool()
 	assert_false(enemy.is_elite, "reset 后 is_elite 应为 false")
-	assert_eq(enemy._elite_coin_mult, 1.0, "reset 后 coin mult 应为 1.0")
 	assert_eq(enemy._elite_exp_mult, 1.0, "reset 后 exp mult 应为 1.0")
 	assert_eq(enemy.scale, Vector2.ONE, "reset 后 scale 应为 ONE")
 	assert_eq(enemy.velocity, Vector2.ZERO, "reset 后 velocity 应为 ZERO")

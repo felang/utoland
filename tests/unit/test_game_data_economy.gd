@@ -165,21 +165,22 @@ func test_add_exp_records_total() -> void:
 func test_add_exp_auto_level_up() -> void:
 	PlayerProgression.player_level = 1
 	PlayerProgression.current_exp = 0
-	# exp_for_level(2) = floor(5 * 2^2) = 20
-	PlayerProgression.add_exp(20)
+	# exp_for_level(2) = floor(5 * 2^1.6) = 15
+	PlayerProgression.add_exp(15)
 	assert_eq(PlayerProgression.player_level, 2)
 
 func test_add_exp_no_level_up_below_threshold() -> void:
 	PlayerProgression.player_level = 1
 	PlayerProgression.current_exp = 0
-	PlayerProgression.add_exp(19)
+	# exp_for_level(2) = 15，加 14 不升级
+	PlayerProgression.add_exp(14)
 	assert_eq(PlayerProgression.player_level, 1)
 
 func test_add_exp_multi_level_up() -> void:
 	PlayerProgression.player_level = 1
 	PlayerProgression.current_exp = 0
-	# exp_for_level(2) = 20, exp_for_level(3) = 45
-	PlayerProgression.add_exp(45)
+	# exp_for_level(2) = 15, exp_for_level(3) = 28
+	PlayerProgression.add_exp(28)
 	assert_eq(PlayerProgression.player_level, 3)
 
 func test_add_exp_emits_level_changed() -> void:
