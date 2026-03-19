@@ -35,3 +35,4 @@ rotation_speed = 10.0
 script = ExtResource("6_bounce")
 bounce_range = 150.0
 max_bounces = 1
+bounce_tracking = true
