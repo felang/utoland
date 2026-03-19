@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://c8projectile01" path="res://scripts/entities/projectiles/projectile.gd" id="1_proj"]
 [ext_resource type="Script" uid="uid://bx7m3k2vpqn4r" path="res://scripts/components/hitbox.gd" id="2_hitbox"]
-[ext_resource type="Script" path="res://scripts/components/linear_movement_component.gd" id="3_linear"]
+[ext_resource type="Script" path="res://scripts/components/tracking_movement_component.gd" id="3_tracking"]
 [ext_resource type="Script" path="res://scripts/components/slow_on_hit_component.gd" id="4_slow"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_ice"]
@@ -19,8 +19,9 @@ script = ExtResource("2_hitbox")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
 shape = SubResource("CircleShape2D_ice")
 
-[node name="LinearMovementComponent" type="Node" parent="."]
-script = ExtResource("3_linear")
+[node name="TrackingMovementComponent" type="Node" parent="."]
+script = ExtResource("3_tracking")
+turn_speed = 8.0
 
 [node name="SlowOnHitComponent" type="Node" parent="."]
 script = ExtResource("4_slow")
