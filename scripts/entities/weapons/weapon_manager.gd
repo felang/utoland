@@ -73,6 +73,7 @@ func add_weapon(weapon_id: String, level: int) -> void:
 		ranged.name = "RangedAttackComponent"
 		ranged.attack_config = weapon_data.attack_config
 		ranged.projectile_data = weapon_data.projectile_data
+		ranged.use_lead_shot = true
 		ranged.projectile_spawned.connect(_on_projectile_spawned)
 		ranged.attack_executed.connect(func(t: Node2D, _p: Node2D) -> void:
 			_on_attack_executed(pivot, weapon_data, t)
