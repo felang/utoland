@@ -135,14 +135,14 @@ func release_exp_orb(orb: Area2D) -> void:
 	_pool_release("exp_orb", orb)
 
 # 统一投射物创建 — 从对象池获取并初始化
-func create_projectile(p_data: ProjectileData, damage: float, from: Vector2, direction: Vector2) -> Node2D:
+func create_projectile(p_data: ProjectileData, damage: float, from: Vector2, direction: Vector2, target: Node2D = null) -> Node2D:
 	assert(p_data != null, "SceneFactory.create_projectile: data 不能为 null")
 	assert(p_data.projectile_scene != null, "SceneFactory.create_projectile: projectile_scene 未配置")
 	var key: String = _get_projectile_pool_key(p_data)
 	if not _pools.has(key):
 		_register_pool(key, p_data.projectile_scene)
 	var proj: Node2D = _pool_acquire(key) as Node2D
-	proj.setup(p_data, damage, from, direction)
+	proj.setup(p_data, damage, from, direction, target)
 	return proj
 
 func release_projectile(proj: Node2D) -> void:
