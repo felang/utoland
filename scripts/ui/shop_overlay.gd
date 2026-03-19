@@ -18,7 +18,6 @@ var _wave_label: Label
 
 # 操作按钮
 var _refresh_button: Button
-var _level_up_button: Button
 var _start_button: Button
 
 # 商店卡片
@@ -120,13 +119,6 @@ func _setup_ui() -> void:
 	var spacer := Control.new()
 	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	info_bar.add_child(spacer)
-
-	_level_up_button = Button.new()
-	_level_up_button.text = "升级 $4"
-	_level_up_button.add_theme_font_size_override("font_size", 14)
-	_level_up_button.custom_minimum_size = Vector2(72, 28)
-	_level_up_button.pressed.connect(_on_level_up_pressed)
-	info_bar.add_child(_level_up_button)
 
 	_refresh_button = Button.new()
 	_refresh_button.text = "刷新 $2"
@@ -289,10 +281,6 @@ func _update_action_buttons() -> void:
 	_refresh_button.text = "刷新 $%d" % GameConfig.shop_config.refresh_cost
 	_refresh_button.disabled = InventoryManager.coins < GameConfig.shop_config.refresh_cost
 
-	var level_cost: int = GameConfig.shop_config.get_level_up_cost(PlayerProgression.player_level)
-	_level_up_button.text = "升级 $%d" % level_cost
-	_level_up_button.disabled = InventoryManager.coins < level_cost
-
 func _show_weapon_menu(weapon_index: int) -> void:
 	_menu_weapon_index = weapon_index
 	_weapon_menu.clear()
@@ -375,10 +363,6 @@ func _on_tower_placement_cancelled() -> void:
 func _on_refresh_pressed() -> void:
 	_shop_manager.manual_refresh()
 	_update_ui()
-
-func _on_level_up_pressed() -> void:
-	if _shop_manager.buy_level_up():
-		_update_ui()
 
 func _on_start_pressed() -> void:
 	start_battle_pressed.emit()

@@ -23,10 +23,6 @@ func get_population_cap() -> int:
 	var config: ExpConfig = GameConfig.exp_config
 	return config.initial_population + (player_level - 1) * config.population_per_level
 
-func buy_level_up() -> void:
-	player_level += 1
-	EventBus.player_level_changed.emit(player_level)
-
 func reset() -> void:
 	player_level = 1
 	current_exp = 0
