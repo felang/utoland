@@ -20,5 +20,4 @@ auto_*.tscn
 .superpowers/
 
 # Godot 生成文件
-*.uid
 export_presets.cfg

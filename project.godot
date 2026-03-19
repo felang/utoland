@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="utoland"
-run/main_scene="uid://24phowe362yu"
+run/main_scene="res://scenes/ui/start_menu.tscn"
 config/features=PackedStringArray("4.6", "GL Compatibility")
 config/icon="res://icon.svg"
 
@@ -26,7 +26,6 @@ SceneFactory="*res://scripts/core/scene_factory.gd"
 EffectsManager="*res://scripts/systems/effects_manager.gd"
 EventBus="*res://scripts/core/event_bus.gd"
 SceneManager="*res://scripts/core/scene_manager.gd"
-GDAIMCPRuntime="*uid://dcne7ryelpxmn"
 AudioManager="*res://scripts/systems/audio_manager.gd"
 
 [display]
