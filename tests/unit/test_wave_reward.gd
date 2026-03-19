@@ -2,12 +2,13 @@ extends GutTest
 
 func test_wave_reward_tiers() -> void:
 	var config: ShopConfig = GameConfig.shop_config
+	# 阈值 [1, 5, 9]，奖励 [5, 8, 10]
 	assert_eq(config.get_wave_reward(1), 5, "Wave 1 奖励应为 5")
-	assert_eq(config.get_wave_reward(5), 5, "Wave 5 奖励应为 5")
-	assert_eq(config.get_wave_reward(6), 8, "Wave 6 奖励应为 8")
-	assert_eq(config.get_wave_reward(10), 8, "Wave 10 奖励应为 8")
-	assert_eq(config.get_wave_reward(11), 10, "Wave 11 奖励应为 10")
-	assert_eq(config.get_wave_reward(15), 10, "Wave 15 奖励应为 10")
+	assert_eq(config.get_wave_reward(4), 5, "Wave 4 奖励应为 5")
+	assert_eq(config.get_wave_reward(5), 8, "Wave 5 奖励应为 8")
+	assert_eq(config.get_wave_reward(8), 8, "Wave 8 奖励应为 8")
+	assert_eq(config.get_wave_reward(9), 10, "Wave 9 奖励应为 10")
+	assert_eq(config.get_wave_reward(12), 10, "Wave 12 奖励应为 10")
 
 func test_boss_bounty_config() -> void:
 	var config: ShopConfig = GameConfig.shop_config

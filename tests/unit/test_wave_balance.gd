@@ -1,30 +1,30 @@
 extends GutTest
 
-func test_forest_has_15_waves():
+func test_forest_has_12_waves():
 	var waves = GameConfig.get_waves_for_map("forest")
-	assert_eq(waves.size(), 15, "Forest 应有 15 波")
+	assert_eq(waves.size(), 12, "Forest 应有 12 波")
 
 func test_wave_numbers_sequential():
 	var waves = GameConfig.get_waves_for_map("forest")
 	for i in range(waves.size()):
 		assert_eq(waves[i].wave_number, i + 1)
 
-func test_boss_waves_at_5_10_15():
+func test_boss_waves_at_4_8_12():
 	var waves = GameConfig.get_waves_for_map("forest")
 	var boss_wave_numbers := []
 	for w: WaveData in waves:
 		if w.is_boss_wave:
 			boss_wave_numbers.append(w.wave_number)
 	assert_eq(boss_wave_numbers.size(), 3, "应有 3 个 Boss 波")
-	assert_has(boss_wave_numbers, 5, "第 5 波应为 Boss 波")
-	assert_has(boss_wave_numbers, 10, "第 10 波应为 Boss 波")
-	assert_has(boss_wave_numbers, 15, "第 15 波应为 Boss 波")
+	assert_has(boss_wave_numbers, 4, "第 4 波应为 Boss 波")
+	assert_has(boss_wave_numbers, 8, "第 8 波应为 Boss 波")
+	assert_has(boss_wave_numbers, 12, "第 12 波应为 Boss 波")
 
 func test_boss_ids():
 	var waves = GameConfig.get_waves_for_map("forest")
-	assert_eq(waves[4].boss_id, "boss_brute")
-	assert_eq(waves[9].boss_id, "boss_summoner")
-	assert_eq(waves[14].boss_id, "boss_guardian")
+	assert_eq(waves[3].boss_id, "boss_brute")
+	assert_eq(waves[7].boss_id, "boss_summoner")
+	assert_eq(waves[11].boss_id, "boss_guardian")
 
 func test_all_waves_have_spawn_phases():
 	var waves = GameConfig.get_waves_for_map("forest")
@@ -41,7 +41,7 @@ func test_spawn_phases_duration_ratio_sum():
 
 func test_time_limit_increasing():
 	var waves = GameConfig.get_waves_for_map("forest")
-	assert_lt(waves[0].time_limit, waves[13].time_limit, "后期波次时间应更长")
+	assert_lt(waves[0].time_limit, waves[11].time_limit, "后期波次时间应更长")
 
 func test_elite_chance_progression():
 	var waves = GameConfig.get_waves_for_map("forest")
@@ -55,4 +55,4 @@ func test_elite_chance_progression():
 
 func test_max_alive_enemies_increasing():
 	var waves = GameConfig.get_waves_for_map("forest")
-	assert_lt(waves[0].max_alive_enemies, waves[14].max_alive_enemies, "后期波次 max_alive 应更大")
+	assert_lt(waves[0].max_alive_enemies, waves[11].max_alive_enemies, "后期波次 max_alive 应更大")

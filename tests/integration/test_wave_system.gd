@@ -2,7 +2,7 @@ extends GutTest
 
 func test_forest_wave_count():
 	var waves: Array = GameConfig.get_waves_for_map("forest")
-	assert_eq(waves.size(), 15, "Forest 地图应有 15 波")
+	assert_eq(waves.size(), 12, "Forest 地图应有 12 波")
 
 func test_waves_sorted_by_number():
 	var waves: Array = GameConfig.get_waves_for_map("forest")
@@ -17,15 +17,15 @@ func test_boss_waves_count():
 			boss_waves.append(w.wave_number)
 	assert_eq(boss_waves.size(), 3, "应有 3 个 Boss 波")
 
-func test_boss_waves_are_5_10_15():
+func test_boss_waves_are_4_8_12():
 	var waves: Array = GameConfig.get_waves_for_map("forest")
 	var boss_wave_numbers := []
 	for w: WaveData in waves:
 		if w.is_boss_wave:
 			boss_wave_numbers.append(w.wave_number)
-	assert_has(boss_wave_numbers, 5, "第 5 波应为 Boss 波")
-	assert_has(boss_wave_numbers, 10, "第 10 波应为 Boss 波")
-	assert_has(boss_wave_numbers, 15, "第 15 波应为 Boss 波")
+	assert_has(boss_wave_numbers, 4, "第 4 波应为 Boss 波")
+	assert_has(boss_wave_numbers, 8, "第 8 波应为 Boss 波")
+	assert_has(boss_wave_numbers, 12, "第 12 波应为 Boss 波")
 
 func test_all_enemy_weights_reference_valid_types():
 	var waves: Array = GameConfig.get_waves_for_map("forest")
@@ -69,3 +69,7 @@ func test_elite_chance_increases_over_waves():
 			has_elite = true
 			break
 	assert_true(has_elite, "后期波次应有精英怪")
+
+func test_time_limit_increases_over_waves():
+	var waves: Array = GameConfig.get_waves_for_map("forest")
+	assert_lt(waves[0].time_limit, waves[11].time_limit, "后期波次时间应更长")
