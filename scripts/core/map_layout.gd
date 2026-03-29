@@ -15,16 +15,10 @@ const TACTICAL_MAX_X: int = 36
 const TACTICAL_MIN_Y: int = 3
 const TACTICAL_MAX_Y: int = 20
 
-const GRID_COLS = [
-	Vector2i(3, 13),
-	Vector2i(14, 25),
-	Vector2i(26, 36),
-]
-const GRID_ROWS = [
-	Vector2i(3, 8),
-	Vector2i(9, 14),
-	Vector2i(15, 20),
-]
+const CENTER_SAFE_MIN_X: int = 14
+const CENTER_SAFE_MAX_X: int = 25
+const CENTER_SAFE_MIN_Y: int = 9
+const CENTER_SAFE_MAX_Y: int = 14
 
 var grid: Array = []
 var spawn_points: Array[Vector2i] = []
@@ -83,9 +77,3 @@ func get_placeable_dict() -> Dictionary:
 	for cell in placeable_cells:
 		dict[cell] = true
 	return dict
-
-
-func get_block_bounds(col_index: int, row_index: int) -> Rect2i:
-	var col: Vector2i = GRID_COLS[col_index]
-	var row: Vector2i = GRID_ROWS[row_index]
-	return Rect2i(col.x, row.x, col.y - col.x + 1, row.y - row.x + 1)

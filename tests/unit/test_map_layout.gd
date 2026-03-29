@@ -53,11 +53,3 @@ func test_get_placeable_dict():
 	assert_true(dict.has(Vector2i(10, 10)))
 	assert_false(dict.has(Vector2i(0, 0)))
 
-
-func test_get_block_bounds():
-	var bounds := layout.get_block_bounds(0, 0)
-	assert_eq(bounds.position, Vector2i(3, 3))
-	assert_eq(bounds.size, Vector2i(11, 6))
-	var center := layout.get_block_bounds(1, 1)
-	assert_eq(center.position, Vector2i(14, 9))
-	assert_eq(center.size, Vector2i(12, 6))
