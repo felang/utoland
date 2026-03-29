@@ -159,10 +159,70 @@ func _ensure_player_spawn_safe(layout: MapLayout) -> void:
 
 
 func _render_rect(feature: TerrainFeature, layout: MapLayout) -> void:
-	# Task 3 实现
-	pass
+	var center_pos := _normalized_to_grid(feature.center)
+	var half_w := feature.size.x / 2
+	var half_h := feature.size.y / 2
+
+	var cell_type := _get_cell_type(feature)
+	var is_plaza := feature.type == TerrainFeature.FeatureType.PLAZA
+
+	for dy in range(-half_h, half_h + 1):
+		for dx in range(-half_w, half_w + 1):
+			var pos := Vector2i(center_pos.x + dx, center_pos.y + dy)
+			if not _is_in_tactical(pos):
+				continue
+			if is_plaza:
+				_plaza_cells.append(pos)
+			elif layout.get_cell(pos) == MapLayout.CellType.GROUND:
+				layout.set_cell(pos, cell_type)
 
 
 func _render_ring(feature: TerrainFeature, layout: MapLayout) -> void:
-	# Task 3 实现
-	pass
+	var center_pos := _normalized_to_grid(feature.center)
+	var half_w := feature.size.x / 2
+	var half_h := feature.size.y / 2
+	var ring_width := feature.width
+
+	var cell_type := _get_cell_type(feature)
+
+	# 计算环的总周长用于缺口位置计算
+	var perimeter := 2 * (feature.size.x + feature.size.y)
+	var ring_cells: Array[Dictionary] = []  # {pos: Vector2i, progress: float}
+	var accumulated := 0
+
+	# 按顺时针收集环上所有格子：上→右→下→左
+	# 上边
+	for dx in range(-half_w, half_w + 1):
+		for dw in range(ring_width):
+			var pos := Vector2i(center_pos.x + dx, center_pos.y - half_h + dw)
+			ring_cells.append({"pos": pos, "progress": float(accumulated) / perimeter})
+		accumulated += 1
+	# 右边
+	for dy in range(-half_h + 1, half_h):
+		for dw in range(ring_width):
+			var pos := Vector2i(center_pos.x + half_w - dw, center_pos.y + dy)
+			ring_cells.append({"pos": pos, "progress": float(accumulated) / perimeter})
+		accumulated += 1
+	# 下边
+	for dx in range(half_w, -half_w - 1, -1):
+		for dw in range(ring_width):
+			var pos := Vector2i(center_pos.x + dx, center_pos.y + half_h - dw)
+			ring_cells.append({"pos": pos, "progress": float(accumulated) / perimeter})
+		accumulated += 1
+	# 左边
+	for dy in range(half_h - 1, -half_h, -1):
+		for dw in range(ring_width):
+			var pos := Vector2i(center_pos.x - half_w + dw, center_pos.y + dy)
+			ring_cells.append({"pos": pos, "progress": float(accumulated) / perimeter})
+		accumulated += 1
+
+	# 渲染，跳过缺口
+	for entry in ring_cells:
+		var pos: Vector2i = entry["pos"]
+		var progress: float = entry["progress"]
+		if not _is_in_tactical(pos):
+			continue
+		if _is_in_gap(progress, feature.gaps, feature.gap_width, perimeter):
+			continue
+		if layout.get_cell(pos) == MapLayout.CellType.GROUND:
+			layout.set_cell(pos, cell_type)

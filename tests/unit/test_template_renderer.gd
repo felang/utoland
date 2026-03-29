@@ -94,3 +94,62 @@ func test_player_spawn_safe():
 		for dx in range(-1, 2):
 			assert_eq(layout.get_cell(Vector2i(spawn.x + dx, spawn.y + dy)), MapLayout.CellType.GROUND,
 				"玩家出生点 (%d,%d) 应为 GROUND" % [spawn.x + dx, spawn.y + dy])
+
+
+func test_rect_wall_band():
+	var layout := MapLayout.new()
+	layout._init_grid()
+	var f := TerrainFeature.new()
+	f.type = TerrainFeature.FeatureType.WALL_BAND
+	f.shape = TerrainFeature.FeatureShape.RECT
+	f.center = Vector2(0.8, 0.2)  # 远离玩家出生点，避免被 _ensure_player_spawn_safe 覆盖
+	f.size = Vector2i(4, 4)
+	var template := _make_template([f])
+	renderer.render(template, layout)
+	var center_pos := Vector2i(
+		int(MapLayout.TACTICAL_MIN_X + 0.8 * (MapLayout.TACTICAL_MAX_X - MapLayout.TACTICAL_MIN_X)),
+		int(MapLayout.TACTICAL_MIN_Y + 0.2 * (MapLayout.TACTICAL_MAX_Y - MapLayout.TACTICAL_MIN_Y)))
+	assert_eq(layout.get_cell(center_pos), MapLayout.CellType.WALL, "RECT 中心应为 WALL")
+
+
+func test_plaza_marks_cells():
+	var layout := MapLayout.new()
+	layout._init_grid()
+	var f := TerrainFeature.new()
+	f.type = TerrainFeature.FeatureType.PLAZA
+	f.shape = TerrainFeature.FeatureShape.RECT
+	f.center = Vector2(0.3, 0.3)
+	f.size = Vector2i(4, 4)
+	var template := _make_template([f])
+	renderer.render(template, layout)
+	assert_gt(renderer.get_plaza_cells().size(), 0, "PLAZA 应有标记格子")
+	# PLAZA 不改变 CellType，仍为 GROUND
+	for cell in renderer.get_plaza_cells():
+		assert_eq(layout.get_cell(cell), MapLayout.CellType.GROUND, "PLAZA 格子仍为 GROUND")
+
+
+func test_ring_creates_ring_shape():
+	var layout := MapLayout.new()
+	layout._init_grid()
+	var f := TerrainFeature.new()
+	f.type = TerrainFeature.FeatureType.RIVER
+	f.shape = TerrainFeature.FeatureShape.RING
+	f.center = Vector2(0.5, 0.5)
+	f.size = Vector2i(10, 6)
+	f.width = 1
+	f.gaps = [0.25, 0.5, 0.75, 1.0]
+	f.gap_width = 2
+	var template := _make_template([f])
+	renderer.render(template, layout)
+	# 中心应为 GROUND（环内部）
+	var center_pos := Vector2i(
+		int(MapLayout.TACTICAL_MIN_X + 0.5 * (MapLayout.TACTICAL_MAX_X - MapLayout.TACTICAL_MIN_X)),
+		int(MapLayout.TACTICAL_MIN_Y + 0.5 * (MapLayout.TACTICAL_MAX_Y - MapLayout.TACTICAL_MIN_Y)))
+	assert_eq(layout.get_cell(center_pos), MapLayout.CellType.GROUND, "环中心应为 GROUND")
+	# 环上应有 ABYSS
+	var abyss_count := 0
+	for y in range(MapLayout.TACTICAL_MIN_Y, MapLayout.TACTICAL_MAX_Y + 1):
+		for x in range(MapLayout.TACTICAL_MIN_X, MapLayout.TACTICAL_MAX_X + 1):
+			if layout.get_cell(Vector2i(x, y)) == MapLayout.CellType.ABYSS:
+				abyss_count += 1
+	assert_gt(abyss_count, 10, "环应产生 ABYSS 格子")
