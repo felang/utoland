@@ -27,9 +27,41 @@ func generate(config: MapGeneratorConfig, seed_value: int = -1) -> MapLayout:
 	return layout
 
 
-func apply_to_tilemap(_map_scene: Node, _layout: MapLayout, _config: MapGeneratorConfig) -> void:
-	## 将生成的地图布局写入 TileMapLayer 节点（Task 7 重写）
-	pass
+func apply_to_tilemap(map_scene: Node, layout: MapLayout, config: MapGeneratorConfig) -> void:
+	var ground_layer: TileMapLayer = map_scene.get_node("Ground")
+	var terrain_layer: TileMapLayer = map_scene.get_node("Terrain")
+
+	assert(ground_layer != null, "地图模板缺少 Ground 节点")
+	assert(terrain_layer != null, "地图模板缺少 Terrain 节点")
+
+	var all_playable: Array[Vector2i] = []
+	var water_cells: Array[Vector2i] = []
+	var wall_cells: Array[Vector2i] = []
+	var border_cells: Array[Vector2i] = []
+
+	for gy in range(MapLayout.PLAYABLE_HEIGHT):
+		for gx in range(MapLayout.PLAYABLE_WIDTH):
+			var tile_pos := Vector2i(MapLayout.PLAYABLE_ORIGIN_X + gx, MapLayout.PLAYABLE_ORIGIN_Y + gy)
+			all_playable.append(tile_pos)
+			match layout.get_cell(Vector2i(gx, gy)):
+				MapLayout.CellType.ABYSS:
+					water_cells.append(tile_pos)
+				MapLayout.CellType.WALL:
+					wall_cells.append(tile_pos)
+				MapLayout.CellType.BORDER:
+					border_cells.append(tile_pos)
+
+	# Ground 层：全部铺草底色
+	var terrain_set := 0
+	ground_layer.set_cells_terrain_connect(all_playable, terrain_set, config.grass_terrain_id)
+
+	# Terrain 层：BORDER + WALL + ABYSS 同层渲染
+	if border_cells.size() > 0:
+		terrain_layer.set_cells_terrain_connect(border_cells, terrain_set, config.border_terrain_id)
+	if wall_cells.size() > 0:
+		terrain_layer.set_cells_terrain_connect(wall_cells, terrain_set, config.wall_terrain_id)
+	if water_cells.size() > 0:
+		terrain_layer.set_cells_terrain_connect(water_cells, terrain_set, config.water_terrain_id)
 
 
 func _fill_borders(layout: MapLayout) -> void:
