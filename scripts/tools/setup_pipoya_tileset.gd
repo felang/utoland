@@ -47,10 +47,10 @@ func _run() -> void:
 
 	# --- Atlas Sources ---
 	var paths := [
-		"res://assets/tilesets/Pipoya RPG Tileset 32x32/[A]_type3/[A]Grass1_pipo.png",
-		"res://assets/tilesets/Pipoya RPG Tileset 32x32/[A]_type3/[A]Water1_pipo.png",
-		"res://assets/tilesets/Pipoya RPG Tileset 32x32/[A]_type3/[A]Wall-Up1_pipo.png",
-		"res://assets/tilesets/Pipoya RPG Tileset 32x32/[A]_type3/[A]Dirt1_pipo.png",
+		"res://assets/tilesets/pipoya/grass.png",
+		"res://assets/tilesets/pipoya/water.png",
+		"res://assets/tilesets/pipoya/wall.png",
+		"res://assets/tilesets/pipoya/dirt.png",
 	]
 	# Grass 无碰撞，Water/Dirt 只有 Solid，Wall 有 Solid + WallBlock
 	var has_solid := [false, true, true, true]
