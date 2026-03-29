@@ -106,3 +106,15 @@ func test_upgrade_tower_node() -> void:
 	_drag_manager.upgrade_tower_node(deploy_id, "pea_shooter", 2, Vector2i(5, 5))
 	assert_true(deploy_id in _drag_manager._tower_nodes)
 
+# ===== 可放置性校验 =====
+
+func test_placeable_cells_blocks_invalid_pos():
+	_drag_manager.placeable_cells = {Vector2i(5, 5): true, Vector2i(6, 6): true}
+	assert_true(_drag_manager._is_grid_available(Vector2i(5, 5)), "在 placeable_cells 中的位置应可用")
+	assert_false(_drag_manager._is_grid_available(Vector2i(10, 10)), "不在 placeable_cells 中的位置应不可用")
+
+
+func test_empty_placeable_cells_allows_all():
+	_drag_manager.placeable_cells = {}
+	assert_true(_drag_manager._is_grid_available(Vector2i(10, 10)), "空 placeable_cells 应允许所有位置")
+

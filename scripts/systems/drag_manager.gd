@@ -22,6 +22,8 @@ var _on_cancelled_callback: Callable
 var _grid_overlay: Node2D = null
 var _is_shop_mode: bool = false
 
+var placeable_cells: Dictionary = {}  # {Vector2i: true}，由 main.gd 传入
+
 var _tower_menu: PopupMenu = null
 var _menu_deploy_id: int = -1
 
@@ -300,6 +302,10 @@ func _is_valid_grid_pos(grid_pos: Vector2i) -> bool:
 		and grid_pos.y >= 0 and grid_pos.y < GameConfig.MAP_GRID_HEIGHT)
 
 func _is_grid_available(grid_pos: Vector2i) -> bool:
+	# 可放置性校验（如果有 placeable_cells 数据）
+	if not placeable_cells.is_empty():
+		if not placeable_cells.has(grid_pos):
+			return false
 	for entry in InventoryManager.deployed_towers:
 		if entry.grid_pos == grid_pos:
 			if _drag_source == DragSource.MOVE_TOWER and entry.deploy_id == _drag_original_deploy_id:
