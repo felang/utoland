@@ -131,6 +131,7 @@ var shop: ShopConfigData = null
 var shop_config: ShopConfig = null
 var spawn: SpawnConfigData = null
 var exp_config: ExpConfig = null
+var prefabs: Dictionary = {}  # {id: MapPrefab}
 
 
 func _ready() -> void:
@@ -140,6 +141,7 @@ func _ready() -> void:
 	_load_waves_by_map("res://resources/waves/")
 	_load_resources_from_dir("res://resources/characters/", characters)
 	_load_resources_from_dir("res://resources/maps/", maps)
+	_load_resources_from_dir("res://resources/maps/prefabs/", prefabs)
 	effects = load("res://resources/effects/default_effects.tres")
 	shop = load("res://resources/shop/default_shop.tres")
 	shop_config = load("res://resources/shop/shop_config.tres")
