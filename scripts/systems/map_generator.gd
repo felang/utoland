@@ -23,6 +23,9 @@ func generate(config: MapGeneratorConfig, seed_value: int = -1) -> MapLayout:
 	if not success:
 		_clear_terrain(layout)
 
+	# 过滤掉被模板地形覆盖的刷怪点
+	_filter_spawn_points(layout)
+
 	_compute_placeable_cells(layout)
 	return layout
 
@@ -265,6 +268,15 @@ func _clear_terrain(layout: MapLayout) -> void:
 		for x in range(MapLayout.TACTICAL_MIN_X, MapLayout.TACTICAL_MAX_X + 1):
 			if layout.get_cell(Vector2i(x, y)) in [MapLayout.CellType.WALL, MapLayout.CellType.ABYSS]:
 				layout.set_cell(Vector2i(x, y), MapLayout.CellType.GROUND)
+
+
+func _filter_spawn_points(layout: MapLayout) -> void:
+	## 移除被模板地形覆盖的刷怪点（只保留在 SPAWN_ZONE 上的）
+	var valid_points: Array[Vector2i] = []
+	for sp in layout.spawn_points:
+		if layout.get_cell(sp) == MapLayout.CellType.SPAWN_ZONE:
+			valid_points.append(sp)
+	layout.spawn_points = valid_points
 
 
 func _compute_placeable_cells(layout: MapLayout) -> void:
