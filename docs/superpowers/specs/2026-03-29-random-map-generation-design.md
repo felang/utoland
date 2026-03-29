@@ -11,21 +11,25 @@
 ### 可玩区在总网格中的位置
 
 可玩区 40×24 居中于 45×30 总网格：
-- 水平边距：(45 - 40) / 2 = 2.5 → 左侧 2 格装饰 + 右侧 3 格装饰（或 3+2）
+- 水平边距：(45 - 40) / 2 = 2.5 → 取整为左侧 3 格 + 右侧 2 格装饰
 - 垂直边距：(30 - 24) / 2 = 3 格装饰
 
-**可玩区起始格**：总网格 (2, 3)，即像素偏移 (64, 96)。
+**可玩区起始格**：总网格 (3, 3)，即像素偏移 (96, 96)。
 
 ### 坐标系统
 
-游戏使用**中心原点**（0,0 在地图中心）。坐标转换公式：
+游戏使用**中心原点**（0,0 在地图中心）。可玩区格子坐标使用 0-based 左上角原点。
 
 ```
-# 可玩区格子坐标 → 世界像素坐标
-world_x = (grid_x - PLAYABLE_WIDTH / 2) * GRID_SIZE + GRID_SIZE / 2
-world_y = (grid_y - PLAYABLE_HEIGHT / 2) * GRID_SIZE + GRID_SIZE / 2
+# 常量
+PLAYABLE_ORIGIN_X = 3   # 可玩区在总网格中的起始列
+PLAYABLE_ORIGIN_Y = 3   # 可玩区在总网格中的起始行
 
-# 即 grid(0,0) → world(-624, -336)，grid(19,11) → world(16, 48) ≈ 地图中心
+# 可玩区格子坐标 → 世界像素坐标
+world_x = (PLAYABLE_ORIGIN_X + grid_x - MAP_GRID_WIDTH / 2.0) * GRID_SIZE + GRID_SIZE / 2
+world_y = (PLAYABLE_ORIGIN_Y + grid_y - MAP_GRID_HEIGHT / 2.0) * GRID_SIZE + GRID_SIZE / 2
+
+# 即 grid(0,0) → world(-624, -336)，grid(19,11) → world(-16, 16) ≈ 地图中心附近
 ```
 
 `MapLayout` 内部使用格子坐标（0-based，左上角为原点），对外提供 `get_*_world()` 方法转换为世界坐标。
@@ -282,7 +286,7 @@ func _load_map():
     var layout = generator.generate(map_config)
 
     # 3. 填充 TileMap
-    generator.apply_to_tilemap(map_scene, layout)
+    generator.apply_to_tilemap(map_scene, layout, map_config.generator_config)
 
     # 4. 传递生成数据给其他系统
     enemy_spawner.spawn_points = layout.get_spawn_points_world()
@@ -344,12 +348,13 @@ GeneratedMap (Node2D)
   tests/unit/test_map_generator.gd          — 生成器单元测试
 
 修改：
-  scripts/ui/main.gd                       — 集成 MapGenerator
-  scripts/systems/enemy_spawner.gd         — 改用固定刷怪点
-  scripts/systems/drag_manager.gd          — 加可放置性校验
+  scripts/ui/main.gd                        — 集成 MapGenerator
+  scripts/systems/enemy_spawner.gd          — 改用固定刷怪点
+  scripts/systems/drag_manager.gd           — 加可放置性校验
+  scripts/resources/map_data.gd             — 新增 generator_config 字段
   scripts/entities/projectiles/projectile.gd — 碰撞 mask 加 WallBlock
-  scripts/core/game_config.gd              — 加载 Prefab、更新可玩区常量
-  project.godot                            — 新增第 9 碰撞层
+  scripts/core/game_config.gd               — 加载 Prefab、更新可玩区常量
+  project.godot                             — 新增第 9 碰撞层
 
 移除：
   scripts/shared/map_boundary.gd
