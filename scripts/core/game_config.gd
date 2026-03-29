@@ -19,8 +19,10 @@ const MAP_GRID_WIDTH = 45
 const MAP_GRID_HEIGHT = 30
 
 # 可活动区域（比地图小，左右缩 2 格，上下缩 1 格）
-const PLAY_AREA_GRID_WIDTH = 41
-const PLAY_AREA_GRID_HEIGHT = 28
+const PLAY_AREA_GRID_WIDTH = 40
+const PLAY_AREA_GRID_HEIGHT = 24
+const PLAYABLE_ORIGIN_X: int = 3
+const PLAYABLE_ORIGIN_Y: int = 3
 
 # 地图尺寸（由网格数量计算，相机边界用）
 var MAP_PIXEL_WIDTH: float = 0.0

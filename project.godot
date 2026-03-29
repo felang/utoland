@@ -35,17 +35,6 @@ window/size/viewport_height=540
 window/size/mode=2
 window/stretch/mode="viewport"
 
-[layer_names]
-
-2d_physics/layer_1="Player"
-2d_physics/layer_2="Enemy"
-2d_physics/layer_3="Solid"
-2d_physics/layer_4="Pickup"
-2d_physics/layer_5="PlayerAttack"
-2d_physics/layer_6="EnemyAttack"
-2d_physics/layer_7="DefenderHurt"
-2d_physics/layer_8="EnemyHurt"
-
 [editor_plugins]
 
 enabled=PackedStringArray("res://addons/AsepriteWizard/plugin.cfg", "res://addons/gdai-mcp-plugin-godot/plugin.cfg", "res://addons/gut/plugin.cfg")
@@ -111,6 +100,18 @@ debug_zoom_in={
 "events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":true,"meta_pressed":false,"pressed":false,"keycode":0,"physical_keycode":53,"key_label":0,"unicode":0,"location":0,"echo":false,"script":null)
 ]
 }
+
+[layer_names]
+
+2d_physics/layer_1="Player"
+2d_physics/layer_2="Enemy"
+2d_physics/layer_3="Solid"
+2d_physics/layer_4="Pickup"
+2d_physics/layer_5="PlayerAttack"
+2d_physics/layer_6="EnemyAttack"
+2d_physics/layer_7="DefenderHurt"
+2d_physics/layer_8="EnemyHurt"
+2d_physics/layer_9="WallBlock"
 
 [physics]
 
