@@ -15,26 +15,38 @@ func generate(config: MapGeneratorConfig, seed_value: int = -1) -> MapLayout:
 
 	var layout := MapLayout.new()
 
+	# 1. 全部填 BORDER（完整边界墙）
 	_fill_borders(layout)
-	_fill_spawn_zone(layout)
-	_generate_spawn_points(layout, config)
 
-	var success := _try_generate_terrain(layout, config)
+	# 2. 内部填 GROUND
+	_fill_ground(layout)
+
+	# 3. 选模板 → 渲染地形 + 开刷怪口
+	var template: MapTemplate = null
+	if not config.templates.is_empty():
+		template = config.templates[_rng.randi_range(0, config.templates.size() - 1)]
+
+	if template:
+		# 渲染模板地形
+		_template_renderer.render(template, layout)
+		# 在边界墙上开刷怪口
+		_open_spawn_gates(layout, template)
+
+	# 4. Prefab 散布 + 连通性验证
+	var success := _try_scatter_with_connectivity(layout, config, template)
 	if not success:
-		_clear_terrain(layout)
+		pass  # 保底：模板地形在，但没有额外 Prefab
 
-	# 过滤掉被模板地形覆盖的刷怪点
-	_filter_spawn_points(layout)
-
+	# 5. 计算可放塔格子
 	_compute_placeable_cells(layout)
 	return layout
 
 
-func apply_to_tilemap(map_scene: Node, layout: MapLayout, config: MapGeneratorConfig) -> void:
+func apply_to_tilemap(map_scene: Node, layout: MapLayout, _config: MapGeneratorConfig) -> void:
 	var ground_layer: TileMapLayer = map_scene.get_node("Ground")
 	var terrain_layer: TileMapLayer = map_scene.get_node("Terrain")
 
-	# luminara tileset source_id=1, tile 坐标：ground=(0,0), border=(1,0), wall=(2,0), abyss=(3,0)
+	# luminara tileset source_id=1
 	var src_id := 1
 	var ground_tile := Vector2i(0, 0)
 	var border_tile := Vector2i(1, 0)
@@ -58,8 +70,10 @@ func apply_to_tilemap(map_scene: Node, layout: MapLayout, config: MapGeneratorCo
 					terrain_layer.set_cell(tile_pos, src_id, abyss_tile)
 
 
+# === 边界和地面 ===
+
 func _fill_borders(layout: MapLayout) -> void:
-	## 填充边界（最外圈一圈）
+	## 外围 1 格全部填 BORDER
 	for x in range(MapLayout.PLAYABLE_WIDTH):
 		layout.set_cell(Vector2i(x, 0), MapLayout.CellType.BORDER)
 		layout.set_cell(Vector2i(x, MapLayout.PLAYABLE_HEIGHT - 1), MapLayout.CellType.BORDER)
@@ -68,107 +82,81 @@ func _fill_borders(layout: MapLayout) -> void:
 		layout.set_cell(Vector2i(MapLayout.PLAYABLE_WIDTH - 1, y), MapLayout.CellType.BORDER)
 
 
-func _fill_spawn_zone(layout: MapLayout) -> void:
-	## 填充四边刷怪区（边界内侧 2 格宽）
-	# 上下两条水平带
-	for x in range(1, MapLayout.PLAYABLE_WIDTH - 1):
-		for y in [1, 2]:
-			layout.set_cell(Vector2i(x, y), MapLayout.CellType.SPAWN_ZONE)
-		for y in [MapLayout.PLAYABLE_HEIGHT - 3, MapLayout.PLAYABLE_HEIGHT - 2]:
-			layout.set_cell(Vector2i(x, y), MapLayout.CellType.SPAWN_ZONE)
-	# 左右两条垂直带
+func _fill_ground(layout: MapLayout) -> void:
+	## 边界内全部填 GROUND（不再有刷怪区分区）
 	for y in range(1, MapLayout.PLAYABLE_HEIGHT - 1):
-		for x in [1, 2]:
-			layout.set_cell(Vector2i(x, y), MapLayout.CellType.SPAWN_ZONE)
-		for x in [MapLayout.PLAYABLE_WIDTH - 3, MapLayout.PLAYABLE_WIDTH - 2]:
-			layout.set_cell(Vector2i(x, y), MapLayout.CellType.SPAWN_ZONE)
+		for x in range(1, MapLayout.PLAYABLE_WIDTH - 1):
+			layout.set_cell(Vector2i(x, y), MapLayout.CellType.GROUND)
 
 
-func _generate_spawn_points(layout: MapLayout, config: MapGeneratorConfig) -> void:
-	## 在四条边的刷怪区内生成刷怪点
-	var edges: Array = [
-		{"axis": "x", "range_min": 3, "range_max": 36, "fixed_values": [1, 2]},
-		{"axis": "x", "range_min": 3, "range_max": 36, "fixed_values": [21, 22]},
-		{"axis": "y", "range_min": 3, "range_max": 20, "fixed_values": [1, 2]},
-		{"axis": "y", "range_min": 3, "range_max": 20, "fixed_values": [37, 38]},
-	]
+# === 刷怪口 ===
 
-	for edge in edges:
-		var count := _rng.randi_range(config.spawns_per_edge.x, config.spawns_per_edge.y)
-		var positions: Array[int] = []
-		for i in range(count):
-			var pos := _pick_spawn_pos_on_edge(
-				edge["range_min"] as int, edge["range_max"] as int,
-				positions, config.min_spawn_spacing
-			)
-			if pos >= 0:
-				positions.append(pos)
-				var fixed_vals: Array = edge["fixed_values"]
-				var fixed_val: int = fixed_vals[_rng.randi_range(0, 1)]
-				var spawn_pos: Vector2i
-				if edge["axis"] == "x":
-					spawn_pos = Vector2i(pos, fixed_val)
-				else:
-					spawn_pos = Vector2i(fixed_val, pos)
-				layout.spawn_points.append(spawn_pos)
-
-	# 四角刷怪点
-	var corners: Array[Vector2i] = [
-		Vector2i(1, 1), Vector2i(38, 1),
-		Vector2i(1, 22), Vector2i(38, 22),
-	]
-	for corner in corners:
-		if _rng.randf() < config.corner_spawn_chance:
-			layout.spawn_points.append(corner)
+func _open_spawn_gates(layout: MapLayout, template: MapTemplate) -> void:
+	## 在边界墙上开缺口，同时生成刷怪点
+	for gate in template.spawn_gates:
+		var gate_cells := _get_gate_cells(gate)
+		for cell in gate_cells:
+			# 边界墙变成 SPAWN_ZONE（标记为刷怪入口）
+			layout.set_cell(cell, MapLayout.CellType.SPAWN_ZONE)
+			# 刷怪点 = 缺口中心
+		# 刷怪点取缺口中心格
+		if gate_cells.size() > 0:
+			var center_idx := gate_cells.size() / 2
+			layout.spawn_points.append(gate_cells[center_idx])
 
 
-func _pick_spawn_pos_on_edge(range_min: int, range_max: int, existing: Array[int], min_spacing: int) -> int:
-	## 在指定范围内选择一个与已有位置保持间距的刷怪位置
-	for attempt in range(20):
-		var pos := _rng.randi_range(range_min, range_max)
-		var valid := true
-		for ex in existing:
-			if abs(pos - ex) < min_spacing:
-				valid = false
-				break
-		if valid:
-			return pos
-	return -1
+func _get_gate_cells(gate: SpawnGate) -> Array[Vector2i]:
+	## 计算刷怪口在边界墙上的格子坐标
+	var cells: Array[Vector2i] = []
+	var half_w := gate.width / 2
+
+	match gate.edge:
+		SpawnGate.Edge.TOP:
+			var center_x := int(1 + gate.position * (MapLayout.PLAYABLE_WIDTH - 3))
+			for dx in range(-half_w, half_w + 1):
+				var x := clampi(center_x + dx, 1, MapLayout.PLAYABLE_WIDTH - 2)
+				cells.append(Vector2i(x, 0))
+		SpawnGate.Edge.BOTTOM:
+			var center_x := int(1 + gate.position * (MapLayout.PLAYABLE_WIDTH - 3))
+			for dx in range(-half_w, half_w + 1):
+				var x := clampi(center_x + dx, 1, MapLayout.PLAYABLE_WIDTH - 2)
+				cells.append(Vector2i(x, MapLayout.PLAYABLE_HEIGHT - 1))
+		SpawnGate.Edge.LEFT:
+			var center_y := int(1 + gate.position * (MapLayout.PLAYABLE_HEIGHT - 3))
+			for dy in range(-half_w, half_w + 1):
+				var y := clampi(center_y + dy, 1, MapLayout.PLAYABLE_HEIGHT - 2)
+				cells.append(Vector2i(0, y))
+		SpawnGate.Edge.RIGHT:
+			var center_y := int(1 + gate.position * (MapLayout.PLAYABLE_HEIGHT - 3))
+			for dy in range(-half_w, half_w + 1):
+				var y := clampi(center_y + dy, 1, MapLayout.PLAYABLE_HEIGHT - 2)
+				cells.append(Vector2i(MapLayout.PLAYABLE_WIDTH - 1, y))
+
+	return cells
 
 
-func _try_generate_terrain(layout: MapLayout, config: MapGeneratorConfig) -> bool:
-	## 模板渲染 + Prefab 散布 + 连通性验证
-	if config.templates.is_empty():
+# === Prefab 散布 + 连通性 ===
+
+func _try_scatter_with_connectivity(layout: MapLayout, config: MapGeneratorConfig, template: MapTemplate) -> bool:
+	if config.prefabs.is_empty():
 		return true
 
-	# 尝试最多 3 个随机模板
-	var tried_indices: Array[int] = []
-	for attempt in range(mini(config.templates.size(), 3)):
-		var idx := _rng.randi_range(0, config.templates.size() - 1)
-		while idx in tried_indices and tried_indices.size() < config.templates.size():
-			idx = _rng.randi_range(0, config.templates.size() - 1)
-		tried_indices.append(idx)
-		var template: MapTemplate = config.templates[idx]
+	var base_layout := _clone_layout(layout)
+	var prefab_count := _rng.randi_range(config.total_prefab_count.x, config.total_prefab_count.y)
 
-		# 渲染模板骨架
-		var attempt_layout := _clone_layout(layout)
-		_template_renderer.render(template, attempt_layout)
-
-		# Prefab 散布 + 连通性检查
-		var prefab_count := _rng.randi_range(config.total_prefab_count.x, config.total_prefab_count.y)
-		for retry in range(5):
-			var scatter_layout := _clone_layout(attempt_layout)
-			_scatter_prefabs(scatter_layout, config, prefab_count)
-			if _validate_connectivity(scatter_layout):
-				_copy_grid(scatter_layout, layout)
-				return true
-			prefab_count = maxi(prefab_count - 2, 0)
+	for retry in range(5):
+		var attempt := _clone_layout(base_layout)
+		_scatter_prefabs(attempt, config, prefab_count)
+		if _validate_connectivity(attempt):
+			_copy_grid(attempt, layout)
+			return true
+		prefab_count = maxi(prefab_count - 2, 0)
 
 	return false
 
 
 func _scatter_prefabs(layout: MapLayout, config: MapGeneratorConfig, count: int) -> void:
-	## 在战术区散布预制件，避开 PLAZA 区域和中心安全区
+	## 在战术区散布预制件，避开 PLAZA 和中心安全区
 	if config.prefabs.is_empty() or count <= 0:
 		return
 	var plaza_set := {}
@@ -184,7 +172,6 @@ func _scatter_prefabs(layout: MapLayout, config: MapGeneratorConfig, count: int)
 
 
 func _try_place_prefab(layout: MapLayout, cells: Array[Vector2i], cell_type: int, plaza_set: Dictionary) -> void:
-	## 随机尝试在战术区放置一个预制件
 	for attempt in range(15):
 		var ox := _rng.randi_range(MapLayout.TACTICAL_MIN_X, MapLayout.TACTICAL_MAX_X)
 		var oy := _rng.randi_range(MapLayout.TACTICAL_MIN_Y, MapLayout.TACTICAL_MAX_Y)
@@ -203,7 +190,6 @@ func _try_place_prefab(layout: MapLayout, cells: Array[Vector2i], cell_type: int
 
 
 func _is_valid_prefab_pos(pos: Vector2i, layout: MapLayout, plaza_set: Dictionary) -> bool:
-	## 检查位置是否可放置预制件
 	if pos.x < MapLayout.TACTICAL_MIN_X or pos.x > MapLayout.TACTICAL_MAX_X:
 		return false
 	if pos.y < MapLayout.TACTICAL_MIN_Y or pos.y > MapLayout.TACTICAL_MAX_Y:
@@ -218,8 +204,9 @@ func _is_valid_prefab_pos(pos: Vector2i, layout: MapLayout, plaza_set: Dictionar
 	return true
 
 
+# === 工具方法 ===
+
 func _clone_layout(layout: MapLayout) -> MapLayout:
-	## 复制 layout 用于尝试（保留边界/刷怪区/刷怪点，只复制 grid）
 	var clone := MapLayout.new()
 	for y in range(MapLayout.PLAYABLE_HEIGHT):
 		for x in range(MapLayout.PLAYABLE_WIDTH):
@@ -230,7 +217,6 @@ func _clone_layout(layout: MapLayout) -> MapLayout:
 
 
 func _copy_grid(source: MapLayout, target: MapLayout) -> void:
-	## 将 source 的完整 grid 复制到 target
 	for y in range(MapLayout.PLAYABLE_HEIGHT):
 		for x in range(MapLayout.PLAYABLE_WIDTH):
 			target.grid[y][x] = source.grid[y][x]
@@ -240,12 +226,10 @@ func _validate_connectivity(layout: MapLayout) -> bool:
 	## BFS 从玩家出生点验证所有刷怪点可达
 	if layout.spawn_points.is_empty():
 		return true
-
 	var visited := {}
 	var queue: Array[Vector2i] = [layout.player_spawn]
 	visited[layout.player_spawn] = true
 	var dirs: Array[Vector2i] = [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]
-
 	while queue.size() > 0:
 		var current: Vector2i = queue.pop_front()
 		for dir in dirs:
@@ -255,7 +239,6 @@ func _validate_connectivity(layout: MapLayout) -> bool:
 			if layout.is_passable(next):
 				visited[next] = true
 				queue.append(next)
-
 	for sp in layout.spawn_points:
 		if not visited.has(sp):
 			return false
@@ -263,26 +246,15 @@ func _validate_connectivity(layout: MapLayout) -> bool:
 
 
 func _clear_terrain(layout: MapLayout) -> void:
-	## 清除战术区内的地形（回退用）
-	for y in range(MapLayout.TACTICAL_MIN_Y, MapLayout.TACTICAL_MAX_Y + 1):
-		for x in range(MapLayout.TACTICAL_MIN_X, MapLayout.TACTICAL_MAX_X + 1):
+	for y in range(1, MapLayout.PLAYABLE_HEIGHT - 1):
+		for x in range(1, MapLayout.PLAYABLE_WIDTH - 1):
 			if layout.get_cell(Vector2i(x, y)) in [MapLayout.CellType.WALL, MapLayout.CellType.ABYSS]:
 				layout.set_cell(Vector2i(x, y), MapLayout.CellType.GROUND)
 
 
-func _filter_spawn_points(layout: MapLayout) -> void:
-	## 移除被模板地形覆盖的刷怪点（只保留在 SPAWN_ZONE 上的）
-	var valid_points: Array[Vector2i] = []
-	for sp in layout.spawn_points:
-		if layout.get_cell(sp) == MapLayout.CellType.SPAWN_ZONE:
-			valid_points.append(sp)
-	layout.spawn_points = valid_points
-
-
 func _compute_placeable_cells(layout: MapLayout) -> void:
-	## 计算战术区内所有可放置塔的格子
 	layout.placeable_cells.clear()
-	for y in range(MapLayout.TACTICAL_MIN_Y, MapLayout.TACTICAL_MAX_Y + 1):
-		for x in range(MapLayout.TACTICAL_MIN_X, MapLayout.TACTICAL_MAX_X + 1):
+	for y in range(1, MapLayout.PLAYABLE_HEIGHT - 1):
+		for x in range(1, MapLayout.PLAYABLE_WIDTH - 1):
 			if layout.get_cell(Vector2i(x, y)) == MapLayout.CellType.GROUND:
 				layout.placeable_cells.append(Vector2i(x, y))

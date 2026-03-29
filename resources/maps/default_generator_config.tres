@@ -1,14 +1,7 @@
-[gd_resource type="Resource" script_class="MapGeneratorConfig" load_steps=21 format=3]
+[gd_resource type="Resource" script_class="MapGeneratorConfig" load_steps=13 format=3]
 
 [ext_resource type="Script" path="res://scripts/resources/map_generator_config.gd" id="1"]
 [ext_resource type="Resource" path="res://resources/maps/templates/central_river.tres" id="t1"]
-[ext_resource type="Resource" path="res://resources/maps/templates/vertical_canyon.tres" id="t2"]
-[ext_resource type="Resource" path="res://resources/maps/templates/cross_corridor.tres" id="t3"]
-[ext_resource type="Resource" path="res://resources/maps/templates/ring_moat.tres" id="t4"]
-[ext_resource type="Resource" path="res://resources/maps/templates/diagonal_rift.tres" id="t5"]
-[ext_resource type="Resource" path="res://resources/maps/templates/twin_rivers.tres" id="t6"]
-[ext_resource type="Resource" path="res://resources/maps/templates/central_fortress.tres" id="t7"]
-[ext_resource type="Resource" path="res://resources/maps/templates/open_plazas.tres" id="t8"]
 [ext_resource type="Resource" path="res://resources/maps/prefabs/wall_l.tres" id="p1"]
 [ext_resource type="Resource" path="res://resources/maps/prefabs/wall_cross.tres" id="p2"]
 [ext_resource type="Resource" path="res://resources/maps/prefabs/wall_line.tres" id="p3"]
@@ -23,13 +16,6 @@
 
 [resource]
 script = ExtResource("1")
-templates = [ExtResource("t1"), ExtResource("t2"), ExtResource("t3"), ExtResource("t4"), ExtResource("t5"), ExtResource("t6"), ExtResource("t7"), ExtResource("t8")]
-total_prefab_count = Vector2i(8, 15)
+templates = [ExtResource("t1")]
+total_prefab_count = Vector2i(6, 10)
 prefabs = [ExtResource("p1"), ExtResource("p2"), ExtResource("p3"), ExtResource("p4"), ExtResource("p5"), ExtResource("p6"), ExtResource("p7"), ExtResource("p8"), ExtResource("p9"), ExtResource("p10"), ExtResource("p11")]
-spawns_per_edge = Vector2i(1, 2)
-corner_spawn_chance = 0.5
-min_spawn_spacing = 4
-grass_terrain_id = 0
-water_terrain_id = 1
-wall_terrain_id = 2
-border_terrain_id = 3
