@@ -8,6 +8,39 @@
 
 总地图尺寸 45×30 格不变（1440×960px），可玩区域 40×24 格（1280×768px），居中放置，外圈空余格填充装饰背景。
 
+### 可玩区在总网格中的位置
+
+可玩区 40×24 居中于 45×30 总网格：
+- 水平边距：(45 - 40) / 2 = 2.5 → 左侧 2 格装饰 + 右侧 3 格装饰（或 3+2）
+- 垂直边距：(30 - 24) / 2 = 3 格装饰
+
+**可玩区起始格**：总网格 (2, 3)，即像素偏移 (64, 96)。
+
+### 坐标系统
+
+游戏使用**中心原点**（0,0 在地图中心）。坐标转换公式：
+
+```
+# 可玩区格子坐标 → 世界像素坐标
+world_x = (grid_x - PLAYABLE_WIDTH / 2) * GRID_SIZE + GRID_SIZE / 2
+world_y = (grid_y - PLAYABLE_HEIGHT / 2) * GRID_SIZE + GRID_SIZE / 2
+
+# 即 grid(0,0) → world(-624, -336)，grid(19,11) → world(16, 48) ≈ 地图中心
+```
+
+`MapLayout` 内部使用格子坐标（0-based，左上角为原点），对外提供 `get_*_world()` 方法转换为世界坐标。
+
+### GameConfig 常量更新
+
+```
+PLAY_AREA_GRID_WIDTH:  41 → 40
+PLAY_AREA_GRID_HEIGHT: 28 → 24
+PLAY_HALF_WIDTH:  656 → 640
+PLAY_HALF_HEIGHT: 448 → 384
+```
+
+MAP_GRID_WIDTH/MAP_GRID_HEIGHT/MAP_HALF_WIDTH/MAP_HALF_HEIGHT 不变。可玩面积缩小约 17%（1148→960 格），但战术区更紧凑，配合固定刷怪点和 Prefab 障碍物，战斗节奏应更紧凑。若测试后发现敌人/波次需要调整，在后续迭代中处理。
+
 ### 可玩区 40×24 的三层划分
 
 ```
@@ -38,16 +71,22 @@ S = 刷怪点
 | 刷怪区 | x=1-2, x=37-38, y=1-2, y=21-22 | 边界墙内侧 2 格，禁止造塔和生成 Prefab |
 | 战术区 | x=3~36, y=3~20 | 中心 34×18 格，九宫格划分 |
 
-**九宫格每块约 11×6 格**（34/3 ≈ 11, 18/3 = 6），中心区保持空地。
+**九宫格精确划分（34×18 战术区）：**
+- 列：11 + 12 + 11 = 34（中列多 1 格）
+  - 左列 x=3~13，中列 x=14~25，右列 x=26~36
+- 行：6 + 6 + 6 = 18
+  - 上行 y=3~8，中行 y=9~14，下行 y=15~20
+
+中心区（x=14~25, y=9~14）保持空地。玩家初始位置：grid(19, 11)，即中心区正中。
 
 ## 数据模型
 
 ### MapLayout（RefCounted）
 
-生成结果的数据载体，传递给其他系统使用。
+生成结果的数据载体，传递给其他系统使用。存放在 `scripts/core/map_layout.gd`（RefCounted 非 Resource，不放 scripts/resources/）。
 
 ```
-scripts/resources/map_layout.gd
+scripts/core/map_layout.gd
 
 属性：
 - grid: Array[Array]           # 40×24 二维数组，每格存 CellType 枚举
@@ -129,6 +168,30 @@ Prefab 数据文件存储在 `resources/maps/prefabs/`。
 
 ## 生成算法
 
+### MapGeneratorConfig（Resource）
+
+生成参数配置，可按地图/难度调整。存放在 `scripts/resources/map_generator_config.gd`。
+
+```
+scripts/resources/map_generator_config.gd
+
+属性：
+- prefabs: Array[MapPrefab]       # 可用 Prefab 池
+- empty_chance: float = 0.35      # 每个区块留空概率（0.0~1.0）
+- min_prefabs_per_block: int = 1  # 区块非空时最少 Prefab 数
+- max_prefabs_per_block: int = 2  # 区块非空时最多 Prefab 数
+- spawns_per_edge: Vector2i = Vector2i(1, 2)  # 每条边刷怪点数量范围
+- corner_spawn_chance: float = 0.5 # 四角刷怪点概率
+- min_spawn_spacing: int = 4      # 同一条边上刷怪点最小间距（格）
+- symmetry_weights: Array[float] = [0.33, 0.34, 0.33]  # RANDOM/MIRROR_X/ROTATE_180 权重
+- ground_tile: Vector2i           # 地面 tile atlas 坐标
+- border_tile: Vector2i           # 边界墙 tile atlas 坐标
+- decoration_tiles: Array[Vector2i] # 装饰背景区可用 tile
+- tileset_source_id: int = 0      # TileSet source ID
+```
+
+默认配置文件：`resources/maps/default_generator_config.tres`。
+
 ### MapGenerator（RefCounted）
 
 ```
@@ -136,7 +199,7 @@ scripts/systems/map_generator.gd
 
 方法：
 - generate(config: MapGeneratorConfig, seed: int = -1) -> MapLayout
-- apply_to_tilemap(map_scene: Node, layout: MapLayout) -> void
+- apply_to_tilemap(map_scene: Node, layout: MapLayout, config: MapGeneratorConfig) -> void
 ```
 
 ### 生成流程
@@ -177,7 +240,8 @@ scripts/systems/map_generator.gd
    ├─ 从玩家初始位置做 flood fill
    ├─ 检查所有刷怪点是否可达（GROUND 和 SPAWN_ZONE 可通行）
    ├─ 失败 → 回到步骤 5 重试（最多 10 次）
-   └─ 10 次失败 → 减少 Prefab 数量再试
+   ├─ 10 次失败 → 减少 Prefab 数量（每块最多 1 个）再试 5 次
+   └─ 仍失败 → 生成无 Prefab 的空旷地图（保底）
 
 8. 计算 placeable_cells
    └─ 战术区内所有 GROUND 格子 → placeable_cells
@@ -193,10 +257,15 @@ scripts/systems/map_generator.gd
 
 ### 碰撞配置
 
-- 实体墙 tile：collision_layer = Solid(3) + WallBlock(9)
-- 深渊水域 tile：collision_layer = Solid(3)
-- 投射物：collision_mask 新增 WallBlock(9)，碰到实体墙时销毁
+碰撞通过 TileSet 的 physics layer 配置（非运行时代码生成）：
+
+- **BORDER tile**：collision_layer = Solid(3)，阻挡玩家/敌人移动（替代 MapBoundary）
+- **WALL tile**：collision_layer = Solid(3) + WallBlock(9)，阻挡移动+投射物
+- **ABYSS tile**：collision_layer = Solid(3)，仅阻挡移动
+- **投射物**：collision_mask 新增 WallBlock(9)，碰到实体墙时销毁
 - 现有塔（仅 Solid 层）不受影响，投射物仍飞过塔
+
+TileSet 需配置两个 physics layer：layer 0 对应 Solid(3)，layer 1 对应 WallBlock(9)。WALL tile 两层都配碰撞形状，BORDER/ABYSS tile 只配 layer 0。
 
 ## 系统集成
 
@@ -238,18 +307,41 @@ func _load_map():
 
 ### MapBoundary 移除
 
-边界墙由 tile 碰撞替代，移除 `map_boundary.gd` 和 `map_boundary.tscn`。
+边界墙由 BORDER tile 碰撞替代（collision_layer = Solid(3)），移除 `map_boundary.gd` 和 `map_boundary.tscn`。现有 `forest.tscn` 中的 MapBoundary 引用一并移除。
+
+### MapData 集成
+
+现有 `MapData` Resource 保留，`map_scene` 字段指向 `generated_map.tscn`。新增字段：
+- `generator_config: MapGeneratorConfig` — 指向该地图的生成配置 `.tres`
+
+map_select 和 `PlayerState.selected_map` 流程不变。手绘地图（如 forest）可保留兼容——`generator_config` 为 null 时走原有手绘加载逻辑。
+
+### generated_map.tscn 模板结构
+
+```
+GeneratedMap (Node2D)
+├── Background (TileMapLayer, z_index=-1)  — 装饰背景区
+├── Ground (TileMapLayer, z_index=-1)      — 地面+边界墙
+├── Terrain (TileMapLayer)                 — Prefab 障碍物（WALL/ABYSS）
+├── PickupLayer (Node2D, z_index=0)
+├── EntityLayer (Node2D, z_index=1, y_sort_enabled=true)
+├── ProjectileLayer (Node2D, z_index=2)
+```
+
+所有 TileMapLayer 共用同一个 TileSet 资源。`apply_to_tilemap()` 通过节点名获取对应 layer 并调用 `set_cell()`。
 
 ## 文件结构
 
 ```
 新增：
-  scripts/systems/map_generator.gd         — MapGenerator（RefCounted）
-  scripts/resources/map_layout.gd          — MapLayout 数据类
-  scripts/resources/map_prefab.gd          — MapPrefab（Resource）
-  resources/maps/prefabs/*.tres            — 6 个 Prefab 数据文件
-  scenes/levels/maps/generated_map.tscn    — 通用地图模板（空 TileMapLayer + 容器）
-  tests/unit/test_map_generator.gd         — 生成器单元测试
+  scripts/systems/map_generator.gd          — MapGenerator（RefCounted）
+  scripts/core/map_layout.gd               — MapLayout 数据类（RefCounted）
+  scripts/resources/map_prefab.gd           — MapPrefab（Resource）
+  scripts/resources/map_generator_config.gd — MapGeneratorConfig（Resource）
+  resources/maps/prefabs/*.tres             — 6 个 Prefab 数据文件
+  resources/maps/default_generator_config.tres — 默认生成配置
+  scenes/levels/maps/generated_map.tscn     — 通用地图模板（空 TileMapLayer + 容器）
+  tests/unit/test_map_generator.gd          — 生成器单元测试
 
 修改：
   scripts/ui/main.gd                       — 集成 MapGenerator
