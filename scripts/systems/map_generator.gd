@@ -3,9 +3,8 @@ extends RefCounted
 
 ## 随机地图生成器
 
-enum SymmetryMode { RANDOM, MIRROR_X, ROTATE_180 }
-
 var _rng: RandomNumberGenerator = RandomNumberGenerator.new()
+var _template_renderer: TemplateRenderer = TemplateRenderer.new()
 
 
 func generate(config: MapGeneratorConfig, seed_value: int = -1) -> MapLayout:
@@ -28,46 +27,9 @@ func generate(config: MapGeneratorConfig, seed_value: int = -1) -> MapLayout:
 	return layout
 
 
-func apply_to_tilemap(map_scene: Node, layout: MapLayout, config: MapGeneratorConfig) -> void:
-	## 将生成的地图布局写入 TileMapLayer 节点
-	var ground_layer: TileMapLayer = map_scene.get_node("Ground")
-	var terrain_layer: TileMapLayer = map_scene.get_node("Terrain")
-	var background_layer: TileMapLayer = map_scene.get_node_or_null("Background")
-
-	assert(ground_layer != null, "地图模板缺少 Ground 节点")
-	assert(terrain_layer != null, "地图模板缺少 Terrain 节点")
-
-	var src_id := config.tileset_source_id
-
-	# 铺设可玩区
-	for gy in range(MapLayout.PLAYABLE_HEIGHT):
-		for gx in range(MapLayout.PLAYABLE_WIDTH):
-			var tile_x := MapLayout.PLAYABLE_ORIGIN_X + gx
-			var tile_y := MapLayout.PLAYABLE_ORIGIN_Y + gy
-			var tile_pos := Vector2i(tile_x, tile_y)
-			var cell := layout.get_cell(Vector2i(gx, gy))
-			match cell:
-				MapLayout.CellType.GROUND, MapLayout.CellType.SPAWN_ZONE:
-					ground_layer.set_cell(tile_pos, src_id, config.ground_tile)
-				MapLayout.CellType.BORDER:
-					ground_layer.set_cell(tile_pos, src_id, config.border_tile)
-				MapLayout.CellType.WALL:
-					ground_layer.set_cell(tile_pos, src_id, config.ground_tile)
-					terrain_layer.set_cell(tile_pos, src_id, config.wall_tile)
-				MapLayout.CellType.ABYSS:
-					terrain_layer.set_cell(tile_pos, src_id, config.abyss_tile)
-
-	# 装饰背景区
-	if background_layer and config.decoration_tiles.size() > 0:
-		for y in range(GameConfig.MAP_GRID_HEIGHT):
-			for x in range(GameConfig.MAP_GRID_WIDTH):
-				var in_playable := (x >= MapLayout.PLAYABLE_ORIGIN_X
-					and x < MapLayout.PLAYABLE_ORIGIN_X + MapLayout.PLAYABLE_WIDTH
-					and y >= MapLayout.PLAYABLE_ORIGIN_Y
-					and y < MapLayout.PLAYABLE_ORIGIN_Y + MapLayout.PLAYABLE_HEIGHT)
-				if not in_playable:
-					var tile := config.decoration_tiles[_rng.randi_range(0, config.decoration_tiles.size() - 1)]
-					background_layer.set_cell(Vector2i(x, y), src_id, tile)
+func apply_to_tilemap(_map_scene: Node, _layout: MapLayout, _config: MapGeneratorConfig) -> void:
+	## 将生成的地图布局写入 TileMapLayer 节点（Task 7 重写）
+	pass
 
 
 func _fill_borders(layout: MapLayout) -> void:
@@ -149,29 +111,85 @@ func _pick_spawn_pos_on_edge(range_min: int, range_max: int, existing: Array[int
 
 
 func _try_generate_terrain(layout: MapLayout, config: MapGeneratorConfig) -> bool:
-	## 对称模板填充 + 连通性验证
-	if config.prefabs.is_empty():
+	## 模板渲染 + Prefab 散布 + 连通性验证
+	if config.templates.is_empty():
 		return true
 
-	# 标准密度尝试 10 次
-	for i in range(10):
-		var attempt_layout := _clone_layout(layout)
-		var symmetry := _pick_symmetry(config)
-		_fill_tactical_zone(attempt_layout, config, symmetry, config.max_prefabs_per_block)
-		if _validate_connectivity(attempt_layout):
-			_copy_terrain(attempt_layout, layout)
-			return true
+	# 尝试最多 3 个随机模板
+	var tried_indices: Array[int] = []
+	for attempt in range(mini(config.templates.size(), 3)):
+		var idx := _rng.randi_range(0, config.templates.size() - 1)
+		while idx in tried_indices and tried_indices.size() < config.templates.size():
+			idx = _rng.randi_range(0, config.templates.size() - 1)
+		tried_indices.append(idx)
+		var template: MapTemplate = config.templates[idx]
 
-	# 降低密度尝试 5 次
-	for i in range(5):
+		# 渲染模板骨架
 		var attempt_layout := _clone_layout(layout)
-		var symmetry := _pick_symmetry(config)
-		_fill_tactical_zone(attempt_layout, config, symmetry, config.min_prefabs_per_block)
-		if _validate_connectivity(attempt_layout):
-			_copy_terrain(attempt_layout, layout)
-			return true
+		_template_renderer.render(template, attempt_layout)
+
+		# Prefab 散布 + 连通性检查
+		var prefab_count := _rng.randi_range(config.total_prefab_count.x, config.total_prefab_count.y)
+		for retry in range(5):
+			var scatter_layout := _clone_layout(attempt_layout)
+			_scatter_prefabs(scatter_layout, config, prefab_count)
+			if _validate_connectivity(scatter_layout):
+				_copy_grid(scatter_layout, layout)
+				return true
+			prefab_count = maxi(prefab_count - 2, 0)
 
 	return false
+
+
+func _scatter_prefabs(layout: MapLayout, config: MapGeneratorConfig, count: int) -> void:
+	## 在战术区散布预制件，避开 PLAZA 区域和中心安全区
+	if config.prefabs.is_empty() or count <= 0:
+		return
+	var plaza_set := {}
+	for c in _template_renderer.get_plaza_cells():
+		plaza_set[c] = true
+	for i in range(count):
+		var prefab: MapPrefab = config.prefabs[_rng.randi_range(0, config.prefabs.size() - 1)]
+		var rotation := 0
+		if prefab.rotatable:
+			rotation = _rng.randi_range(0, 3)
+		var cells := prefab.get_rotated_cells(rotation)
+		_try_place_prefab(layout, cells, prefab.cell_type, plaza_set)
+
+
+func _try_place_prefab(layout: MapLayout, cells: Array[Vector2i], cell_type: int, plaza_set: Dictionary) -> void:
+	## 随机尝试在战术区放置一个预制件
+	for attempt in range(15):
+		var ox := _rng.randi_range(MapLayout.TACTICAL_MIN_X, MapLayout.TACTICAL_MAX_X)
+		var oy := _rng.randi_range(MapLayout.TACTICAL_MIN_Y, MapLayout.TACTICAL_MAX_Y)
+		var valid := true
+		var placed: Array[Vector2i] = []
+		for c in cells:
+			var pos := Vector2i(ox + c.x, oy + c.y)
+			if not _is_valid_prefab_pos(pos, layout, plaza_set):
+				valid = false
+				break
+			placed.append(pos)
+		if valid:
+			for pos in placed:
+				layout.set_cell(pos, cell_type as MapLayout.CellType)
+			return
+
+
+func _is_valid_prefab_pos(pos: Vector2i, layout: MapLayout, plaza_set: Dictionary) -> bool:
+	## 检查位置是否可放置预制件
+	if pos.x < MapLayout.TACTICAL_MIN_X or pos.x > MapLayout.TACTICAL_MAX_X:
+		return false
+	if pos.y < MapLayout.TACTICAL_MIN_Y or pos.y > MapLayout.TACTICAL_MAX_Y:
+		return false
+	if layout.get_cell(pos) != MapLayout.CellType.GROUND:
+		return false
+	if plaza_set.has(pos):
+		return false
+	if (pos.x >= MapLayout.CENTER_SAFE_MIN_X and pos.x <= MapLayout.CENTER_SAFE_MAX_X
+		and pos.y >= MapLayout.CENTER_SAFE_MIN_Y and pos.y <= MapLayout.CENTER_SAFE_MAX_Y):
+		return false
+	return true
 
 
 func _clone_layout(layout: MapLayout) -> MapLayout:
@@ -185,196 +203,11 @@ func _clone_layout(layout: MapLayout) -> MapLayout:
 	return clone
 
 
-func _copy_terrain(source: MapLayout, target: MapLayout) -> void:
-	## 将 source 的战术区地形复制到 target
-	for y in range(MapLayout.TACTICAL_MIN_Y, MapLayout.TACTICAL_MAX_Y + 1):
-		for x in range(MapLayout.TACTICAL_MIN_X, MapLayout.TACTICAL_MAX_X + 1):
+func _copy_grid(source: MapLayout, target: MapLayout) -> void:
+	## 将 source 的完整 grid 复制到 target
+	for y in range(MapLayout.PLAYABLE_HEIGHT):
+		for x in range(MapLayout.PLAYABLE_WIDTH):
 			target.grid[y][x] = source.grid[y][x]
-
-
-func _pick_symmetry(config: MapGeneratorConfig) -> SymmetryMode:
-	## 根据权重随机选择对称模式
-	var weights := config.symmetry_weights
-	var total := 0.0
-	for w in weights:
-		total += w
-	if total <= 0.0:
-		return SymmetryMode.RANDOM
-
-	var roll := _rng.randf() * total
-	var cumulative := 0.0
-	for i in range(weights.size()):
-		cumulative += weights[i]
-		if roll <= cumulative:
-			return i as SymmetryMode
-	return SymmetryMode.RANDOM
-
-
-func _fill_tactical_zone(layout: MapLayout, config: MapGeneratorConfig, symmetry: SymmetryMode, max_per_block: int) -> void:
-	## 对每个主块填充预制件，然后镜像到对称块
-	var primary_blocks := _get_primary_blocks(symmetry)
-	for block_pos in primary_blocks:
-		# 空块概率
-		if _rng.randf() < config.empty_chance:
-			continue
-
-		var count := _rng.randi_range(config.min_prefabs_per_block, max_per_block)
-		var placements := _generate_block_placements(layout, config, block_pos, count)
-		_apply_placements(layout, placements)
-
-		# 镜像到对称块
-		var mirror_block := _get_mirror_block(block_pos, symmetry)
-		if mirror_block != Vector2i(-1, -1):
-			_mirror_placements(layout, placements, block_pos, mirror_block, symmetry)
-
-
-func _get_primary_blocks(symmetry: SymmetryMode) -> Array[Vector2i]:
-	## 返回需要独立决策的主块列表（col_index, row_index）
-	match symmetry:
-		SymmetryMode.MIRROR_X:
-			# 左侧 + 上下中列，右侧镜像左侧
-			return [Vector2i(0, 0), Vector2i(0, 1), Vector2i(0, 2), Vector2i(1, 0), Vector2i(1, 2)]
-		SymmetryMode.ROTATE_180:
-			# 左上半区，对角镜像
-			return [Vector2i(0, 0), Vector2i(1, 0), Vector2i(2, 0), Vector2i(0, 1)]
-		_:
-			# RANDOM：所有 8 个非中心块
-			return [
-				Vector2i(0, 0), Vector2i(1, 0), Vector2i(2, 0),
-				Vector2i(0, 1), Vector2i(2, 1),
-				Vector2i(0, 2), Vector2i(1, 2), Vector2i(2, 2),
-			]
-
-
-func _get_mirror_block(block_pos: Vector2i, symmetry: SymmetryMode) -> Vector2i:
-	## 返回对称的镜像块位置，无镜像返回 (-1,-1)
-	match symmetry:
-		SymmetryMode.MIRROR_X:
-			# 左→右镜像：col 0→2, col 2→0, col 1 无镜像
-			if block_pos.x == 0:
-				return Vector2i(2, block_pos.y)
-			elif block_pos.x == 2:
-				return Vector2i(0, block_pos.y)
-			return Vector2i(-1, -1)
-		SymmetryMode.ROTATE_180:
-			# 180度旋转：(c,r) → (2-c, 2-r)，中心(1,1)无镜像
-			var mirror := Vector2i(2 - block_pos.x, 2 - block_pos.y)
-			if mirror == block_pos:
-				return Vector2i(-1, -1)
-			return mirror
-		_:
-			return Vector2i(-1, -1)
-
-
-func _generate_block_placements(layout: MapLayout, config: MapGeneratorConfig, block_pos: Vector2i, count: int) -> Array:
-	## 在指定块内生成预制件放置方案
-	var placements: Array = []  # Array of {cells: Array[Vector2i], cell_type: int}
-	var bounds := layout.get_block_bounds(block_pos.x, block_pos.y)
-
-	for i in range(count):
-		var prefab: MapPrefab = config.prefabs[_rng.randi_range(0, config.prefabs.size() - 1)]
-		var rotation := 0
-		if prefab.rotatable:
-			rotation = _rng.randi_range(0, 3)
-		var cells := prefab.get_rotated_cells(rotation)
-
-		var placed_cells := _try_place_in_bounds(layout, cells, bounds, prefab.cell_type)
-		if not placed_cells.is_empty():
-			placements.append({"cells": placed_cells, "cell_type": prefab.cell_type})
-
-	return placements
-
-
-func _try_place_in_bounds(layout: MapLayout, cells: Array[Vector2i], bounds: Rect2i, cell_type: int) -> Array[Vector2i]:
-	## 在块范围内找到有效位置放置预制件，返回世界坐标的 cells
-	# 计算预制件的包围盒
-	var min_x := 9999
-	var min_y := 9999
-	var max_x := -9999
-	var max_y := -9999
-	for c in cells:
-		min_x = mini(min_x, c.x)
-		min_y = mini(min_y, c.y)
-		max_x = maxi(max_x, c.x)
-		max_y = maxi(max_y, c.y)
-
-	var prefab_w := max_x - min_x + 1
-	var prefab_h := max_y - min_y + 1
-
-	# 可用放置范围
-	var place_w := bounds.size.x - prefab_w + 1
-	var place_h := bounds.size.y - prefab_h + 1
-	if place_w <= 0 or place_h <= 0:
-		return []
-
-	# 随机尝试放置
-	for attempt in range(10):
-		var ox := bounds.position.x + _rng.randi_range(0, place_w - 1) - min_x
-		var oy := bounds.position.y + _rng.randi_range(0, place_h - 1) - min_y
-
-		var valid := true
-		var world_cells: Array[Vector2i] = []
-		for c in cells:
-			var wc := Vector2i(ox + c.x, oy + c.y)
-			# 检查是否在战术区且当前为 GROUND
-			if wc.x < MapLayout.TACTICAL_MIN_X or wc.x > MapLayout.TACTICAL_MAX_X:
-				valid = false
-				break
-			if wc.y < MapLayout.TACTICAL_MIN_Y or wc.y > MapLayout.TACTICAL_MAX_Y:
-				valid = false
-				break
-			if layout.get_cell(wc) != MapLayout.CellType.GROUND:
-				valid = false
-				break
-			world_cells.append(wc)
-
-		if valid:
-			return world_cells
-
-	return []
-
-
-func _apply_placements(layout: MapLayout, placements: Array) -> void:
-	## 将放置方案写入 grid
-	for placement in placements:
-		var cell_type_int: int = placement["cell_type"]
-		for cell in placement["cells"]:
-			layout.set_cell(cell, cell_type_int as MapLayout.CellType)
-
-
-func _mirror_placements(layout: MapLayout, placements: Array, src_block: Vector2i, dst_block: Vector2i, symmetry: SymmetryMode) -> void:
-	## 将放置方案从源块变换到目标块
-	var src_bounds := layout.get_block_bounds(src_block.x, src_block.y)
-	var dst_bounds := layout.get_block_bounds(dst_block.x, dst_block.y)
-
-	for placement in placements:
-		var cell_type_int: int = placement["cell_type"]
-		var src_cells: Array = placement["cells"]
-
-		for cell in src_cells:
-			var mirror_pos: Vector2i
-			match symmetry:
-				SymmetryMode.MIRROR_X:
-					# X 轴镜像：在目标块内水平翻转
-					var local_x: int = cell.x - src_bounds.position.x
-					var local_y: int = cell.y - src_bounds.position.y
-					var mirrored_x: int = dst_bounds.position.x + dst_bounds.size.x - 1 - local_x
-					var mirrored_y: int = dst_bounds.position.y + local_y
-					mirror_pos = Vector2i(mirrored_x, mirrored_y)
-				SymmetryMode.ROTATE_180:
-					# 180度旋转：在目标块内旋转
-					var local_x: int = cell.x - src_bounds.position.x
-					var local_y: int = cell.y - src_bounds.position.y
-					var rotated_x: int = dst_bounds.position.x + dst_bounds.size.x - 1 - local_x
-					var rotated_y: int = dst_bounds.position.y + dst_bounds.size.y - 1 - local_y
-					mirror_pos = Vector2i(rotated_x, rotated_y)
-				_:
-					continue
-
-			if mirror_pos.x >= MapLayout.TACTICAL_MIN_X and mirror_pos.x <= MapLayout.TACTICAL_MAX_X \
-				and mirror_pos.y >= MapLayout.TACTICAL_MIN_Y and mirror_pos.y <= MapLayout.TACTICAL_MAX_Y:
-				if layout.get_cell(mirror_pos) == MapLayout.CellType.GROUND:
-					layout.set_cell(mirror_pos, cell_type_int as MapLayout.CellType)
 
 
 func _validate_connectivity(layout: MapLayout) -> bool:
