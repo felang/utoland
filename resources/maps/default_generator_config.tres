@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="MapGeneratorConfig" load_steps=8 format=3]
+[gd_resource type="Resource" script_class="MapGeneratorConfig" load_steps=13 format=3]
 
 [ext_resource type="Script" path="res://scripts/resources/map_generator_config.gd" id="1"]
 [ext_resource type="Resource" path="res://resources/maps/prefabs/wall_l.tres" id="2"]
@@ -7,13 +7,18 @@
 [ext_resource type="Resource" path="res://resources/maps/prefabs/abyss_river.tres" id="5"]
 [ext_resource type="Resource" path="res://resources/maps/prefabs/abyss_island.tres" id="6"]
 [ext_resource type="Resource" path="res://resources/maps/prefabs/abyss_pool.tres" id="7"]
+[ext_resource type="Resource" path="res://resources/maps/prefabs/wall_t.tres" id="8"]
+[ext_resource type="Resource" path="res://resources/maps/prefabs/wall_long.tres" id="9"]
+[ext_resource type="Resource" path="res://resources/maps/prefabs/wall_u.tres" id="10"]
+[ext_resource type="Resource" path="res://resources/maps/prefabs/abyss_arc.tres" id="11"]
+[ext_resource type="Resource" path="res://resources/maps/prefabs/abyss_lake.tres" id="12"]
 
 [resource]
 script = ExtResource("1")
-prefabs = [ExtResource("2"), ExtResource("3"), ExtResource("4"), ExtResource("5"), ExtResource("6"), ExtResource("7")]
-empty_chance = 0.35
+prefabs = [ExtResource("2"), ExtResource("3"), ExtResource("4"), ExtResource("5"), ExtResource("6"), ExtResource("7"), ExtResource("8"), ExtResource("9"), ExtResource("10"), ExtResource("11"), ExtResource("12")]
+empty_chance = 0.15
 min_prefabs_per_block = 1
-max_prefabs_per_block = 2
+max_prefabs_per_block = 3
 spawns_per_edge = Vector2i(1, 2)
 corner_spawn_chance = 0.5
 min_spawn_spacing = 4
