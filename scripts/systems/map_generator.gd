@@ -28,6 +28,48 @@ func generate(config: MapGeneratorConfig, seed_value: int = -1) -> MapLayout:
 	return layout
 
 
+func apply_to_tilemap(map_scene: Node, layout: MapLayout, config: MapGeneratorConfig) -> void:
+	## 将生成的地图布局写入 TileMapLayer 节点
+	var ground_layer: TileMapLayer = map_scene.get_node("Ground")
+	var terrain_layer: TileMapLayer = map_scene.get_node("Terrain")
+	var background_layer: TileMapLayer = map_scene.get_node_or_null("Background")
+
+	assert(ground_layer != null, "地图模板缺少 Ground 节点")
+	assert(terrain_layer != null, "地图模板缺少 Terrain 节点")
+
+	var src_id := config.tileset_source_id
+
+	# 铺设可玩区
+	for gy in range(MapLayout.PLAYABLE_HEIGHT):
+		for gx in range(MapLayout.PLAYABLE_WIDTH):
+			var tile_x := MapLayout.PLAYABLE_ORIGIN_X + gx
+			var tile_y := MapLayout.PLAYABLE_ORIGIN_Y + gy
+			var tile_pos := Vector2i(tile_x, tile_y)
+			var cell := layout.get_cell(Vector2i(gx, gy))
+			match cell:
+				MapLayout.CellType.GROUND, MapLayout.CellType.SPAWN_ZONE:
+					ground_layer.set_cell(tile_pos, src_id, config.ground_tile)
+				MapLayout.CellType.BORDER:
+					ground_layer.set_cell(tile_pos, src_id, config.border_tile)
+				MapLayout.CellType.WALL:
+					ground_layer.set_cell(tile_pos, src_id, config.ground_tile)
+					terrain_layer.set_cell(tile_pos, src_id, config.wall_tile)
+				MapLayout.CellType.ABYSS:
+					terrain_layer.set_cell(tile_pos, src_id, config.abyss_tile)
+
+	# 装饰背景区
+	if background_layer and config.decoration_tiles.size() > 0:
+		for y in range(GameConfig.MAP_GRID_HEIGHT):
+			for x in range(GameConfig.MAP_GRID_WIDTH):
+				var in_playable := (x >= MapLayout.PLAYABLE_ORIGIN_X
+					and x < MapLayout.PLAYABLE_ORIGIN_X + MapLayout.PLAYABLE_WIDTH
+					and y >= MapLayout.PLAYABLE_ORIGIN_Y
+					and y < MapLayout.PLAYABLE_ORIGIN_Y + MapLayout.PLAYABLE_HEIGHT)
+				if not in_playable:
+					var tile := config.decoration_tiles[_rng.randi_range(0, config.decoration_tiles.size() - 1)]
+					background_layer.set_cell(Vector2i(x, y), src_id, tile)
+
+
 func _fill_borders(layout: MapLayout) -> void:
 	## 填充边界（最外圈一圈）
 	for x in range(MapLayout.PLAYABLE_WIDTH):
