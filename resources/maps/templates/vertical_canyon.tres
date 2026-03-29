@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="MapTemplate" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/map_template.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/resources/terrain_feature.gd" id="2"]
+
+[sub_resource type="Resource" id="feature_1"]
+script = ExtResource("2")
+type = 2
+shape = 0
+start = Vector2(0.5, 0)
+end = Vector2(0.5, 1)
+width = 3
+gaps = Array[float]([])
+gap_width = 2
+size = Vector2i(6, 6)
+center = Vector2(0.5, 0.5)
+
+[resource]
+script = ExtResource("1")
+id = "vertical_canyon"
+display_name = "纵向峡谷"
+features = [SubResource("feature_1")]

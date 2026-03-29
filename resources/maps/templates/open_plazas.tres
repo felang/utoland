@@ -1,0 +1,46 @@
+[gd_resource type="Resource" script_class="MapTemplate" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/map_template.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/resources/terrain_feature.gd" id="2"]
+
+[sub_resource type="Resource" id="feature_1"]
+script = ExtResource("2")
+type = 3
+shape = 1
+start = Vector2(0, 0)
+end = Vector2(1, 1)
+width = 1
+gaps = Array[float]([])
+gap_width = 2
+size = Vector2i(6, 4)
+center = Vector2(0.2, 0.3)
+
+[sub_resource type="Resource" id="feature_2"]
+script = ExtResource("2")
+type = 3
+shape = 1
+start = Vector2(0, 0)
+end = Vector2(1, 1)
+width = 1
+gaps = Array[float]([])
+gap_width = 2
+size = Vector2i(6, 4)
+center = Vector2(0.8, 0.3)
+
+[sub_resource type="Resource" id="feature_3"]
+script = ExtResource("2")
+type = 3
+shape = 1
+start = Vector2(0, 0)
+end = Vector2(1, 1)
+width = 1
+gaps = Array[float]([])
+gap_width = 2
+size = Vector2i(8, 4)
+center = Vector2(0.5, 0.8)
+
+[resource]
+script = ExtResource("1")
+id = "open_plazas"
+display_name = "三广场"
+features = [SubResource("feature_1"), SubResource("feature_2"), SubResource("feature_3")]
