@@ -30,10 +30,10 @@ func apply_to_tilemap(map_scene: Node, layout: MapLayout, _config: MapGeneratorC
 	var terrain_layer: TileMapLayer = map_scene.get_node("Terrain")
 
 	var src_id := 1
-	var ground_tile := Vector2i(0, 0)
-	var border_tile := Vector2i(1, 0)
-	var wall_tile := Vector2i(2, 0)
-	var abyss_tile := Vector2i(3, 0)
+	var ground_tile := Vector2i(1, 1)  # 绿色草地
+	var border_tile := Vector2i(0, 0)  # 灰色石头
+	var wall_tile := Vector2i(4, 2)    # 深色圆形（栅栏/障碍物感）
+	var abyss_tile := Vector2i(0, 3)   # 蓝色水面
 
 	for gy in range(MapLayout.PLAYABLE_HEIGHT):
 		for gx in range(MapLayout.PLAYABLE_WIDTH):
