@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="MapGeneratorConfig" load_steps=9 format=3]
+[gd_resource type="Resource" script_class="MapGeneratorConfig" load_steps=10 format=3]
 
 [ext_resource type="Script" path="res://scripts/resources/map_generator_config.gd" id="1"]
 [ext_resource type="Resource" path="res://resources/maps/prefabs/pillar.tres" id="p1"]
@@ -8,8 +8,9 @@
 [ext_resource type="Resource" path="res://resources/maps/prefabs/pond.tres" id="p5"]
 [ext_resource type="Resource" path="res://resources/maps/prefabs/stream.tres" id="p6"]
 [ext_resource type="Resource" path="res://resources/maps/prefabs/lake_c.tres" id="p7"]
+[ext_resource type="Resource" path="res://resources/maps/prefabs/moat.tres" id="p8"]
 
 [resource]
 script = ExtResource("1")
-prefabs = [ExtResource("p1"), ExtResource("p2"), ExtResource("p3"), ExtResource("p4"), ExtResource("p5"), ExtResource("p6"), ExtResource("p7")]
+prefabs = [ExtResource("p1"), ExtResource("p2"), ExtResource("p3"), ExtResource("p4"), ExtResource("p5"), ExtResource("p6"), ExtResource("p7"), ExtResource("p8")]
 total_prefab_count = Vector2i(10, 16)
