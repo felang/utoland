@@ -107,12 +107,9 @@ func _load_map() -> void:
 		var generator := MapGenerator.new()
 		var layout := generator.generate(map_data.generator_config)
 		generator.apply_to_tilemap(map_instance, layout, map_data.generator_config)
-		# 传递生成数据
-		var enemy_spawner = get_node_or_null("EnemySpawner")
-		if enemy_spawner:
-			enemy_spawner.spawn_points = layout.get_spawn_points_world()
 		_map_layout = layout
 		_player_spawn_pos = layout.get_player_spawn_world()
+		# DragManager 延迟设置（_ready 中 _drag_manager 初始化后）
 	else:
 		_player_spawn_pos = Vector2.ZERO
 

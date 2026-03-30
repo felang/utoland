@@ -1,7 +1,6 @@
 [gd_resource type="Resource" script_class="MapGeneratorConfig" load_steps=13 format=3]
 
 [ext_resource type="Script" path="res://scripts/resources/map_generator_config.gd" id="1"]
-[ext_resource type="Resource" path="res://resources/maps/templates/central_river.tres" id="t1"]
 [ext_resource type="Resource" path="res://resources/maps/prefabs/wall_l.tres" id="p1"]
 [ext_resource type="Resource" path="res://resources/maps/prefabs/wall_cross.tres" id="p2"]
 [ext_resource type="Resource" path="res://resources/maps/prefabs/wall_line.tres" id="p3"]
@@ -16,6 +15,5 @@
 
 [resource]
 script = ExtResource("1")
-templates = [ExtResource("t1")]
-total_prefab_count = Vector2i(6, 10)
 prefabs = [ExtResource("p1"), ExtResource("p2"), ExtResource("p3"), ExtResource("p4"), ExtResource("p5"), ExtResource("p6"), ExtResource("p7"), ExtResource("p8"), ExtResource("p9"), ExtResource("p10"), ExtResource("p11")]
+total_prefab_count = Vector2i(10, 18)
