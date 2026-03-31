@@ -1,0 +1,14 @@
+[remap]
+
+importer="aseprite_wizard.plugin.noop"
+type="PackedDataContainer"
+uid="uid://0jdq664ni6o8"
+path="res://.godot/imported/luminara-terrace.aseprite-ed8e20a81271622937e49960c4dcf8b4.res"
+
+[deps]
+
+source_file="res://assets_source/maps/luminara-terrace.aseprite"
+dest_files=["res://.godot/imported/luminara-terrace.aseprite-ed8e20a81271622937e49960c4dcf8b4.res"]
+
+[params]
+

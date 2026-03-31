@@ -1,0 +1,14 @@
+[remap]
+
+importer="aseprite_wizard.plugin.noop"
+type="PackedDataContainer"
+uid="uid://b5grlvg3bv6ow"
+path="res://.godot/imported/luminara-object-tileset.aseprite-2ae88db3c62d7ad7bdea6b795ef1a748.res"
+
+[deps]
+
+source_file="res://assets_source/maps/luminara-object-tileset.aseprite"
+dest_files=["res://.godot/imported/luminara-object-tileset.aseprite-2ae88db3c62d7ad7bdea6b795ef1a748.res"]
+
+[params]
+

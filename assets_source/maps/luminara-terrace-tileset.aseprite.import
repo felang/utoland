@@ -1,0 +1,14 @@
+[remap]
+
+importer="aseprite_wizard.plugin.noop"
+type="PackedDataContainer"
+uid="uid://bkbmrutemftl3"
+path="res://.godot/imported/luminara-terrace-tileset.aseprite-02ad88316f85dc11bf3c7939bb855543.res"
+
+[deps]
+
+source_file="res://assets_source/maps/luminara-terrace-tileset.aseprite"
+dest_files=["res://.godot/imported/luminara-terrace-tileset.aseprite-02ad88316f85dc11bf3c7939bb855543.res"]
+
+[params]
+
