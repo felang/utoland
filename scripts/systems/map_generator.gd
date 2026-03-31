@@ -29,28 +29,35 @@ func apply_to_tilemap(map_scene: Node, layout: MapLayout, _config: MapGeneratorC
 	var ground_layer: TileMapLayer = map_scene.get_node("Ground")
 	var terrain_layer: TileMapLayer = map_scene.get_node("Terrain")
 
-	var src_id := 1
-	var ground_tile := Vector2i(1, 1)  # 绿色草地
-	var border_tile := Vector2i(0, 0)  # 灰色石头
-	var wall_tile := Vector2i(4, 2)    # 深色圆形（栅栏/障碍物感）
-	var abyss_tile := Vector2i(0, 3)   # 蓝色水面
+	# Grass1 满铺坐标（type3 网格中心 fill tile）
+	var grass_src_id := 0
+	var grass_tile := Vector2i(5, 1)
+
+	# 地形 source ID
+	var border_src_id := 1   # Dirt1
+	var wall_src_id := 2     # Wall-Up1
+	var abyss_src_id := 3    # Water1
 
 	for gy in range(MapLayout.PLAYABLE_HEIGHT):
 		for gx in range(MapLayout.PLAYABLE_WIDTH):
+			var grid_pos := Vector2i(gx, gy)
 			var tile_pos := Vector2i(MapLayout.PLAYABLE_ORIGIN_X + gx, MapLayout.PLAYABLE_ORIGIN_Y + gy)
-			var cell := layout.get_cell(Vector2i(gx, gy))
+			var cell := layout.get_cell(grid_pos)
+
+			# Ground layer: 全部铺草地
+			ground_layer.set_cell(tile_pos, grass_src_id, grass_tile)
+
+			# Terrain layer: 非 GROUND/SPAWN_ZONE 叠加 autotile
 			match cell:
-				MapLayout.CellType.GROUND, MapLayout.CellType.SPAWN_ZONE:
-					ground_layer.set_cell(tile_pos, src_id, ground_tile)
 				MapLayout.CellType.BORDER:
-					ground_layer.set_cell(tile_pos, src_id, ground_tile)
-					terrain_layer.set_cell(tile_pos, src_id, border_tile)
+					var atlas := TerrainAutotiler.get_atlas_coord(layout, grid_pos, MapLayout.CellType.BORDER)
+					terrain_layer.set_cell(tile_pos, border_src_id, atlas)
 				MapLayout.CellType.WALL:
-					ground_layer.set_cell(tile_pos, src_id, ground_tile)
-					terrain_layer.set_cell(tile_pos, src_id, wall_tile)
+					var atlas := TerrainAutotiler.get_atlas_coord(layout, grid_pos, MapLayout.CellType.WALL)
+					terrain_layer.set_cell(tile_pos, wall_src_id, atlas)
 				MapLayout.CellType.ABYSS:
-					ground_layer.set_cell(tile_pos, src_id, ground_tile)
-					terrain_layer.set_cell(tile_pos, src_id, abyss_tile)
+					var atlas := TerrainAutotiler.get_atlas_coord(layout, grid_pos, MapLayout.CellType.ABYSS)
+					terrain_layer.set_cell(tile_pos, abyss_src_id, atlas)
 
 
 func _fill_borders(layout: MapLayout) -> void:

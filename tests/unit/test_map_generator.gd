@@ -105,3 +105,24 @@ func test_edge_connectivity():
 				queue.append(next)
 	for ep in edge_points:
 		assert_true(visited.has(ep), "边缘点 %s 应可达玩家" % ep)
+
+
+func test_autotiler_returns_valid_coords_for_generated_layout():
+	var cfg := _make_config_with_prefabs()
+	var layout := generator.generate(cfg, 42)
+	for y in range(MapLayout.PLAYABLE_HEIGHT):
+		for x in range(MapLayout.PLAYABLE_WIDTH):
+			var pos := Vector2i(x, y)
+			var cell := layout.get_cell(pos)
+			if cell == MapLayout.CellType.GROUND or cell == MapLayout.CellType.SPAWN_ZONE:
+				continue
+			var coord := TerrainAutotiler.get_atlas_coord(layout, pos, cell)
+			assert_true(coord.x >= 0 and coord.x < 8, "atlas x 应在 0-7 范围: pos=%s type=%d" % [pos, cell])
+			assert_true(coord.y >= 0 and coord.y < 6, "atlas y 应在 0-5 范围: pos=%s type=%d" % [pos, cell])
+
+
+func test_border_autotile_consistency():
+	var layout := generator.generate(config, 42)
+	var corner_coord := TerrainAutotiler.get_atlas_coord(layout, Vector2i(0, 0), MapLayout.CellType.BORDER)
+	var edge_coord := TerrainAutotiler.get_atlas_coord(layout, Vector2i(10, 0), MapLayout.CellType.BORDER)
+	assert_ne(corner_coord, edge_coord, "角落和直边应使用不同 tile")
