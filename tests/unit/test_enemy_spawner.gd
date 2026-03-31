@@ -27,3 +27,14 @@ func test_pick_weighted_enemy_respects_weights():
 	# normal 应该占绝大多数（至少 80%）
 	assert_gt(normal_count, 160, "权重 99 的 normal 应出现在绝大多数情况")
 
+func test_spawn_from_fixed_points():
+	var points: Array[Vector2] = [Vector2(100, 200), Vector2(-100, -200)]
+	spawner.spawn_points = points
+	var pos: Vector2 = spawner.get_random_spawn_position()
+	var near_any := false
+	for p in points:
+		if pos.distance_to(p) <= 23.0:
+			near_any = true
+			break
+	assert_true(near_any, "生成位置应在刷怪点附近")
+

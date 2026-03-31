@@ -1,0 +1,60 @@
+[gd_resource type="Resource" script_class="MapTemplate" load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/map_template.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/resources/terrain_feature.gd" id="2"]
+[ext_resource type="Script" path="res://scripts/resources/spawn_gate.gd" id="3"]
+
+[sub_resource type="Resource" id="river"]
+script = ExtResource("2")
+type = 0
+shape = 0
+start = Vector2(0, 0.5)
+end = Vector2(1, 0.5)
+width = 3
+gaps = Array[float]([0.25, 0.75])
+gap_width = 3
+size = Vector2i(6, 6)
+center = Vector2(0.5, 0.5)
+
+[sub_resource type="Resource" id="center_plaza"]
+script = ExtResource("2")
+type = 3
+shape = 1
+start = Vector2(0, 0)
+end = Vector2(1, 1)
+width = 1
+gaps = Array[float]([])
+gap_width = 2
+size = Vector2i(10, 4)
+center = Vector2(0.5, 0.5)
+
+[sub_resource type="Resource" id="gate_top_left"]
+script = ExtResource("3")
+edge = 0
+position = 0.3
+width = 3
+
+[sub_resource type="Resource" id="gate_top_right"]
+script = ExtResource("3")
+edge = 0
+position = 0.7
+width = 3
+
+[sub_resource type="Resource" id="gate_bottom_left"]
+script = ExtResource("3")
+edge = 1
+position = 0.3
+width = 3
+
+[sub_resource type="Resource" id="gate_bottom_right"]
+script = ExtResource("3")
+edge = 1
+position = 0.7
+width = 3
+
+[resource]
+script = ExtResource("1")
+id = "central_river"
+display_name = "中央横河"
+features = [SubResource("river"), SubResource("center_plaza")]
+spawn_gates = [SubResource("gate_top_left"), SubResource("gate_top_right"), SubResource("gate_bottom_left"), SubResource("gate_bottom_right")]

@@ -1,29 +1,26 @@
-[gd_scene load_steps=5 format=3 uid="uid://ice_bullet_projectile"]
+[gd_scene format=3 uid="uid://by7smalpp1oha"]
 
-[ext_resource type="Script" uid="uid://c8projectile01" path="res://scripts/entities/projectiles/projectile.gd" id="1_proj"]
+[ext_resource type="Script" uid="uid://7516wgatcnb5" path="res://scripts/entities/projectiles/projectile.gd" id="1_proj"]
 [ext_resource type="Script" uid="uid://bx7m3k2vpqn4r" path="res://scripts/components/hitbox.gd" id="2_hitbox"]
-[ext_resource type="Script" path="res://scripts/components/tracking_movement_component.gd" id="3_tracking"]
-[ext_resource type="Script" path="res://scripts/components/slow_on_hit_component.gd" id="4_slow"]
+[ext_resource type="Script" uid="uid://dg5wfy12s8h5n" path="res://scripts/components/tracking_movement_component.gd" id="3_tracking"]
+[ext_resource type="Script" uid="uid://c4ok4g1u5djhs" path="res://scripts/components/slow_on_hit_component.gd" id="4_slow"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_ice"]
 radius = 6.0
 
-[node name="IceBullet" type="Node2D"]
+[node name="IceBullet" type="Node2D" unique_id=975357267]
 script = ExtResource("1_proj")
 
-[node name="Hitbox" type="Area2D" parent="." groups=["hitboxes"]]
+[node name="Hitbox" type="Area2D" parent="." unique_id=1589178408 groups=["hitboxes"]]
 collision_layer = 16
-collision_mask = 128
+collision_mask = 384
 script = ExtResource("2_hitbox")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox" unique_id=1443420827]
 shape = SubResource("CircleShape2D_ice")
 
-[node name="TrackingMovementComponent" type="Node" parent="."]
+[node name="TrackingMovementComponent" type="Node" parent="." unique_id=1579380164]
 script = ExtResource("3_tracking")
-turn_speed = 8.0
 
-[node name="SlowOnHitComponent" type="Node" parent="."]
+[node name="SlowOnHitComponent" type="Node" parent="." unique_id=788736163]
 script = ExtResource("4_slow")
-slow_ratio = 0.3
-slow_duration = 1.5

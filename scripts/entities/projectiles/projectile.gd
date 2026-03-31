@@ -23,6 +23,8 @@ func setup(p_data: ProjectileData, dmg: float, from: Vector2, dir: Vector2, p_ta
 		if hitbox.area_entered.is_connected(_on_hitbox_area_entered):
 			hitbox.area_entered.disconnect(_on_hitbox_area_entered)
 		hitbox.area_entered.connect(_on_hitbox_area_entered)
+		if not hitbox.body_entered.is_connected(_on_hitbox_body_entered):
+			hitbox.body_entered.connect(_on_hitbox_body_entered)
 	# 设置精灵（动态创建）
 	_setup_sprite()
 	# 设置旋转
@@ -31,6 +33,10 @@ func setup(p_data: ProjectileData, dmg: float, from: Vector2, dir: Vector2, p_ta
 	for child in get_children():
 		if child.has_method("on_projectile_setup"):
 			child.on_projectile_setup(self)
+
+func _on_hitbox_body_entered(_body: Node2D) -> void:
+	## 碰到实体墙（WallBlock 层），销毁投射物
+	request_destroy()
 
 func _on_hitbox_area_entered(area: Area2D) -> void:
 	if not area is Hurtbox:
@@ -66,6 +72,8 @@ func reset_for_pool() -> void:
 	var hitbox = get_node_or_null("Hitbox") as Hitbox
 	if hitbox and hitbox.area_entered.is_connected(_on_hitbox_area_entered):
 		hitbox.area_entered.disconnect(_on_hitbox_area_entered)
+	if hitbox and hitbox.body_entered.is_connected(_on_hitbox_body_entered):
+		hitbox.body_entered.disconnect(_on_hitbox_body_entered)
 	for child in get_children():
 		if child.has_method("reset"):
 			child.reset()

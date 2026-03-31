@@ -5,6 +5,7 @@ const HP_SCALING_PER_WAVE: float = 0.055
 const DAMAGE_SCALING_START_WAVE: int = 9
 const DAMAGE_SCALING_PER_WAVE: float = 0.0375
 
+var spawn_points: Array[Vector2] = []  # 由 main.gd 从 MapLayout 传入
 var spawn_timer: float = 0.0
 var player: Node2D
 var _current_wave_data: WaveData = null
@@ -132,6 +133,13 @@ func _spawn_boss() -> void:
 	AudioManager.play("boss_appear")
 
 func get_random_spawn_position() -> Vector2:
+	if spawn_points.is_empty():
+		return _legacy_random_position()
+	var base_pos := spawn_points[randi() % spawn_points.size()]
+	var offset := Vector2(randf_range(-16, 16), randf_range(-16, 16))
+	return base_pos + offset
+
+func _legacy_random_position() -> Vector2:
 	var spawn_pos = Vector2.ZERO
 	var attempts = 0
 	var max_attempts: int = GameConfig.spawn.max_spawn_attempts if GameConfig.spawn else 10

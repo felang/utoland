@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="MapPrefab" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/map_prefab.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "stream"
+cell_type = 3
+cells = [Vector2i(0, 0), Vector2i(0, 1), Vector2i(0, 2), Vector2i(0, 3), Vector2i(0, 4), Vector2i(0, 5), Vector2i(0, 6), Vector2i(0, 7)]
+rotatable = true
+tile_atlas_coords = Vector2i(0, 0)

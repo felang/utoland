@@ -11,13 +11,17 @@ var _player: Node2D = null
 var _entity_layer: Node2D = null
 var _projectile_layer: Node2D = null
 var _pickup_layer: Node2D = null
+var _player_spawn_pos: Vector2 = Vector2.ZERO
+var _map_layout: MapLayout = null  # 随机地图生成结果，供延迟初始化用
 
 func _ready() -> void:
 	_load_map()
 
 	# 创建玩家并添加到地图的 EntityLayer
 	_player = PLAYER_SCENE.instantiate()
+	_player.position = _player_spawn_pos
 	_entity_layer.add_child(_player)
+	print("Player position after add_child: ", _player.position, " global: ", _player.global_position)
 
 	# 初始化分层容器（供 SceneFactory 全局使用）
 	SceneFactory.init_containers(_entity_layer, _projectile_layer, _pickup_layer)
@@ -29,6 +33,8 @@ func _ready() -> void:
 	# DragManager（预先在 main.tscn 中添加）
 	_drag_manager = $DragManager
 	_drag_manager.initialize(_entity_layer, _player)
+	if _map_layout:
+		_drag_manager.placeable_cells = _map_layout.get_placeable_dict()
 	_shop_overlay.drag_manager = _drag_manager
 
 	# WeaponManager 注入（Player 的子节点）
@@ -95,6 +101,17 @@ func _load_map() -> void:
 	var map_instance = load(map_data.map_scene).instantiate()
 	add_child(map_instance)
 	move_child(map_instance, 0)
+
+	# 随机地图生成
+	if map_data.generator_config != null:
+		var generator := MapGenerator.new()
+		var layout := generator.generate(map_data.generator_config)
+		generator.apply_to_tilemap(map_instance, layout, map_data.generator_config)
+		_map_layout = layout
+		_player_spawn_pos = layout.get_player_spawn_world()
+		# DragManager 延迟设置（_ready 中 _drag_manager 初始化后）
+	else:
+		_player_spawn_pos = Vector2.ZERO
 
 	# 从地图场景中获取分层容器
 	_entity_layer = map_instance.get_node("EntityLayer")

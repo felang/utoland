@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="MapPrefab" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/map_prefab.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "wall_t"
+cell_type = 2
+cells = [Vector2i(-1, 0), Vector2i(0, 0), Vector2i(1, 0), Vector2i(0, 1), Vector2i(0, 2)]
+rotatable = true
+tile_atlas_coords = Vector2i(0, 0)

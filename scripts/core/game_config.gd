@@ -19,8 +19,10 @@ const MAP_GRID_WIDTH = 45
 const MAP_GRID_HEIGHT = 30
 
 # 可活动区域（比地图小，左右缩 2 格，上下缩 1 格）
-const PLAY_AREA_GRID_WIDTH = 41
-const PLAY_AREA_GRID_HEIGHT = 28
+const PLAY_AREA_GRID_WIDTH = 40
+const PLAY_AREA_GRID_HEIGHT = 24
+const PLAYABLE_ORIGIN_X: int = 3
+const PLAYABLE_ORIGIN_Y: int = 3
 
 # 地图尺寸（由网格数量计算，相机边界用）
 var MAP_PIXEL_WIDTH: float = 0.0
@@ -129,6 +131,7 @@ var shop: ShopConfigData = null
 var shop_config: ShopConfig = null
 var spawn: SpawnConfigData = null
 var exp_config: ExpConfig = null
+var prefabs: Dictionary = {}  # {id: MapPrefab}
 
 
 func _ready() -> void:
@@ -138,6 +141,7 @@ func _ready() -> void:
 	_load_waves_by_map("res://resources/waves/")
 	_load_resources_from_dir("res://resources/characters/", characters)
 	_load_resources_from_dir("res://resources/maps/", maps)
+	_load_resources_from_dir("res://resources/maps/prefabs/", prefabs)
 	effects = load("res://resources/effects/default_effects.tres")
 	shop = load("res://resources/shop/default_shop.tres")
 	shop_config = load("res://resources/shop/shop_config.tres")

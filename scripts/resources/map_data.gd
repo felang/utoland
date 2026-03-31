@@ -9,3 +9,4 @@ extends Resource
 @export var fallback_color: String = "#2d5016"
 @export var wave_count: int = 10
 @export var map_scene: String = ""  # 指向对应地图场景，如 res://scenes/levels/maps/forest.tscn
+@export var generator_config: MapGeneratorConfig = null  # null 表示手绘地图
