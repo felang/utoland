@@ -31,7 +31,7 @@ func apply_to_tilemap(map_scene: Node, layout: MapLayout, _config: MapGeneratorC
 
 	# Grass1 满铺坐标（type3 网格中心 fill tile）
 	var grass_src_id := 0
-	var grass_tile := Vector2i(5, 1)
+	var grass_tile := Vector2i(6, 1)  # type3 全填充位置（bitmask 255）
 
 	# 地形 source ID
 	var border_src_id := 1   # Dirt1

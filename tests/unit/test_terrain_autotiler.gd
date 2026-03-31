@@ -96,4 +96,4 @@ func test_get_atlas_coord_isolated():
 func test_get_atlas_coord_full():
 	var layout := _make_layout_filled(MapLayout.CellType.BORDER)
 	var coord := TerrainAutotiler.get_atlas_coord(layout, Vector2i(10, 10), MapLayout.CellType.BORDER)
-	assert_eq(coord, Vector2i(7, 0), "全填充应返回 (7,0)")
+	assert_eq(coord, Vector2i(6, 1), "全填充应返回 (6,1)")
