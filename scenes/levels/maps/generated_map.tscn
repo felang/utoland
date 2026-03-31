@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://dsaeox4mm8qsi"]
 
-[ext_resource type="TileSet" uid="uid://bx217yuq2c30x" path="res://resources/maps/tilesets/luminara_terrace_tileset.tres" id="1_lum"]
+[ext_resource type="TileSet" uid="uid://cbpx6iyp4nlm8" path="res://resources/maps/tilesets/pipoya_generated_tileset.tres" id="1_lum"]
 
 [node name="GeneratedMap" type="Node2D" unique_id=2062147782]
 
