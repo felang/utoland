@@ -26,7 +26,8 @@ func _ready() -> void:
 	add_to_group(Enums.Group.PLAYER)
 
 	# 应用被动属性
-	var max_hp: float = PlayerState.player_stats[Enums.Stat.MAX_HP] * PlayerState.player_stats[Enums.Stat.HP_MULT]
+	var hp_perk: float = PlayerState.player_stats.get(Enums.Stat.HP_BONUS_PERCENT, 0.0)
+	var max_hp: float = PlayerState.player_stats[Enums.Stat.MAX_HP] * PlayerState.player_stats[Enums.Stat.HP_MULT] * (1.0 + hp_perk)
 	health.initialize(max_hp)
 	speed = PlayerState.character_speed
 	_base_max_hp = max_hp
@@ -62,6 +63,7 @@ func _ready() -> void:
 	# 连接升级信号并应用当前等级成长
 	EventBus.player_level_changed.connect(_on_level_up)
 	_apply_level_growth(PlayerProgression.player_level)
+	EventBus.perk_applied.connect(_on_perk_applied)
 
 func _process(delta: float) -> void:
 	if invincible_timer > 0:
@@ -150,9 +152,11 @@ func _apply_level_growth(level: int) -> void:
 		health.heal(hp_diff)
 	# 移速成长（复利）
 	var speed_mult: float = pow(1.0 + LEVEL_SPEED_GROWTH, levels_gained)
-	speed = _base_speed * speed_mult
+	var move_perk: float = PlayerState.player_stats.get(Enums.Stat.MOVE_SPEED_BONUS_PERCENT, 0.0)
+	speed = _base_speed * speed_mult * (1.0 + move_perk)
 	# 拾取范围成长（复利）
-	pickup_range_mult = pow(1.0 + LEVEL_PICKUP_GROWTH, levels_gained)
+	var pickup_perk: float = PlayerState.player_stats.get(Enums.Stat.PICKUP_RADIUS_BONUS_PERCENT, 0.0)
+	pickup_range_mult = pow(1.0 + LEVEL_PICKUP_GROWTH, levels_gained) * (1.0 + pickup_perk)
 
 ## 吸血回复：供投射物命中敌人后调用
 func heal_hp(amount: float) -> void:
@@ -276,3 +280,17 @@ func get_blood_rage_mult() -> float:
 	var hp_pct: float = health.current_hp / health.max_hp
 	var lost_pct: float = 1.0 - hp_pct
 	return 1.0 + minf(lost_pct / 0.1 * PlayerState.new_passive_value, PlayerState.new_passive_value_2)
+
+func _on_perk_applied(_perk_id: String) -> void:
+	# 即时应用 perk 加成(避免等到下次升级才生效)
+	# 重新跑等级成长公式即可,会读取最新 perk bonus
+	_apply_level_growth(PlayerProgression.player_level)
+	# HP 上限也同步
+	var hp_perk: float = PlayerState.player_stats.get(Enums.Stat.HP_BONUS_PERCENT, 0.0)
+	var new_max: float = _base_max_hp * (1.0 + hp_perk)
+	# Lv1 时 _apply_level_growth 不跑,这里兜底处理
+	if PlayerProgression.player_level == 1:
+		var hp_diff: float = new_max - health.max_hp
+		health.max_hp = new_max
+		if hp_diff > 0:
+			health.heal(hp_diff)
