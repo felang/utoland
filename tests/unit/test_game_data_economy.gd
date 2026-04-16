@@ -187,11 +187,11 @@ func test_add_exp_emits_level_changed() -> void:
 	PlayerProgression.player_level = 1
 	PlayerProgression.current_exp = 0
 	var level_changes: Array[int] = []
-	EventBus.player_level_changed.connect(func(lvl: int): level_changes.append(lvl))
+	var _cb := func(lvl: int): level_changes.append(lvl)
+	EventBus.player_level_changed.connect(_cb)
 	PlayerProgression.add_exp(20)
 	assert_eq(level_changes, [2])
-	for conn in EventBus.player_level_changed.get_connections():
-		EventBus.player_level_changed.disconnect(conn["callable"])
+	EventBus.player_level_changed.disconnect(_cb)
 
 func test_add_exp_emits_exp_changed() -> void:
 	PlayerProgression.player_level = 1
