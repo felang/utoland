@@ -8,6 +8,7 @@ extends Resource
 @export var icon_path: String = ""
 @export var sell_price_per_level: PackedInt32Array = PackedInt32Array([])
 @export var hp_per_level: PackedFloat32Array = []
+@export var tier: int = 1  # Tier 1-4
 
 @export_group("射击塔配置")
 @export var attack_config: AttackConfigData = null

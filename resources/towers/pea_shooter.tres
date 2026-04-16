@@ -18,5 +18,6 @@ description = "稳定射击最近的敌人。虽然平凡，但从不缺席。"
 icon_path = "res://assets/towers/pea_shooter/sprite.png"
 sell_price_per_level = PackedInt32Array(3, 7, 21)
 hp_per_level = PackedFloat32Array(80, 150, 260)
+tier = 1
 attack_config = SubResource("AttackConfigData_pea_shooter")
 projectile_data = ExtResource("3")

@@ -18,6 +18,7 @@ description = "射出寒冰弹，命中敌人造成伤害并减速。"
 icon_path = "res://assets/towers/ice_flower/sprite.png"
 sell_price_per_level = PackedInt32Array(3, 7, 21)
 hp_per_level = PackedFloat32Array(70, 125, 200)
+tier = 1
 attack_config = SubResource("AttackConfigData_ice_flower")
 projectile_data = ExtResource("3")
 slow_ratio_per_level = PackedFloat32Array(0.3, 0.4, 0.5)

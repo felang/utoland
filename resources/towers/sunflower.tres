@@ -16,4 +16,5 @@ description = "定时产出金币。它追逐的不是阳光，而是闪闪发�
 icon_path = "res://assets/towers/sunflower/sprite.png"
 sell_price_per_level = PackedInt32Array(3, 7, 21)
 hp_per_level = PackedFloat32Array(70, 115, 170)
+tier = 1
 generator_config = SubResource("GeneratorConfigData_sunflower")
