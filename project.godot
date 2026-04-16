@@ -27,6 +27,7 @@ EffectsManager="*res://scripts/systems/effects_manager.gd"
 EventBus="*res://scripts/core/event_bus.gd"
 SceneManager="*res://scripts/core/scene_manager.gd"
 AudioManager="*res://scripts/systems/audio_manager.gd"
+PerkManager="*res://scripts/core/perk_manager.gd"
 
 [display]
 
