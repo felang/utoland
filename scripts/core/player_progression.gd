@@ -11,8 +11,10 @@ func exp_for_level(level: int) -> int:
 	return int(floor(config.base_exp * pow(level, config.exp_exponent)))
 
 func add_exp(amount: int) -> void:
-	current_exp += amount
-	total_exp_earned += amount
+	var bonus: float = PlayerState.player_stats.get(Enums.Stat.EXP_GAIN_BONUS_PERCENT, 0.0)
+	var actual: int = int(round(amount * (1.0 + bonus)))
+	current_exp += actual
+	total_exp_earned += actual
 	while current_exp >= exp_for_level(player_level + 1):
 		player_level += 1
 		EventBus.player_level_changed.emit(player_level)
@@ -21,7 +23,9 @@ func add_exp(amount: int) -> void:
 
 func get_population_cap() -> int:
 	var config: ExpConfig = GameConfig.exp_config
-	return config.initial_population + (player_level - 1) * config.population_per_level
+	var base: int = config.initial_population + (player_level - 1) * config.population_per_level
+	var bonus: int = PlayerState.player_stats.get(Enums.Stat.POPULATION_BONUS, 0)
+	return base + bonus
 
 func reset() -> void:
 	player_level = 1

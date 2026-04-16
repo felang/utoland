@@ -60,3 +60,19 @@ func test_reset_restores_defaults() -> void:
 	assert_eq(PlayerProgression.player_level, 1)
 	assert_eq(PlayerProgression.current_exp, 0)
 	assert_eq(PlayerProgression.total_exp_earned, 0)
+
+# ===== Perk bonus 应用 =====
+
+func test_exp_gain_bonus_multiplies_added_exp() -> void:
+	PlayerState.reset()
+	PlayerProgression.reset()
+	PlayerState.player_stats[Enums.Stat.EXP_GAIN_BONUS_PERCENT] = 0.5  # +50%
+	PlayerProgression.add_exp(10)
+	assert_eq(PlayerProgression.current_exp, 15)
+
+func test_population_bonus_added_to_cap() -> void:
+	PlayerState.reset()
+	PlayerProgression.reset()
+	var base_cap: int = PlayerProgression.get_population_cap()
+	PlayerState.player_stats[Enums.Stat.POPULATION_BONUS] = 3
+	assert_eq(PlayerProgression.get_population_cap(), base_cap + 3)
