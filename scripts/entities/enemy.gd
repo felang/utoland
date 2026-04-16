@@ -82,6 +82,7 @@ func _on_died() -> void:
 	EventBus.enemy_killed.emit(enemy_type, global_position, is_elite)
 	AudioManager.play("enemy_die")
 	_drop_exp_orbs()
+	# TODO(#5): 敌人掉金币机制接入,届时应用 PlayerState.player_stats.get(Enums.Stat.COIN_DROP_BONUS_PERCENT, 0.0) 加成
 	EffectsManager.spawn_enhanced_death(global_position, health.death_color)
 	SceneFactory.release_enemy(self)
 
