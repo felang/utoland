@@ -4,3 +4,7 @@
 
 [resource]
 script = ExtResource("1")
+roll_cost = 3
+pending_queue_size = 3
+dynamic_weight_multiplier = 1.5
+sell_return_ratio = 0.7
