@@ -96,23 +96,14 @@ func _on_slot_pressed(idx: int) -> void:
 func _on_placed(grid_pos: Vector2i) -> void:
 	if _placing_index < 0:
 		return
-	var tower_id: String = InventoryManager.consume_pending(_placing_index)
-	if tower_id != "":
-		# 备份合成前状态
-		var old_towers: Array = InventoryManager.deployed_towers.duplicate(true)
-		# 部署新塔(走数据 + 视觉)
-		var deploy_id: int = InventoryManager._next_deploy_id
-		InventoryManager._next_deploy_id += 1
-		InventoryManager.deployed_towers.append({
-			id = tower_id, level = 1,
-			grid_pos = grid_pos, deploy_id = deploy_id,
-		})
-		drag_manager.spawn_tower_node(deploy_id, tower_id, 1, grid_pos)
-		EventBus.tower_placed.emit(tower_id, Vector2(grid_pos))
-		EventBus.item_purchased.emit({id = tower_id, type = "tower", level = 1})
-		# 自动 2 合 1 检查
-		InventoryManager._check_merge(tower_id, 1)
-		_sync_merge_visuals(old_towers, deploy_id, grid_pos)
+	var result: Dictionary = InventoryManager.deploy_pending_tower(_placing_index, grid_pos)
+	if not result.is_empty():
+		# 移除被合成的旧塔节点
+		for old_id in result.merged_away:
+			drag_manager._remove_tower_node(old_id)
+		# 部署最终塔节点(若合成则是升级产物)
+		drag_manager.spawn_tower_node(result.deploy_id, result.tower_id, result.level, grid_pos)
+	# 若 result 为空(人口满或失败),pending 不消费,卡片留在栏内 ✓
 	_placing_index = -1
 	_refresh()
 
@@ -120,32 +111,3 @@ func _on_cancelled() -> void:
 	# 玩家取消放置 → pending 不消费,卡片回到栏内
 	_placing_index = -1
 	_refresh()
-
-func _sync_merge_visuals(old_towers: Array, just_placed_deploy_id: int, just_placed_grid_pos: Vector2i) -> void:
-	# 1. 找出被合成掉的 deploy_id(old 里有但 new 里没有)→ 移除节点
-	var current_ids: Array[int] = []
-	for entry in InventoryManager.deployed_towers:
-		current_ids.append(entry.deploy_id)
-	for entry in old_towers:
-		if entry.deploy_id not in current_ids:
-			drag_manager._remove_tower_node(entry.deploy_id)
-	# 还要处理刚 spawn 的那个(它在 old_towers 里也没有,但被 _check_merge 删掉了)
-	if just_placed_deploy_id not in current_ids:
-		drag_manager._remove_tower_node(just_placed_deploy_id)
-	# 2. 找出升级了 level 的塔 → 替换节点
-	for entry in InventoryManager.deployed_towers:
-		for old in old_towers:
-			if old.deploy_id == entry.deploy_id and old.level != entry.level:
-				drag_manager.upgrade_tower_node(entry.deploy_id, entry.id, entry.level, entry.grid_pos)
-				break
-	# 3. 找出 _check_merge 留下的"新升级品"(deploy_id 不在 old 里,但在 new 里)
-	#    该 deploy_id 复用了 just_placed_deploy_id,需要 spawn 升级后的节点
-	for entry in InventoryManager.deployed_towers:
-		var in_old: bool = false
-		for old in old_towers:
-			if old.deploy_id == entry.deploy_id:
-				in_old = true
-				break
-		if not in_old and entry.deploy_id == just_placed_deploy_id and entry.level > 1:
-			# 刚 spawn 的 Lv1 节点已被 _remove_tower_node 删掉,这里 spawn 升级后的节点
-			drag_manager.spawn_tower_node(entry.deploy_id, entry.id, entry.level, entry.grid_pos)

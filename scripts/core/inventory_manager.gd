@@ -292,3 +292,55 @@ func can_roll() -> bool:
 
 func get_current_roll_offer() -> Array[String]:
 	return _current_roll_offer.duplicate()
+
+## 部署一个 pending 塔(从待建造栏取出 + 人口检查 + append + 自动合成)
+## 返回: { tower_id, deploy_id, level, merged_away } 或空字典(失败)
+##   - tower_id: 实际部署的 tower id
+##   - deploy_id: 最终塔的 deploy_id(合成时复用刚 spawn 的 id)
+##   - level: 最终等级
+##   - merged_away: Array[int],被合成消耗的旧 deploy_ids(供 UI 移除节点)
+## 失败原因: pending 索引无效 / 人口已满
+func deploy_pending_tower(pending_index: int, grid_pos: Vector2i) -> Dictionary:
+	if pending_index < 0 or pending_index >= pending_towers.size():
+		return {}
+	if get_population_used() >= PlayerProgression.get_population_cap():
+		return {}
+	var tower_id: String = pending_towers[pending_index]
+	# 备份合成前已部署 deploy_ids
+	var old_ids: Array[int] = []
+	for entry in deployed_towers:
+		old_ids.append(entry.deploy_id)
+	# 真正消费 pending(扣队列)
+	pending_towers.remove_at(pending_index)
+	EventBus.tower_consumed_from_queue.emit(pending_index)
+	# 部署新塔(数据层)
+	var deploy_id: int = _next_deploy_id
+	_next_deploy_id += 1
+	deployed_towers.append({
+		id = tower_id, level = 1,
+		grid_pos = grid_pos, deploy_id = deploy_id,
+	})
+	EventBus.tower_placed.emit(tower_id, Vector2(grid_pos))
+	EventBus.item_purchased.emit({id = tower_id, type = "tower", level = 1})
+	# 自动合成检查(2 合 1)
+	_check_merge(tower_id, 1)
+	# 计算合成结果:被消耗的 deploy_ids
+	var current_ids: Array[int] = []
+	for entry in deployed_towers:
+		current_ids.append(entry.deploy_id)
+	var merged_away: Array[int] = []
+	for old_id in old_ids:
+		if old_id not in current_ids:
+			merged_away.append(old_id)
+	# 找最终塔的 level(deploy_id 沿用刚 spawn 的,合成时复用)
+	var final_level: int = 1
+	for entry in deployed_towers:
+		if entry.deploy_id == deploy_id:
+			final_level = entry.level
+			break
+	return {
+		"tower_id": tower_id,
+		"deploy_id": deploy_id,
+		"level": final_level,
+		"merged_away": merged_away,
+	}

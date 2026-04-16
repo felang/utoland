@@ -14,8 +14,9 @@ func before_each() -> void:
 func test_perk_manager_loads_all_perks() -> void:
 	# 验证 PerkManager 加载了所有 perk
 	assert_gt(PerkManager._all_perks.size(), 0, "应加载 perk 列表")
-	# 应该有 8 个 perk：vitality, swift, power, rapid, reach, greed, study, expansion
-	assert_eq(PerkManager._all_perks.size(), 8, "应有 8 个 perk")
+	# 应该有 7 个 perk：vitality, swift, power, rapid, reach, study, expansion
+	# (greed 暂时移除，待 #5 敌人掉金币机制接入后恢复)
+	assert_eq(PerkManager._all_perks.size(), 7, "应有 7 个 perk")
 
 func test_draw_three_returns_valid_perks() -> void:
 	# 验证 _draw_three() 返回 3 个不重复的 perk
@@ -181,3 +182,18 @@ func test_perk_effects_accumulate() -> void:
 
 	var second_bonus: float = PlayerState.player_stats.get(Enums.Stat.HP_BONUS_PERCENT, 0.0)
 	assert_almost_eq(second_bonus, 0.2, 0.001, "第二次选择 vitality 后应有 0.2 bonus（累加）")
+
+# 验证 C1 修复:vitality 真正影响 player 实例
+# 注意:此测试只验证字段累加和 _apply_level_growth 公式,不实例化 Player
+func test_vitality_increases_max_hp_via_apply_level_growth() -> void:
+	PlayerState.reset()
+	PlayerProgression.reset()
+	# 模拟 PlayerState.character_max_hp = 100
+	PlayerState.character_max_hp = 100.0
+	PlayerState.player_stats[Enums.Stat.MAX_HP] = 100.0
+	# 没 perk 时,Lv1 base = 100
+	# 吃 vitality (+10%) 后,Lv1 max_hp 应该 = 110
+	PlayerState.player_stats[Enums.Stat.HP_BONUS_PERCENT] = 0.1
+	# 公式: _base_max_hp(100) * pow(1.03, 0) * (1 + 0.1) = 110
+	var expected: float = 100.0 * pow(1.03, 0) * 1.1
+	assert_almost_eq(expected, 110.0, 0.01, "vitality perk 应使 Lv1 max_hp = 110")

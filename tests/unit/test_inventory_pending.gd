@@ -70,3 +70,41 @@ func test_reset_clears_pending() -> void:
 	InventoryManager.reset()
 	assert_eq(InventoryManager.pending_towers.size(), 0)
 	assert_eq(InventoryManager.get_current_roll_offer().size(), 0)
+
+# ===== deploy_pending_tower(C2 + C3 修复)=====
+
+func test_deploy_pending_tower_basic() -> void:
+	InventoryManager.pending_towers = ["pea_shooter"]
+	var result: Dictionary = InventoryManager.deploy_pending_tower(0, Vector2i(5, 5))
+	assert_false(result.is_empty())
+	assert_eq(result.tower_id, "pea_shooter")
+	assert_eq(result.level, 1)
+	assert_eq(result.merged_away.size(), 0)
+	assert_eq(InventoryManager.pending_towers.size(), 0)
+	assert_eq(InventoryManager.deployed_towers.size(), 1)
+
+func test_deploy_pending_tower_blocked_by_population() -> void:
+	# 人口已满
+	for i in PlayerProgression.get_population_cap():
+		InventoryManager.deployed_weapons.append({id = "bow", level = 1})
+	InventoryManager.pending_towers = ["pea_shooter"]
+	var result: Dictionary = InventoryManager.deploy_pending_tower(0, Vector2i(5, 5))
+	assert_true(result.is_empty(), "人口满时应该拒绝部署")
+	assert_eq(InventoryManager.pending_towers.size(), 1, "失败时 pending 不消费")
+
+func test_deploy_pending_tower_triggers_merge() -> void:
+	# 已部署 1 座 pea_shooter Lv1,放下第 2 座触发合成
+	InventoryManager.deployed_towers.append({
+		id = "pea_shooter", level = 1,
+		grid_pos = Vector2i(0, 0), deploy_id = 1,
+	})
+	InventoryManager._next_deploy_id = 2
+	InventoryManager.pending_towers = ["pea_shooter"]
+	# 给足人口
+	PlayerProgression.player_level = 5
+	var result: Dictionary = InventoryManager.deploy_pending_tower(0, Vector2i(5, 5))
+	assert_false(result.is_empty())
+	assert_eq(result.level, 2, "合成后 level = 2")
+	assert_eq(result.merged_away.size(), 1, "1 个旧塔被合成消耗")
+	assert_eq(result.merged_away[0], 1, "旧塔 deploy_id = 1 被消耗")
+	assert_eq(InventoryManager.deployed_towers.size(), 1, "数据层只剩 1 座 Lv2")
