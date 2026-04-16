@@ -55,3 +55,29 @@ func test_reset_preserves_current_character() -> void:
 		PlayerState.current_character = Enums.Character.KAZE
 		PlayerState.reset()
 		assert_eq(PlayerState.current_character, Enums.Character.KAZE)
+
+# ===== Perk bonus 字段 =====
+
+func test_player_stats_has_perk_bonus_keys() -> void:
+	PlayerState.reset()
+	assert_true(PlayerState.player_stats.has(Enums.Stat.HP_BONUS_PERCENT))
+	assert_true(PlayerState.player_stats.has(Enums.Stat.MOVE_SPEED_BONUS_PERCENT))
+	assert_true(PlayerState.player_stats.has(Enums.Stat.DAMAGE_BONUS_PERCENT))
+	assert_true(PlayerState.player_stats.has(Enums.Stat.ATTACK_SPEED_BONUS_PERCENT))
+	assert_true(PlayerState.player_stats.has(Enums.Stat.PICKUP_RADIUS_BONUS_PERCENT))
+	assert_true(PlayerState.player_stats.has(Enums.Stat.COIN_DROP_BONUS_PERCENT))
+	assert_true(PlayerState.player_stats.has(Enums.Stat.EXP_GAIN_BONUS_PERCENT))
+	assert_true(PlayerState.player_stats.has(Enums.Stat.POPULATION_BONUS))
+
+func test_perk_bonus_initialized_to_zero() -> void:
+	PlayerState.reset()
+	assert_eq(PlayerState.player_stats[Enums.Stat.HP_BONUS_PERCENT], 0.0)
+	assert_eq(PlayerState.player_stats[Enums.Stat.POPULATION_BONUS], 0)
+
+func test_perk_bonus_reset_clears_accumulated() -> void:
+	PlayerState.reset()
+	PlayerState.player_stats[Enums.Stat.HP_BONUS_PERCENT] = 0.5
+	PlayerState.player_stats[Enums.Stat.POPULATION_BONUS] = 3
+	PlayerState.reset()
+	assert_eq(PlayerState.player_stats[Enums.Stat.HP_BONUS_PERCENT], 0.0)
+	assert_eq(PlayerState.player_stats[Enums.Stat.POPULATION_BONUS], 0)

@@ -25,7 +25,16 @@ var player_stats: Dictionary = {
 	Enums.Stat.HP_MULT: 1.0,
 	Enums.Stat.DAMAGE_MULT: 1.0,
 	Enums.Stat.ATTACK_SPEED_MULT: 1.0,
-	Enums.Stat.TOWER_MULT: 1.0
+	Enums.Stat.TOWER_MULT: 1.0,
+	# Perk bonus(战斗中累加,reset 重置)
+	Enums.Stat.HP_BONUS_PERCENT: 0.0,
+	Enums.Stat.MOVE_SPEED_BONUS_PERCENT: 0.0,
+	Enums.Stat.DAMAGE_BONUS_PERCENT: 0.0,
+	Enums.Stat.ATTACK_SPEED_BONUS_PERCENT: 0.0,
+	Enums.Stat.PICKUP_RADIUS_BONUS_PERCENT: 0.0,
+	Enums.Stat.COIN_DROP_BONUS_PERCENT: 0.0,
+	Enums.Stat.EXP_GAIN_BONUS_PERCENT: 0.0,
+	Enums.Stat.POPULATION_BONUS: 0,
 }
 
 func _ready() -> void:
@@ -55,5 +64,13 @@ func reset() -> void:
 		Enums.Stat.HP_MULT: 1.0,
 		Enums.Stat.DAMAGE_MULT: character_damage_mult,
 		Enums.Stat.ATTACK_SPEED_MULT: character_attack_speed_mult,
-		Enums.Stat.TOWER_MULT: 1.0
+		Enums.Stat.TOWER_MULT: 1.0,
+		Enums.Stat.HP_BONUS_PERCENT: 0.0,
+		Enums.Stat.MOVE_SPEED_BONUS_PERCENT: 0.0,
+		Enums.Stat.DAMAGE_BONUS_PERCENT: 0.0,
+		Enums.Stat.ATTACK_SPEED_BONUS_PERCENT: 0.0,
+		Enums.Stat.PICKUP_RADIUS_BONUS_PERCENT: 0.0,
+		Enums.Stat.COIN_DROP_BONUS_PERCENT: 0.0,
+		Enums.Stat.EXP_GAIN_BONUS_PERCENT: 0.0,
+		Enums.Stat.POPULATION_BONUS: 0,
 	}
