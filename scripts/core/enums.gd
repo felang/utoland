@@ -66,6 +66,15 @@ class Stat:
 	const TOWER_MULT = "tower_mult"
 	const MELEE_DAMAGE_MULT = "MELEE_DAMAGE_MULT"
 	const MELEE_ATTACK_SPEED_MULT = "MELEE_ATTACK_SPEED_MULT"
+	# Perk bonus(战斗中 3 选 1 累加)
+	const HP_BONUS_PERCENT = "hp_bonus_percent"
+	const MOVE_SPEED_BONUS_PERCENT = "move_speed_bonus_percent"
+	const DAMAGE_BONUS_PERCENT = "damage_bonus_percent"
+	const ATTACK_SPEED_BONUS_PERCENT = "attack_speed_bonus_percent"
+	const PICKUP_RADIUS_BONUS_PERCENT = "pickup_radius_bonus_percent"
+	const COIN_DROP_BONUS_PERCENT = "coin_drop_bonus_percent"
+	const EXP_GAIN_BONUS_PERCENT = "exp_gain_bonus_percent"
+	const POPULATION_BONUS = "population_bonus"
 
 # 动画名
 class Anim:
