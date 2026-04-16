@@ -25,13 +25,13 @@ var _base_speed: float = 0.0
 func _ready() -> void:
 	add_to_group(Enums.Group.PLAYER)
 
-	# 应用被动属性
-	var hp_perk: float = PlayerState.player_stats.get(Enums.Stat.HP_BONUS_PERCENT, 0.0)
-	var max_hp: float = PlayerState.player_stats[Enums.Stat.MAX_HP] * PlayerState.player_stats[Enums.Stat.HP_MULT] * (1.0 + hp_perk)
-	health.initialize(max_hp)
-	speed = PlayerState.character_speed
-	_base_max_hp = max_hp
-	_base_speed = speed
+	# 初始化基础值（不含 perk，perk 在 _apply_level_growth 中统一应用）
+	var base_hp: float = PlayerState.player_stats[Enums.Stat.MAX_HP] * PlayerState.player_stats[Enums.Stat.HP_MULT]
+	_base_max_hp = base_hp
+	_base_speed = PlayerState.character_speed
+	speed = _base_speed
+	# 初始 HP 通过 _apply_level_growth 在 _ready 末尾设置，这里先用基础值初始化
+	health.initialize(base_hp)
 
 	# 应用待处理的治疗
 	if PlayerState.pending_heal > 0:
@@ -140,22 +140,21 @@ func _on_level_up(new_level: int) -> void:
 	_weapon_manager.refresh_passive_multipliers()
 
 func _apply_level_growth(level: int) -> void:
-	var levels_gained: int = level - 1  # Lv1 = 0 次成长
-	if levels_gained <= 0:
-		return
-	# HP 成长（复利）
+	var levels_gained: int = level - 1  # Lv1 = 0 次成长（但仍跑函数以应用 perk）
+	var hp_perk: float = PlayerState.player_stats.get(Enums.Stat.HP_BONUS_PERCENT, 0.0)
+	var move_perk: float = PlayerState.player_stats.get(Enums.Stat.MOVE_SPEED_BONUS_PERCENT, 0.0)
+	var pickup_perk: float = PlayerState.player_stats.get(Enums.Stat.PICKUP_RADIUS_BONUS_PERCENT, 0.0)
+	# HP 成长（复利 + perk）
 	var hp_mult: float = pow(1.0 + LEVEL_HP_GROWTH, levels_gained)
-	var new_max_hp: float = _base_max_hp * hp_mult
+	var new_max_hp: float = _base_max_hp * hp_mult * (1.0 + hp_perk)
 	var hp_diff: float = new_max_hp - health.max_hp
 	health.max_hp = new_max_hp
 	if hp_diff > 0:
 		health.heal(hp_diff)
-	# 移速成长（复利）
+	# 移速成长（复利 + perk）
 	var speed_mult: float = pow(1.0 + LEVEL_SPEED_GROWTH, levels_gained)
-	var move_perk: float = PlayerState.player_stats.get(Enums.Stat.MOVE_SPEED_BONUS_PERCENT, 0.0)
 	speed = _base_speed * speed_mult * (1.0 + move_perk)
-	# 拾取范围成长（复利）
-	var pickup_perk: float = PlayerState.player_stats.get(Enums.Stat.PICKUP_RADIUS_BONUS_PERCENT, 0.0)
+	# 拾取范围成长（复利 + perk）
 	pickup_range_mult = pow(1.0 + LEVEL_PICKUP_GROWTH, levels_gained) * (1.0 + pickup_perk)
 
 ## 吸血回复：供投射物命中敌人后调用
@@ -282,15 +281,5 @@ func get_blood_rage_mult() -> float:
 	return 1.0 + minf(lost_pct / 0.1 * PlayerState.new_passive_value, PlayerState.new_passive_value_2)
 
 func _on_perk_applied(_perk_id: String) -> void:
-	# 即时应用 perk 加成(避免等到下次升级才生效)
-	# 重新跑等级成长公式即可,会读取最新 perk bonus
+	# 重新跑 level growth,会读最新 perk bonus
 	_apply_level_growth(PlayerProgression.player_level)
-	# HP 上限也同步
-	var hp_perk: float = PlayerState.player_stats.get(Enums.Stat.HP_BONUS_PERCENT, 0.0)
-	var new_max: float = _base_max_hp * (1.0 + hp_perk)
-	# Lv1 时 _apply_level_growth 不跑,这里兜底处理
-	if PlayerProgression.player_level == 1:
-		var hp_diff: float = new_max - health.max_hp
-		health.max_hp = new_max
-		if hp_diff > 0:
-			health.heal(hp_diff)
