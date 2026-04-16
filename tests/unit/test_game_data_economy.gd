@@ -207,21 +207,23 @@ func test_add_exp_emits_exp_changed() -> void:
 # ===== sell_from_deployed_weapon =====
 
 func test_sell_from_deployed_weapon() -> void:
-	# bow lv1 sell_price = 3
+	# bow lv1 sell_price = 3, with 70% return ratio: int(round(3 * 0.7)) = 2
 	InventoryManager.deployed_weapons.append({id = "bow", level = 1})
 	var initial_coins: int = InventoryManager.coins
 	var refund: int = InventoryManager.sell_from_deployed_weapon(0)
-	assert_eq(refund, 3)
-	assert_eq(InventoryManager.coins, initial_coins + 3)
+	var expected: int = int(round(3 * GameConfig.shop_config.sell_return_ratio))
+	assert_eq(refund, expected)
+	assert_eq(InventoryManager.coins, initial_coins + expected)
 	assert_eq(InventoryManager.deployed_weapons.size(), 0)
 
 func test_sell_from_deployed_weapon_lv2() -> void:
-	# bow lv2 sell_price = 7
+	# bow lv2 sell_price = 7, with 70% return ratio: int(round(7 * 0.7)) = 5
 	InventoryManager.deployed_weapons.append({id = "bow", level = 2})
 	var initial_coins: int = InventoryManager.coins
 	var refund: int = InventoryManager.sell_from_deployed_weapon(0)
-	assert_eq(refund, 7)
-	assert_eq(InventoryManager.coins, initial_coins + 7)
+	var expected: int = int(round(7 * GameConfig.shop_config.sell_return_ratio))
+	assert_eq(refund, expected)
+	assert_eq(InventoryManager.coins, initial_coins + expected)
 
 func test_sell_from_deployed_weapon_invalid_index() -> void:
 	var initial_coins: int = InventoryManager.coins
@@ -237,8 +239,9 @@ func test_sell_from_deployed_tower() -> void:
 	var deploy_id: int = InventoryManager.buy_and_place_tower("pea_shooter", 3, Vector2i(0, 0))
 	var coins_after_buy: int = InventoryManager.coins
 	var refund: int = InventoryManager.sell_from_deployed_tower(deploy_id)
-	assert_eq(refund, 3)
-	assert_eq(InventoryManager.coins, coins_after_buy + 3)
+	var expected: int = int(round(3 * GameConfig.shop_config.sell_return_ratio))
+	assert_eq(refund, expected)
+	assert_eq(InventoryManager.coins, coins_after_buy + expected)
 	assert_eq(InventoryManager.deployed_towers.size(), 0)
 
 func test_sell_from_deployed_tower_invalid_deploy_id() -> void:
