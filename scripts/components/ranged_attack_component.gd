@@ -56,12 +56,15 @@ func tick(delta: float) -> void:
 	_cooldown_remaining = get_final_cooldown()
 
 func get_final_damage() -> float:
-	return _base_damage * damage_multiplier
+	var perk_bonus: float = PlayerState.player_stats.get(Enums.Stat.DAMAGE_BONUS_PERCENT, 0.0)
+	return _base_damage * damage_multiplier * (1.0 + perk_bonus)
 
 func get_final_cooldown() -> float:
-	if speed_multiplier <= 0.0:
+	var perk_bonus: float = PlayerState.player_stats.get(Enums.Stat.ATTACK_SPEED_BONUS_PERCENT, 0.0)
+	var spd: float = speed_multiplier * (1.0 + perk_bonus)
+	if spd <= 0.0:
 		return _base_cooldown
-	return _base_cooldown / speed_multiplier
+	return _base_cooldown / spd
 
 func _calculate_direction(fire_pos: Vector2, target_pos: Vector2, target_velocity: Vector2, proj_speed: float) -> Vector2:
 	if use_lead_shot and target_velocity.length_squared() > 0.0:

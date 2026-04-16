@@ -68,3 +68,21 @@ func test_calculate_direction_no_lead_shot() -> void:
 	var result: Vector2 = comp._calculate_direction(fire_pos, target_pos, target_velocity, speed)
 	assert_almost_eq(result.x, 1.0, 0.01)
 	assert_almost_eq(result.y, 0.0, 0.01)
+
+# ===== Perk bonus 应用 =====
+
+func test_damage_bonus_applied() -> void:
+	PlayerState.reset()
+	var comp := RangedAttackComponent.new()
+	comp._base_damage = 10.0
+	comp.damage_multiplier = 1.0
+	PlayerState.player_stats[Enums.Stat.DAMAGE_BONUS_PERCENT] = 0.5
+	assert_almost_eq(comp.get_final_damage(), 15.0, 0.01)
+
+func test_attack_speed_bonus_reduces_cooldown() -> void:
+	PlayerState.reset()
+	var comp := RangedAttackComponent.new()
+	comp._base_cooldown = 1.0
+	comp.speed_multiplier = 1.0
+	PlayerState.player_stats[Enums.Stat.ATTACK_SPEED_BONUS_PERCENT] = 1.0  # +100%
+	assert_almost_eq(comp.get_final_cooldown(), 0.5, 0.01)
