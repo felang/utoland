@@ -39,3 +39,14 @@ signal item_sold(item: Dictionary, refund: int)
 signal item_merged(item_id: String, new_level: int)
 signal player_level_changed(new_level: int)
 signal tower_moved(deploy_id: int, old_pos: Vector2i, new_pos: Vector2i)
+
+# Perk 系统(战斗中 3 选 1 升级)
+signal perk_offered(perks: Array)            # Array[PerkData]
+signal perk_selected(perk_id: String)
+signal perk_applied(perk_id: String)         # 应用完毕广播,UI 可刷新
+
+# Roll 塔系统
+signal tower_rolled(candidates: Array)       # Array[String](3 个 tower_id)
+signal tower_added_to_queue(tower_id: String)
+signal tower_consumed_from_queue(index: int)
+signal tower_roll_canceled()
