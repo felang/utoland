@@ -105,18 +105,11 @@ func _show_tower_menu(deploy_id: int) -> void:
 			break
 	if entry.is_empty():
 		return
-	# 合成选项
-	var has_pair: bool = false
-	for t in InventoryManager.deployed_towers:
-		if t.deploy_id != deploy_id and t.id == entry.id and t.level == entry.level and entry.level < 3:
-			has_pair = true
-			break
-	if has_pair:
-		_tower_menu.add_item("合成", 0)
-	# 卖出选项
+	# 卖出选项(按 sell_return_ratio 返还)
 	var tower_data: TowerData = GameConfig.towers.get(entry.id)
-	var refund: int = tower_data.sell_price_per_level[entry.level - 1] if tower_data else 0
-	_tower_menu.add_item("卖出 $%d" % refund, 1)
+	var base_value: int = tower_data.sell_price_per_level[entry.level - 1] if tower_data else 0
+	var refund_preview: int = int(round(base_value * GameConfig.shop_config.sell_return_ratio))
+	_tower_menu.add_item("卖出 $%d" % refund_preview, 1)
 	# 移动选项
 	_tower_menu.add_item("移动", 2)
 	var tower_node: Node2D = _tower_nodes[deploy_id]
@@ -127,10 +120,6 @@ func _show_tower_menu(deploy_id: int) -> void:
 func _on_tower_menu_pressed(id: int) -> void:
 	var deploy_id: int = _menu_deploy_id
 	match id:
-		0:  # 合成
-			var old_towers: Array = InventoryManager.deployed_towers.duplicate(true)
-			if InventoryManager.merge_tower(deploy_id):
-				_handle_tower_merge_visual(deploy_id, old_towers)
 		1:  # 卖出
 			var refund: int = InventoryManager.sell_from_deployed_tower(deploy_id)
 			if refund > 0:
@@ -138,18 +127,6 @@ func _on_tower_menu_pressed(id: int) -> void:
 		2:  # 移动
 			start_move_tower(deploy_id)
 	_menu_deploy_id = -1
-
-func _handle_tower_merge_visual(kept_deploy_id: int, old_towers: Array) -> void:
-	var current_ids: Array[int] = []
-	for entry in InventoryManager.deployed_towers:
-		current_ids.append(entry.deploy_id)
-	for entry in old_towers:
-		if entry.deploy_id not in current_ids:
-			_remove_tower_node(entry.deploy_id)
-	for entry in InventoryManager.deployed_towers:
-		if entry.deploy_id == kept_deploy_id:
-			upgrade_tower_node(entry.deploy_id, entry.id, entry.level, entry.grid_pos)
-			break
 
 func _end_drag(world_pos: Vector2, _viewport_pos: Vector2 = Vector2.ZERO) -> void:
 	match _drag_source:
