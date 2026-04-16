@@ -11,6 +11,15 @@ var _recommended_weapon: String = ""
 var _recommended_tower: String = ""
 var _next_deploy_id: int = 1
 
+# 待建造栏(roll 出来选的塔卡片,等待拖到地图上放置)
+var pending_towers: Array[String] = []  # 元素是 tower_id
+
+# Roll 管理器(惰性初始化)
+var _roll_manager: TowerRollManager = null
+
+# 当前 Roll 出来的 3 个候选(等待玩家从中选 1)
+var _current_roll_offer: Array[String] = []
+
 func get_population_used() -> int:
 	return deployed_weapons.size() + deployed_towers.size()
 
@@ -93,7 +102,9 @@ func _apply_sell(item: Dictionary) -> int:
 		data = GameConfig.weapons[item.id]
 	else:
 		data = GameConfig.towers[item.id]
-	var refund: int = data.sell_price_per_level[item.level - 1]
+	var base_value: int = data.sell_price_per_level[item.level - 1]
+	var ratio: float = GameConfig.shop_config.sell_return_ratio
+	var refund: int = int(round(base_value * ratio))
 	coins += refund
 	EventBus.item_sold.emit(item, refund)
 	EventBus.coins_changed.emit(refund, coins)
@@ -214,5 +225,70 @@ func reset() -> void:
 	_recommended_weapon = char_data.recommended_weapon
 	_recommended_tower = char_data.recommended_tower
 	_next_deploy_id = 1
+	pending_towers = []
+	_current_roll_offer = []
+	# _roll_manager 复用,不清
 	if char_data.starting_weapon != "":
 		deployed_weapons.append({id = char_data.starting_weapon, level = 1})
+
+# ===== Roll / Pending 管理 =====
+
+func _get_roll_manager() -> TowerRollManager:
+	if _roll_manager == null:
+		_roll_manager = TowerRollManager.new()
+	return _roll_manager
+
+## 触发一次 Roll:扣金币 + 抽 3 个候选 + 发信号
+## 调用前应先用 can_roll() 检查
+func roll_tower() -> bool:
+	var cost: int = GameConfig.shop_config.roll_cost
+	if coins < cost:
+		return false
+	if pending_towers.size() >= GameConfig.shop_config.pending_queue_size:
+		return false
+	if not _current_roll_offer.is_empty():
+		return false  # 已有未决 offer
+	coins -= cost
+	EventBus.coins_changed.emit(-cost, coins)
+	_current_roll_offer = []
+	for tid in _get_roll_manager().roll_three(PlayerProgression.player_level):
+		_current_roll_offer.append(tid)
+	EventBus.tower_rolled.emit(_current_roll_offer.duplicate())
+	return true
+
+## 玩家从 3 选 1 中确认选择,加入 pending_towers
+func confirm_roll_pick(candidate_index: int) -> bool:
+	if candidate_index < 0 or candidate_index >= _current_roll_offer.size():
+		return false
+	var tower_id: String = _current_roll_offer[candidate_index]
+	pending_towers.append(tower_id)
+	_current_roll_offer = []
+	EventBus.tower_added_to_queue.emit(tower_id)
+	return true
+
+## 玩家点取消 → 退还 roll 费用,清空 offer
+func cancel_roll() -> void:
+	if _current_roll_offer.is_empty():
+		return
+	var refund: int = GameConfig.shop_config.roll_cost
+	coins += refund
+	EventBus.coins_changed.emit(refund, coins)
+	_current_roll_offer = []
+	EventBus.tower_roll_canceled.emit()
+
+## 从待建造栏取出 1 个 tower_id 用于放置(放置成功调)
+func consume_pending(index: int) -> String:
+	if index < 0 or index >= pending_towers.size():
+		return ""
+	var tid: String = pending_towers[index]
+	pending_towers.remove_at(index)
+	EventBus.tower_consumed_from_queue.emit(index)
+	return tid
+
+func can_roll() -> bool:
+	return (coins >= GameConfig.shop_config.roll_cost
+		and pending_towers.size() < GameConfig.shop_config.pending_queue_size
+		and _current_roll_offer.is_empty())
+
+func get_current_roll_offer() -> Array[String]:
+	return _current_roll_offer.duplicate()
