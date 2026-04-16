@@ -36,15 +36,15 @@ func test_dynamic_weight_favors_deployed() -> void:
 		})
 	var pea_count: int = 0
 	var total: int = 0
-	for i in 100:
+	for i in 1000:
 		var r: Array = _mgr.roll_three(1)
 		for tid in r:
 			total += 1
 			if tid == "pea_shooter":
 				pea_count += 1
-	# 3 座塔均匀概率 1/3 ≈ 33%,加权后应 > 40%
+	# 3 座塔均匀概率 1/3 ≈ 33%,加权后应 > 38% (期望 42.8%,给予更充足的检验空间)
 	var ratio: float = float(pea_count) / float(total)
-	assert_gt(ratio, 0.4, "pea_shooter 应该被显著加权,实际比例: " + str(ratio))
+	assert_gt(ratio, 0.38, "pea_shooter 应该被显著加权,实际比例: " + str(ratio))
 
 func test_lv3_deployed_does_not_boost_weight() -> void:
 	# 部署 Lv3 满级 pea_shooter — 不应加权
