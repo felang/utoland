@@ -4,7 +4,6 @@
 [ext_resource type="Script" uid="uid://b0j68ldejylty" path="res://scripts/systems/enemy_spawner.gd" id="2_0wfyh"]
 [ext_resource type="PackedScene" uid="uid://cw1ribon6hcfu" path="res://scenes/ui/hud.tscn" id="4_tbgi4"]
 [ext_resource type="Script" uid="uid://spn074bn5fw7" path="res://scripts/systems/wave_manager.gd" id="6_tefeu"]
-[ext_resource type="PackedScene" uid="uid://dkqv7xm2w3a8p" path="res://scenes/ui/shop_overlay.tscn" id="8_shop"]
 [ext_resource type="Script" path="res://scripts/systems/drag_manager.gd" id="9_drag"]
 
 [node name="Main" type="Node2D" unique_id=1198174103]
@@ -18,7 +17,6 @@ script = ExtResource("2_0wfyh")
 [node name="WaveManager" type="Node" parent="." unique_id=1826046686]
 script = ExtResource("6_tefeu")
 
-[node name="ShopOverlay" parent="." instance=ExtResource("8_shop")]
 
 [node name="DragManager" type="Node" parent="."]
 script = ExtResource("9_drag")
