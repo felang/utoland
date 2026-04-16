@@ -2,7 +2,7 @@ extends Node
 
 const VICTORY_DELAY: float = 1.0
 const WAVE_CLEANUP_DELAY: float = 2.0
-const SHOP_TRANSITION_DELAY: float = 1.0
+const WAVE_BREATHER_DELAY: float = 3.0  # 波次间呼吸期(原 SHOP_TRANSITION_DELAY)
 
 var total_waves: int = 0
 var current_wave: int = 0
@@ -55,7 +55,7 @@ func complete_wave() -> void:
 	attract_all_exp_orbs()
 	await get_tree().create_timer(WAVE_CLEANUP_DELAY).timeout
 	clear_all_enemies()
-	await get_tree().create_timer(SHOP_TRANSITION_DELAY).timeout
+	await get_tree().create_timer(WAVE_BREATHER_DELAY).timeout
 	EventBus.wave_transition_ready.emit()
 
 func attract_all_coins() -> void:
