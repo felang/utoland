@@ -109,6 +109,7 @@ func _on_restart() -> void:
 	PlayerProgression.reset()
 	InventoryManager.reset()
 	StatsTracker.reset()
+	PerkManager.reset()
 	SceneManager.go_to(Enums.Scene.CHARACTER_SELECTION)
 
 
@@ -117,4 +118,5 @@ func _on_menu() -> void:
 	PlayerProgression.reset()
 	InventoryManager.reset()
 	StatsTracker.reset()
+	PerkManager.reset()
 	SceneManager.go_to(Enums.Scene.START_MENU)

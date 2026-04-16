@@ -255,4 +255,5 @@ func _on_select_pressed() -> void:
 	PlayerProgression.reset()
 	InventoryManager.reset()
 	StatsTracker.reset()
+	PerkManager.reset()
 	SceneManager.go_to(Enums.Scene.MAP_SELECT)
