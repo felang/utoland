@@ -15,7 +15,7 @@ const PERK_FILES: Array[String] = [
 	"res://resources/perks/power.tres",
 	"res://resources/perks/rapid.tres",
 	"res://resources/perks/reach.tres",
-	"res://resources/perks/greed.tres",
+	# "res://resources/perks/greed.tres",  # 待 #5 敌人掉金币机制接入后取消注释
 	"res://resources/perks/study.tres",
 	"res://resources/perks/expansion.tres",
 ]
