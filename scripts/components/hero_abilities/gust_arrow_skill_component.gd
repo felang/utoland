@@ -88,7 +88,7 @@ func _spawn_arrow(dir: Vector2) -> void:
 		proj.add_child(bounce)
 
 	if proj.has_method("setup"):
-		proj.setup(null, _current_damage, _host, dir)
+		proj.setup(null, _current_damage, _host.global_position, dir)
 
 	var container: Node = SceneFactory.get_projectile_layer()
 	if container == null:
