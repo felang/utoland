@@ -1,0 +1,14 @@
+[gd_scene format=3 uid="uid://arrow_rain_effect"]
+
+[ext_resource type="Script" path="res://scripts/entities/effects/arrow_rain_effect.gd" id="1_arrowrain"]
+
+[node name="ArrowRainEffect" type="Node2D"]
+script = ExtResource("1_arrowrain")
+
+[node name="Area2D" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 2
+monitoring = true
+monitorable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
