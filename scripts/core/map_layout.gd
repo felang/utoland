@@ -57,7 +57,8 @@ func get_placeable_dict() -> Dictionary:
 		for x in range(grid_width):
 			var pos := Vector2i(x, y)
 			if is_placeable(pos):
-				dict[pos] = true
+				var full_pos := Vector2i(GameConfig.PLAYABLE_ORIGIN_X + x, GameConfig.PLAYABLE_ORIGIN_Y + y)
+				dict[full_pos] = true
 	return dict
 
 func get_spawn_points_world() -> Dictionary:

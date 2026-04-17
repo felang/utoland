@@ -94,7 +94,7 @@ func _can_place_fill(layout: MapLayout, pos: Vector2i, zone: ZoneData, blueprint
 		for wall_offset in zone.fixed_walls:
 			var wall_pos := zone.origin + wall_offset
 			var dist := absi(pos.x - wall_pos.x) + absi(pos.y - wall_pos.y)
-			if dist < zone.fill_margin:
+			if dist <= zone.fill_margin:
 				return false
 	return true
 

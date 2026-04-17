@@ -8,6 +8,7 @@ const SPAWN_MARKER_COLOR := Color("#cc3333")
 func render(layout: MapLayout, tilemap: TileMapLayer) -> void:
 	var tileset := _create_tileset()
 	tilemap.tile_set = tileset
+	tilemap.position = Vector2(-GameConfig.MAP_HALF_WIDTH, -GameConfig.MAP_HALF_HEIGHT)
 	for y in range(layout.grid_height):
 		for x in range(layout.grid_width):
 			var grid_pos := Vector2i(x, y)

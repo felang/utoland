@@ -74,9 +74,10 @@ func test_world_to_grid_roundtrip() -> void:
 func test_get_placeable_dict() -> void:
 	layout.set_cell(Vector2i(5, 5), MapLayout.CellType.OBSTACLE)
 	var dict := layout.get_placeable_dict()
-	assert_true(dict.has(Vector2i(10, 10)))
-	assert_false(dict.has(Vector2i(5, 5)))
-	assert_false(dict.has(Vector2i(19, 12)))
+	# 返回全地图坐标（加 PLAYABLE_ORIGIN 偏移），与 DragManager._world_to_grid 兼容
+	assert_true(dict.has(Vector2i(13, 13)))  # playable(10,10) → full(13,13)
+	assert_false(dict.has(Vector2i(8, 8)))   # playable(5,5) → full(8,8) is OBSTACLE
+	assert_false(dict.has(Vector2i(22, 15))) # playable(19,12) → full(22,15) is player spawn
 
 func test_get_spawn_points_world() -> void:
 	var world_points := layout.get_spawn_points_world()
