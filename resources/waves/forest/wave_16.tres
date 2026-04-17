@@ -27,6 +27,7 @@ spawn_phases = Array[ExtResource("2")]([SubResource("phase_1"), SubResource("pha
 enemy_weights = {
 "fast": 55,
 "normal": 35,
-"tank": 10
+"tank": 10,
+"tower_breaker": 12
 }
 elite_chance = 0.13
