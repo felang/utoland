@@ -57,6 +57,18 @@ func _test_tick(delta: float) -> void:
 func _test_is_ready() -> bool:
 	return _cooldown_timer <= 0.0
 
+## 公共 API：是否处于 ready 态（BattleHUD Task16 使用）
+func is_ready() -> bool:
+	return _cooldown_timer <= 0.0
+
+## 公共 API：剩余冷却时间（BattleHUD Task16 使用）
+func get_cooldown_remaining() -> float:
+	return max(0.0, _cooldown_timer)
+
+## 公共 API：完整冷却时间（BattleHUD Task16 使用）
+func get_cooldown_total() -> float:
+	return _current_cooldown
+
 func _find_nearest_enemy() -> Node2D:
 	if _host == null:
 		return null
