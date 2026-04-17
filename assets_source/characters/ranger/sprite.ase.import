@@ -1,0 +1,14 @@
+[remap]
+
+importer="aseprite_wizard.plugin.noop"
+type="PackedDataContainer"
+uid="uid://dmxe2cmfr7wrb"
+path="res://.godot/imported/sprite.ase-a0a1c8761f001e378627c65aff63e7d3.res"
+
+[deps]
+
+source_file="res://assets_source/characters/ranger/sprite.ase"
+dest_files=["res://.godot/imported/sprite.ase-a0a1c8761f001e378627c65aff63e7d3.res"]
+
+[params]
+
