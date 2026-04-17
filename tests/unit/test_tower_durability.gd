@@ -67,3 +67,23 @@ func test_health_component_heal_clamps():
 	tower.take_damage(10.0)
 	tower.health.heal(max_hp)
 	assert_almost_eq(tower.health.current_hp, max_hp, 0.01, "heal 不应超过 max_hp")
+
+func test_tower_heal_between_waves():
+	var tower = SceneFactory.create_tower(Enums.TowerId.PEA_SHOOTER)
+	test_scene.add_child(tower)
+	var max_hp: float = tower.health.max_hp
+	tower.take_damage(max_hp * 0.5)
+	var hp_before: float = tower.health.current_hp
+	var expected_heal: float = max_hp * 0.3
+	tower.heal(expected_heal)
+	assert_almost_eq(tower.health.current_hp, hp_before + expected_heal, 0.01,
+		"应恢复 30% max_hp")
+
+func test_tower_heal_does_not_exceed_max():
+	var tower = SceneFactory.create_tower(Enums.TowerId.PEA_SHOOTER)
+	test_scene.add_child(tower)
+	var max_hp: float = tower.health.max_hp
+	tower.take_damage(5.0)
+	tower.heal(max_hp)
+	assert_almost_eq(tower.health.current_hp, max_hp, 0.01,
+		"heal 不应超过 max_hp")

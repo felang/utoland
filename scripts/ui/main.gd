@@ -55,6 +55,8 @@ func _ready() -> void:
 	EventBus.wave_transition_ready.connect(_on_wave_transition_ready)
 	EventBus.coins_generated.connect(_on_coins_generated)
 	EventBus.wave_started.connect(_on_wave_started_warmup)
+	EventBus.tower_destroyed.connect(_on_tower_destroyed)
+	EventBus.wave_completed.connect(_on_wave_completed_heal_towers)
 
 	# HUD(顶部信息栏 — 现有的 HUD)
 	$HUD.set_battle_phase(true)
@@ -109,6 +111,16 @@ func _on_coins_generated(amount: int, _pos: Vector2) -> void:
 
 func _on_wave_started_warmup(_wave_num: int, wave_data: WaveData) -> void:
 	SceneFactory.warmup_for_wave(wave_data)
+
+func _on_tower_destroyed(_tower_type: String, _position: Vector2, deploy_id: int) -> void:
+	InventoryManager.remove_destroyed_tower(deploy_id)
+	_drag_manager.untrack_tower(deploy_id)
+
+func _on_wave_completed_heal_towers(_wave_number: int) -> void:
+	var towers: Array[Node] = get_tree().get_nodes_in_group(Enums.Group.TOWERS)
+	for tower in towers:
+		if tower.has_method("heal"):
+			tower.heal(tower.health.max_hp * 0.3)
 
 func _exit_tree() -> void:
 	SceneFactory.clear_all_pools()
