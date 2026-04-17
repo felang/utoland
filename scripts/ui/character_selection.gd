@@ -178,6 +178,33 @@ func _generate_portrait_list() -> void:
 		_portrait_list.add_child(panel)
 		_portrait_buttons[character_id] = panel
 
+	# 添加 5 个"敬请期待"占位卡（不可点击，灰色）
+	for i in range(5):
+		var placeholder_panel := PanelContainer.new()
+		placeholder_panel.custom_minimum_size = PORTRAIT_BUTTON_SIZE
+
+		var coming_soon_bg := ColorRect.new()
+		coming_soon_bg.color = Color(0.2, 0.2, 0.2, 0.8)
+		coming_soon_bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		coming_soon_bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+		var coming_soon_label := Label.new()
+		coming_soon_label.text = "敬请\n期待"
+		coming_soon_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		coming_soon_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		coming_soon_label.autowrap_mode = TextServer.AUTOWRAP_OFF
+		coming_soon_label.add_theme_font_size_override("font_size", 9)
+		coming_soon_label.add_theme_color_override("font_color", Color(0.5, 0.5, 0.5, 0.8))
+		coming_soon_label.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		coming_soon_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+		placeholder_panel.add_child(coming_soon_bg)
+		placeholder_panel.add_child(coming_soon_label)
+		placeholder_panel.modulate = Color(0.6, 0.6, 0.6, 0.7)
+		placeholder_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+		_portrait_list.add_child(placeholder_panel)
+
 
 func _load_portrait(path: String) -> Texture2D:
 	if path == "" or not ResourceLoader.exists(path):
@@ -245,10 +272,11 @@ func _color_stat(label: Label, value: float, baseline: float) -> void:
 func _on_select_pressed() -> void:
 	if _selected_id == "":
 		return
-	PlayerState.current_character = _selected_id
-	PlayerState.reset()
+	# 重置顺序：PlayerState → PlayerProgression → InventoryManager → StatsTracker → PerkManager
+	PlayerState.init_character(_selected_id)
 	PlayerProgression.reset()
 	InventoryManager.reset()
 	StatsTracker.reset()
 	PerkManager.reset()
+	PerkManager.refresh_pool_for_current_character()
 	SceneManager.go_to(Enums.Scene.MAP_SELECT)
