@@ -32,11 +32,6 @@ func _ready() -> void:
 	# 初始 HP 通过 _apply_level_growth 在 _ready 末尾设置，这里先用基础值初始化
 	health.initialize(base_hp)
 
-	# 应用待处理的治疗
-	if PlayerState.pending_heal > 0:
-		health.heal(PlayerState.pending_heal)
-		PlayerState.pending_heal = 0
-
 	# 同步金币
 	coins = InventoryManager.coins
 

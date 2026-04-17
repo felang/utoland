@@ -20,11 +20,7 @@ class Scene:
 
 # 角色 ID
 class Character:
-	const DORA = "dora"
-	const GORG = "gorg"
-	const KAZE = "kaze"
-	const MERLIN = "merlin"
-	const NEMO = "nemo"
+	const RANGER = "ranger"
 
 # 敌人类型
 class Enemy:

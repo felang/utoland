@@ -9,8 +9,8 @@ func before_each():
 	# Setup test scene
 	test_scene = Node2D.new()
 	add_child_autofree(test_scene)
-	# 重置被动系统
-	PlayerState.new_passive_id = ""
+	# 重置状态
+	PlayerState.reset()
 
 func test_tower_shoots_at_enemy():
 	# Test that tower can shoot bullets

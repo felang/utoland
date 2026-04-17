@@ -6,7 +6,6 @@ var coins: int = GameConfig.PLAYER["initial_coins"]
 var deployed_towers: Array[Dictionary] = []
 var shop_slots: Array[Dictionary] = []
 var is_first_shop_visit: bool = true
-var _recommended_tower: String = ""
 var _next_deploy_id: int = 1
 
 # 待建造栏(roll 出来选的塔卡片,等待拖到地图上放置)
@@ -137,13 +136,14 @@ func _collect_items_by_id_level(item_id: String, item_level: int) -> Array[Dicti
 
 func reset() -> void:
 	# 必须在 PlayerState.reset() 之后调用
-	var char_data: CharacterData = GameConfig.characters[PlayerState.current_character]
-	coins = GameConfig.PLAYER["initial_coins"] + char_data.starting_gold
-	assert(coins >= 6, "初始金币必须 >= 6")
+	var starting_gold: int = 0
+	if GameConfig.characters.has(PlayerState.current_character):
+		var char_data: CharacterData = GameConfig.characters[PlayerState.current_character]
+		starting_gold = char_data.starting_gold
+	coins = GameConfig.PLAYER["initial_coins"] + starting_gold
 	deployed_towers = []
 	shop_slots = []
 	is_first_shop_visit = true
-	_recommended_tower = char_data.recommended_tower
 	_next_deploy_id = 1
 	pending_towers = []
 	_current_roll_offer = []

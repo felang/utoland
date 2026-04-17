@@ -6,33 +6,18 @@ extends Resource
 @export var description: String = ""
 @export var max_hp: float = 100.0
 @export var speed: float = 100.0
-@export var damage_mult: float = 1.0
-@export var attack_speed_mult: float = 1.0
-## 初始资金（与 GameConfig.PLAYER["initial_coins"] 叠加）
 @export var starting_gold: int = 0
-## 初始武器 ID（开局自动装备，空字符串表示无）
-@export var starting_weapon: String = ""
-## 角色推荐武器 ID（商店首次访问保证出现）
-@export var recommended_weapon: String = ""
-## 角色推荐塔 ID（商店首次访问保证出现）
-@export var recommended_tower: String = ""
-## 旧被动技能类型（已弃用，保留兼容 .tres 文件）
-@export var passive_type: String = ""
-## 被动技能数值
-@export var passive_value: float = 0.0
-## 角色特色被动描述（展示用）
-@export var passive_description: String = ""
-## 新被动技能 ID（羁绊系统使用）
-@export var new_passive_id: String = ""
-## 新被动技能数值 1
-@export var new_passive_value: float = 0.0
-## 新被动技能数值 2
-@export var new_passive_value_2: float = 0.0
-## 被动进化数据（三阶进化系统，覆盖旧被动字段）
-@export var passive_evolution: PassiveEvolutionData = null
-## 精灵 SpriteFrames 资源路径（Aseprite Wizard 导出的 .res）
+
+## 精灵 SpriteFrames 资源路径
 @export var sprite_frames_path: String = ""
 ## 头像 PNG 路径
 @export var portrait_path: String = ""
-## 原始精灵像素尺寸，用于缩放计算
+## 原始精灵像素尺寸
 @export var sprite_pixel_size: float = 16.0
+
+## 专属经验曲线（null 时后备 GameConfig.exp_config）
+@export var exp_config: ExpConfig = null
+## 专属 perk 池
+@export var perk_pool: Array[PerkData] = []
+## 能力组件场景，按顺序挂到 Player $Abilities 下
+@export var ability_scenes: Array[PackedScene] = []

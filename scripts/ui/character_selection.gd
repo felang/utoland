@@ -7,14 +7,12 @@ const PORTRAIT_BUTTON_SIZE := Vector2(56, 56)
 const PORTRAIT_BORDER_WIDTH := 2
 const PORTRAIT_BORDER_RADIUS := 4
 
-const CHARACTER_ORDER: Array[String] = ["dora", "kaze", "nemo", "merlin", "gorg"]
-const UNLOCKED_CHARACTERS: Array[String] = ["dora"]
+const CHARACTER_ORDER: Array[String] = ["ranger"]
+const UNLOCKED_CHARACTERS: Array[String] = ["ranger"]
 
 const STAT_BASELINES := {
 	"max_hp": 100.0,
-	"speed": 200.0,
-	"damage_mult": 1.0,
-	"attack_speed_mult": 1.0,
+	"speed": 100.0,
 	"starting_gold": 0,
 }
 
@@ -46,9 +44,9 @@ func _ready() -> void:
 	_apply_styles()
 	_connect_buttons()
 	_generate_portrait_list()
-	# 默认选中 dora
-	if GameConfig.characters.has("dora"):
-		_select_character("dora")
+	# 默认选中第一个可用角色
+	if GameConfig.characters.has("ranger"):
+		_select_character("ranger")
 	elif GameConfig.characters.size() > 0:
 		_select_character(GameConfig.characters.keys()[0])
 
@@ -219,22 +217,20 @@ func _fill_detail_panel(character_id: String) -> void:
 	# 属性
 	_hp_value.text = "%d" % int(char_data.max_hp)
 	_speed_value.text = "%d" % int(char_data.speed)
-	_damage_value.text = "x%.1f" % char_data.damage_mult
-	_attack_speed_value.text = "x%.1f" % char_data.attack_speed_mult
+	_damage_value.text = "—"
+	_attack_speed_value.text = "—"
 	_starting_gold_value.text = "%d" % char_data.starting_gold
 
 	# 属性颜色
 	_color_stat(_hp_value, char_data.max_hp, STAT_BASELINES["max_hp"])
 	_color_stat(_speed_value, char_data.speed, STAT_BASELINES["speed"])
-	_color_stat(_damage_value, char_data.damage_mult, STAT_BASELINES["damage_mult"])
-	_color_stat(_attack_speed_value, char_data.attack_speed_mult, STAT_BASELINES["attack_speed_mult"])
 	_color_stat(_starting_gold_value, float(char_data.starting_gold), float(STAT_BASELINES["starting_gold"]))
 
-	# 被动技能
-	if char_data.passive_description != "":
-		_passive_desc.text = char_data.passive_description
+	# 技能描述（Task 15 改造为能力列表）
+	if char_data.description != "":
+		_passive_desc.text = char_data.description
 	else:
-		_passive_desc.text = "暂无被动技能"
+		_passive_desc.text = "暂无描述"
 
 
 func _color_stat(label: Label, value: float, baseline: float) -> void:
