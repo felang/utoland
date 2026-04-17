@@ -14,9 +14,9 @@ func before_each() -> void:
 func test_perk_manager_loads_all_perks() -> void:
 	# 验证 PerkManager 加载了所有 perk
 	assert_gt(PerkManager._all_perks.size(), 0, "应加载 perk 列表")
-	# 应该有 7 个 perk：vitality, swift, power, rapid, reach, study, expansion
-	# (greed 暂时移除，待 #5 敌人掉金币机制接入后恢复)
-	assert_eq(PerkManager._all_perks.size(), 7, "应有 7 个 perk")
+	# 应该有 6 个 perk：vitality, swift, power, rapid, reach, study
+	# (greed 暂时移除，待 #5 敌人掉金币机制接入后恢复；expansion 随人口系统移除)
+	assert_eq(PerkManager._all_perks.size(), 6, "应有 6 个 perk")
 
 func test_draw_three_returns_valid_perks() -> void:
 	# 验证 _draw_three() 返回 3 个不重复的 perk
@@ -49,28 +49,6 @@ func test_select_perk_applies_vitality_effect() -> void:
 	# 验证效果：hp_bonus_percent 应增加 0.1
 	var hp_bonus: float = PlayerState.player_stats.get(Enums.Stat.HP_BONUS_PERCENT, 0.0)
 	assert_almost_eq(hp_bonus, 0.1, 0.001, "HP bonus 应为 0.1（vitality 效果为 +10%%）")
-
-func test_select_perk_applies_expansion_effect() -> void:
-	# 直接测试 select_perk 对 expansion 的效果
-	var expansion_perk: PerkData = null
-	for p in PerkManager._all_perks:
-		if p.id == "expansion":
-			expansion_perk = p
-			break
-
-	assert_not_null(expansion_perk, "expansion perk 应存在")
-
-	var pre_cap: int = PlayerProgression.get_population_cap()
-
-	# 手动设置当前 offer 为只包含 expansion
-	PerkManager._current_offer = [expansion_perk]
-
-	# 选择 expansion
-	var success: bool = PerkManager.select_perk("expansion")
-	assert_true(success, "应成功选择 expansion")
-
-	var post_cap: int = PlayerProgression.get_population_cap()
-	assert_eq(post_cap, pre_cap + 1, "人口上限应增加 1（expansion 效果为 +1）")
 
 func test_select_perk_applies_study_effect() -> void:
 	# 直接测试 select_perk 对 study 的效果

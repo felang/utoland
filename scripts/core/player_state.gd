@@ -23,7 +23,6 @@ var player_stats: Dictionary = {
 	Enums.Stat.PICKUP_RADIUS_BONUS_PERCENT: 0.0,
 	Enums.Stat.COIN_DROP_BONUS_PERCENT: 0.0,
 	Enums.Stat.EXP_GAIN_BONUS_PERCENT: 0.0,
-	Enums.Stat.POPULATION_BONUS: 0,
 }
 
 func _ready() -> void:
@@ -53,5 +52,4 @@ func reset() -> void:
 		Enums.Stat.PICKUP_RADIUS_BONUS_PERCENT: 0.0,
 		Enums.Stat.COIN_DROP_BONUS_PERCENT: 0.0,
 		Enums.Stat.EXP_GAIN_BONUS_PERCENT: 0.0,
-		Enums.Stat.POPULATION_BONUS: 0,
 	}

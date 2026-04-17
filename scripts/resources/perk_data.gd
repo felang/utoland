@@ -10,7 +10,6 @@ enum EffectType {
 	PICKUP_RADIUS_PERCENT,
 	COIN_DROP_PERCENT,
 	EXP_GAIN_PERCENT,
-	POPULATION_FLAT,
 }
 
 @export var id: String = ""

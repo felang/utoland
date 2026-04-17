@@ -2,7 +2,7 @@ extends GutTest
 
 const PERK_IDS: Array[String] = [
 	"vitality", "swift", "power", "rapid",
-	"reach", "greed", "study", "expansion",
+	"reach", "greed", "study",
 ]
 
 func test_all_perk_files_load() -> void:
@@ -18,7 +18,3 @@ func test_vitality_effect() -> void:
 	assert_eq(perk.effect_type, PerkData.EffectType.HP_PERCENT)
 	assert_almost_eq(perk.effect_value, 0.1, 0.001)
 
-func test_expansion_effect() -> void:
-	var perk: PerkData = load("res://resources/perks/expansion.tres")
-	assert_eq(perk.effect_type, PerkData.EffectType.POPULATION_FLAT)
-	assert_almost_eq(perk.effect_value, 1.0, 0.001)

@@ -1,6 +1,6 @@
 extends GutTest
 ## 经济系统单元测试（原 GameData，已拆分为 InventoryManager/PlayerProgression/PlayerState）
-## 覆盖：初始状态、种群上限、部署/撤回、出售逻辑、经验系统、deploy_id、move_tower
+## 覆盖：初始状态、部署/撤回、出售逻辑、经验系统、deploy_id、move_tower
 
 func before_each() -> void:
 	PlayerState.reset()
@@ -19,23 +19,6 @@ func test_initial_state_after_reset() -> void:
 	assert_eq(InventoryManager.deployed_towers.size(), 0)
 	assert_eq(InventoryManager.shop_slots.size(), 0)
 	assert_true(InventoryManager.is_first_shop_visit)
-
-# ===== 种群上限 =====
-
-func test_get_population_cap_level1() -> void:
-	PlayerProgression.player_level = 1
-	# initial_population + (1-1) * 1 = 2
-	assert_eq(PlayerProgression.get_population_cap(), 2)
-
-func test_get_population_cap_level5() -> void:
-	PlayerProgression.player_level = 5
-	# initial_population + (5-1) * 1 = 6
-	assert_eq(PlayerProgression.get_population_cap(), 6)
-
-func test_get_population_cap_level10() -> void:
-	PlayerProgression.player_level = 10
-	# initial_population + (10-1) * 1 = 11
-	assert_eq(PlayerProgression.get_population_cap(), 11)
 
 # ===== buy_and_place_tower =====
 

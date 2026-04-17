@@ -17,7 +17,6 @@ const PERK_FILES: Array[String] = [
 	"res://resources/perks/reach.tres",
 	# "res://resources/perks/greed.tres",  # 待 #5 敌人掉金币机制接入后取消注释
 	"res://resources/perks/study.tres",
-	"res://resources/perks/expansion.tres",
 ]
 
 var _all_perks: Array = []           # Array[PerkData]
@@ -87,9 +86,6 @@ func _apply_effect(perk: PerkData) -> void:
 			_add(Enums.Stat.COIN_DROP_BONUS_PERCENT, perk.effect_value)
 		PerkData.EffectType.EXP_GAIN_PERCENT:
 			_add(Enums.Stat.EXP_GAIN_BONUS_PERCENT, perk.effect_value)
-		PerkData.EffectType.POPULATION_FLAT:
-			var cur: int = PlayerState.player_stats.get(Enums.Stat.POPULATION_BONUS, 0)
-			PlayerState.player_stats[Enums.Stat.POPULATION_BONUS] = cur + int(perk.effect_value)
 		_:
 			push_warning("未知 perk effect_type: " + str(perk.effect_type))
 

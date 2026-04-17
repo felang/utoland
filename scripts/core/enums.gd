@@ -59,7 +59,6 @@ class Stat:
 	const PICKUP_RADIUS_BONUS_PERCENT = "pickup_radius_bonus_percent"
 	const COIN_DROP_BONUS_PERCENT = "coin_drop_bonus_percent"
 	const EXP_GAIN_BONUS_PERCENT = "exp_gain_bonus_percent"
-	const POPULATION_BONUS = "population_bonus"
 
 # 动画名
 class Anim:
