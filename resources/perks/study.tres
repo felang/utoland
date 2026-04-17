@@ -10,3 +10,5 @@ description = "经验获取 +10%"
 icon_path = ""
 effect_type = 6
 effect_value = 0.1
+max_level = 5
+category = 0

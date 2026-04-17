@@ -10,3 +10,5 @@ description = "拾取范围 +30%"
 icon_path = ""
 effect_type = 4
 effect_value = 0.3
+max_level = 5
+category = 0

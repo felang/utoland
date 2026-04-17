@@ -10,3 +10,5 @@ description = "移速 +10%"
 icon_path = ""
 effect_type = 1
 effect_value = 0.1
+max_level = 5
+category = 0

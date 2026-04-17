@@ -10,3 +10,5 @@ description = "武器攻速 +10%"
 icon_path = ""
 effect_type = 3
 effect_value = 0.1
+max_level = 5
+category = 0

@@ -10,3 +10,5 @@ description = "最大生命 +10%"
 icon_path = ""
 effect_type = 0
 effect_value = 0.1
+max_level = 5
+category = 0

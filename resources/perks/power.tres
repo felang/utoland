@@ -10,3 +10,5 @@ description = "武器伤害 +10%"
 icon_path = ""
 effect_type = 2
 effect_value = 0.1
+max_level = 5
+category = 0

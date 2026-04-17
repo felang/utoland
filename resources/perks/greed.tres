@@ -10,3 +10,5 @@ description = "金币掉落 +10%"
 icon_path = ""
 effect_type = 5
 effect_value = 0.1
+max_level = 5
+category = 0
