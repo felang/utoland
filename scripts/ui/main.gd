@@ -36,8 +36,6 @@ func _ready() -> void:
 	_battle_hud = BATTLE_HUD_SCENE.instantiate()
 	add_child(_battle_hud)
 	_battle_hud.set_drag_manager(_drag_manager)
-	if _player.has_node("WeaponManager"):
-		_battle_hud.weapon_manager = _player.get_node("WeaponManager")
 
 	# Perk 选择弹窗(常驻,视实时升级而显示)
 	_perk_overlay = PERK_OVERLAY_SCENE.instantiate()

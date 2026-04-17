@@ -11,8 +11,6 @@ var pending_heal: int = 0
 # 角色属性（从 CharacterData 初始化）
 var character_max_hp: float = 0.0
 var character_speed: float = 0.0
-var character_damage_mult: float = 1.0
-var character_attack_speed_mult: float = 1.0
 
 # 被动系统
 var new_passive_id: String = ""
@@ -22,9 +20,6 @@ var new_passive_value_2: float = 0.0
 # 运行时属性集
 var player_stats: Dictionary = {
 	Enums.Stat.MAX_HP: 100.0,
-	Enums.Stat.HP_MULT: 1.0,
-	Enums.Stat.DAMAGE_MULT: 1.0,
-	Enums.Stat.ATTACK_SPEED_MULT: 1.0,
 	Enums.Stat.TOWER_MULT: 1.0,
 	# Perk bonus(战斗中累加,reset 重置)
 	Enums.Stat.HP_BONUS_PERCENT: 0.0,
@@ -48,8 +43,6 @@ func init_character(character_id: String) -> void:
 	var char_data: CharacterData = GameConfig.characters[character_id]
 	character_max_hp = char_data.max_hp
 	character_speed = char_data.speed
-	character_damage_mult = char_data.damage_mult
-	character_attack_speed_mult = char_data.attack_speed_mult
 	new_passive_id = char_data.new_passive_id
 	new_passive_value = char_data.new_passive_value
 	new_passive_value_2 = char_data.new_passive_value_2
@@ -61,9 +54,6 @@ func reset() -> void:
 	pending_heal = 0
 	player_stats = {
 		Enums.Stat.MAX_HP: character_max_hp,
-		Enums.Stat.HP_MULT: 1.0,
-		Enums.Stat.DAMAGE_MULT: character_damage_mult,
-		Enums.Stat.ATTACK_SPEED_MULT: character_attack_speed_mult,
 		Enums.Stat.TOWER_MULT: 1.0,
 		Enums.Stat.HP_BONUS_PERCENT: 0.0,
 		Enums.Stat.MOVE_SPEED_BONUS_PERCENT: 0.0,

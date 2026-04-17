@@ -28,7 +28,6 @@ func _ready() -> void:
 	_add_stat_row(stats_grid, "击杀总数", str(StatsTracker.total_kills))
 	_add_stat_row(stats_grid, "获取金币", str(StatsTracker.total_coins_earned))
 	_add_stat_row(stats_grid, "获取经验", str(PlayerProgression.total_exp_earned))
-	_add_stat_row(stats_grid, "拥有武器", str(InventoryManager.deployed_weapons.size()))
 	_add_stat_row(stats_grid, "拥有塔", str(InventoryManager.deployed_towers.size()))
 	_add_stat_row(stats_grid, "受到伤害", str(int(StatsTracker.total_damage_taken)))
 	_add_stat_row(stats_grid, "最高连杀", str(StatsTracker.max_kill_streak))
@@ -38,24 +37,14 @@ func _ready() -> void:
 	items_panel.add_theme_stylebox_override("panel", UIConstants.create_panel_stylebox())
 	var items_flow: HFlowContainer = vbox.get_node("ItemsPanel/ItemsFlow")
 	var has_items := false
-	# 显示已上阵武器和塔
-	var all_items: Array[Dictionary] = []
-	for item in InventoryManager.deployed_weapons:
-		all_items.append({id = item.id, type = "weapon", level = item.level})
+	# 显示已上阵塔
 	for item in InventoryManager.deployed_towers:
-		all_items.append({id = item.id, type = "tower", level = item.level})
-	for item in all_items:
 		has_items = true
 		var item_id: String = item.id
 		var level: int = item.level
-		if item.type == "weapon":
-			var wdata: WeaponData = GameConfig.weapons.get(item_id)
-			var text: String = (wdata.display_name if wdata else item_id) + " Lv%d" % level
-			_add_pill(items_flow, text)
-		else:
-			var tdata: TowerData = GameConfig.towers.get(item_id)
-			var text: String = (tdata.display_name if tdata else item_id) + " Lv%d" % level
-			_add_pill(items_flow, text)
+		var tdata: TowerData = GameConfig.towers.get(item_id)
+		var text: String = (tdata.display_name if tdata else item_id) + " Lv%d" % level
+		_add_pill(items_flow, text)
 	if not has_items:
 		var label := Label.new()
 		label.text = "无"

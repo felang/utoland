@@ -1,42 +1,7 @@
 extends GutTest
 
 # Resource 加载测试
-# 验证 GameConfig 从 .tres 文件正确加载资源并构建向后兼容字典
-
-
-# ===== 武器资源加载 =====
-
-func test_weapons_loaded_count() -> void:
-	assert_eq(GameConfig.weapons.size(), 3, "应加载 3 种武器")
-
-func test_weapon_bow_resource() -> void:
-	assert_true(GameConfig.weapons.has(Enums.WeaponId.BOW), "应包含 bow")
-	var w: WeaponData = GameConfig.weapons[Enums.WeaponId.BOW]
-	assert_eq(w.id, Enums.WeaponId.BOW)
-	assert_eq(w.display_name, "弓")
-	assert_not_null(w.projectile_data, "弓应为远程模式（有 projectile_data）")
-	assert_not_null(w.attack_config, "弓应有 attack_config")
-	assert_almost_eq(w.attack_config.fire_rate_per_level[0], 0.5, 0.001)
-	assert_almost_eq(w.attack_config.damage_per_level[0], 8.0, 0.001)
-	assert_almost_eq(w.attack_config.attack_range_per_level[0], 200.0, 0.001)
-	assert_eq(w.projectile_data.speed, 600.0)
-
-func test_weapon_shuriken_resource() -> void:
-	assert_true(GameConfig.weapons.has(Enums.WeaponId.SHURIKEN), "应包含 shuriken")
-	var w: WeaponData = GameConfig.weapons[Enums.WeaponId.SHURIKEN]
-	assert_not_null(w.projectile_data, "手里剑应为远程模式（有 projectile_data）")
-	assert_not_null(w.attack_config, "手里剑应有 attack_config")
-	assert_almost_eq(w.attack_config.fire_rate_per_level[0], 0.8, 0.001)
-	assert_almost_eq(w.attack_config.damage_per_level[0], 15.0, 0.001)
-	assert_eq(w.projectile_data.speed, 350.0)
-
-func test_weapon_sword_resource() -> void:
-	assert_true(GameConfig.weapons.has(Enums.WeaponId.SWORD), "应包含 sword")
-	var w: WeaponData = GameConfig.weapons[Enums.WeaponId.SWORD]
-	assert_not_null(w.melee_config, "剑应为近战模式（有 melee_config）")
-	assert_null(w.projectile_data, "剑不应有 projectile_data")
-	assert_not_null(w.attack_config, "剑应有 attack_config")
-	assert_almost_eq(w.attack_config.damage_per_level[0], 20.0, 0.001)
+# 验证 GameConfig 从 .tres 文件正确加载资源并构建字典
 
 
 # ===== 敌人资源加载 =====
@@ -117,28 +82,6 @@ func test_character_dora_resource() -> void:
 	assert_eq(c.display_name, "朵拉")
 	assert_eq(c.max_hp, 100.0)
 	assert_eq(c.speed, 200.0)
-	assert_eq(c.damage_mult, 1.0)
-	assert_eq(c.recommended_weapon, Enums.WeaponId.BOW)
-
-func test_character_gorg_resource() -> void:
-	var c: CharacterData = GameConfig.characters[Enums.Character.GORG]
-	assert_eq(c.display_name, "格格")
-	assert_eq(c.recommended_weapon, Enums.WeaponId.SWORD)
-
-func test_character_kaze_resource() -> void:
-	var c: CharacterData = GameConfig.characters[Enums.Character.KAZE]
-	assert_eq(c.display_name, "风")
-	assert_eq(c.recommended_weapon, Enums.WeaponId.BOW)
-
-func test_character_merlin_resource() -> void:
-	var c: CharacterData = GameConfig.characters[Enums.Character.MERLIN]
-	assert_eq(c.display_name, "梅林")
-	assert_eq(c.recommended_weapon, Enums.WeaponId.SHURIKEN)
-
-func test_character_nemo_resource() -> void:
-	var c: CharacterData = GameConfig.characters[Enums.Character.NEMO]
-	assert_eq(c.display_name, "尼莫")
-	assert_eq(c.recommended_weapon, Enums.WeaponId.SHURIKEN)
 
 func test_character_has_sprite_frames_path() -> void:
 	var c: CharacterData = GameConfig.characters[Enums.Character.DORA]
@@ -184,18 +127,6 @@ func test_boss_brute_is_boss():
 func test_normal_enemy_not_boss():
 	var ed: EnemyData = GameConfig.enemies[Enums.Enemy.NORMAL]
 	assert_false(ed.is_boss, "normal 不应标记为 is_boss")
-
-
-func test_weapon_has_attack_config():
-	var bow: WeaponData = GameConfig.weapons[Enums.WeaponId.BOW]
-	assert_not_null(bow.attack_config, "bow 应有 attack_config")
-	assert_not_null(bow.projectile_data, "bow 应为远程（有 projectile_data）")
-	var shuriken: WeaponData = GameConfig.weapons[Enums.WeaponId.SHURIKEN]
-	assert_not_null(shuriken.attack_config, "shuriken 应有 attack_config")
-	assert_not_null(shuriken.projectile_data, "shuriken 应为远程（有 projectile_data）")
-	var sword: WeaponData = GameConfig.weapons[Enums.WeaponId.SWORD]
-	assert_not_null(sword.attack_config, "sword 应有 attack_config")
-	assert_not_null(sword.melee_config, "sword 应为近战（有 melee_config）")
 
 
 func test_player_const_unchanged() -> void:

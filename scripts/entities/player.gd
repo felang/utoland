@@ -19,14 +19,13 @@ var _base_max_hp: float = 0.0
 var _base_speed: float = 0.0
 
 @onready var health: HealthComponent = $HealthComponent
-@onready var _weapon_manager: WeaponManager = $WeaponManager
 @onready var _sprite_animator: SpriteAnimator = $SpriteAnimator
 
 func _ready() -> void:
 	add_to_group(Enums.Group.PLAYER)
 
 	# 初始化基础值（不含 perk，perk 在 _apply_level_growth 中统一应用）
-	var base_hp: float = PlayerState.player_stats[Enums.Stat.MAX_HP] * PlayerState.player_stats[Enums.Stat.HP_MULT]
+	var base_hp: float = PlayerState.player_stats[Enums.Stat.MAX_HP]
 	_base_max_hp = base_hp
 	_base_speed = PlayerState.character_speed
 	speed = _base_speed
@@ -37,13 +36,6 @@ func _ready() -> void:
 	if PlayerState.pending_heal > 0:
 		health.heal(PlayerState.pending_heal)
 		PlayerState.pending_heal = 0
-
-	# 初始化武器系统（从 deployed_weapons 注入等级）
-	_weapon_manager.initialize(InventoryManager.deployed_weapons)
-	# 注入动态伤害倍率回调（swift_combo / blood_rage 等每帧变化的被动）
-	_weapon_manager.set_dynamic_damage_mult_getter(_get_dynamic_damage_mult)
-	# 连接武器命中信号，用于更新连击状态
-	_weapon_manager.weapon_attack_executed.connect(_on_weapon_attack_executed)
 
 	# 同步金币
 	coins = InventoryManager.coins
@@ -57,9 +49,6 @@ func _ready() -> void:
 	var sprite_frames: SpriteFrames = load(char_data.sprite_frames_path)
 	_sprite_animator.setup_from_sprite_frames(sprite_frames, char_data.sprite_pixel_size, GameConfig.ENTITY_SIZE_STANDARD)
 
-	# 新被动技能初始化
-	_init_passives()
-
 	# 连接升级信号并应用当前等级成长
 	EventBus.player_level_changed.connect(_on_level_up)
 	_apply_level_growth(PlayerProgression.player_level)
@@ -69,19 +58,10 @@ func _process(delta: float) -> void:
 	if invincible_timer > 0:
 		invincible_timer -= delta
 
-	# 武器视觉更新（轨道旋转、精灵朝向）
-	_weapon_manager.tick_visual(delta)
-
-	# 被动技能更新
-	_process_passives(delta)
-
 func set_input_enabled(enabled: bool) -> void:
 	_input_enabled = enabled
 
-func _physics_process(delta: float) -> void:
-	# 武器攻击判定（与物理检测同步，确保 get_overlapping_bodies 数据是当前帧的）
-	_weapon_manager.tick_combat(delta)
-
+func _physics_process(_delta: float) -> void:
 	if not _input_enabled:
 		velocity = Vector2.ZERO
 		move_and_slide()
@@ -136,8 +116,6 @@ func add_exp(amount: int) -> void:
 
 func _on_level_up(new_level: int) -> void:
 	_apply_level_growth(new_level)
-	_apply_passive_tier(new_level)
-	_weapon_manager.refresh_passive_multipliers()
 
 func _apply_level_growth(level: int) -> void:
 	var levels_gained: int = level - 1  # Lv1 = 0 次成长（但仍跑函数以应用 perk）
@@ -176,109 +154,6 @@ func _start_invincible_blink() -> void:
 		_blink_tween.tween_property(self, "modulate:a", fx.invincible_blink_alpha_low, fx.invincible_blink_interval)
 		_blink_tween.tween_property(self, "modulate:a", fx.invincible_blink_alpha_high, fx.invincible_blink_interval)
 	_blink_tween.tween_property(self, "modulate:a", 1.0, BLINK_RESET_DURATION)
-
-# ===== 新被动系统 =====
-
-## 疾风连击（Kaze）— 连续攻击同一目标叠加伤害
-var _combo_target: Node2D = null
-var _combo_stacks: int = 0
-const _COMBO_MAX_STACKS: int = 6  # max_mult = value_2 / value = 0.3/0.05 = 6
-
-## 坚壁回馈（Dora）— 每 5 秒回复 2% 最大 HP
-var _fortify_regen_timer: float = 0.0
-const _FORTIFY_REGEN_INTERVAL: float = 5.0
-
-# 被动进化系统
-var _passive_evolution: PassiveEvolutionData = null
-var _current_passive_tier: Dictionary = {}
-var _kill_heal_amount: float = 0.0
-
-func _init_passives() -> void:
-	var char_data: CharacterData = GameConfig.characters[PlayerState.current_character]
-	if char_data.passive_evolution:
-		_passive_evolution = char_data.passive_evolution
-		_apply_passive_tier(PlayerProgression.player_level)
-	else:
-		# 旧系统回退路径（Kaze/Nemo/Gorg/Merlin 暂用）
-		match PlayerState.new_passive_id:
-			"swift_combo":
-				_combo_target = null
-				_combo_stacks = 0
-			"fortify_regen":
-				_fortify_regen_timer = 0.0
-
-func _apply_passive_tier(level: int) -> void:
-	if not _passive_evolution:
-		return
-	_current_passive_tier = _passive_evolution.get_tier_for_level(level)
-	# 写入 player_stats 供 WeaponManager 读取
-	PlayerState.player_stats[Enums.Stat.MELEE_DAMAGE_MULT] = _current_passive_tier.get("melee_damage_mult", 1.0)
-	PlayerState.player_stats[Enums.Stat.MELEE_ATTACK_SPEED_MULT] = _current_passive_tier.get("melee_attack_speed_mult", 1.0)
-	# 击杀回血
-	_kill_heal_amount = _current_passive_tier.get("kill_heal", 0.0)
-	if _kill_heal_amount > 0.0 and not EventBus.enemy_killed.is_connected(_on_enemy_killed_heal):
-		EventBus.enemy_killed.connect(_on_enemy_killed_heal)
-	elif _kill_heal_amount <= 0.0 and EventBus.enemy_killed.is_connected(_on_enemy_killed_heal):
-		EventBus.enemy_killed.disconnect(_on_enemy_killed_heal)
-
-func _on_enemy_killed_heal(_enemy_type: String, _pos: Vector2, _is_elite: bool) -> void:
-	if _kill_heal_amount > 0.0:
-		health.heal(_kill_heal_amount)
-
-func _process_passives(delta: float) -> void:
-	if PlayerState.new_passive_id == "fortify_regen":
-		_fortify_regen_timer += delta
-		if _fortify_regen_timer >= _FORTIFY_REGEN_INTERVAL:
-			_fortify_regen_timer -= _FORTIFY_REGEN_INTERVAL
-			var heal_pct: float = PlayerState.new_passive_value  # 0.02
-			# 坚壁回馈：≥3 个 fortify 标签单位存活时治疗翻倍
-			var fortify_count: int = _count_fortify_units()
-			if fortify_count >= int(PlayerState.new_passive_value_2):
-				heal_pct *= 2.0
-			health.heal(health.max_hp * heal_pct)
-
-## 武器命中回调（由 WeaponManager.weapon_attack_executed 信号触发）
-func _on_weapon_attack_executed(target: Node2D) -> void:
-	update_combo_target(target)
-
-## 返回动态伤害倍率（注入 WeaponManager，每帧查询）
-## 合并 swift_combo 连击倍率与 blood_rage 血怒倍率
-func _get_dynamic_damage_mult() -> float:
-	var mult: float = 1.0
-	match PlayerState.new_passive_id:
-		"swift_combo":
-			mult *= get_combo_damage_mult()
-		"blood_rage":
-			mult *= get_blood_rage_mult()
-	return mult
-
-## 获取连击伤害倍率
-func get_combo_damage_mult() -> float:
-	if PlayerState.new_passive_id != "swift_combo":
-		return 1.0
-	return 1.0 + (_combo_stacks * PlayerState.new_passive_value)
-
-## 更新连击目标（武器命中时调用）
-func update_combo_target(target: Node2D) -> void:
-	if PlayerState.new_passive_id != "swift_combo":
-		return
-	if target == _combo_target:
-		_combo_stacks = mini(_combo_stacks + 1, _COMBO_MAX_STACKS)
-	else:
-		_combo_target = target
-		_combo_stacks = 0
-
-## 统计上场塔数量
-func _count_fortify_units() -> int:
-	return get_tree().get_nodes_in_group(Enums.Group.TOWERS).size()
-
-## 获取血怒伤害倍率（Gorg）— 供武器/塔查询 AOE 伤害加成
-func get_blood_rage_mult() -> float:
-	if PlayerState.new_passive_id != "blood_rage":
-		return 1.0
-	var hp_pct: float = health.current_hp / health.max_hp
-	var lost_pct: float = 1.0 - hp_pct
-	return 1.0 + minf(lost_pct / 0.1 * PlayerState.new_passive_value, PlayerState.new_passive_value_2)
 
 func _on_perk_applied(_perk_id: String) -> void:
 	# 重新跑 level growth,会读最新 perk bonus

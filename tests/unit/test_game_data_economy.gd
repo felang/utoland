@@ -8,7 +8,6 @@ func before_each() -> void:
 	InventoryManager.reset()
 	StatsTracker.reset()
 	# 清空部署状态，确保每个测试从干净状态开始
-	InventoryManager.deployed_weapons = []
 	InventoryManager.deployed_towers = []
 	PlayerProgression.player_level = 1
 	InventoryManager.coins = GameConfig.PLAYER["initial_coins"]
@@ -17,7 +16,6 @@ func before_each() -> void:
 
 func test_initial_state_after_reset() -> void:
 	assert_eq(PlayerProgression.player_level, 1)
-	assert_eq(InventoryManager.deployed_weapons.size(), 0)
 	assert_eq(InventoryManager.deployed_towers.size(), 0)
 	assert_eq(InventoryManager.shop_slots.size(), 0)
 	assert_true(InventoryManager.is_first_shop_visit)
@@ -38,60 +36,6 @@ func test_get_population_cap_level10() -> void:
 	PlayerProgression.player_level = 10
 	# initial_population + (10-1) * 1 = 11
 	assert_eq(PlayerProgression.get_population_cap(), 11)
-
-# ===== 种群已用 =====
-
-func test_get_population_used_empty() -> void:
-	assert_eq(InventoryManager.get_population_used(), 0)
-
-func test_get_population_used_with_deployed() -> void:
-	InventoryManager.deployed_weapons.append({id = "bow", level = 1})
-	InventoryManager.deployed_towers.append({id = "pea_shooter", level = 1, grid_pos = Vector2i(0, 0)})
-	assert_eq(InventoryManager.get_population_used(), 2)
-
-# ===== can_deploy =====
-
-func test_can_deploy_when_under_cap() -> void:
-	PlayerProgression.player_level = 1
-	# cap=2, used=0
-	assert_true(InventoryManager.can_deploy())
-
-func test_can_deploy_when_at_cap() -> void:
-	PlayerProgression.player_level = 1
-	# cap=2, fill with 2 deployed
-	InventoryManager.deployed_weapons.append({id = "bow", level = 1})
-	InventoryManager.deployed_towers.append({id = "pea_shooter", level = 1, grid_pos = Vector2i(0, 0)})
-	assert_false(InventoryManager.can_deploy())
-
-# ===== buy_and_equip_weapon =====
-
-func test_buy_and_equip_weapon_success() -> void:
-	PlayerProgression.player_level = 2
-	InventoryManager.coins = 50
-	var result: bool = InventoryManager.buy_and_equip_weapon("bow", 3)
-	assert_true(result)
-	assert_eq(InventoryManager.deployed_weapons.size(), 1)
-	assert_eq(InventoryManager.deployed_weapons[0].id, "bow")
-	assert_eq(InventoryManager.deployed_weapons[0].level, 1)
-	assert_eq(InventoryManager.coins, 47)
-
-func test_buy_and_equip_weapon_fails_when_population_full() -> void:
-	PlayerProgression.player_level = 1
-	# 填满种群上限（cap=2）
-	InventoryManager.deployed_weapons.append({id = "bow", level = 1})
-	InventoryManager.deployed_towers.append({id = "pea_shooter", level = 1, grid_pos = Vector2i(0, 0)})
-	InventoryManager.coins = 50
-	var result: bool = InventoryManager.buy_and_equip_weapon("bow", 3)
-	assert_false(result)
-	assert_eq(InventoryManager.deployed_weapons.size(), 1)
-	assert_eq(InventoryManager.coins, 50)
-
-func test_buy_and_equip_weapon_fails_insufficient_coins() -> void:
-	PlayerProgression.player_level = 2
-	InventoryManager.coins = 1
-	var result: bool = InventoryManager.buy_and_equip_weapon("bow", 3)
-	assert_false(result)
-	assert_eq(InventoryManager.deployed_weapons.size(), 0)
 
 # ===== buy_and_place_tower =====
 
@@ -121,14 +65,6 @@ func test_buy_and_place_tower_increments_deploy_id() -> void:
 	assert_ne(id1, id2)
 	assert_gt(id2, id1)
 
-func test_buy_and_place_tower_fails_population_full() -> void:
-	PlayerProgression.player_level = 1
-	InventoryManager.deployed_weapons.append({id = "bow", level = 1})
-	InventoryManager.deployed_towers.append({id = "pea_shooter", level = 1, grid_pos = Vector2i(0, 0)})
-	InventoryManager.coins = 50
-	var deploy_id: int = InventoryManager.buy_and_place_tower("ice_flower", 3, Vector2i(5, 5))
-	assert_eq(deploy_id, 0)
-
 func test_buy_and_place_tower_fails_insufficient_coins() -> void:
 	PlayerProgression.player_level = 2
 	InventoryManager.coins = 1
@@ -141,7 +77,6 @@ func test_reset_clears_deploy_id_counter() -> void:
 	InventoryManager.buy_and_place_tower("pea_shooter", 3, Vector2i(5, 5))
 	InventoryManager.reset()
 	PlayerProgression.player_level = 2
-	InventoryManager.deployed_weapons = []
 	InventoryManager.deployed_towers = []
 	InventoryManager.coins = 100
 	var deploy_id: int = InventoryManager.buy_and_place_tower("pea_shooter", 3, Vector2i(5, 5))
@@ -203,33 +138,6 @@ func test_add_exp_emits_exp_changed() -> void:
 	assert_eq(exp_events[0][0], 10)
 	for conn in EventBus.exp_changed.get_connections():
 		EventBus.exp_changed.disconnect(conn["callable"])
-
-# ===== sell_from_deployed_weapon =====
-
-func test_sell_from_deployed_weapon() -> void:
-	# bow lv1 sell_price = 3, with 70% return ratio: int(round(3 * 0.7)) = 2
-	InventoryManager.deployed_weapons.append({id = "bow", level = 1})
-	var initial_coins: int = InventoryManager.coins
-	var refund: int = InventoryManager.sell_from_deployed_weapon(0)
-	var expected: int = int(round(3 * GameConfig.shop_config.sell_return_ratio))
-	assert_eq(refund, expected)
-	assert_eq(InventoryManager.coins, initial_coins + expected)
-	assert_eq(InventoryManager.deployed_weapons.size(), 0)
-
-func test_sell_from_deployed_weapon_lv2() -> void:
-	# bow lv2 sell_price = 7, with 70% return ratio: int(round(7 * 0.7)) = 5
-	InventoryManager.deployed_weapons.append({id = "bow", level = 2})
-	var initial_coins: int = InventoryManager.coins
-	var refund: int = InventoryManager.sell_from_deployed_weapon(0)
-	var expected: int = int(round(7 * GameConfig.shop_config.sell_return_ratio))
-	assert_eq(refund, expected)
-	assert_eq(InventoryManager.coins, initial_coins + expected)
-
-func test_sell_from_deployed_weapon_invalid_index() -> void:
-	var initial_coins: int = InventoryManager.coins
-	var refund: int = InventoryManager.sell_from_deployed_weapon(0)
-	assert_eq(refund, 0)
-	assert_eq(InventoryManager.coins, initial_coins)
 
 # ===== sell_from_deployed_tower =====
 

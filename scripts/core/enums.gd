@@ -26,12 +26,6 @@ class Character:
 	const MERLIN = "merlin"
 	const NEMO = "nemo"
 
-# 武器 ID
-class WeaponId:
-	const BOW = "bow"
-	const SHURIKEN = "shuriken"
-	const SWORD = "sword"
-
 # 敌人类型
 class Enemy:
 	const NORMAL = "normal"
@@ -60,12 +54,7 @@ class Map:
 # 玩家属性 key
 class Stat:
 	const MAX_HP = "max_hp"
-	const HP_MULT = "hp_mult"
-	const DAMAGE_MULT = "damage_mult"
-	const ATTACK_SPEED_MULT = "attack_speed_mult"
 	const TOWER_MULT = "tower_mult"
-	const MELEE_DAMAGE_MULT = "MELEE_DAMAGE_MULT"
-	const MELEE_ATTACK_SPEED_MULT = "MELEE_ATTACK_SPEED_MULT"
 	# Perk bonus(战斗中 3 选 1 累加)
 	const HP_BONUS_PERCENT = "hp_bonus_percent"
 	const MOVE_SPEED_BONUS_PERCENT = "move_speed_bonus_percent"

@@ -4,7 +4,6 @@
 [ext_resource type="Script" uid="uid://el0rtsjwhuhc" path="res://scripts/systems/camera_shake.gd" id="2_shake"]
 [ext_resource type="Script" uid="uid://dhkti1lxuee1t" path="res://scripts/components/health_component.gd" id="3_health"]
 [ext_resource type="Script" uid="uid://ct4p4yj54jqds" path="res://scripts/components/sprite_animator.gd" id="5_sprite"]
-[ext_resource type="Script" uid="uid://bf70rjdekxu1k" path="res://scripts/entities/weapons/weapon_manager.gd" id="6_wmanager"]
 [ext_resource type="Script" uid="uid://ddn6hix1oc36n" path="res://scripts/components/hurtbox.gd" id="7_hurtbox"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_body"]
@@ -36,9 +35,6 @@ script = ExtResource("3_health")
 
 [node name="SpriteAnimator" type="Node" parent="." unique_id=1576584886]
 script = ExtResource("5_sprite")
-
-[node name="WeaponManager" type="Node2D" parent="." unique_id=1672782666]
-script = ExtResource("6_wmanager")
 
 [node name="Hurtbox" type="Area2D" parent="." unique_id=716001015]
 collision_layer = 64

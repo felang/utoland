@@ -22,17 +22,3 @@ func test_bullet_projectile_creates_trail():
 	# TrailComponent 是投射物的子节点，其内部 Line2D 挂在 TrailComponent 下
 	var trail_comp = bullet.get_node_or_null("TrailComponent")
 	assert_not_null(trail_comp, "箭矢投射物应有 TrailComponent 子节点")
-
-func test_shuriken_projectile_rotates():
-	var shuriken_pd: ProjectileData = GameConfig.weapons[Enums.WeaponId.SHURIKEN].projectile_data
-	var shuriken: Node2D = SceneFactory.create_projectile(shuriken_pd, 10.0, Vector2.ZERO, Vector2.RIGHT)
-	add_child_autoqfree(shuriken)
-	# RotationComponent 旋转的是 _PooledSprite 精灵，而非根节点
-	var rot_comp = shuriken.get_node_or_null("RotationComponent")
-	assert_not_null(rot_comp, "手里剑投射物应有 RotationComponent 子节点")
-	var sprite = shuriken.get_node_or_null("_PooledSprite")
-	var initial_rotation: float = sprite.rotation if sprite else 0.0
-	await get_tree().create_timer(0.1).timeout
-	if sprite:
-		assert_ne(sprite.rotation, initial_rotation, "手里剑精灵应持续旋转")
-

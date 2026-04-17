@@ -10,7 +10,6 @@ func before_each() -> void:
 	StatsTracker.reset()
 	InventoryManager.coins = 50
 	PlayerProgression.player_level = 5
-	InventoryManager.deployed_weapons = []
 	InventoryManager.deployed_towers = []
 	_tower_container = Node2D.new()
 	add_child(_tower_container)

@@ -108,13 +108,6 @@ func test_create_projectile():
 	assert_not_null(proj, "Projectile should be created via create_projectile")
 	proj.queue_free()
 
-func test_create_shuriken_via_projectile():
-	var wd: WeaponData = GameConfig.weapons[Enums.WeaponId.SHURIKEN]
-	assert_not_null(wd.projectile_data, "Shuriken weapon should have projectile_data")
-	var proj: Node2D = SceneFactory.create_projectile(wd.projectile_data, 10.0, Vector2.ZERO, Vector2.RIGHT)
-	assert_not_null(proj, "Shuriken projectile should be created via create_projectile")
-	proj.queue_free()
-
 func test_all_towers_can_be_created():
 	var all_ids: Array[String] = [
 		Enums.TowerId.PEA_SHOOTER, Enums.TowerId.ICE_FLOWER,
@@ -127,14 +120,3 @@ func test_all_towers_can_be_created():
 		assert_eq(tower.tower_type, id)
 		assert_not_null(tower.data, id + " 应注入 TowerData")
 		tower.queue_free()
-
-func test_all_weapons_loaded():
-	var all_ids: Array[String] = [
-		Enums.WeaponId.BOW, Enums.WeaponId.SHURIKEN, Enums.WeaponId.SWORD,
-	]
-	for id in all_ids:
-		assert_true(GameConfig.weapons.has(id), "应包含武器: " + id)
-		var w: WeaponData = GameConfig.weapons[id]
-		assert_true(w.projectile_data != null or w.melee_config != null, id + " 应有 projectile_data 或 melee_config")
-		assert_not_null(w.attack_config, id + " 应有 attack_config")
-		assert_gt(w.attack_config.damage_per_level.size(), 0, id + " attack_config.damage_per_level 不应为空")

@@ -224,14 +224,6 @@ func clear_all_pools() -> void:
 	_pools.clear()
 
 func warmup_initial() -> void:
-	# 投射物预热：遍历所有武器的 projectile_data
-	for weapon_id in GameConfig.weapons:
-		var wd: WeaponData = GameConfig.weapons[weapon_id]
-		if wd.projectile_data and wd.projectile_data.projectile_scene:
-			var key: String = _get_projectile_pool_key(wd.projectile_data)
-			if not _pools.has(key):
-				_register_pool(key, wd.projectile_data.projectile_scene)
-			_pool_warmup(key, 20)
 	# 敌人预热
 	if _pools.has("enemy_normal"):
 		_pool_warmup("enemy_normal", 10)

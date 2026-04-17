@@ -119,7 +119,6 @@ const SPRITES = {
 }
 
 # ===== 资源注册表 =====
-var weapons: Dictionary = {}
 var enemies: Dictionary = {}
 var towers: Dictionary = {}
 var waves: Array = []  # 当前地图的波次（向后兼容）
@@ -135,7 +134,6 @@ var prefabs: Dictionary = {}  # {id: MapPrefab}
 
 
 func _ready() -> void:
-	_load_resources_from_dir("res://resources/weapons/", weapons)
 	_load_resources_from_dir("res://resources/enemies/", enemies)
 	_load_resources_from_dir("res://resources/towers/", towers)
 	_load_waves_by_map("res://resources/waves/")

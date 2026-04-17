@@ -5,6 +5,7 @@ func before_each() -> void:
 	PlayerProgression.reset()
 	InventoryManager.reset()
 	InventoryManager.coins = 100
+	InventoryManager.deployed_towers = []
 	InventoryManager.pending_towers = []
 	InventoryManager._current_roll_offer = []
 
@@ -83,14 +84,10 @@ func test_deploy_pending_tower_basic() -> void:
 	assert_eq(InventoryManager.pending_towers.size(), 0)
 	assert_eq(InventoryManager.deployed_towers.size(), 1)
 
-func test_deploy_pending_tower_blocked_by_population() -> void:
-	# 人口已满
-	for i in PlayerProgression.get_population_cap():
-		InventoryManager.deployed_weapons.append({id = "bow", level = 1})
-	InventoryManager.pending_towers = ["pea_shooter"]
+func test_deploy_pending_tower_invalid_index() -> void:
+	InventoryManager.pending_towers = []
 	var result: Dictionary = InventoryManager.deploy_pending_tower(0, Vector2i(5, 5))
-	assert_true(result.is_empty(), "人口满时应该拒绝部署")
-	assert_eq(InventoryManager.pending_towers.size(), 1, "失败时 pending 不消费")
+	assert_true(result.is_empty(), "无效索引时应该拒绝部署")
 
 func test_deploy_pending_tower_triggers_merge() -> void:
 	# 已部署 1 座 pea_shooter Lv1,放下第 2 座触发合成

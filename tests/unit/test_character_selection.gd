@@ -7,12 +7,6 @@ func test_all_characters_have_portrait_path() -> void:
 		var char_data: CharacterData = GameConfig.characters[character_id]
 		assert_ne(char_data.portrait_path, "", "%s 应有 portrait_path" % character_id)
 
-func test_all_characters_have_valid_recommended_weapon() -> void:
-	for character_id in GameConfig.characters:
-		var char_data: CharacterData = GameConfig.characters[character_id]
-		assert_true(GameConfig.weapons.has(char_data.recommended_weapon),
-			"%s 的 recommended_weapon '%s' 应存在于 GameConfig.weapons" % [character_id, char_data.recommended_weapon])
-
 func test_all_characters_have_display_name() -> void:
 	for character_id in GameConfig.characters:
 		var char_data: CharacterData = GameConfig.characters[character_id]
@@ -31,7 +25,6 @@ func test_game_data_init_character_sets_stats() -> void:
 	PlayerState.init_character(first_id)
 	assert_eq(PlayerState.character_max_hp, char_data.max_hp, "init_character 应设置 max_hp")
 	assert_eq(PlayerState.character_speed, char_data.speed, "init_character 应设置 speed")
-	assert_eq(PlayerState.character_damage_mult, char_data.damage_mult, "init_character 应设置 damage_mult")
 
 func test_characters_dict_not_empty() -> void:
 	assert_gt(GameConfig.characters.size(), 0, "角色字典不应为空")

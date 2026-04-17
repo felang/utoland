@@ -7,9 +7,8 @@ const CARD_HEIGHT: int = 200
 const DEFAULT_BORDER_COLOR: Color = Color("#4fc3f7")
 
 static func create_card(opt: Dictionary, on_selected: Callable) -> PanelContainer:
-	var is_weapon: bool = opt["type"] == "weapon"
 	var border_color: Color = DEFAULT_BORDER_COLOR
-	var bg_color: Color = Color("#1a1a3a") if is_weapon else Color("#1a2a1a")
+	var bg_color: Color = Color("#1a2a1a")
 
 	var panel := PanelContainer.new()
 	panel.custom_minimum_size = Vector2(CARD_WIDTH, CARD_HEIGHT)
@@ -37,7 +36,7 @@ static func create_card(opt: Dictionary, on_selected: Callable) -> PanelContaine
 
 	# 类型标签
 	var type_lbl := Label.new()
-	type_lbl.text = "⚔ 武器" if is_weapon else "🏗 塔"
+	type_lbl.text = "🏗 塔"
 	type_lbl.add_theme_font_size_override("font_size", 11)
 	type_lbl.add_theme_color_override("font_color", border_color)
 	type_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -52,13 +51,8 @@ static func create_card(opt: Dictionary, on_selected: Callable) -> PanelContaine
 	vbox.add_child(name_lbl)
 
 	# 描述文字
-	var desc_text: String = ""
-	if is_weapon:
-		var wd_for_desc: WeaponData = GameConfig.weapons[opt["id"]]
-		desc_text = wd_for_desc.description
-	else:
-		var td_for_desc: TowerData = GameConfig.towers[opt["id"]]
-		desc_text = td_for_desc.description
+	var td_for_desc: TowerData = GameConfig.towers[opt["id"]]
+	var desc_text: String = td_for_desc.description
 	if desc_text != "":
 		var desc_lbl := Label.new()
 		desc_lbl.text = desc_text
@@ -71,7 +65,7 @@ static func create_card(opt: Dictionary, on_selected: Callable) -> PanelContaine
 	# 等级信息
 	var level_lbl := Label.new()
 	if opt["is_new"]:
-		level_lbl.text = "新武器! Lv1" if is_weapon else "新塔! Lv1"
+		level_lbl.text = "新塔! Lv1"
 		level_lbl.add_theme_color_override("font_color", Color("#4caf50"))
 	else:
 		level_lbl.text = "Lv%d → Lv%d" % [opt["current_level"], opt["target_level"]]
@@ -98,40 +92,24 @@ static func create_card(opt: Dictionary, on_selected: Callable) -> PanelContaine
 
 
 static func _get_display_name(opt: Dictionary) -> String:
-	if opt["type"] == "weapon":
-		var wd: WeaponData = GameConfig.weapons[opt["id"]]
-		return wd.display_name
-	else:
-		var td: TowerData = GameConfig.towers[opt["id"]]
-		return td.display_name
+	var td: TowerData = GameConfig.towers[opt["id"]]
+	return td.display_name
 
 
 static func _get_stats_text(opt: Dictionary) -> String:
 	var level: int = opt["target_level"]
 	var idx: int = level - 1
-	if opt["type"] == "weapon":
-		var wd: WeaponData = GameConfig.weapons[opt["id"]]
-		var lines: Array[String] = []
-		if wd.attack_config != null:
-			if wd.attack_config.damage_per_level.size() > idx:
-				lines.append("伤害: %d" % int(wd.attack_config.damage_per_level[idx]))
-			if wd.attack_config.fire_rate_per_level.size() > idx:
-				lines.append("射速: %.1f" % wd.attack_config.fire_rate_per_level[idx])
-			if wd.attack_config.attack_range_per_level.size() > idx:
-				lines.append("范围: %d" % int(wd.attack_config.attack_range_per_level[idx]))
-		return "\n".join(lines)
-	else:
-		var td: TowerData = GameConfig.towers[opt["id"]]
-		var lines: Array[String] = []
-		if td.attack_config != null:
-			if td.attack_config.damage_per_level.size() > idx and td.attack_config.damage_per_level[idx] > 0:
-				lines.append("伤害: %d" % int(td.attack_config.damage_per_level[idx]))
-			if td.attack_config.fire_rate_per_level.size() > idx and td.attack_config.fire_rate_per_level[idx] > 0:
-				lines.append("射速: %.1f" % td.attack_config.fire_rate_per_level[idx])
-			if td.attack_config.attack_range_per_level.size() > idx and td.attack_config.attack_range_per_level[idx] > 0:
-				lines.append("范围: %d" % int(td.attack_config.attack_range_per_level[idx]))
-		if td.slow_ratio_per_level.size() > idx and td.slow_ratio_per_level[idx] > 0:
-			lines.append("减速: %d%%" % int(td.slow_ratio_per_level[idx] * 100))
-		if td.hp_per_level.size() > idx and td.hp_per_level[idx] > 0:
-			lines.append("HP: %d" % int(td.hp_per_level[idx]))
-		return "\n".join(lines)
+	var td: TowerData = GameConfig.towers[opt["id"]]
+	var lines: Array[String] = []
+	if td.attack_config != null:
+		if td.attack_config.damage_per_level.size() > idx and td.attack_config.damage_per_level[idx] > 0:
+			lines.append("伤害: %d" % int(td.attack_config.damage_per_level[idx]))
+		if td.attack_config.fire_rate_per_level.size() > idx and td.attack_config.fire_rate_per_level[idx] > 0:
+			lines.append("射速: %.1f" % td.attack_config.fire_rate_per_level[idx])
+		if td.attack_config.attack_range_per_level.size() > idx and td.attack_config.attack_range_per_level[idx] > 0:
+			lines.append("范围: %d" % int(td.attack_config.attack_range_per_level[idx]))
+	if td.slow_ratio_per_level.size() > idx and td.slow_ratio_per_level[idx] > 0:
+		lines.append("减速: %d%%" % int(td.slow_ratio_per_level[idx] * 100))
+	if td.hp_per_level.size() > idx and td.hp_per_level[idx] > 0:
+		lines.append("HP: %d" % int(td.hp_per_level[idx]))
+	return "\n".join(lines)

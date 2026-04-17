@@ -72,7 +72,7 @@ func _update_info() -> void:
 	var dmg_text: String = "N/A"
 	if player and player.has_node("HealthComponent"):
 		hp_text = "%d/%d" % [int(player.health.current_hp), int(player.health.max_hp)]
-	dmg_text = "x%.1f" % PlayerState.player_stats.get(Enums.Stat.DAMAGE_MULT, 1.0)
+	dmg_text = "-"
 
 	# 摄像机 zoom 信息
 	var zoom_text: String = "N/A"
