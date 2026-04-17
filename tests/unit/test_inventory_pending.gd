@@ -53,16 +53,16 @@ func test_consume_pending_invalid_index() -> void:
 	assert_eq(tid, "")
 
 func test_sell_returns_70_percent() -> void:
-	# 部署一座 lv1 pea_shooter
+	# 部署一座 lv1 pea_shooter(N_before=1,cost_at_0 = tower_cost_base)
 	InventoryManager.deployed_towers.append({
 		id = "pea_shooter", level = 1,
 		grid_pos = Vector2i(0, 0), deploy_id = 1,
 	})
 	var pre: int = InventoryManager.coins
-	var data: TowerData = GameConfig.towers["pea_shooter"]
-	var base_value: int = data.sell_price_per_level[0]
+	var cfg: ShopConfig = GameConfig.shop_config
+	var expected_refund: int = int(round(cfg.tower_cost_base * cfg.sell_return_ratio))
 	var refund: int = InventoryManager.sell_from_deployed_tower(1)
-	assert_eq(refund, int(round(base_value * 0.7)))
+	assert_eq(refund, expected_refund)
 	assert_eq(InventoryManager.coins, pre + refund)
 
 func test_reset_clears_pending() -> void:

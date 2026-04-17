@@ -130,7 +130,9 @@ func test_sell_from_deployed_tower() -> void:
 	var deploy_id: int = InventoryManager.buy_and_place_tower("pea_shooter", 3, Vector2i(0, 0))
 	var coins_after_buy: int = InventoryManager.coins
 	var refund: int = InventoryManager.sell_from_deployed_tower(deploy_id)
-	var expected: int = int(round(3 * GameConfig.shop_config.sell_return_ratio))
+	# 新公式: N_before=1 (无其他同类塔), cost_at_0 = tower_cost_base
+	var cfg: ShopConfig = GameConfig.shop_config
+	var expected: int = int(round(cfg.tower_cost_base * cfg.sell_return_ratio))
 	assert_eq(refund, expected)
 	assert_eq(InventoryManager.coins, coins_after_buy + expected)
 	assert_eq(InventoryManager.deployed_towers.size(), 0)

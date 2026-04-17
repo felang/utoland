@@ -62,11 +62,33 @@ func sell_from_deployed_tower(deploy_id: int) -> int:
 	var item := {id = entry.id, type = "tower", level = entry.level}
 	return _apply_sell(item)
 
+## 计算购买指定 tower_id 的当前价格
+## buy_cost = tower_cost_base + tower_cost_per_same_type * N
+## N = 当前 deployed + pending 中同类塔的数量
+func calc_tower_buy_cost(tower_id: String) -> int:
+	var n: int = 0
+	for entry in deployed_towers:
+		if entry.id == tower_id:
+			n += 1
+	for tid in pending_towers:
+		if tid == tower_id:
+			n += 1
+	var cfg: ShopConfig = GameConfig.shop_config
+	return cfg.tower_cost_base + cfg.tower_cost_per_same_type * n
+
 func _apply_sell(item: Dictionary) -> int:
-	var data: Resource = GameConfig.towers[item.id]
-	var base_value: int = data.sell_price_per_level[item.level - 1]
-	var ratio: float = GameConfig.shop_config.sell_return_ratio
-	var refund: int = int(round(base_value * ratio))
+	# 塔卖出时,deployed_towers 已在调用前移除该塔
+	# N_before = 当前剩余同类数量 + 1(被卖出的那座)
+	var n_before: int = 1
+	for entry in deployed_towers:
+		if entry.id == item.id:
+			n_before += 1
+	for tid in pending_towers:
+		if tid == item.id:
+			n_before += 1
+	var cfg: ShopConfig = GameConfig.shop_config
+	var cost_at_n: int = cfg.tower_cost_base + cfg.tower_cost_per_same_type * (n_before - 1)
+	var refund: int = int(round(cost_at_n * cfg.sell_return_ratio))
 	coins += refund
 	EventBus.item_sold.emit(item, refund)
 	EventBus.coins_changed.emit(refund, coins)
@@ -222,6 +244,12 @@ func deploy_pending_tower(pending_index: int, grid_pos: Vector2i) -> Dictionary:
 	if pending_index < 0 or pending_index >= pending_towers.size():
 		return {}
 	var tower_id: String = pending_towers[pending_index]
+	# 扣除购买费用(含同类数量递增)
+	var buy_cost: int = calc_tower_buy_cost(tower_id)
+	if coins < buy_cost:
+		return {}
+	coins -= buy_cost
+	EventBus.coins_changed.emit(-buy_cost, coins)
 	# 备份合成前已部署 deploy_ids
 	var old_ids: Array[int] = []
 	for entry in deployed_towers:
