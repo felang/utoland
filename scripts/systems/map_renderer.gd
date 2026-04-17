@@ -55,5 +55,7 @@ func _create_tileset() -> TileSet:
 	var source := TileSetAtlasSource.new()
 	source.texture = tex
 	source.texture_region_size = Vector2i(GameConfig.GRID_SIZE, GameConfig.GRID_SIZE)
+	source.create_tile(Vector2i(0, 0))
+	source.create_tile(Vector2i(1, 0))
 	ts.add_source(source)
 	return ts
