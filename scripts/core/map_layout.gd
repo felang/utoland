@@ -1,79 +1,70 @@
 class_name MapLayout
 extends RefCounted
 
-## 随机地图生成结果的数据载体
-
-enum CellType { GROUND, BORDER, WALL, ABYSS, SPAWN_ZONE }
-
-const PLAYABLE_WIDTH: int = 40
-const PLAYABLE_HEIGHT: int = 24
-const PLAYABLE_ORIGIN_X: int = 3
-const PLAYABLE_ORIGIN_Y: int = 3
-
-const TACTICAL_MIN_X: int = 3
-const TACTICAL_MAX_X: int = 36
-const TACTICAL_MIN_Y: int = 3
-const TACTICAL_MAX_Y: int = 20
-
-const CENTER_SAFE_MIN_X: int = 14
-const CENTER_SAFE_MAX_X: int = 25
-const CENTER_SAFE_MIN_Y: int = 9
-const CENTER_SAFE_MAX_Y: int = 14
+enum CellType { GROUND, OBSTACLE }
 
 var grid: Array = []
-var spawn_points: Array[Vector2i] = []
-var placeable_cells: Array[Vector2i] = []
-var player_spawn: Vector2i = Vector2i(19, 11)
+var spawn_points: Dictionary = {}
+var player_spawn: Vector2i = Vector2i(19, 12)
+var grid_width: int = 40
+var grid_height: int = 24
 
-
-func _init() -> void:
-	_init_grid()
-
-
-func _init_grid() -> void:
-	grid.resize(PLAYABLE_HEIGHT)
-	for y in range(PLAYABLE_HEIGHT):
+func init_grid() -> void:
+	grid.clear()
+	for y in range(grid_height):
 		var row: Array = []
-		row.resize(PLAYABLE_WIDTH)
+		row.resize(grid_width)
 		row.fill(CellType.GROUND)
-		grid[y] = row
+		grid.append(row)
 
-
-func get_cell(pos: Vector2i) -> CellType:
-	if pos.x < 0 or pos.x >= PLAYABLE_WIDTH or pos.y < 0 or pos.y >= PLAYABLE_HEIGHT:
-		return CellType.BORDER
+func get_cell(pos: Vector2i) -> int:
+	if pos.x < 0 or pos.x >= grid_width or pos.y < 0 or pos.y >= grid_height:
+		return CellType.OBSTACLE
 	return grid[pos.y][pos.x]
 
-
-func set_cell(pos: Vector2i, cell_type: CellType) -> void:
-	if pos.x >= 0 and pos.x < PLAYABLE_WIDTH and pos.y >= 0 and pos.y < PLAYABLE_HEIGHT:
+func set_cell(pos: Vector2i, cell_type: int) -> void:
+	if pos.x >= 0 and pos.x < grid_width and pos.y >= 0 and pos.y < grid_height:
 		grid[pos.y][pos.x] = cell_type
 
+func is_ground(pos: Vector2i) -> bool:
+	return get_cell(pos) == CellType.GROUND
 
-func is_passable(pos: Vector2i) -> bool:
-	var cell := get_cell(pos)
-	return cell == CellType.GROUND or cell == CellType.SPAWN_ZONE
+func is_placeable(pos: Vector2i) -> bool:
+	if not is_ground(pos):
+		return false
+	if pos == player_spawn:
+		return false
+	for sp in spawn_points.values():
+		if pos == sp:
+			return false
+	return true
 
-
-func grid_to_world(grid_pos: Vector2i) -> Vector2:
-	var world_x := (PLAYABLE_ORIGIN_X + grid_pos.x - GameConfig.MAP_GRID_WIDTH / 2.0) * GameConfig.GRID_SIZE + GameConfig.GRID_SIZE / 2.0
-	var world_y := (PLAYABLE_ORIGIN_Y + grid_pos.y - GameConfig.MAP_GRID_HEIGHT / 2.0) * GameConfig.GRID_SIZE + GameConfig.GRID_SIZE / 2.0
+func grid_to_world(pos: Vector2i) -> Vector2:
+	var full_x := GameConfig.PLAYABLE_ORIGIN_X + pos.x
+	var full_y := GameConfig.PLAYABLE_ORIGIN_Y + pos.y
+	var world_x := (full_x - GameConfig.MAP_GRID_WIDTH / 2.0) * GameConfig.GRID_SIZE + GameConfig.GRID_SIZE / 2.0
+	var world_y := (full_y - GameConfig.MAP_GRID_HEIGHT / 2.0) * GameConfig.GRID_SIZE + GameConfig.GRID_SIZE / 2.0
 	return Vector2(world_x, world_y)
 
-
-func get_spawn_points_world() -> Array[Vector2]:
-	var result: Array[Vector2] = []
-	for sp in spawn_points:
-		result.append(grid_to_world(sp))
-	return result
-
-
-func get_player_spawn_world() -> Vector2:
-	return grid_to_world(player_spawn)
-
+func world_to_grid(world_pos: Vector2) -> Vector2i:
+	var gx := int(floor((world_pos.x + GameConfig.MAP_HALF_WIDTH) / GameConfig.GRID_SIZE)) - GameConfig.PLAYABLE_ORIGIN_X
+	var gy := int(floor((world_pos.y + GameConfig.MAP_HALF_HEIGHT) / GameConfig.GRID_SIZE)) - GameConfig.PLAYABLE_ORIGIN_Y
+	return Vector2i(gx, gy)
 
 func get_placeable_dict() -> Dictionary:
 	var dict := {}
-	for cell in placeable_cells:
-		dict[cell] = true
+	for y in range(grid_height):
+		for x in range(grid_width):
+			var pos := Vector2i(x, y)
+			if is_placeable(pos):
+				dict[pos] = true
 	return dict
+
+func get_spawn_points_world() -> Dictionary:
+	var result := {}
+	for dir in spawn_points:
+		result[dir] = grid_to_world(spawn_points[dir])
+	return result
+
+func get_player_spawn_world() -> Vector2:
+	return grid_to_world(player_spawn)
