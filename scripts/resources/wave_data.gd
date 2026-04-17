@@ -22,3 +22,6 @@ extends Resource
 # Boss 波
 @export var is_boss_wave: bool = false
 @export var boss_id: String = ""
+
+# 刷新点方向覆盖（空=走自动规则）
+@export var active_spawn_directions: Array[String] = []

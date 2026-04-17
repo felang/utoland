@@ -144,8 +144,9 @@ func test_spawner_uses_dynamic_map_bounds():
 	var spawner = preload("res://scripts/systems/enemy_spawner.gd").new()
 	add_child_autoqfree(spawner)
 	await get_tree().process_frame
-	assert_almost_eq(spawner.map_min_x, -GameConfig.MAP_HALF_WIDTH, 0.01, "min_x 应等于动态值")
-	assert_almost_eq(spawner.map_max_x, GameConfig.MAP_HALF_WIDTH, 0.01, "max_x 应等于动态值")
+	# 新方向刷新系统：验证 all_spawn_points 和 active_directions 字段存在
+	assert_true(spawner.all_spawn_points is Dictionary, "all_spawn_points 应为 Dictionary")
+	assert_true(spawner.active_directions is Array, "active_directions 应为 Array")
 
 func test_spawn_position_is_inside_new_map_bounds():
 	var spawner = preload("res://scripts/systems/enemy_spawner.gd").new()

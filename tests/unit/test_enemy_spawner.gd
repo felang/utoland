@@ -28,11 +28,11 @@ func test_pick_weighted_enemy_respects_weights():
 	assert_gt(normal_count, 160, "权重 99 的 normal 应出现在绝大多数情况")
 
 func test_spawn_from_fixed_points():
-	var points: Array[Vector2] = [Vector2(100, 200), Vector2(-100, -200)]
-	spawner.spawn_points = points
+	spawner.all_spawn_points = {"north": Vector2(100, 200), "south": Vector2(-100, -200)}
+	spawner.active_directions = ["north", "south"]
 	var pos: Vector2 = spawner.get_random_spawn_position()
 	var near_any := false
-	for p in points:
+	for p: Vector2 in spawner.all_spawn_points.values():
 		if pos.distance_to(p) <= 23.0:
 			near_any = true
 			break

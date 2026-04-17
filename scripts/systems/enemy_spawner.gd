@@ -5,7 +5,8 @@ const HP_SCALING_PER_WAVE: float = 0.055
 const DAMAGE_SCALING_START_WAVE: int = 9
 const DAMAGE_SCALING_PER_WAVE: float = 0.0375
 
-var spawn_points: Array[Vector2] = []  # 由 main.gd 从 MapLayout 传入
+var all_spawn_points: Dictionary = {}  # {"north": Vector2, ...}
+var active_directions: Array[String] = []
 var spawn_timer: float = 0.0
 var player: Node2D
 var _current_wave_data: WaveData = null
@@ -19,20 +20,7 @@ var _phase_duration: float = 0.0
 var _current_spawn_interval: float = 1.0
 var _current_enemy_weights: Dictionary = {}
 
-# 地图边界
-var map_min_x: float = 0.0
-var map_max_x: float = 0.0
-var map_min_y: float = 0.0
-var map_max_y: float = 0.0
-var min_distance_from_player: float = 200.0
-
 func _ready() -> void:
-	map_min_x = -GameConfig.MAP_HALF_WIDTH
-	map_max_x = GameConfig.MAP_HALF_WIDTH
-	map_min_y = -GameConfig.MAP_HALF_HEIGHT
-	map_max_y = GameConfig.MAP_HALF_HEIGHT
-	if GameConfig.spawn:
-		min_distance_from_player = GameConfig.spawn.min_distance_from_player
 	EventBus.wave_started.connect(_on_wave_started)
 	EventBus.wave_completed.connect(_on_wave_completed)
 	EventBus.game_won.connect(_on_game_ended)
@@ -133,31 +121,44 @@ func _spawn_boss() -> void:
 	AudioManager.play("boss_appear")
 
 func get_random_spawn_position() -> Vector2:
-	if spawn_points.is_empty():
-		return _legacy_random_position()
-	var base_pos := spawn_points[randi() % spawn_points.size()]
-	var offset := Vector2(randf_range(-16, 16), randf_range(-16, 16))
-	return base_pos + offset
+	if active_directions.is_empty() or all_spawn_points.is_empty():
+		return Vector2(
+			randf_range(-GameConfig.PLAY_HALF_WIDTH, GameConfig.PLAY_HALF_WIDTH),
+			randf_range(-GameConfig.PLAY_HALF_HEIGHT, GameConfig.PLAY_HALF_HEIGHT)
+		)
+	var dir: String = active_directions[randi() % active_directions.size()]
+	var base_pos: Vector2 = all_spawn_points[dir]
+	return base_pos + Vector2(randf_range(-16, 16), randf_range(-16, 16))
 
-func _legacy_random_position() -> Vector2:
-	var spawn_pos = Vector2.ZERO
-	var attempts = 0
-	var max_attempts: int = GameConfig.spawn.max_spawn_attempts if GameConfig.spawn else 10
-	while attempts < max_attempts:
-		spawn_pos.x = randf_range(map_min_x, map_max_x)
-		spawn_pos.y = randf_range(map_min_y, map_max_y)
-		if player and player.global_position.distance_to(spawn_pos) >= min_distance_from_player:
-			break
-		attempts += 1
-	return spawn_pos
+func update_active_directions(wave_number: int, wave_data: WaveData) -> void:
+	if not wave_data.active_spawn_directions.is_empty():
+		active_directions = wave_data.active_spawn_directions.duplicate()
+		return
+	var count: int
+	if wave_number <= 5:
+		count = 2
+	elif wave_number <= 12:
+		count = 3
+	else:
+		count = all_spawn_points.size()
+	active_directions = _pick_random_directions(count)
 
-func _on_wave_started(_wave_number: int, wave_data: WaveData) -> void:
+func _pick_random_directions(count: int) -> Array[String]:
+	var dirs: Array[String] = []
+	var all_dirs := all_spawn_points.keys()
+	all_dirs.shuffle()
+	for i in range(mini(count, all_dirs.size())):
+		dirs.append(all_dirs[i])
+	return dirs
+
+func _on_wave_started(wave_number: int, wave_data: WaveData) -> void:
 	if player == null:
 		player = get_tree().get_first_node_in_group(Enums.Group.PLAYER)
 	_current_wave_data = wave_data
 	_is_wave_active = true
 	spawn_timer = 0.0
 	_boss_spawned = false
+	update_active_directions(wave_number, wave_data)
 	if wave_data.spawn_phases.size() > 0:
 		_enter_phase(0)
 	else:
