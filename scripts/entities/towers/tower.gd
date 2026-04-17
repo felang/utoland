@@ -6,6 +6,8 @@ var data: TowerData = null
 var tower_type: String = ""
 # 由 SceneFactory 在实例化后注入的等级
 var current_level: int = 1
+# 由 DragManager/InventoryManager 注入，用于销毁时清理记录
+var deploy_id: int = -1
 
 # Buff 系统
 var damage_mult: float = 1.0
@@ -123,7 +125,7 @@ func _on_hurtbox_hit_taken(damage: float, _knockback: Vector2) -> void:
 	health.take_damage(damage)
 
 func _on_died() -> void:
-	EventBus.tower_destroyed.emit(tower_type, global_position)
+	EventBus.tower_destroyed.emit(tower_type, global_position, deploy_id)
 	queue_free()
 
 func _on_attack_animation_finished() -> void:

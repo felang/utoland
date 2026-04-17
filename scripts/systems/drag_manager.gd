@@ -186,6 +186,7 @@ func _cleanup_drag() -> void:
 
 func spawn_tower_node(deploy_id: int, tower_id: String, level: int, grid_pos: Vector2i) -> void:
 	var tower: Node2D = SceneFactory.create_tower(tower_id, level)
+	tower.deploy_id = deploy_id
 	tower.position = _grid_to_world(grid_pos)
 	SceneFactory.get_entity_layer().add_child(tower)
 	_tower_nodes[deploy_id] = tower
@@ -198,6 +199,9 @@ func _remove_tower_node(deploy_id: int) -> void:
 	if deploy_id in _tower_nodes:
 		_tower_nodes[deploy_id].queue_free()
 		_tower_nodes.erase(deploy_id)
+
+func untrack_tower(deploy_id: int) -> void:
+	_tower_nodes.erase(deploy_id)
 
 func remove_tower_nodes(consumed_deploy_ids: Array) -> void:
 	for deploy_id in consumed_deploy_ids:
