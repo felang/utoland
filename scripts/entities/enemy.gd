@@ -121,6 +121,9 @@ func remove_slow(source_id: String = "") -> void:
 
 func _on_hurtbox_hit(damage: float, knockback_dir: Vector2) -> void:
 	AudioManager.play("hit", -6.0)
+	# 猎杀标记：被标记的敌人受到双倍伤害
+	if has_meta("hunt_marked") and get_meta("hunt_marked"):
+		damage *= 2.0
 	health.take_damage(damage)
 	EffectsManager.sprite_shake(self, 4.0)
 	if knockback_dir.length() > 0:
