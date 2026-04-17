@@ -22,6 +22,11 @@ var _root_source: String = ""  # 定身来源标记
 # 对象池标识（由 SceneFactory 管理）
 var _is_pooled: bool = false
 
+# 寻塔 AI（targets_towers 时使用）
+var _tower_target: Node2D = null
+var _target_refresh_timer: float = 0.0
+const TARGET_REFRESH_INTERVAL: float = 0.5
+
 @onready var health: HealthComponent = $HealthComponent
 @onready var _knockback: KnockbackHandler = $KnockbackHandler
 @onready var slow_handler: SlowHandler = $SlowHandler
@@ -52,7 +57,11 @@ func _ready() -> void:
 	_sprite_animator.setup_enemy_sprite(sprite_config, target_size)
 
 func _physics_process(delta: float) -> void:
-	_chase_player(delta)
+	if data and data.targets_towers:
+		_update_tower_target(delta)
+		_chase_target(delta)
+	else:
+		_chase_player(delta)
 
 func _chase_player(delta: float) -> void:
 	# 击退速度（始终处理，即使定身也要滑行）
@@ -64,6 +73,41 @@ func _chase_player(delta: float) -> void:
 		return
 	if player and is_instance_valid(player):
 		velocity = position.direction_to(player.global_position) * speed + kb_vel
+		move_and_slide()
+		_sprite_animator.update_animation_no_idle(velocity)
+
+func _update_tower_target(delta: float) -> void:
+	_target_refresh_timer -= delta
+	if _target_refresh_timer <= 0:
+		_target_refresh_timer = TARGET_REFRESH_INTERVAL
+		_tower_target = _find_nearest_tower()
+
+func _find_nearest_tower() -> Node2D:
+	var towers: Array[Node] = get_tree().get_nodes_in_group(Enums.Group.TOWERS)
+	var nearest: Node2D = null
+	var nearest_dist: float = INF
+	for tower in towers:
+		if not is_instance_valid(tower):
+			continue
+		var dist: float = global_position.distance_squared_to(tower.global_position)
+		if dist < nearest_dist:
+			nearest_dist = dist
+			nearest = tower
+	return nearest
+
+func _chase_target(delta: float) -> void:
+	var kb_vel: Vector2 = _knockback.tick(delta)
+	if is_rooted:
+		if kb_vel.length_squared() > 0:
+			velocity = kb_vel
+			move_and_slide()
+		return
+	if _tower_target and not is_instance_valid(_tower_target):
+		_tower_target = null
+		_target_refresh_timer = 0.0
+	var target: Node2D = _tower_target if _tower_target else player
+	if target and is_instance_valid(target):
+		velocity = position.direction_to(target.global_position) * speed + kb_vel
 		move_and_slide()
 		_sprite_animator.update_animation_no_idle(velocity)
 
@@ -168,3 +212,5 @@ func reset_for_pool() -> void:
 		_sprite_animator._current_anim = "walk_down"
 	visible = true
 	modulate = Color.WHITE
+	_tower_target = null
+	_target_refresh_timer = 0.0
