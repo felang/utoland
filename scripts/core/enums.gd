@@ -30,6 +30,7 @@ class Enemy:
 	const BOSS_BRUTE = "boss_brute"
 	const BOSS_SUMMONER = "boss_summoner"
 	const BOSS_GUARDIAN = "boss_guardian"
+	const TOWER_BREAKER = "tower_breaker"
 
 # 塔类型
 class TowerId:

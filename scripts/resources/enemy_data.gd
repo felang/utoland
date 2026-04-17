@@ -17,3 +17,6 @@ extends Resource
 
 # Boss 标识
 @export var is_boss: bool = false
+
+# 拆塔者标识：优先追塔
+@export var targets_towers: bool = false
