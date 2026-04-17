@@ -2,7 +2,7 @@ extends GutTest
 
 func test_forest_wave_count():
 	var waves: Array = GameConfig.get_waves_for_map("forest")
-	assert_eq(waves.size(), 12, "Forest 地图应有 12 波")
+	assert_eq(waves.size(), 20, "Forest 地图应有 20 波")
 
 func test_waves_sorted_by_number():
 	var waves: Array = GameConfig.get_waves_for_map("forest")
@@ -15,7 +15,7 @@ func test_boss_waves_count():
 	for w: WaveData in waves:
 		if w.is_boss_wave:
 			boss_waves.append(w.wave_number)
-	assert_eq(boss_waves.size(), 3, "应有 3 个 Boss 波")
+	assert_eq(boss_waves.size(), 5, "应有 5 个 Boss 波")
 
 func test_boss_waves_are_4_8_12():
 	var waves: Array = GameConfig.get_waves_for_map("forest")
@@ -26,6 +26,8 @@ func test_boss_waves_are_4_8_12():
 	assert_has(boss_wave_numbers, 4, "第 4 波应为 Boss 波")
 	assert_has(boss_wave_numbers, 8, "第 8 波应为 Boss 波")
 	assert_has(boss_wave_numbers, 12, "第 12 波应为 Boss 波")
+	assert_has(boss_wave_numbers, 15, "第 15 波应为 Boss 波")
+	assert_has(boss_wave_numbers, 20, "第 20 波应为 Boss 波")
 
 func test_all_enemy_weights_reference_valid_types():
 	var waves: Array = GameConfig.get_waves_for_map("forest")

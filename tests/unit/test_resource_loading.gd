@@ -53,7 +53,7 @@ func test_tower_ice_flower_resource() -> void:
 # ===== 波次资源加载 =====
 
 func test_waves_loaded_count() -> void:
-	assert_eq(GameConfig.waves.size(), 12, "应加载 12 个波次")
+	assert_eq(GameConfig.waves.size(), 20, "应加载 20 个波次")
 
 func test_waves_sorted_by_number() -> void:
 	for i in range(GameConfig.waves.size()):

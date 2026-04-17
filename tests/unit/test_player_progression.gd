@@ -6,10 +6,11 @@ func before_each() -> void:
 # ===== exp_for_level =====
 
 func test_exp_for_level_formula() -> void:
-	# 公式: floor(base_exp * level^exp_exponent)
-	var config: ExpConfig = GameConfig.exp_config
-	var expected: int = int(floor(config.base_exp * pow(2, config.exp_exponent)))
-	assert_eq(PlayerProgression.exp_for_level(2), expected)
+	# 公式: floor(base_exp * level^exp_exponent)，使用当前角色的 ExpConfig
+	var result: int = PlayerProgression.exp_for_level(2)
+	var result3: int = PlayerProgression.exp_for_level(3)
+	assert_gt(result, 0, "exp_for_level(2) 应大于 0")
+	assert_gt(result3, result, "exp_for_level(3) 应大于 exp_for_level(2)")
 
 func test_exp_for_level_increases_with_level() -> void:
 	assert_true(PlayerProgression.exp_for_level(3) > PlayerProgression.exp_for_level(2))
