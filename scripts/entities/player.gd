@@ -44,6 +44,9 @@ func _ready() -> void:
 	var sprite_frames: SpriteFrames = load(char_data.sprite_frames_path)
 	_sprite_animator.setup_from_sprite_frames(sprite_frames, char_data.sprite_pixel_size, GameConfig.ENTITY_SIZE_STANDARD)
 
+	# 挂载能力组件
+	_mount_abilities()
+
 	# 连接升级信号并应用当前等级成长
 	EventBus.player_level_changed.connect(_on_level_up)
 	_apply_level_growth(PlayerProgression.player_level)
@@ -153,3 +156,30 @@ func _start_invincible_blink() -> void:
 func _on_perk_applied(_perk_id: String) -> void:
 	# 重新跑 level growth,会读最新 perk bonus
 	_apply_level_growth(PlayerProgression.player_level)
+
+## 根据 CharacterData.ability_scenes 动态挂载能力组件
+func _mount_abilities() -> void:
+	var char_data: CharacterData = GameConfig.characters.get(PlayerState.current_character)
+	if char_data == null or char_data.ability_scenes.is_empty():
+		push_warning("Player: 无 ability_scenes 配置")
+		return
+	var container: Node = $Abilities
+	# 能力数据路径，与 CharacterData.ability_scenes 顺序对应
+	# TODO(#7): 多英雄支持时改为 CharacterData 字段驱动
+	var ability_data_paths: Array[String] = [
+		"res://resources/hero_abilities/ranger/auto_attack.tres",
+		"res://resources/hero_abilities/ranger/gust_arrow.tres",
+		"res://resources/hero_abilities/ranger/arrow_rain.tres",
+		"res://resources/hero_abilities/ranger/hunt_mark.tres",
+	]
+	for i in range(char_data.ability_scenes.size()):
+		var ps: PackedScene = char_data.ability_scenes[i]
+		if ps == null:
+			continue
+		var inst: Node = ps.instantiate()
+		# 注入数据资源
+		if i < ability_data_paths.size():
+			var data_res: Resource = load(ability_data_paths[i])
+			if data_res != null and "data" in inst:
+				inst.data = data_res
+		container.add_child(inst)

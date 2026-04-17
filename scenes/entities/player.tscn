@@ -45,3 +45,5 @@ repeat_interval = 1.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox" unique_id=790979603]
 shape = SubResource("CircleShape2D_hurtbox")
+
+[node name="Abilities" type="Node" parent="."]
