@@ -28,6 +28,7 @@ func _ready() -> void:
 	var idx: int = current_level - 1
 	health.initialize(data.hp_per_level[idx])
 	health.died.connect(_on_died)
+	health.damaged.connect(_on_damaged)
 
 	# 播放待机动画
 	if visual and visual.sprite_frames and visual.sprite_frames.has_animation("idle"):
@@ -127,6 +128,30 @@ func _on_hurtbox_hit_taken(damage: float, _knockback: Vector2) -> void:
 func _on_died() -> void:
 	EventBus.tower_destroyed.emit(tower_type, global_position, deploy_id)
 	queue_free()
+
+func heal(amount: float) -> void:
+	health.heal(amount)
+	_update_damage_visual()
+
+func _on_damaged(_amount: float, _current_hp: float, _attacker: Node2D) -> void:
+	_update_damage_visual()
+
+func _update_damage_visual() -> void:
+	var hp_ratio: float = health.current_hp / health.max_hp
+	if visual:
+		visual.modulate = Color(1, 0.5, 0.5) if hp_ratio < 0.3 else Color.WHITE
+	queue_redraw()
+
+func _draw() -> void:
+	if health.current_hp >= health.max_hp:
+		return
+	var bar_width: float = 28.0
+	var bar_height: float = 4.0
+	var bar_y: float = -20.0
+	var hp_ratio: float = health.current_hp / health.max_hp
+	draw_rect(Rect2(-bar_width / 2, bar_y, bar_width, bar_height), Color(0.2, 0.2, 0.2, 0.8))
+	var color: Color = Color.GREEN if hp_ratio > 0.3 else Color.RED
+	draw_rect(Rect2(-bar_width / 2, bar_y, bar_width * hp_ratio, bar_height), color)
 
 func _on_attack_animation_finished() -> void:
 	if visual and visual.sprite_frames and visual.sprite_frames.has_animation("idle"):
