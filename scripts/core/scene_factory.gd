@@ -58,6 +58,7 @@ var _enemy_scenes: Dictionary = {
 	Enums.Enemy.BOSS_BRUTE: preload("res://scenes/entities/enemies/boss_brute.tscn"),
 	Enums.Enemy.BOSS_SUMMONER: preload("res://scenes/entities/enemies/boss_summoner.tscn"),
 	Enums.Enemy.BOSS_GUARDIAN: preload("res://scenes/entities/enemies/boss_guardian.tscn"),
+	Enums.Enemy.TOWER_BREAKER: preload("res://scenes/entities/enemies/enemy_tower_breaker.tscn"),
 }
 
 var _coin_scene: PackedScene = preload("res://scenes/entities/coin.tscn")

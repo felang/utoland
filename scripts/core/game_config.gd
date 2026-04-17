@@ -101,6 +101,13 @@ const SPRITES = {
 			"walk_frames": 4,
 			"walk_directions": 4,
 			"fps": 4.0
+		},
+		"tower_breaker": {
+			"spritesheet": "res://assets/enemies/slime/sprite.png",
+			"frame_size": Vector2(16, 16),
+			"walk_frames": 4,
+			"walk_directions": 4,
+			"fps": 8.0
 		}
 	},
 	"towers": {

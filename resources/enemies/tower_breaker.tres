@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/enemy_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "tower_breaker"
+display_name = "拆塔者"
+hp = 150.0
+speed = 100.0
+damage = 20.0
+exp_drop_min = 2
+exp_drop_max = 3
+targets_towers = true

@@ -85,3 +85,15 @@ func test_normal_enemy_ignores_towers():
 	test_scene.add_child(enemy)
 	assert_eq(enemy.data.targets_towers, false, "普通敌人不追塔")
 	assert_null(enemy._tower_target, "_tower_target 应为 null")
+
+func test_game_config_has_tower_breaker():
+	assert_true(GameConfig.enemies.has("tower_breaker"), "GameConfig 应注册 tower_breaker")
+	var data: EnemyData = GameConfig.enemies["tower_breaker"]
+	assert_eq(data.targets_towers, true, "拆塔者 targets_towers 应为 true")
+	assert_gt(data.hp, 100.0, "拆塔者 HP 应高于普通怪")
+
+func test_scene_factory_creates_tower_breaker():
+	var enemy = SceneFactory.create_enemy(Enums.Enemy.TOWER_BREAKER)
+	assert_not_null(enemy, "SceneFactory 应能创建 tower_breaker")
+	test_scene.add_child(enemy)
+	assert_eq(enemy.data.targets_towers, true, "创建的 tower_breaker 应有 targets_towers=true")

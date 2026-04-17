@@ -7,7 +7,7 @@ extends GutTest
 # ===== 敌人资源加载 =====
 
 func test_enemies_loaded_count() -> void:
-	assert_eq(GameConfig.enemies.size(), 6, "应加载 6 种敌人")
+	assert_eq(GameConfig.enemies.size(), 7, "应加载 7 种敌人")
 
 func test_enemy_normal_resource() -> void:
 	var e: EnemyData = GameConfig.enemies[Enums.Enemy.NORMAL]
