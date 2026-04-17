@@ -11,6 +11,7 @@ var _root: Control
 var _card_buttons: Array[Button] = []
 var _card_titles: Array[Label] = []
 var _card_descs: Array[Label] = []
+var _card_levels: Array[Label] = []
 var _current_offer: Array = []
 
 func _ready() -> void:
@@ -19,6 +20,7 @@ func _ready() -> void:
 	_build_ui()
 	visible = false
 	EventBus.perk_offered.connect(_on_perk_offered)
+	EventBus.no_perk_available.connect(_on_no_perk_available)
 
 func _build_ui() -> void:
 	# 半透明遮罩
@@ -78,6 +80,13 @@ func _create_card(idx: int) -> Button:
 	vbox.add_child(desc)
 	_card_descs.append(desc)
 
+	var level_label := Label.new()
+	level_label.add_theme_font_size_override("font_size", 12)
+	level_label.add_theme_color_override("font_color", Color(1.0, 0.85, 0.4))
+	level_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	vbox.add_child(level_label)
+	_card_levels.append(level_label)
+
 	btn.pressed.connect(_on_card_pressed.bind(idx))
 	_card_buttons.append(btn)
 	return btn
@@ -89,12 +98,21 @@ func _on_perk_offered(perks: Array) -> void:
 			var p: PerkData = perks[i]
 			_card_titles[i].text = p.display_name
 			_card_descs[i].text = p.description
+			if p.max_level > 1:
+				var next_level: int = PerkManager.get_perk_level(p.id) + 1
+				_card_levels[i].text = "[%d/%d]" % [next_level, p.max_level]
+			else:
+				_card_levels[i].text = ""
 			_card_buttons[i].visible = true
 			_card_buttons[i].disabled = false
 		else:
 			_card_buttons[i].visible = false
 	visible = true
 	get_tree().paused = true
+
+func _on_no_perk_available() -> void:
+	visible = false
+	get_tree().paused = false
 
 func _on_card_pressed(idx: int) -> void:
 	if idx < 0 or idx >= _current_offer.size():
