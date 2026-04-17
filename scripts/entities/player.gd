@@ -42,7 +42,16 @@ func _ready() -> void:
 	# 设置精灵（从 CharacterData 加载 SpriteFrames）
 	var char_data: CharacterData = GameConfig.characters[PlayerState.current_character]
 	var sprite_frames: SpriteFrames = load(char_data.sprite_frames_path)
-	_sprite_animator.setup_from_sprite_frames(sprite_frames, char_data.sprite_pixel_size, GameConfig.ENTITY_SIZE_STANDARD)
+	# 检查帧是否为空（占位 SpriteFrames 无纹理），用彩色方块兜底
+	var has_frames: bool = false
+	for anim_name in sprite_frames.get_animation_names():
+		if sprite_frames.get_frame_count(anim_name) > 0:
+			has_frames = true
+			break
+	if has_frames:
+		_sprite_animator.setup_from_sprite_frames(sprite_frames, char_data.sprite_pixel_size, GameConfig.ENTITY_SIZE_STANDARD)
+	else:
+		_create_placeholder_sprite()
 
 	# 挂载能力组件
 	_mount_abilities()
@@ -152,6 +161,15 @@ func _start_invincible_blink() -> void:
 		_blink_tween.tween_property(self, "modulate:a", fx.invincible_blink_alpha_low, fx.invincible_blink_interval)
 		_blink_tween.tween_property(self, "modulate:a", fx.invincible_blink_alpha_high, fx.invincible_blink_interval)
 	_blink_tween.tween_property(self, "modulate:a", 1.0, BLINK_RESET_DURATION)
+
+func _create_placeholder_sprite() -> void:
+	var sprite := Sprite2D.new()
+	sprite.name = "PlaceholderSprite"
+	var img := Image.create(16, 16, false, Image.FORMAT_RGBA8)
+	img.fill(Color(0.2, 0.8, 0.3))
+	sprite.texture = ImageTexture.create_from_image(img)
+	sprite.scale = Vector2(2, 2)
+	add_child(sprite)
 
 func _on_perk_applied(_perk_id: String) -> void:
 	# 重新跑 level growth,会读最新 perk bonus
