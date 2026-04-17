@@ -62,6 +62,12 @@ func sell_from_deployed_tower(deploy_id: int) -> int:
 	var item := {id = entry.id, type = "tower", level = entry.level}
 	return _apply_sell(item)
 
+func remove_destroyed_tower(deploy_id: int) -> void:
+	for i in range(deployed_towers.size()):
+		if deployed_towers[i].deploy_id == deploy_id:
+			deployed_towers.remove_at(i)
+			return
+
 ## 计算购买指定 tower_id 的当前价格
 ## buy_cost = tower_cost_base + tower_cost_per_same_type * N
 ## N = 当前 deployed + pending 中同类塔的数量
