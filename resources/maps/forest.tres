@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="MapData" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scripts/resources/map_data.gd" id="1"]
-[ext_resource type="Resource" path="res://resources/maps/default_generator_config.tres" id="2"]
+[ext_resource type="Resource" path="res://resources/maps/blueprints/forest_blueprint.tres" id="2"]
 
 [resource]
 script = ExtResource("1")
@@ -11,5 +11,5 @@ description = "茂密的森林环境"
 preview_image = "res://assets/maps/forest_preview.png"
 background = "res://assets/maps/forest_bg.png"
 map_scene = "res://scenes/levels/maps/generated_map.tscn"
-wave_count = 12
-generator_config = ExtResource("2")
+wave_count = 20
+blueprint = ExtResource("2")

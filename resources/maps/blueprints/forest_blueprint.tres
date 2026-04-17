@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="MapBlueprint" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/map_blueprint.gd" id="1"]
+[ext_resource type="Resource" path="res://resources/maps/zones/central_ruins.tres" id="2"]
+[ext_resource type="Resource" path="res://resources/maps/zones/ne_corridor.tres" id="3"]
+[ext_resource type="Resource" path="res://resources/maps/zones/south_rubble.tres" id="4"]
+
+[resource]
+script = ExtResource("1")
+id = "forest"
+grid_width = 40
+grid_height = 24
+zones = [ExtResource("2"), ExtResource("3"), ExtResource("4")]
+spawn_points = { "north": Vector2i(20, 0), "south": Vector2i(20, 23), "east": Vector2i(39, 12), "west": Vector2i(0, 12) }
+player_spawn = Vector2i(19, 12)
+border_gap_size = 3
