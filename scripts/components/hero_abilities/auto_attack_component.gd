@@ -68,7 +68,7 @@ func _spawn_projectile(target: Node2D) -> void:
 	proj.global_position = _host.global_position
 	var dir: Vector2 = (target.global_position - _host.global_position).normalized()
 	if proj.has_method("setup"):
-		proj.setup(null, _current_damage, _host.global_position, dir)
+		proj.setup(data.projectile_data, _current_damage, _host.global_position, dir)
 	var container: Node = SceneFactory.get_projectile_layer()
 	if container == null:
 		container = _host.get_parent()

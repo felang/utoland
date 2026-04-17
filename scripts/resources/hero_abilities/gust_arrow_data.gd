@@ -7,3 +7,4 @@ extends Resource
 @export var slow_ratio: float = 0.4
 @export var slow_duration: float = 1.0
 @export var projectile_scene: PackedScene = null
+@export var projectile_data: ProjectileData = null

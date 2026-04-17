@@ -2,8 +2,8 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://ranger_portrait_placeholder"
-path="res://.godot/imported/portrait.png-938209fcf0cd7b831586ce741087176f.ctex"
+uid="uid://3ck1e85q1pd3"
+path="res://.godot/imported/portrait.png-668f501e4a341702fc1cc001d65c03ff.ctex"
 metadata={
 "vram_texture": false
 }
@@ -11,7 +11,7 @@ metadata={
 [deps]
 
 source_file="res://assets/characters/ranger/portrait.png"
-dest_files=["res://.godot/imported/portrait.png-938209fcf0cd7b831586ce741087176f.ctex"]
+dest_files=["res://.godot/imported/portrait.png-668f501e4a341702fc1cc001d65c03ff.ctex"]
 
 [params]
 

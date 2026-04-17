@@ -5,3 +5,4 @@ extends Resource
 @export var cooldown: float = 0.4
 @export var damage: float = 10.0
 @export var projectile_scene: PackedScene = null
+@export var projectile_data: ProjectileData = null
