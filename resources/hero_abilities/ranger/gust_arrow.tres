@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="GustArrowData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/hero_abilities/gust_arrow_data.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/entities/projectiles/arrow.tscn" id="2"]
+
+[resource]
+script = ExtResource("1")
+trigger_distance = 160.0
+damage = 25.0
+pierce_count = 3
+slow_ratio = 0.4
+slow_duration = 1.0
+projectile_scene = ExtResource("2")

@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="PerkData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/perk_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "mark_duration"
+display_name = "标记·延续"
+description = "猎杀标记持续时间 +2s/级"
+icon_path = ""
+effect_type = 7
+effect_value = 2.0
+max_level = 3
+category = 3

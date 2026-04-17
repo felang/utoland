@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="PerkData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/perk_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "gust_interval_down"
+display_name = "疾风·急促"
+description = "疾风箭触发间距 -20%/级"
+icon_path = ""
+effect_type = 7
+effect_value = 0.2
+max_level = 5
+category = 1

@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="PerkData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/perk_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "gust_pierce_plus"
+display_name = "疾风·贯穿"
+description = "疾风箭穿透 +1/级"
+icon_path = ""
+effect_type = 7
+effect_value = 1.0
+max_level = 3
+category = 1

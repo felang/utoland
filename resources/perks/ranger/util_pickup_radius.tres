@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="PerkData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/perk_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "util_pickup_radius"
+display_name = "寻觅"
+description = "拾取范围 +15%/级"
+icon_path = ""
+effect_type = 4
+effect_value = 0.15
+max_level = 5
+category = 4

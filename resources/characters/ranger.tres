@@ -1,0 +1,41 @@
+[gd_resource type="Resource" script_class="CharacterData" load_steps=25 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/character_data.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scripts/components/hero_abilities/ranger_auto_attack_component.tscn" id="2"]
+[ext_resource type="PackedScene" path="res://scripts/components/hero_abilities/gust_arrow_skill_component.tscn" id="3"]
+[ext_resource type="PackedScene" path="res://scripts/components/hero_abilities/arrow_rain_skill_component.tscn" id="4"]
+[ext_resource type="PackedScene" path="res://scripts/components/hero_abilities/hunt_mark_skill_component.tscn" id="5"]
+[ext_resource type="Resource" path="res://resources/exp/ranger_exp.tres" id="6"]
+[ext_resource type="Resource" path="res://resources/perks/ranger/gust_interval_down.tres" id="7"]
+[ext_resource type="Resource" path="res://resources/perks/ranger/gust_fanshot.tres" id="8"]
+[ext_resource type="Resource" path="res://resources/perks/ranger/gust_pierce_plus.tres" id="9"]
+[ext_resource type="Resource" path="res://resources/perks/ranger/gust_bounce.tres" id="10"]
+[ext_resource type="Resource" path="res://resources/perks/ranger/rain_radius.tres" id="11"]
+[ext_resource type="Resource" path="res://resources/perks/ranger/rain_dot_field.tres" id="12"]
+[ext_resource type="Resource" path="res://resources/perks/ranger/rain_knockback.tres" id="13"]
+[ext_resource type="Resource" path="res://resources/perks/ranger/rain_cooldown.tres" id="14"]
+[ext_resource type="Resource" path="res://resources/perks/ranger/mark_charge_speed.tres" id="15"]
+[ext_resource type="Resource" path="res://resources/perks/ranger/mark_duration.tres" id="16"]
+[ext_resource type="Resource" path="res://resources/perks/ranger/mark_chain.tres" id="17"]
+[ext_resource type="Resource" path="res://resources/perks/ranger/mark_self_damage.tres" id="18"]
+[ext_resource type="Resource" path="res://resources/perks/ranger/util_movespeed.tres" id="19"]
+[ext_resource type="Resource" path="res://resources/perks/ranger/util_move_shield.tres" id="20"]
+[ext_resource type="Resource" path="res://resources/perks/ranger/util_tower_heal.tres" id="21"]
+[ext_resource type="Resource" path="res://resources/perks/ranger/util_pickup_radius.tres" id="22"]
+[ext_resource type="Resource" path="res://resources/perks/ranger/util_dodge.tres" id="23"]
+[ext_resource type="Resource" path="res://resources/perks/ranger/util_coin_drop.tres" id="24"]
+
+[resource]
+script = ExtResource("1")
+id = "ranger"
+display_name = "游侠"
+description = "机动远程，走位即是怪的路线"
+max_hp = 500.0
+speed = 144.0
+starting_gold = 100
+sprite_frames_path = "res://assets/characters/ranger/sprite_frames.tres"
+portrait_path = "res://assets/characters/ranger/portrait.png"
+sprite_pixel_size = 16.0
+exp_config = ExtResource("6")
+perk_pool = [ExtResource("7"), ExtResource("8"), ExtResource("9"), ExtResource("10"), ExtResource("11"), ExtResource("12"), ExtResource("13"), ExtResource("14"), ExtResource("15"), ExtResource("16"), ExtResource("17"), ExtResource("18"), ExtResource("19"), ExtResource("20"), ExtResource("21"), ExtResource("22"), ExtResource("23"), ExtResource("24")]
+ability_scenes = [ExtResource("2"), ExtResource("3"), ExtResource("4"), ExtResource("5")]

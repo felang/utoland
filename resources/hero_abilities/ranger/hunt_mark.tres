@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="HuntMarkData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/hero_abilities/hunt_mark_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+charge_per_kill = 1.0
+charge_per_elite = 5.0
+charge_required = 35.0
+mark_duration = 8.0
+damage_multiplier = 2.0
+kill_refund_ratio = 0.5

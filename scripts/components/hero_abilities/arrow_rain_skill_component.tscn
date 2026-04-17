@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/components/hero_abilities/arrow_rain_skill_component.gd" id="1"]
+
+[node name="ArrowRainSkillComponent" type="Node"]
+script = ExtResource("1")

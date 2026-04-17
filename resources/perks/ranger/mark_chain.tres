@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="PerkData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/perk_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "mark_chain"
+display_name = "标记·连锁"
+description = "标记目标死亡后跳转下一个"
+icon_path = ""
+effect_type = 7
+effect_value = 0.0
+max_level = 1
+category = 3

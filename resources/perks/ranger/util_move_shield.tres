@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="PerkData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/resources/perk_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "util_move_shield"
+display_name = "飘逸"
+description = "持续移动累积护盾"
+icon_path = ""
+effect_type = 7
+effect_value = 0.0
+max_level = 2
+category = 4

@@ -79,11 +79,12 @@ func test_characters_loaded_count() -> void:
 	assert_true(GameConfig.characters.size() >= 0, "角色字典加载不应报错")
 
 func test_character_has_sprite_frames_path() -> void:
-	# 有角色时验证 sprite_frames_path
+	# 有角色时验证 sprite_frames_path（.res 二进制格式或 .tres 文本格式均可）
 	for character_id in GameConfig.characters:
 		var c: CharacterData = GameConfig.characters[character_id]
 		assert_ne(c.sprite_frames_path, "", "%s 应有 sprite_frames_path" % character_id)
-		assert_true(c.sprite_frames_path.ends_with(".res"), "%s 路径应为 .res 文件" % character_id)
+		var valid_ext: bool = c.sprite_frames_path.ends_with(".res") or c.sprite_frames_path.ends_with(".tres")
+		assert_true(valid_ext, "%s 路径应为 .res 或 .tres 文件" % character_id)
 
 
 # ===== 地图资源加载 =====
