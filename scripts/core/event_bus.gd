@@ -44,6 +44,9 @@ signal tower_moved(deploy_id: int, old_pos: Vector2i, new_pos: Vector2i)
 signal perk_offered(perks: Array)            # Array[PerkData]
 signal perk_selected(perk_id: String)
 signal perk_applied(perk_id: String)         # 应用完毕广播,UI 可刷新
+signal no_perk_available()                   # 所有 perk 已满级,无可抽取
+signal hunt_mark_applied(enemy: Node2D)      # 猎标施加到敌人
+signal hunt_mark_cleared(enemy: Node2D)      # 猎标从敌人移除
 
 # Roll 塔系统
 signal tower_rolled(candidates: Array)       # Array[String](3 个 tower_id)
