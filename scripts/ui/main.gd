@@ -29,6 +29,8 @@ func _ready() -> void:
 	_drag_manager.initialize(_entity_layer, _player)
 	if _map_layout:
 		_drag_manager.placeable_cells = _map_layout.get_placeable_dict()
+	if _map_layout:
+		$EnemySpawner.all_spawn_points = _map_layout.get_spawn_points_world()
 	# Battle 阶段:塔点击菜单始终启用
 	_drag_manager.set_shop_mode(true)
 
@@ -83,12 +85,15 @@ func _load_map() -> void:
 	add_child(map_instance)
 	move_child(map_instance, 0)
 
-	if map_data.generator_config != null:
+	if map_data.blueprint != null:
 		var generator := MapGenerator.new()
-		var layout := generator.generate(map_data.generator_config)
-		generator.apply_to_tilemap(map_instance, layout, map_data.generator_config)
+		var layout := generator.generate(map_data.blueprint)
 		_map_layout = layout
 		_player_spawn_pos = layout.get_player_spawn_world()
+		var renderer := MapRenderer.new()
+		renderer.render(layout, map_instance.get_node("Ground"))
+		renderer.create_colliders(layout, map_instance.get_node("Colliders"))
+		renderer.create_spawn_markers(layout, map_instance.get_node("SpawnMarkers"))
 	else:
 		_player_spawn_pos = Vector2.ZERO
 
